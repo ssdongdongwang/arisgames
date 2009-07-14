@@ -7,61 +7,31 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "model/AppModel.h";
-
 #import "LoginViewController.h";
-#import "GenericWebViewController.h";
+#import "ToolbarViewController.h";
+#import "GamePickerViewController.h";
+#import "model/AppModel.h";
 #import "MyCLController.h"
+#import "TODOViewController.h"
+#import "GenericWebViewController.h";
 
-#import "model/Game.h"
-#import "NearbyLocation.h"
-#import "NearbyBar.h"
-#import "Item.h"
-#import "ItemDetailsViewController.h"
-
-#import "QuestsViewController.h"
-#import "GPSViewController.h"
-#import "InventoryListViewController.h"
-#import "CameraViewController.h"
-#import "QRScannerViewController.h"
-#import "IMViewController.h"
-#import "GamePickerViewController.h"
-#import "LogoutViewController.h"
-#import "DeveloperViewController.h"
-#import "WaitingIndicatorViewController.h"
-
-@interface ARISAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate> {
-	AppModel *appModel;
-	UIWindow *window;
+@interface ARISAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate, MyCLControllerDelegate> {
+    UIWindow *window;
     UITabBarController *tabBarController;
-	NearbyBar *nearbyBar;
-	MyCLController *myCLController;
 	LoginViewController *loginViewController;
-	UINavigationController *loginViewNavigationController;
+	ToolbarViewController *toolbarViewController;
 	GamePickerViewController *gamePickerViewController;
-	UINavigationController *gamePickerNavigationController;
-	UINavigationController *nearbyObjectNavigationController;
-	WaitingIndicatorViewController *waitingIndicator;
-	UIAlertView *networkAlert;
+	GenericWebViewController *genericWebViewController;
+	AppModel *appModel;
+	UIWebView *webView;
+	MyCLController *myCLController;
 }
 
-@property (nonatomic, retain) AppModel *appModel;
-@property (nonatomic, retain) MyCLController *myCLController;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 @property (nonatomic, retain) IBOutlet LoginViewController *loginViewController;
-@property (nonatomic, retain) IBOutlet UINavigationController *loginViewNavigationController;
+@property (nonatomic, retain) IBOutlet ToolbarViewController *toolbarViewController;
 @property (nonatomic, retain) IBOutlet GamePickerViewController *gamePickerViewController;
-@property (nonatomic, retain) IBOutlet UINavigationController *gamePickerNavigationController;
-@property (nonatomic, retain) IBOutlet NearbyBar *nearbyBar;
-@property (nonatomic, retain) IBOutlet UINavigationController *nearbyObjectNavigationController;
-@property (nonatomic, retain) WaitingIndicatorViewController *waitingIndicator;
-@property (nonatomic, retain) UIAlertView *networkAlert;
-
-- (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController;
-- (void) showWaitingIndicator:(NSString *)message;
-- (void) removeWaitingIndicator;
-- (void) showNetworkAlert;
-- (void) removeNetworkAlert;
+@property (nonatomic, retain) IBOutlet GenericWebViewController *genericWebViewController;
 
 @end

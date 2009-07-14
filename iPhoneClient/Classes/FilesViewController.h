@@ -1,5 +1,5 @@
 //
-//  IMViewController.h
+//  FilesViewController.h
 //  ARIS
 //
 //  Created by Ben Longoria on 2/11/09.
@@ -9,10 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "model/AppModel.h";
 
-@interface IMViewController : UIViewController {
+@interface FilesViewController : UIViewController {
 	NSString *moduleName;
 	UIWebView *webview;
-	AppModel *appModel;
+	AppModel *appModel;	
 }
 
 -(void) setModel:(AppModel *)model;

@@ -7,24 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
 
-@interface NearbyLocation : NSObject <NearbyObjectProtocol> {
-	NSString *name;
-	nearbyObjectKind kind;
-	BOOL forcedDisplay;
-	
+
+@interface NearbyLocation : NSObject {
 	int locationId;
+	NSString *label;
+	NSString *type;
 	NSString *iconURL;
 	NSString *URL;
 }
 
-
-@property(copy, readwrite) NSString *name;
-@property(readwrite, assign) nearbyObjectKind kind;
-@property(readwrite, assign) BOOL forcedDisplay;
-
 @property(readwrite, assign) int locationId;
+@property(copy, readwrite) NSString *label;
+@property(copy, readwrite) NSString *type;
 @property(copy, readwrite) NSString *iconURL;
 @property(copy, readwrite) NSString *URL;
 

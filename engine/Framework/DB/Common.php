@@ -88,7 +88,7 @@ abstract class Framework_DB_Common extends Framework_Object
      * Returns a string with all _P_s replaced by the table prefix.
      */
     public function prefix($sql) {
-    	return str_replace('_P_', Framework::$site->name . '_', $sql);
+    	return str_replace('_P_', Framework::$site->config->aris->tablePrefix, $sql);
     }
 }
 

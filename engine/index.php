@@ -39,13 +39,13 @@ try {
     // instance, www.foo.com and foo.com load up Framework_Site_Foo, while
     // www.bar.com, www.baz.com, baz.com, and bar.com load up Bar
     // (Framework_Site_Bar).
-    $site = isset($_REQUEST['site']) ? $_REQUEST['site'] : "Default";
+    $site = isset($_GET['site']) ? $_GET['site'] : "Default";
     
     // The second argument is the controller. Not all modules will support all
     // controllers. If that's the case an appropriate error will be output. We
     // default to using the web controller.
-    $controller = isset($_REQUEST['controller']) ? $_REQUEST['controller'] : 'Web';
-	
+    $controller = isset($_GET['controller']) ? $_GET['controller'] : 'Web';
+    
     Framework::start($site, $controller);
 
     // Run shutdown functions and stop the Framework
@@ -57,7 +57,7 @@ catch (Framework_Exception $error) {
     case FRAMEWORK_ERROR_AUTH:
         
 		//Check for a cookie
-		if (isset($_COOKIE["ARISUserField"]) && !isset($_REQUEST["user_name"])) {	
+		if (isset($_COOKIE["ARISUserField"])) {	
 			//log them in and redirect
 			$session = Framework_Session::singleton();
 			$userField = Framework::$site->config->user->userField;
@@ -72,14 +72,10 @@ catch (Framework_Exception $error) {
 			die;
 		}
 		
-		if(!isset($_REQUEST["user_name"])) {
-			// Redirect to your login page here?
-        	$pg = urlencode($_SERVER['REQUEST_URI']);
-        	header("Location: index.php?module=Welcome&controller=Web&site=$site&event=error");
-		} else {
-			header("Location: {$_SERVER['PHP_SELF']}?module=RESTError&controller=Web&event=loginError&site=" . Framework::$site->name);
-		}
-		
+			
+		// Redirect to your login page here?
+        $pg = urlencode($_SERVER['REQUEST_URI']);
+        header("Location: index.php?module=Welcome&controller=Web&site=$site&event=error");
         break;
     default:
         // If a PEAR error is returned usually something catastrophic

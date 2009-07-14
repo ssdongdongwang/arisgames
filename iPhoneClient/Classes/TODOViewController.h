@@ -1,5 +1,5 @@
 //
-//  IMViewController.h
+//  TODOViewController.h
 //  ARIS
 //
 //  Created by Ben Longoria on 2/11/09.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "model/AppModel.h";
 
-@interface IMViewController : UIViewController {
+@interface TODOViewController : UIViewController {
 	NSString *moduleName;
 	UIWebView *webview;
 	AppModel *appModel;
@@ -19,6 +19,5 @@
 
 @property(copy, readwrite) NSString *moduleName;
 @property (nonatomic, retain) IBOutlet UIWebView *webview;
-
 
 @end

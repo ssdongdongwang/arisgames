@@ -50,10 +50,7 @@ class Framework_Module_Map extends Framework_Auth_User
 		}
 		
 		// Set up a player marker
-		if (!$user->latitude or !$user->longitude) {
-			$user->latitude = 1;
-			$user->longitude = 1;
-		}
+
 			$playerIcon = $site->getUriPath() . '/templates/' . $site->config->aris->map->defaultPlayerIcon;
 			$pointsString  .= "	// Create our player marker icon
 								var playerIcon = new GIcon(G_DEFAULT_ICON);

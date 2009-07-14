@@ -50,8 +50,6 @@
 					<int key="IBUIBarStyle">1</int>
 					<bool key="IBUIPrompted">NO</bool>
 				</object>
-				<bool key="IBUIShowsHorizontalScrollIndicator">NO</bool>
-				<int key="IBUIIndicatorStyle">2</int>
 				<bool key="IBUIBouncesZoom">NO</bool>
 				<int key="IBUISeparatorStyle">1</int>
 				<int key="IBUISectionIndexMinimumDisplayRowCount">0</int>
@@ -123,7 +121,7 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>GamePickerViewController</string>
 					<string>UIResponder</string>
-					<string>{{472, 664}, {320, 480}}</string>
+					<string>{{576, 325}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				</object>
 			</object>

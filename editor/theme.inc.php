@@ -27,7 +27,6 @@
 		<a href = 'games.php'>Game Home</a>
 		<a href = 'index.php'>Select a Different Game</a>
 		<a href = 'locations.php'>Locations</a>
-		<a href = 'qrcodes.php'>QR Codes</a>
 		<a href = 'nodes.php'>Nodes</a>
 		<a href = 'npcs.php'>NPCs</a>
 		<a href = 'items.php'>Items</a>

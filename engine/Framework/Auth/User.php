@@ -1,7 +1,5 @@
 <?php
 
-include_once "Framework/Module/RESTLoginLib.php";
-
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
@@ -36,16 +34,7 @@ abstract class Framework_Auth_User extends Framework_Auth
      */
     public function authenticate()
     {
-    	$session = Framework_Session::singleton();
-    	
-    	//if REST, then check that too
-    	if(isset($_REQUEST["user_name"])) {
-    		$user = loginUser();
-    		if($user) {
-    			return true;
-    		}
-    	}
-    	
+    	$session = Framework_Session::singleton();    	
     	if (is_array($session->authorization)) return true;
 
     	throw new Framework_Exception('User must be logged in for this request', 				

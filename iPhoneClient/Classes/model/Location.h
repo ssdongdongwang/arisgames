@@ -12,17 +12,13 @@
 @interface Location : NSObject {
 	int locationId;
 	NSString *name;
-	double latitude;
-	double longitude;
-	bool hidden;
-	int qty;
+	NSString *latitude;
+	NSString *longitude;
 }
 
 @property(readwrite, assign) int locationId;
 @property(copy, readwrite) NSString *name;
-@property(readwrite) double latitude;
-@property(readwrite) double longitude;
-@property(readwrite) bool hidden;
-@property(readwrite) int qty;
+@property(copy, readwrite) NSString *latitude;
+@property(copy, readwrite) NSString *longitude;
 
 @end
