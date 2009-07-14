@@ -22,7 +22,6 @@ static int DEFAULT_ZOOM = 16;
 
 @synthesize mapView;
 @synthesize moduleName;
-@synthesize autoCenter;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -34,8 +33,6 @@ static int DEFAULT_ZOOM = 16;
 		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
 																							   target:self action:@selector(refresh:)] autorelease];
 	}
-	
-	autoCenter = YES;
     return self;
 }
 		
@@ -94,6 +91,9 @@ static int DEFAULT_ZOOM = 16;
 	playerMarker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-player"]];
 	[markerManager addMarker:playerMarker AtLatLong:playerPosition];
 	
+	//Zoom and Center
+	[self zoomAndCenterMap];
+	
 	NSLog(@"GPS View Loaded");
 }
 
@@ -122,8 +122,8 @@ static int DEFAULT_ZOOM = 16;
 	[self refreshPlayerMarker];
 		
 	//Ask for the Locations to be loaded into the model, which will trigger a notification to refreshMarkers here
-	//[NSThread detachNewThreadSelector: @selector(fetchLocationList) toTarget:appModel withObject: nil];	
-	[appModel fetchLocationList];
+	[NSThread detachNewThreadSelector: @selector(fetchLocationList) toTarget:appModel withObject: nil];	
+	//[appModel fetchLocationList];
 
 }
 
@@ -145,9 +145,8 @@ static int DEFAULT_ZOOM = 16;
 		[playerMarker replaceImage:[RMMarker loadPNGFromBundle:@"marker-player"] anchorPoint:CGPointMake(.5, .6)];
 	else [playerMarker replaceImage:[RMMarker loadPNGFromBundle:@"marker-player-lqgps"] anchorPoint:CGPointMake(.5, .6)];
 
-	//Center the first time
-	if (autoCenter == YES) [self zoomAndCenterMap];
-	autoCenter = NO;
+	
+	//[[mapView contents] moveToLatLong:appModel.lastLocation.coordinate];
 }
 
 - (void)refreshMarkers {
@@ -183,7 +182,7 @@ static int DEFAULT_ZOOM = 16;
 		locationLatLong.latitude = player.latitude;
 		locationLatLong.longitude = player.longitude;
 		
-		RMMarker *marker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-other-player"]];
+		RMMarker *marker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-player"]];
 		[marker setTextLabel:player.name];
 		[markerManager addMarker:marker AtLatLong:locationLatLong];
 		[marker release];

@@ -20,17 +20,15 @@
 	RMMapView *mapView;
 	RMMarker *playerMarker;
 	RMMarkerManager *markerManager;
-	BOOL autoCenter;
 }
 
 -(void) setModel:(AppModel *)model;
 -(void) refreshMap;
--(void) zoomAndCenterMap;
 -(void) refreshPlayerMarker;
 
 
 @property(copy, readwrite) NSString *moduleName;
 @property (nonatomic, retain) RMMapView *mapView;
-@property BOOL autoCenter;
+
 
 @end
