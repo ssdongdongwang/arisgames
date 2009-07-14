@@ -52,7 +52,7 @@ class Framework_User extends Framework_Object_DB
             }
         }
 
-        $sql = sprintf("SELECT * FROM %s WHERE UPPER(%s) LIKE UPPER('%d')",
+        $sql = sprintf("SELECT * FROM %s WHERE %s='%d'",
         	Framework::$site->config->user->userTable,
         	Framework::$site->config->user->userField, $userID);
 

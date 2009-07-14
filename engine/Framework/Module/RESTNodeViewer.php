@@ -4,7 +4,7 @@ include_once "RESTLoginLib.php";
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
-require_once('RESTNodeManager.php');
+require_once('NodeManager.php');
 
 /**
  * Framework_Module_Main
@@ -38,8 +38,6 @@ class Framework_Module_RESTNodeViewer extends Framework_Auth_User
     	
     	$user = loginUser();
     	
-		//echo 'Viewer: Default Running';
-		
     	if(!$user) {
     		header("Location: {$_SERVER['PHP_SELF']}?module=RESTError&controller=Web&event=loginError&site=" . Framework::$site->name);
     		die;
@@ -97,7 +95,7 @@ class Framework_Module_RESTNodeViewer extends Framework_Auth_User
     	$photo = $this->findMedia($user['photo'], 'defaultUser.png');
     	$site = Framework::$site->name;
     	
-		RESTNodeManager::loadNodeConversations($_REQUEST['npc_id']);
+		NodeManager::loadNodeConversations($_REQUEST['npc_id']);
 		$this->setVariables();
 		$this->time = date('g:i a');
 				
@@ -131,7 +129,7 @@ SCRIPT;
     	$session = Framework_Session::singleton();
 		//$user = $this->restUser;
 		
-		RESTNodeManager::loadNodeConversations($_REQUEST['npc_id']);
+		NodeManager::loadNodeConversations($_REQUEST['npc_id']);
 		$this->setVariables();
 		$this->username = $user['user_name'];
 		$this->password = $user['password'];
@@ -142,7 +140,7 @@ SCRIPT;
      */
     public function faceTalk() {
 		$user = loginUser();
-    			
+    	
     	if(!$user) {
     		header("Location: {$_SERVER['PHP_SELF']}?module=RESTError&controller=Web&event=loginError&site=" . Framework::$site->name);
     		die;
@@ -157,22 +155,14 @@ SCRIPT;
     	}
     	
 		$this->chromeless = true;
+		//$user = $this->restUser;
     	$session = Framework_Session::singleton();
     	$this->messages = array();
 		
-		//echo 'Viewer: A request to load node ' . $_REQUEST['node_id'] . '<br/>';
-		
-		if (!isSet($_REQUEST['npc_id']) or $_REQUEST['npc_id'] < 1) $_REQUEST['npc_id'] = 0;
-		RESTNodeManager::loadNode($_REQUEST['node_id'], $_REQUEST['npc_id']);
-		
-		//echo '<p>Viewer: Back from request to load node ' . $_REQUEST['node_id'] . '</p>';
+		NodeManager::loadNode($_REQUEST['node_id'], $_REQUEST['npc_id']);
 		
 		$this->setVariables();
 		$npc = $this->npc;
-		
-		//echo '<p>Viewer: NPC Info </p>';
-		//var_dump($npc);
-		
 		$this->username = $user['user_name'];
 		$this->password = $user['password'];
 		
@@ -184,18 +174,13 @@ SCRIPT;
     }
     
     protected function setVariables() {
-    	$this->conversations = RESTNodeManager::$conversations;
+    	$this->conversations = NodeManager::$conversations;
     	// TODO: Is this needed?
 		$this->wwwBase = FRAMEWORK_WWW_BASE_PATH;
 		
-    	$this->node = RESTNodeManager::$node;
-    	
-		$npc = RESTNodeManager::$npc;
-    	
-		//echo '<p>Viewer: setVariables just ran RESTNodeManager::$npc. Here is the result</p>';
-		//var_dump($npc);
-		
-		if ($npc['npc_id'] > 0) $this->title = 'Chat with ' . $npc['name'];
+    	$this->node = NodeManager::$node;
+    	$npc = NodeManager::$npc;
+    	if ($npc['npc_id'] > 0) $this->title = 'Chat with ' . $npc['name'];
     	else $this->title = $this->node['title'];
 
 		if (!empty($npc['media'])) {

@@ -12,7 +12,6 @@
 
 @synthesize gameId;
 @synthesize name;
-@synthesize site;
 
 - (void)dealloc {
 	[name release];

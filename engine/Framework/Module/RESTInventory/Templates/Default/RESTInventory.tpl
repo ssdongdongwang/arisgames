@@ -1,5 +1,23 @@
-<playerInventory>
+<table class="inventoryList">
+{if count($inventory) > 0}
 {foreach from=$inventory item=item}
-	<item id="{$item.item_id}" name="{$item.name}" type="{$item.type}" description="{$item.description}" iconURL="{$item.icon}" mediaURL="{$item.mediaURL}" />
+	<tr>
+		<td><img src="{$item.icon}" width = "50px"></td>
+		<td>
+			<table>
+				<tr><td>
+					{if $item.isImage}
+						{link text=$item.name module=RESTInventory event="displayItem&item_id=`$item.item_id`"}
+					{else}
+						<a href = "{$item.link}" target="_self">{$item.name}</a>
+					{/if}
+				</td></tr>
+				<tr><td>{$item.description}</td></tr>
+			</table>
+		</td>
+	</tr>
 {/foreach}
-</playerInventory>
+{else}
+	<tr><td></td><td>No Items</td></tr>
+{/if}
+</table>

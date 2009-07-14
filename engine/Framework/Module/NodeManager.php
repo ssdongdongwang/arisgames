@@ -56,13 +56,9 @@ class NodeManager
     	self::$node = $row;
     	if (self::$node['require_item_id'] > 0) {
 	    	self::checkRequiredItem($userID, self::$node['require_item_id'],
-									self::$node['required_condition_not_met_node_id'], $npcID);
-		}
-		
-		if (self::$node['require_event_id'] > 0) {
-	    	self::checkRequiredEvent($userID, self::$node['require_event_id'],
-									 self::$node['required_condition_not_met_node_id'], $npcID);
-		}
+	    		self::$node['required_condition_not_met_node_id']);
+	    }
+
     	if (self::$node['add_item_id']) {
     		self::addItem($userID, self::$node['add_item_id']);
     	}
@@ -75,9 +71,7 @@ class NodeManager
 			Framework_Module::addEvent($userID, self::$node['add_event_id']);
     	}
 
-		if (self::$node['remove_event_id']) {
-			Framework_Module::removePlayerEvent($userID, self::$node['remove_event_id']);
-    	}
+       	// TODO: Check for a remove event_id
 
 		// NOTE: calling methods should check for 'require_answer_string' 
 		// to handle input
@@ -87,7 +81,7 @@ class NodeManager
     			|| (!empty(self::$node['opt3_text']) && !empty(self::$node['opt3_node_id'])))
     		{ self::loadOptions($npcID); }
     		
-    		if ($npcID > 0 && is_null(self::$conversations)) {
+    		if ($npcID >= 0 && is_null(self::$conversations)) {
     			self::loadNodeConversations($npcID);
     		}
     	}
@@ -127,7 +121,7 @@ class NodeManager
     /**
      * Checks if the player owns this item.
      */
-    static protected function checkRequiredItem($userID, $itemID, $notFoundNodeID, $npcID) {
+    static protected function checkRequiredItem($userID, $itemID, $notFoundNodeID) {
 		$sql = Framework::$db->prefix("SELECT * FROM _P_player_items 
 			WHERE player_id = '$userID' 
 				AND item_id = '$itemID'");
@@ -135,31 +129,9 @@ class NodeManager
 		
 		if (!$row) {
 			// Item not found, load the required_item_not_found_node_id
-			self::loadNode($notFoundNodeID, $npcID);
+			self::loadNode($notFoundNodeID);
 		}
     }
-	
-	/**
-     * Checks if the player has this event.
-     */
-    static protected function checkRequiredEvent($userID, $eventID, $notFoundNodeID, $npcID) {
-		//echo '<p>Manager: begin req event test<br/>';
-		
-		$sql = Framework::$db->prefix("SELECT * FROM _P_player_events 
-									  WHERE player_id = '$userID' 
-									  AND event_id = '$eventID'");
-		
-		//echo '<p>Manager: ' . $sql. '</p>';
-		
-		$row = Framework::$db->getRow($sql);
-		
-		if (!$row) {
-			//echo 'Manager: req item test failed, load node:' . $notFoundNodeID . '<br/>';
-			// Item not found, load the required_item_not_found_node_id
-			self::loadNode($notFoundNodeID, $npcID);
-		}
-    }
-	
     
     /**
      * Adds the specified item to the specified player.

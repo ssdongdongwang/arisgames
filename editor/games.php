@@ -23,31 +23,31 @@
 	</div>";
 	
 	
-	echo "<h3>Triggers</h3>
+	echo "<h3>Basic Options</h3>
 			<table class = 'gametasks' width = '600px'>
 			<tr>
 				<td width = '50px'><a href = 'locations.php'><img src = 'images/location_icon.png'/></a></td><td width = '250px'><a href = 'locations.php'>Locations</a></td>
-				<td width = '50px'><a href = 'qrcodes.php'><img src = 'images/qrcode_icon.png'/></a></td><td width = '250px'><a href = 'qrcodes.php'>QR Codes</a></td>
+				<td width = '50px'><a href = 'nodes.php'><img src = 'images/nodes.png'/></a></td><td width = '250px'><a href = 'nodes.php'>Nodes</a></td>
 			</tr>
 			<tr>
-				<td><a href = 'events.php'><img src = 'images/events.png'/></a></td><td><a href = 'events.php'>Events</a></td>
-				<td>&nbsp;</td><td>&nbsp;</td>
+				<td width = '50px'><a href = 'qrcodes.php'><img src = 'images/qrcode_icon.png'/></a></td><td width = '250px'><a href = 'qrcodes.php'>QR Codes</a></td>
+				<td><a href = '{$engine_www_path}' target='_blank'><img src = 'images/play.png'/></a></td><td><a href = '{$engine_www_path}' target='_blank'>Playtest your game<br/>Login: {$_SESSION['current_game_short_name']}<br/>Pass: {$_SESSION['current_game_short_name']}</a></td>
 			</tr>
 			
 			</table>
 	
-			<h3>Content</h3>
+			<h3>Intermediate Options</h3>
 			<table class = 'gametasks' width = '600px'>
 			<tr>
-				<td width = '50px'><a href = 'nodes.php'><img src = 'images/nodes.png'/></a></td><td width = '250px'><a href = 'nodes.php'>Nodes</a></td>
-				<td width = '50px'><a href = 'items.php'><img src = 'images/item_icon.png'/></a></td><td width = '250px'><a href = 'items.php'>Items</a></td>
-			</tr>
-			<tr>
 				<td width = '50px'><a href = 'npcs.php'><img src = 'images/npcs.png'/></a></td><td width = '250px'><a href = 'npcs.php'>NPCs</a></td>
-				<td width = '50px'><a href = 'conversations.php'><img src = 'images/conversation_icon.png'/></a></td><td width = '250px'><a href = 'conversations.php'>NPC Conversations</a></td>				
+				<td width = '50px'><a href = 'conversations.php'><img src = 'images/conversation_icon.png'/></a></td><td width = '250px'><a href = 'conversations.php'>NPC Conversations</a></td>
 			</tr>
 			<tr>
 				<td><a href = 'quests.php'><img src = 'images/quests.png'/></a></td><td><a href = 'quests.php'>Quests</a></td>
+				<td><a href = 'items.php'><img src = 'images/item_icon.png'/></a></td><td><a href = 'items.php'>Items</a></td>
+			</tr>
+			<tr>
+				<td><a href = 'events.php'><img src = 'images/events.png'/></a></td><td><a href = 'events.php'>Events</a></td>
 				<td>&nbsp;</td><td>&nbsp;</td>
 			</tr>
 			</table>
@@ -55,17 +55,15 @@
 			<h3>Advanced Options</h3>
 			<table class = 'gametasks' width = '600px'>
 			<tr>
-				<td width = '50px'><a href = 'db_upgrades.php'><img src = 'images/gears.png'/></a></td><td  width = '250px'><a href = 'db_upgrades.php'>DB Upgrades</a></td>
-				<td>&nbsp;</td><td>&nbsp;</td>
-				<!--<td width = '50px'><a href = 'applications.php'><img src = 'images/applications.png'/></a></td><td width = '250px'><a href = 'applications.php'>Applications</a></td>-->
-				
+				<td width = '50px'><a href = 'applications.php'><img src = 'images/applications.png'/></a></td><td width = '250px'><a href = 'applications.php'>Applications</a></td>
+				<td width = '50px'><a href = 'db_upgrades.php'><img src = 'images/gears.png'/></a></td><td width = '250px'><a href = 'db_upgrades.php'>DB Upgrades</a></td>
 			</tr>
 			<tr>
-				<!--<td><a href = 'game_players.php'><img src = 'images/players.png'/></a></td><td><a href = 'game_players.php'>Registered Players</a></td>-->
-				<!--<td><a href = 'games_edit_xml.php'><img src = 'images/gears.png'/></a></td><td><a href = 'games_edit_xml.php'>Edit XML Config</a></td>-->
+				<td><a href = 'game_players.php'><img src = 'images/players.png'/></a></td><td><a href = 'game_players.php'>Registered Players</a></td>
+				<td><a href = 'games_edit_xml.php'><img src = 'images/gears.png'/></a></td><td><a href = 'games_edit_xml.php'>Edit XML Config</a></td>
 			</tr>
 			<tr>
-				<!--<td><a href = 'games_edit_page.php'><img src = 'images/gears.png'/></a></td><td><a href = 'games_edit_page.php'>Edit Visual Template</a></td>-->
+				<td><a href = 'games_edit_page.php'><img src = 'images/gears.png'/></a></td><td><a href = 'games_edit_page.php'>Edit Visual Template</a></td>
 			</tr>
 			</table>";
 	

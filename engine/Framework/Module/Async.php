@@ -29,7 +29,7 @@ define('TYPE_JS', 'JS');
  */
 class Framework_Module_Async extends Framework_Auth_User
 {
-	public $controllers = array('JSON', 'Web', 'SimpleREST');
+	public $controllers = array('JSON', 'Web');
 
 	protected $events;
 	protected $items;
@@ -95,8 +95,7 @@ class Framework_Module_Async extends Framework_Auth_User
 				WHERE latitude < ({$_REQUEST['latitude']} + error) 
 					AND latitude > ({$_REQUEST['latitude']} - error)
 					AND longitude < ({$_REQUEST['longitude']} + error)
-					AND longitude > ({$_REQUEST['longitude']} - error)
-					AND (item_qty IS NULL OR item_qty > 0"); 
+					AND longitude > ({$_REQUEST['longitude']} - error)"); 
 			$locations = $this->db->getAll($sql);
 			
 			$sql = $this->db->prefix("SELECT event_id FROM _P_player_events WHERE player_id = 

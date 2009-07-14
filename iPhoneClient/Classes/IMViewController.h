@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "model/AppModel.h";
 
-@interface IMViewController : UIViewController <UIWebViewDelegate> {
+@interface IMViewController : UIViewController {
 	NSString *moduleName;
 	UIWebView *webview;
 	AppModel *appModel;

@@ -173,8 +173,6 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 		name varchar(100) default NULL,
 		description text,
 		media varchar(50) NOT NULL default 'item_default.jpg',
-		type enum('AV','Image') NOT NULL default 'Image',
-		event_id_when_viewed int(10) unsigned NULL,
 		PRIMARY KEY  (item_id)
 		) ";
 	mysql_query($query);
@@ -190,12 +188,10 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 		error double default '0.0005',												
 		type enum('Node','Event','Item','Npc') default NULL,
 		type_id int(11) default NULL,
-		item_qty int(11) default NULL,
 		require_event_id int(10) unsigned default NULL,
 		remove_if_event_id int(10) unsigned default NULL,
 		add_event_id int(10) unsigned default NULL,
 		hidden enum('0','1') default '0',
-		force_view enum('0','1') NOT NULL DEFAULT '0' COMMENT 'Forces this Location to Display when nearby',
 		PRIMARY KEY  (location_id),
 		KEY require_event_id (require_event_id)
 		)";

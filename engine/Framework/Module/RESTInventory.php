@@ -39,7 +39,7 @@
 		 */
 		public function __default() {
 			$user = loginUser();
-			
+    	
 			if(!$user) {
 				header("Location: {$_SERVER['PHP_SELF']}?module=RESTError&controller=Web&event=loginError&site=" . Framework::$site->name);
 				die;
@@ -48,7 +48,6 @@
 			$site = Framework::$site;
 			
 			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
 			$this->loadInventory($user["player_id"]);
 		}
 		
@@ -66,8 +65,39 @@
 			foreach ($inventory as &$item) {
 				//Use defaults if specified media cannot be found
 				$media = empty($item['media']) ? DEFAULT_IMAGE : $item['media'];
-				$item['mediaURL'] = 'http://' . $_SERVER['SERVER_NAME'] . $this->findMedia($media, DEFAULT_IMAGE);
-				$item['icon'] = 'http://' . $_SERVER['SERVER_NAME'] . $this->findMedia(Framework::$site->config->aris->inventory->imageIcon, NULL);
+				$item['media'] = $this->findMedia($media, DEFAULT_IMAGE);
+				
+				//Support multiple media types by changing the link and the icon
+				$extension = substr(strrchr($item['media'], "."), 1);
+				
+				//Is it an image?
+				if (array_search($extension,array("png", "jpg", "gif")) !== FALSE) {
+					$item['isImage'] = TRUE;
+					$item['icon'] = $this->findMedia(Framework::$site->config->aris->inventory->imageIcon, NULL);
+
+				}
+			
+				//Is it a movie?
+				if (array_search($extension,array("mp4", "mov", "m4v", "3gp")) !== FALSE) {
+					$item['isImage'] = FALSE;
+					$item['icon'] = $this->findMedia(Framework::$site->config->aris->inventory->videoIcon, NULL);
+					$item['link'] = 'http://' . $_SERVER["SERVER_NAME"] . $item['media'];
+				}
+				
+				//Is it audio?
+				if (array_search($extension,array("mp3", "m4a")) !== FALSE) {
+					$item['isImage'] = FALSE;
+					$item['icon'] = $this->findMedia(Framework::$site->config->aris->inventory->audioIcon, NULL);
+					$item['link'] = 'http://' . $_SERVER["SERVER_NAME"] . $item['media'];
+				}
+				
+				//Is it a PDF?
+				if (array_search($extension,array("pdf")) !== FALSE) {
+					$item['isImage'] = FALSE;
+					$item['icon'] = $this->findMedia(Framework::$site->config->aris->inventory->pdfIcon, NULL);
+					$item['link'] = 'http://' . $_SERVER["SERVER_NAME"] . $item['media'];
+				}
+				
 			}
 			unset($item);
 			
@@ -105,13 +135,11 @@
 			}
 			
 			if (isset($_REQUEST['event_id']) && $_REQUEST['event_id'] > 0) {
-				$this->addEvent($this->user->player_id, $_REQUEST['event_id']);
+				$this->addEvent($_SESSION['player_id'], $_REQUEST['event_id']);
 			}
 			
 			$item = NodeManager::addItem($_SESSION['player_id'], 
 				$_REQUEST['item_id']);
-			
-			if (isset($_REQUEST['location_id'])) $this->decrementItemQtyAtLocation($_REQUEST['location_id'], 1);
 
 			$this->tplFile = "RESTInventory_displayItem.tpl";
 			$this->title = $item['name'];
@@ -121,51 +149,5 @@
 			//Check if an image was specified and can be found, if not, load the default
 			$this->media = $this->findMedia($this->item['media'], DEFAULT_IMAGE);
 		}
-		
-		public function dropItemHere(){
-			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
-			
-			if (empty($_REQUEST['item_id'])) {
-				$this->title = "Error";
-				$this->message = "No item selected.";
-				return;
-			}
-			
-			//Place this item in the world inventory
-			$this->giveItemToWorld($_REQUEST['item_id'], $this->user->latitude, $this->user->longitude);
-			
-			//Remove from the player's inventory
-			$this->takeItemFromPlayer($_REQUEST['item_id'], $this->user->player_id);
-
-		}
-		
-		public function destroyPlayerItem(){
-			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
-			
-			if (empty($_REQUEST['item_id'])) {
-				$this->title = "Error";
-				$this->message = "No item selected.";
-				return;
-			}
-			
-			//Remove from the player's inventory
-			$this->takeItemFromPlayer($_REQUEST['item_id'], $this->user->player_id);
-
-		}		
-		
-		public function pickupItem() {
-			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
-			
-			$item = NodeManager::addItem($_SESSION['player_id'], 
-										 $_REQUEST['item_id']);
-			
-			if (isset($_REQUEST['location_id'])) $this->decrementItemQtyAtLocation($_REQUEST['location_id'], 1);
-		}		
-		
-		
-		
 	}
-?>
+	?>
