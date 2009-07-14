@@ -285,16 +285,6 @@
 								   'sort'     => true 
 	);	
 	
-	
-	$opts['fdd']['force_view'] = array(
-								   'name'     => 'Automatically display this location when nearby',
-								   'select'   => 'C', 
-								   'maxlen'   => 1, 
-								   'values2'  => array("No","Yes"), 
-								   'sort'     => true 
-	);	
-	
-	
 	$opts['fdd']['type'] = array(
 								 'name'     => 'What is at this location?',
 								 'select'   => 'T',
@@ -313,15 +303,6 @@
 									'sort'     => true,
 									'help'		=> 'If this is not set, the location (or any others in range) will not tripper properly. '
 	);
-	
-	$opts['fdd']['item_qty'] = array(
-									'name'     => 'If item, QTY of the item placed here',
-									'select'   => 'T',
-									'maxlen'   => 11,
-									'sort'     => true,
-									 'sqlw'		=>'IF($val_qas = "", NULL, $val_qas)',	 
-									'help'		=> 'Leave blank for an unlimited number of items here'
-									);
 
 	$opts['fdd']['require_event_id'] = array(
 											 'default'    => '',

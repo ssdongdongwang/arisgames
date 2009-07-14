@@ -37,42 +37,16 @@ class Framework_Module_RESTSelectGame extends Framework_Auth_No
     	
 		error_log("user id: " . $user['player_id']);
 		//Determine Games Available to this user		
-		
-		/*
 		$sql = sprintf("SELECT * FROM games
 					   LEFT JOIN game_players
 					   ON games.game_id = game_players.game_id
 					   WHERE game_players.player_id = '%s'", 
 					   $user['player_id']);
-		*/
-		$sql = sprintf("SELECT * FROM games");
 		$available_games = Framework::$db->getAll($sql);
-		
-		//Groom the prefix to become the site name
-		foreach ($available_games as $gameItem=> &$game) {
-			$game['prefix'] = substr($game['prefix'], 0, strlen($game['prefix'])-1);
-		}
 		
 		$this->available_games = $available_games;
 				
     }
-	
-	public function setGame(){
-		$this->pageTemplateFile = 'empty.tpl';
-    	
-    	$user = loginUser();
-    	
-    	//$session = Framework_Session::singleton();
-		
-		$player_id = $user['player_id'];
-		$site = Framework::$site->name;
-		
-		$sql = $this->db->prefix("UPDATE players
-								 SET site = '$site'
-								 WHERE player_id = '$player_id'");
-		$this->db->exec($sql);
-	}
-	
 	/*
 	public function loadGame()
 	{

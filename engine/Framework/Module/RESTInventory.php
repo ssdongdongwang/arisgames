@@ -110,8 +110,6 @@
 			
 			$item = NodeManager::addItem($_SESSION['player_id'], 
 				$_REQUEST['item_id']);
-			
-			if (isset($_REQUEST['location_id'])) $this->decrementItemQtyAtLocation($_REQUEST['location_id'], 1);
 
 			$this->tplFile = "RESTInventory_displayItem.tpl";
 			$this->title = $item['name'];
@@ -155,17 +153,5 @@
 
 		}		
 		
-		public function pickupItem() {
-			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
-			
-			$item = NodeManager::addItem($_SESSION['player_id'], 
-										 $_REQUEST['item_id']);
-			
-			if (isset($_REQUEST['location_id'])) $this->decrementItemQtyAtLocation($_REQUEST['location_id'], 1);
-		}		
-		
-		
-		
 	}
-?>
+	?>

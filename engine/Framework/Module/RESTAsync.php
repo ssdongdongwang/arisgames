@@ -65,8 +65,8 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
     		Framework::$site->config->aris->async->notification;
     }
     
-	protected function makeLink($type, $force_view, $url, $label, $icon = null) {
-		$item = array('type' => $type, 'force_view' => $force_view, 'url' => $url, 'label' => $label);
+	protected function makeLink($type, $url, $label, $icon = null) {
+		$item = array('type' => $type, 'url' => $url, 'label' => $label);
 		$item['icon'] = (is_null($icon)) ? $this->findMedia("async{$type}.png",
 			'defaultAsync.png') : $icon;
 		return $item;
@@ -91,10 +91,7 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
 				WHERE latitude < ({$_REQUEST['latitude']} + error) 
 					AND latitude > ({$_REQUEST['latitude']} - error)
 					AND longitude < ({$_REQUEST['longitude']} + error)
-					AND longitude > ({$_REQUEST['longitude']} - error)
-					AND (item_qty is null OR item_qty > 0 OR type != 'Item')
-					ORDER BY location_id"); 
-
+					AND longitude > ({$_REQUEST['longitude']} - error)"); 
 			$locations = $this->db->getAll($sql);
 			
 			$sql = $this->db->prefix("SELECT event_id FROM _P_player_events WHERE player_id = 
@@ -127,14 +124,12 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
 		}
 		
 		//Check if an event should be added
-		/*
 		if (array_key_exists($location['add_event_id'], $location)
 			&& $location['add_event_id'] > 0
 			&& !array_key_exists($location['add_event_id'], $this->events)) 
 		{
 			$this->addEvent($_SESSION['player_id'], $location['add_event_id']);
 		}
-		 */
 		
 		if ($location['type_id'] < 1) return;
     
@@ -165,7 +160,7 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
     			&& !empty(NodeManager::$node['media']))
     				? $this->findMedia(NodeManager::$node['media'], 'defaultAsync.png') : null;
     		array_push($links, 
-    			$this->makeLink(TYPE_NODE,$location['force_view'], "&amp;event=faceTalk&amp;npc_id=-1&amp;node_id=" 
+    			$this->makeLink(TYPE_NODE, "&amp;event=faceTalk&amp;npc_id=-1&amp;node_id=" 
     				. NodeManager::$node['node_id'], NodeManager::$node['title'], $media));
     	}
     }
@@ -178,21 +173,23 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
     }
     
     protected function processItem($location, &$links) {
-		$sql = $this->db->prefix("SELECT * FROM _P_items 
+    	$sql = $this->db->prefix("SELECT * FROM _P_items 
     		WHERE item_id={$location['type_id']}");
     	$item = $this->db->getRow($sql);
-		
-		$item['location_id'] = $location['location_id'];
-		$item['force_view'] = $location['force_view'];
-		$item['mediaURL'] = $this->findMedia($item['media'], 'defaultInventory.png');
-		$item['icon'] = $this->findMedia(Framework::$site->config->aris->inventory->imageIcon, NULL);	
-		$item['object_type'] = "Item";
-    	array_push($links, $item);
-
+    
+    	$itemName = (array_key_exists('name', $item) && !empty($item['name']))
+    		? $item['name'] : 'undefined';
+    	$media = (array_key_exists('media', $item) 
+    			&& !empty($item['media']))
+    				? $this->findMedia($item['media'], 'defaultInventory.png') : null;
+    
+    	array_push($links, 
+    		$this->makeLink(TYPE_ITEM, "&amp;event=addItem&amp;item_id={$location['type_id']}", 
+    			$itemName, $media));
     }
     
-    protected function processNpc($location, &$links) {		
-		$sql = $this->db->prefix("SELECT * FROM _P_npcs 
+    protected function processNpc($location, &$links) {
+    	$sql = $this->db->prefix("SELECT * FROM _P_npcs 
     		WHERE npc_id={$location['type_id']}");
     	$npc = $this->db->getRow($sql);
     
@@ -201,7 +198,7 @@ class Framework_Module_RESTAsync extends Framework_Auth_User
     	$npcMedia = (array_key_exists('media', $npc) && !empty($npc['media']))
     		? $this->findMedia($npc['media'], 'defaultUser.png') : null;
     
-    	array_push($links, $this->makeLink(TYPE_NPC,$location['force_view'],
+    	array_push($links, $this->makeLink(TYPE_NPC,
     		"&amp;event=faceConversation&amp;npc_id=" . $location['type_id'],
     		$npcName, $npcMedia));
     }

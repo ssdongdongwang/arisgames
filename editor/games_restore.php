@@ -96,10 +96,9 @@
 		if (empty($SQLglob)) die ("<p>Your file was not a valid ARIS game package: No SQL file found</p>");
 
 		$SQLCommand = "{$mysql_bin_path}/mysql -u {$opts['un']} --password={$opts['pw']} aris < database.sql";
-		//echo "<p>Running Command: $SQLCommand </p>";
-		exec($SQLCommand, $output, $return);
-		if ($return) echo "<h3>There was an error restoring the SQL Database</h3>";
-		else echo "<p>SQL Restore Successfull</p>";	
+		//echo $SQLCommand;
+		exec($SQLCommand);
+		echo ('<p>SQL upload attempted</p>');
 		
 		//Add a game record
 		$query = "INSERT INTO games (prefix, name) VALUES ('{$prefix}_','{$prefix}')";

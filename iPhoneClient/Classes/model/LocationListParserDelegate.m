@@ -8,17 +8,14 @@
 
 #import "LocationListParserDelegate.h"
 #import "Location.h";
-#import "Player.h";
 
 @implementation LocationListParserDelegate
 
-- (LocationListParserDelegate*)initWithModel:(AppModel *)model{
+- (LocationListParserDelegate*)initWithLocationList:(NSMutableArray *)modelLocationList {
 	self = [super init];
     if ( self ) {
-		locationList = model.locationList;
-		[locationList  retain];
-		playerList = model.playerList;
-		[playerList retain];
+		locationList = modelLocationList;
+		[locationList retain];
     }
 	
     return self;
@@ -41,26 +38,13 @@
 		Location *location = [[Location alloc] init];
 		location.locationId = [[attributeDict objectForKey:@"location_id"] intValue];
 		location.name = [attributeDict objectForKey:@"name"];
-		location.latitude = [[attributeDict objectForKey:@"latitude"] doubleValue];
-		location.longitude = [[attributeDict objectForKey:@"longitude"] doubleValue];
+		location.latitude = [attributeDict objectForKey:@"latitude"];
+		location.longitude = [attributeDict objectForKey:@"longitude"];
 		if ([[attributeDict objectForKey:@"hidden"] isEqualToString: @"1"]) location.hidden = YES;
 		else location.hidden = NO;
-		location.qty = [[attributeDict objectForKey:@"qty"] intValue];
 		
 		[locationList addObject:location];
 		NSLog([NSString stringWithFormat:@"Adding Location: %@", location.name]);
-	}
-	
-	if ([elementName isEqualToString:@"player"]) {
-		//Found a location element 
-		Player *player = [[Player alloc] init];
-		player.name = [attributeDict objectForKey:@"name"];
-		player.latitude = [[attributeDict objectForKey:@"latitude"] doubleValue];
-		player.longitude = [[attributeDict objectForKey:@"longitude"] doubleValue];
-		player.hidden = NO;
-		
-		[playerList addObject:player];
-		NSLog([NSString stringWithFormat:@"Adding Player: %@", player.name]);
 	}
 }
 
