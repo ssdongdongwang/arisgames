@@ -9,7 +9,6 @@
 #import "QRScannerViewController.h"
 #import "Decoder.h"
 #import "TwoDDecoderResult.h"
-#import "ARISAppDelegate.h"
 
 
 @implementation QRScannerViewController 
@@ -17,7 +16,6 @@
 @synthesize moduleName;
 @synthesize imagePickerController;
 @synthesize scanButton;
-@synthesize manualCode;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -61,16 +59,10 @@
 	 
 }
 
-- (IBAction)codeEnteredAction: (id) sender{
-	NSLog(@"Code Entered");
-	[self loadResult:manualCode.text];
-}
-
-
 #pragma mark UIImagePickerControllerDelegate Protocol Methods
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo {
-	[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 	CGRect cropRect;
 	//if ([editInfo objectForKey:UIImagePickerControllerCropRect]) {  //do we have a user specified cropRect?
 	//	cropRect = [[editInfo objectForKey:UIImagePickerControllerCropRect] CGRectValue];
@@ -86,30 +78,18 @@
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-	[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark QRCScan delegate methods
 
 - (void)decoder:(Decoder *)decoder didDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset withResult:(TwoDDecoderResult *)twoDResult {
-	//Stop Waiting Indicator
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeWaitingIndicator];
-	
 	//get the result
 	NSString *result = twoDResult.text;
 
 	//we are done with the scanner, so release it
 	[decoder release];
 	NSLog(@"QR Scanner: Decode Complete. QR Code ID = %@", result);
-	
-	[self loadResult:result];
-}	
-
--(void) loadResult:(NSString *)result {
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	//Start Waiting Indicator
-	[appDelegate showWaitingIndicator:@"Loading Content..."];
 	
 	//init url
 	NSString *baseURL = [appModel getURLStringForModule:@"RESTQRScanner"];
@@ -137,28 +117,10 @@
 - (void)decoder:(Decoder *)decoder failedToDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset reason:(NSString *)reason {
 	NSLog(@"Failed to decode image");
 	[decoder release];
-	
-	//Stop Waiting Indicator
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeWaitingIndicator];
-	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Decoding Error" message:@"Try scanning the code again: Step back 2 feet and hold the camera as still as possible"
-												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-	[alert show];	
-	[alert release];
-	
-	
-	
-	
 }
 
 - (void)decoder:(Decoder *)decoder willDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset {
-	NSLog(@"QR: Will decode image");
-	
-	//Start Waiting Indicator
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate showWaitingIndicator:@"Decoding..."];
-	
+	NSLog(@"Will decode image");
 }
 
 #pragma mark UINavigationControllerDelegate Protocol Methods
@@ -172,22 +134,7 @@
 
 #pragma mark QRScannerParserDelegate Methods
 - (void) qrParserDidFinish:(id<QRCodeProtocol>)qrcode{
-	//Stop Waiting Indicator
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeWaitingIndicator];
-	
-	if (qrcode == nil) {
-		//Display an alert
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Decoding Error" message:@"This code is not a part of your current ARIS game"
-													   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-		[alert show];	
-		[alert release];
-		
-	}
-	else {	
-		//Display the content
-		[qrcode display];
-	}
+	[qrcode display];
 }
 
 

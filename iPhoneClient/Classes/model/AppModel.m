@@ -13,12 +13,10 @@
 #import "NearbyLocationsListParserDelegate.h"
 #import "InventoryParserDelegate.h"
 #import "XMLParserDelegate.h"
-#import "ARISAppDelegate.h"
 
 #import "Item.h"
 
-static NSString *nearbyLock = @"nearbyLock";
-static NSString *locationsLock = @"locationsLock";
+
 
 @implementation AppModel
 
@@ -33,12 +31,9 @@ NSDictionary *InventoryElements;
 @synthesize site;
 @synthesize gameList;
 @synthesize locationList;
-@synthesize playerList;
+@synthesize nearbyLocationsList;
 @synthesize lastLocation;
 @synthesize inventory;
-@synthesize networkAlert;
-
-@dynamic nearbyLocationsList;
 
 -(id)init {
     if (self = [super init]) {
@@ -87,8 +82,7 @@ NSDictionary *InventoryElements;
 	if (![lastCharString isEqualToString:@"/"]) self.baseAppURL = [[NSString alloc] initWithFormat:@"%@/",self.baseAppURL];
 	
 	NSURL *url = [NSURL URLWithString:self.baseAppURL];
-	self.serverName = [NSString stringWithFormat:@"http://%@:%d", [url host], 
-					   ([url port] ? [[url port] intValue] : 80)];
+	self.serverName = [NSString stringWithFormat:@"http://%@:%@", [url host], [url port]];
 	
 	self.site = [defaults stringForKey:@"site"];
 	self.loggedIn = [defaults boolForKey:@"loggedIn"];
@@ -136,7 +130,7 @@ NSDictionary *InventoryElements;
 
 -(void)initUserDefaults {	
 	NSDictionary *initDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-								  @"http://arisgames.org/engine/", @"baseAppURL",
+								  @"http://atsosxdev.doit.wisc.edu/aris/games", @"baseAppURL",
 								  @"Default", @"site",
 								  nil];
 
@@ -222,8 +216,13 @@ NSDictionary *InventoryElements;
 	NSError *error = NULL;
 	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-	if (error != NULL) [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];	
-	else [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeNetworkAlert];
+	if (error != NULL) {
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"ARIS is not able to communicate with the server. Check your internet connection."
+												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+		[alert show];	
+		[alert release];
+	}
+
 	return data;
 }
 
@@ -256,73 +255,30 @@ NSDictionary *InventoryElements;
 
 
 - (void)fetchLocationList {
-	@synchronized (nearbyLock) {
+	NSLog(@"Fetching All Locations.");
 	
-		NSLog(@"Fetching All Locations.");	
-		
-		//init location list array
-		if(locationList != nil) {
-			[locationList release];
-		}
-		locationList = [NSMutableArray array];
-		[locationList retain];
-	
-		//init player list array
-		if(playerList != nil) {
-			[playerList release];
-		}
-		playerList = [NSMutableArray array];
-		[playerList retain];
-	
-	
-		//Fetch Data
-		NSURLRequest *request = [self getURLForModule:@"RESTMap"];
-		NSData *data = [self fetchURLData:request];
-	
-		NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
-		LocationListParserDelegate *locationListParserDelegate = [[LocationListParserDelegate alloc] initWithModel:self];
-		[parser setDelegate:locationListParserDelegate];
-	
-		//init parser
-		[parser setShouldProcessNamespaces:NO];
-		[parser setShouldReportNamespacePrefixes:NO];
-		[parser setShouldResolveExternalEntities:NO];
-		[parser parse];
-		[parser release];
+	//init location list array
+	if(locationList != nil) {
+		[locationList release];
 	}
+	locationList = [NSMutableArray array];
+	[locationList retain];
+	
+	//Fetch Data
+	NSURLRequest *request = [self getURLForModule:@"RESTMap"];
+	NSData *data = [self fetchURLData:request];
+	
+	NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
+	LocationListParserDelegate *locationListParserDelegate = [[LocationListParserDelegate alloc] initWithLocationList:locationList];
+	[parser setDelegate:locationListParserDelegate];
+	
+	//init parser
+	[parser setShouldProcessNamespaces:NO];
+	[parser setShouldReportNamespacePrefixes:NO];
+	[parser setShouldResolveExternalEntities:NO];
+	[parser parse];
+	[parser release];
 }
-
-- (NSMutableArray *)locationList {
-	NSMutableArray *result = nil;
-	@synchronized (locationsLock) {
-		result = [locationList retain];
-	}
-	return result;
-}
-
-- (void)setLocationList:(NSMutableArray *)source {
-	@synchronized (locationsLock) {
-		locationList = [source copy];
-	}
-}
-
-
-- (NSMutableArray *)playerList {
-	NSMutableArray *result = nil;
-	@synchronized (locationsLock) {
-		result = [playerList retain];
-	}
-	return result;
-}
-
-- (void)setPlayerList:(NSMutableArray *)source {
-	@synchronized (locationsLock) {
-		playerList = [source copy];
-	}
-}
-
-
-
 
 
 - (void)fetchInventory {
@@ -355,45 +311,33 @@ NSDictionary *InventoryElements;
 
 
 - (void)updateServerLocationAndfetchNearbyLocationList {
-	@synchronized (nearbyLock) {
-		//init a fresh nearby location list array
-		if(nearbyLocationsList != nil) {
-			[nearbyLocationsList release];
-		}
-		nearbyLocationsList = [NSMutableArray array];
-		[nearbyLocationsList retain];
+	//init a fresh nearby location list array
+	if(nearbyLocationsList != nil) {
+		[nearbyLocationsList release];
+	}
+	nearbyLocationsList = [NSMutableArray array];
+	[nearbyLocationsList retain];
 	
-		//Fetch Data
-		NSURLRequest *request = [self getURLForModule:
-								 [NSString stringWithFormat:@"RESTAsync&latitude=%f&longitude=%f", lastLocation.coordinate.latitude, lastLocation.coordinate.longitude]];
-		NSData *data = [self fetchURLData:request];	
-		NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];	
 	
-		NearbyLocationsListParserDelegate *nearbyLocationsListParserDelegate = [[NearbyLocationsListParserDelegate alloc] initWithNearbyLocationsList:nearbyLocationsList];
-		[parser setDelegate:nearbyLocationsListParserDelegate];
+	//Fetch Data
+	NSURLRequest *request = [self getURLForModule:
+							 [NSString stringWithFormat:@"RESTAsync&latitude=%f&longitude=%f", lastLocation.coordinate.latitude, lastLocation.coordinate.longitude]];
+	NSData *data = [self fetchURLData:request];
+	
+	NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];	
+	
 		
-		//init parser
-		[parser setShouldProcessNamespaces:NO];
-		[parser setShouldReportNamespacePrefixes:NO];
-		[parser setShouldResolveExternalEntities:NO];
-		[parser parse];
-		[parser release];
-	}
+	NearbyLocationsListParserDelegate *nearbyLocationsListParserDelegate = [[NearbyLocationsListParserDelegate alloc] initWithNearbyLocationsList:nearbyLocationsList];
+	[parser setDelegate:nearbyLocationsListParserDelegate];
+	//init parser
+	[parser setShouldProcessNamespaces:NO];
+	[parser setShouldReportNamespacePrefixes:NO];
+	[parser setShouldResolveExternalEntities:NO];
+	[parser parse];
+	[parser release];
 }
 
-- (NSMutableArray *)nearbyLocationsList {
-	NSMutableArray *result = nil;
-	@synchronized (nearbyLock) {
-		result = [nearbyLocationsList retain];
-	}
-	return result;
-}
 
-- (void)setNearbyLocationList:(NSMutableArray *)source {
-	@synchronized (nearbyLock) {
-		nearbyLocationsList = [source copy];
-	}
-}
 
 - (void)dealloc {
 	[gameList release];

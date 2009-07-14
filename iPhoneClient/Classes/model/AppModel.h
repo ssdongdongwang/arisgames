@@ -23,11 +23,9 @@ extern NSDictionary *InventoryElements;
 	NSString *site;
 	NSMutableArray *gameList;
 	NSMutableArray *locationList;
-	NSMutableArray *playerList;
 	NSMutableArray *nearbyLocationsList;
 	CLLocation *lastLocation;
 	NSMutableArray *inventory;
-	UIAlertView *networkAlert;
 }
 
 @property(copy) NSString *serverName;
@@ -38,12 +36,10 @@ extern NSDictionary *InventoryElements;
 @property(copy, readwrite) UIViewController *currentModule;
 @property(copy, readwrite) NSString *site;
 @property(copy, readwrite) NSMutableArray *gameList;	
-@property(copy, readwrite) NSMutableArray *locationList;
-@property(copy, readwrite) NSMutableArray *playerList;
+@property(copy, readwrite) NSMutableArray *locationList;	
 @property(copy, readwrite) NSMutableArray *nearbyLocationsList;	
 @property(copy, readwrite) CLLocation *lastLocation;	
-@property(copy, readwrite) NSMutableArray *inventory;
-@property(retain) UIAlertView *networkAlert;	
+@property(copy, readwrite) NSMutableArray *inventory;	
 
 -(id)init;
 -(void)loadUserDefaults;

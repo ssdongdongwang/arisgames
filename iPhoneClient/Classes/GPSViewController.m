@@ -12,17 +12,11 @@
 #import "RMMarker.h"
 #import "RMMarkerManager.h"
 #import "Location.h"
-#import "Player.h"
-#import "ARISAppDelegate.h"
-
-
-static int DEFAULT_ZOOM = 16;
 
 @implementation GPSViewController
 
 @synthesize mapView;
 @synthesize moduleName;
-@synthesize autoCenter;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -31,34 +25,10 @@ static int DEFAULT_ZOOM = 16;
     if (self) {
         self.title = @"GPS";
         self.tabBarItem.image = [UIImage imageNamed:@"GPS.png"];
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-																							   target:self action:@selector(refresh:)] autorelease];
-	}
-	
-	autoCenter = YES;
+    }
     return self;
 }
-		
-- (IBAction)refresh: (id) sender{
 
-	NSLog(@"GPS: Refresh Button Touched");
-	
-	//Center the Map
-	[[mapView contents] moveToLatLong:appModel.lastLocation.coordinate];
-	
-	//Force a location update
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate.myCLController.locationManager stopUpdatingLocation];
-	[appDelegate.myCLController.locationManager startUpdatingLocation];
-
-	//Rerfresh all contents
-	[self refreshMap];
-	
-	//Zoom and Center
-	[self zoomAndCenterMap];
-
-}
-		
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -68,7 +38,7 @@ static int DEFAULT_ZOOM = 16;
 	
 	//register for notifications
 	NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-	[dispatcher addObserver:self selector:@selector(refreshMap) name:@"PlayerMoved" object:nil];
+	[dispatcher addObserver:self selector:@selector(refreshPlayerMarker) name:@"PlayerMoved" object:nil];
 	[dispatcher addObserver:self selector:@selector(refreshMarkers) name:@"ReceivedLocationList" object:nil];
 
 
@@ -80,8 +50,7 @@ static int DEFAULT_ZOOM = 16;
 							CGRectGetMinY(mainViewBounds),
 							CGRectGetWidth(mainViewBounds),
 							tableViewHeight);
-	mapView = [[RMMapView alloc] initWithFrame:tableFrame];
-    
+	mapView = [[RMMapView alloc] initWithFrame:tableFrame];    
 	[self.view addSubview:mapView];
 	
 	markerManager = [mapView markerManager];
@@ -93,6 +62,7 @@ static int DEFAULT_ZOOM = 16;
 	CLLocationCoordinate2D playerPosition;
 	playerMarker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-player"]];
 	[markerManager addMarker:playerMarker AtLatLong:playerPosition];
+
 	
 	NSLog(@"GPS View Loaded");
 }
@@ -117,26 +87,18 @@ static int DEFAULT_ZOOM = 16;
 
 // Updates the map to current data for player and locations from the server
 - (void) refreshMap {
-	NSLog(@"GPS refreshMap requested");	
+	NSLog(@"GPS refreshMap requested");
+	
 	//Move the player marker
 	[self refreshPlayerMarker];
 		
 	//Ask for the Locations to be loaded into the model, which will trigger a notification to refreshMarkers here
-	//[NSThread detachNewThreadSelector: @selector(fetchLocationList) toTarget:appModel withObject: nil];	
 	[appModel fetchLocationList];
-
-}
-
--(void) zoomAndCenterMap {
-	
-	//Center the map on the player
-	[[mapView contents] moveToLatLong:appModel.lastLocation.coordinate];
-	
-	//Set to default zoom
-	mapView.contents.zoom = DEFAULT_ZOOM;
 }
 
 - (void)refreshPlayerMarker {
+	NSLog(@"PlayerMoved notification recieved by GPS controller, running refreshPlayerMarker");
+	
 	//Move the player marker
 
 	[markerManager moveMarker:playerMarker AtLatLon: appModel.lastLocation.coordinate];
@@ -145,9 +107,8 @@ static int DEFAULT_ZOOM = 16;
 		[playerMarker replaceImage:[RMMarker loadPNGFromBundle:@"marker-player"] anchorPoint:CGPointMake(.5, .6)];
 	else [playerMarker replaceImage:[RMMarker loadPNGFromBundle:@"marker-player-lqgps"] anchorPoint:CGPointMake(.5, .6)];
 
-	//Center the first time
-	if (autoCenter == YES) [self zoomAndCenterMap];
-	autoCenter = NO;
+	
+	[[mapView contents] moveToLatLong:appModel.lastLocation.coordinate];
 }
 
 - (void)refreshMarkers {
@@ -167,29 +128,11 @@ static int DEFAULT_ZOOM = 16;
 		locationLatLong.longitude = location.longitude;
 
 		RMMarker *locationMarker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-blue"]];
-		NSString *label;
-		if (location.qty > 0) label = [[NSString alloc] initWithFormat:@"%@ (%d)",location.name, location.qty];
-		else label = location.name;
-		[locationMarker setTextLabel:label];
+		[locationMarker setTextLabel:location.name];
 		[markerManager addMarker:locationMarker AtLatLong:locationLatLong];
 		[locationMarker release];
 		
 	}
-	
-	//Add the freshly loaded players from the notification
-	for ( Player* player in appModel.playerList ) {
-		if (player.hidden == YES) continue;
-		CLLocationCoordinate2D locationLatLong;
-		locationLatLong.latitude = player.latitude;
-		locationLatLong.longitude = player.longitude;
-		
-		RMMarker *marker = [[RMMarker alloc]initWithCGImage:[RMMarker loadPNGFromBundle:@"marker-other-player"]];
-		[marker setTextLabel:player.name];
-		[markerManager addMarker:marker AtLatLong:locationLatLong];
-		[marker release];
-		
-	}
-	
 	
 }
 

@@ -111,6 +111,8 @@
 		2B3D12EC0F4382070067FD3A /* LogoutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D12EB0F4382070067FD3A /* LogoutViewController.m */; };
 		2B3D12EE0F4382A00067FD3A /* Logout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2B3D12ED0F4382A00067FD3A /* Logout.xib */; };
 		2B3D14620F45EBAA0067FD3A /* GamePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D14610F45EBAA0067FD3A /* GamePickerViewController.m */; };
+		2B3D15A30F461AA30067FD3A /* ToolbarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D15A20F461AA30067FD3A /* ToolbarViewController.m */; };
+		2B3D15A50F461AD10067FD3A /* Toolbar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2B3D15A40F461AD10067FD3A /* Toolbar.xib */; };
 		2B3D16660F4628C70067FD3A /* GamePicker.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2B3D16650F4628C70067FD3A /* GamePicker.xib */; };
 		2B3D17070F49C99B0067FD3A /* Game.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D17060F49C99B0067FD3A /* Game.m */; };
 		2B3D175A0F49D18D0067FD3A /* DeveloperViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D17590F49D18D0067FD3A /* DeveloperViewController.m */; };
@@ -132,9 +134,7 @@
 		A72F04A00F6ED78F0089B90F /* NearbyLocationsListParserDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A72F049F0F6ED78F0089B90F /* NearbyLocationsListParserDelegate.m */; };
 		A72F04AE0F6ED8620089B90F /* NearbyLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = A72F04AD0F6ED8620089B90F /* NearbyLocation.m */; };
 		A75AF2B90F86A47100F15535 /* ItemDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A75AF2B80F86A47100F15535 /* ItemDetailsViewController.m */; };
-		A75F7D350FDEBC1800E36140 /* marker-other-player.png in Resources */ = {isa = PBXBuildFile; fileRef = A75F7D340FDEBC1800E36140 /* marker-other-player.png */; };
 		A76048E70FC1B6DE00219A53 /* QRCodeProtocol.h in Resources */ = {isa = PBXBuildFile; fileRef = A76048E60FC1B6DE00219A53 /* QRCodeProtocol.h */; };
-		A7615F8F0FDED3DC00438796 /* LoginBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A7615F8E0FDED3DC00438796 /* LoginBackground.png */; };
 		A763B5250F4E283100FDCC55 /* MyCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = A763B5240F4E283100FDCC55 /* MyCLController.m */; };
 		A78E753C0FB5B88000922F6C /* GPS.xib in Resources */ = {isa = PBXBuildFile; fileRef = A78E753B0FB5B88000922F6C /* GPS.xib */; };
 		A78E753E0FB5BA0C00922F6C /* Developer.xib in Resources */ = {isa = PBXBuildFile; fileRef = A78E753D0FB5BA0C00922F6C /* Developer.xib */; };
@@ -142,9 +142,6 @@
 		A78FD8B20F4B7EA200820FEA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A78FD8B10F4B7EA200820FEA /* CoreGraphics.framework */; };
 		A79202640F8E717C0049F990 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A79202630F8E717C0049F990 /* MediaPlayer.framework */; };
 		A7955B930F73E095005148E4 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7955B920F73E095005148E4 /* AudioToolbox.framework */; };
-		A79830140FCB1CD700C1C2E7 /* WaitingIndicatorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A79830130FCB1CD700C1C2E7 /* WaitingIndicatorViewController.m */; };
-		A79830180FCB1D8900C1C2E7 /* WaitingIndicator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A79830170FCB1D8900C1C2E7 /* WaitingIndicator.xib */; };
-		A798301B0FCB1F8100C1C2E7 /* RoundedBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A798301A0FCB1F8100C1C2E7 /* RoundedBackground.png */; };
 		A7986E860F8FF42000A5469F /* libMapView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7986D830F8FEDD900A5469F /* libMapView.a */; };
 		A7A172830F4F26A60017E865 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7A172820F4F26A60017E865 /* Entitlements.plist */; };
 		A7A1728C0F4F27120017E865 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A7A1728A0F4F27120017E865 /* Icon.png */; };
@@ -156,10 +153,6 @@
 		A7C1F6000FC070690045F15D /* NearbyBar.m in Sources */ = {isa = PBXBuildFile; fileRef = A7C1F5FC0FC070690045F15D /* NearbyBar.m */; };
 		A7C1F6010FC070690045F15D /* NearbyBarItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7C1F5FE0FC070690045F15D /* NearbyBarItemView.m */; };
 		A7C1F6020FC070690045F15D /* NearbyBarButtonBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A7C1F5FF0FC070690045F15D /* NearbyBarButtonBackground.png */; };
-		A7DBEDAD0FD5FF8400C6C659 /* page.png in Resources */ = {isa = PBXBuildFile; fileRef = A7DBEDAA0FD5FF8400C6C659 /* page.png */; };
-		A7DBEDAE0FD5FF8400C6C659 /* person.png in Resources */ = {isa = PBXBuildFile; fileRef = A7DBEDAB0FD5FF8400C6C659 /* person.png */; };
-		A7DBEDAF0FD5FF8400C6C659 /* pickaxe.png in Resources */ = {isa = PBXBuildFile; fileRef = A7DBEDAC0FD5FF8400C6C659 /* pickaxe.png */; };
-		A7E32E9E0FD1CEFD0058EDB7 /* Player.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E32E9D0FD1CEFD0058EDB7 /* Player.m */; };
 		A7E39EAD0F5F60D000826198 /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E39EAC0F5F60D000826198 /* CameraViewController.m */; };
 		A7E39ECA0F5F655E00826198 /* Camera.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7E39EC90F5F655E00826198 /* Camera.xib */; };
 		A7E39FB40F5F930E00826198 /* Developer.png in Resources */ = {isa = PBXBuildFile; fileRef = A7E39FA90F5F930E00826198 /* Developer.png */; };
@@ -181,7 +174,6 @@
 		A7F0EE3F0F71CFEF008F7BAD /* GenericWebView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7F0EE3E0F71CFEF008F7BAD /* GenericWebView.xib */; };
 		A7F0EE610F71D0C5008F7BAD /* GenericWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F0EE600F71D0C5008F7BAD /* GenericWebViewController.m */; };
 		A7F73FD50FB248DF0044B85A /* XMLParserDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F73FD40FB248DF0044B85A /* XMLParserDelegate.m */; };
-		A7FA0E7C0FC7048C00941493 /* IndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7FA0E7B0FC7048C00941493 /* IndicatorView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -325,6 +317,9 @@
 		2B3D12ED0F4382A00067FD3A /* Logout.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Logout.xib; sourceTree = "<group>"; };
 		2B3D14600F45EBAA0067FD3A /* GamePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamePickerViewController.h; path = Classes/GamePickerViewController.h; sourceTree = "<group>"; };
 		2B3D14610F45EBAA0067FD3A /* GamePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GamePickerViewController.m; path = Classes/GamePickerViewController.m; sourceTree = "<group>"; };
+		2B3D15A10F461AA30067FD3A /* ToolbarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToolbarViewController.h; path = Classes/ToolbarViewController.h; sourceTree = "<group>"; };
+		2B3D15A20F461AA30067FD3A /* ToolbarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ToolbarViewController.m; path = Classes/ToolbarViewController.m; sourceTree = "<group>"; };
+		2B3D15A40F461AD10067FD3A /* Toolbar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Toolbar.xib; sourceTree = "<group>"; };
 		2B3D16650F4628C70067FD3A /* GamePicker.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GamePicker.xib; sourceTree = "<group>"; };
 		2B3D17050F49C99B0067FD3A /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
 		2B3D17060F49C99B0067FD3A /* Game.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Game.m; sourceTree = "<group>"; };
@@ -361,9 +356,7 @@
 		A72F04AD0F6ED8620089B90F /* NearbyLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearbyLocation.m; sourceTree = "<group>"; };
 		A75AF2B70F86A47100F15535 /* ItemDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ItemDetailsViewController.h; path = Classes/ItemDetailsViewController.h; sourceTree = "<group>"; };
 		A75AF2B80F86A47100F15535 /* ItemDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ItemDetailsViewController.m; path = Classes/ItemDetailsViewController.m; sourceTree = "<group>"; };
-		A75F7D340FDEBC1800E36140 /* marker-other-player.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "marker-other-player.png"; path = "images/marker-other-player.png"; sourceTree = "<group>"; };
 		A76048E60FC1B6DE00219A53 /* QRCodeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeProtocol.h; sourceTree = "<group>"; };
-		A7615F8E0FDED3DC00438796 /* LoginBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LoginBackground.png; path = images/LoginBackground.png; sourceTree = "<group>"; };
 		A763B5230F4E283100FDCC55 /* MyCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyCLController.h; path = Classes/MyCLController.h; sourceTree = "<group>"; };
 		A763B5240F4E283100FDCC55 /* MyCLController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyCLController.m; path = Classes/MyCLController.m; sourceTree = "<group>"; };
 		A77A7EB70FB3305500A9DAB5 /* XMLParserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParserDelegate.h; sourceTree = "<group>"; };
@@ -373,10 +366,6 @@
 		A78FD8B10F4B7EA200820FEA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		A79202630F8E717C0049F990 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		A7955B920F73E095005148E4 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		A79830120FCB1CD700C1C2E7 /* WaitingIndicatorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaitingIndicatorViewController.h; sourceTree = "<group>"; };
-		A79830130FCB1CD700C1C2E7 /* WaitingIndicatorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaitingIndicatorViewController.m; sourceTree = "<group>"; };
-		A79830170FCB1D8900C1C2E7 /* WaitingIndicator.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WaitingIndicator.xib; sourceTree = "<group>"; };
-		A798301A0FCB1F8100C1C2E7 /* RoundedBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RoundedBackground.png; sourceTree = "<group>"; };
 		A7A172720F4F26280017E865 /* ARIS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARIS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7A172820F4F26A60017E865 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		A7A1728A0F4F27120017E865 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
@@ -392,11 +381,6 @@
 		A7C1F5FD0FC070690045F15D /* NearbyBarItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearbyBarItemView.h; sourceTree = "<group>"; };
 		A7C1F5FE0FC070690045F15D /* NearbyBarItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearbyBarItemView.m; sourceTree = "<group>"; };
 		A7C1F5FF0FC070690045F15D /* NearbyBarButtonBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NearbyBarButtonBackground.png; sourceTree = "<group>"; };
-		A7DBEDAA0FD5FF8400C6C659 /* page.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = page.png; sourceTree = "<group>"; };
-		A7DBEDAB0FD5FF8400C6C659 /* person.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = person.png; sourceTree = "<group>"; };
-		A7DBEDAC0FD5FF8400C6C659 /* pickaxe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pickaxe.png; sourceTree = "<group>"; };
-		A7E32E9C0FD1CEFD0058EDB7 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
-		A7E32E9D0FD1CEFD0058EDB7 /* Player.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Player.m; sourceTree = "<group>"; };
 		A7E39EAB0F5F60D000826198 /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = Classes/CameraViewController.h; sourceTree = "<group>"; };
 		A7E39EAC0F5F60D000826198 /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraViewController.m; path = Classes/CameraViewController.m; sourceTree = "<group>"; };
 		A7E39EC90F5F655E00826198 /* Camera.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Camera.xib; sourceTree = "<group>"; };
@@ -421,8 +405,6 @@
 		A7F0EE5F0F71D0C5008F7BAD /* GenericWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericWebViewController.h; path = Classes/GenericWebViewController.h; sourceTree = "<group>"; };
 		A7F0EE600F71D0C5008F7BAD /* GenericWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericWebViewController.m; path = Classes/GenericWebViewController.m; sourceTree = "<group>"; };
 		A7F73FD40FB248DF0044B85A /* XMLParserDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLParserDelegate.m; sourceTree = "<group>"; };
-		A7FA0E7A0FC7048C00941493 /* IndicatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndicatorView.h; sourceTree = "<group>"; };
-		A7FA0E7B0FC7048C00941493 /* IndicatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndicatorView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -607,6 +589,7 @@
 				A7986D640F8FEBFA00A5469F /* Game Picker */,
 				A7986D670F8FEC3900A5469F /* Logout */,
 				A7986D610F8FEBB200A5469F /* Developer */,
+				A7986D6C0F8FECBA00A5469F /* Toolbar (Not used, only kept for code refrence) */,
 				A7986D650F8FEC1100A5469F /* Login */,
 				A7986D6B0F8FEC8800A5469F /* Generic Web View (compatability) */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -637,8 +620,6 @@
 				2B3D17060F49C99B0067FD3A /* Game.m */,
 				A722E7130F57425B004B04D2 /* Location.h */,
 				A722E7140F57425B004B04D2 /* Location.m */,
-				A7E32E9C0FD1CEFD0058EDB7 /* Player.h */,
-				A7E32E9D0FD1CEFD0058EDB7 /* Player.m */,
 			);
 			name = Model;
 			path = Classes/model;
@@ -647,11 +628,6 @@
 		A760473F0FC0AA1E00219A53 /* NearbyObjectBar */ = {
 			isa = PBXGroup;
 			children = (
-				A7DBEDAA0FD5FF8400C6C659 /* page.png */,
-				A7DBEDAB0FD5FF8400C6C659 /* person.png */,
-				A7DBEDAC0FD5FF8400C6C659 /* pickaxe.png */,
-				A7FA0E7A0FC7048C00941493 /* IndicatorView.h */,
-				A7FA0E7B0FC7048C00941493 /* IndicatorView.m */,
 				A722CB5A0FBDFEA6009432DB /* NearbyObjectProtocol.h */,
 				A7C1F5FB0FC070690045F15D /* NearbyBar.h */,
 				A7C1F5FC0FC070690045F15D /* NearbyBar.m */,
@@ -665,7 +641,6 @@
 		A77B06ED0F78372F005945D3 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				A75F7D340FDEBC1800E36140 /* marker-other-player.png */,
 				A7E39FAC0F5F930E00826198 /* loading.png */,
 				A703EFE20F7C5C39008A12E2 /* marker-player-lqgps.png */,
 				A72C01B00F7977A600D00602 /* marker-player.png */,
@@ -675,17 +650,6 @@
 				A7E39FB10F5F930E00826198 /* marker-red.png */,
 			);
 			name = Images;
-			sourceTree = "<group>";
-		};
-		A798300A0FCB1C5900C1C2E7 /* Waiting Indicator */ = {
-			isa = PBXGroup;
-			children = (
-				A798301A0FCB1F8100C1C2E7 /* RoundedBackground.png */,
-				A79830120FCB1CD700C1C2E7 /* WaitingIndicatorViewController.h */,
-				A79830130FCB1CD700C1C2E7 /* WaitingIndicatorViewController.m */,
-				A79830170FCB1D8900C1C2E7 /* WaitingIndicator.xib */,
-			);
-			name = "Waiting Indicator";
 			sourceTree = "<group>";
 		};
 		A7986D600F8FEB8700A5469F /* GPS */ = {
@@ -761,7 +725,6 @@
 		A7986D650F8FEC1100A5469F /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				A7615F8E0FDED3DC00438796 /* LoginBackground.png */,
 				2B3D11AF0F4361940067FD3A /* LoginViewController.h */,
 				2B3D11B00F4361940067FD3A /* LoginViewController.m */,
 				2B3D11AC0F4361380067FD3A /* Login.xib */,
@@ -832,7 +795,6 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				A7E4C8980F54C5E300C6D9E8 /* CoreLocation.framework */,
 				A760473F0FC0AA1E00219A53 /* NearbyObjectBar */,
-				A798300A0FCB1C5900C1C2E7 /* Waiting Indicator */,
 				2B3D17040F49C9920067FD3A /* Model */,
 				A763B5230F4E283100FDCC55 /* MyCLController.h */,
 				A763B5240F4E283100FDCC55 /* MyCLController.m */,
@@ -858,6 +820,16 @@
 				A7F0EE3E0F71CFEF008F7BAD /* GenericWebView.xib */,
 			);
 			name = "Generic Web View (compatability)";
+			sourceTree = "<group>";
+		};
+		A7986D6C0F8FECBA00A5469F /* Toolbar (Not used, only kept for code refrence) */ = {
+			isa = PBXGroup;
+			children = (
+				2B3D15A10F461AA30067FD3A /* ToolbarViewController.h */,
+				2B3D15A20F461AA30067FD3A /* ToolbarViewController.m */,
+				2B3D15A40F461AD10067FD3A /* Toolbar.xib */,
+			);
+			name = "Toolbar (Not used, only kept for code refrence)";
 			sourceTree = "<group>";
 		};
 		A7986D7C0F8FEDD900A5469F /* Products */ = {
@@ -969,6 +941,7 @@
 				2B3D12D00F437AF90067FD3A /* Quests.xib in Resources */,
 				2B3D12DB0F437E690067FD3A /* InventoryList.xib in Resources */,
 				2B3D12EE0F4382A00067FD3A /* Logout.xib in Resources */,
+				2B3D15A50F461AD10067FD3A /* Toolbar.xib in Resources */,
 				2B3D16660F4628C70067FD3A /* GamePicker.xib in Resources */,
 				A7A172830F4F26A60017E865 /* Entitlements.plist in Resources */,
 				A7A1728C0F4F27120017E865 /* Icon.png in Resources */,
@@ -1001,13 +974,6 @@
 				A722C8C00FBCD8D0009432DB /* SelfRegistration.xib in Resources */,
 				A7C1F6020FC070690045F15D /* NearbyBarButtonBackground.png in Resources */,
 				A76048E70FC1B6DE00219A53 /* QRCodeProtocol.h in Resources */,
-				A79830180FCB1D8900C1C2E7 /* WaitingIndicator.xib in Resources */,
-				A798301B0FCB1F8100C1C2E7 /* RoundedBackground.png in Resources */,
-				A7DBEDAD0FD5FF8400C6C659 /* page.png in Resources */,
-				A7DBEDAE0FD5FF8400C6C659 /* person.png in Resources */,
-				A7DBEDAF0FD5FF8400C6C659 /* pickaxe.png in Resources */,
-				A75F7D350FDEBC1800E36140 /* marker-other-player.png in Resources */,
-				A7615F8F0FDED3DC00438796 /* LoginBackground.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1027,6 +993,7 @@
 				2B3D12E00F4380B70067FD3A /* GPSViewController.m in Sources */,
 				2B3D12EC0F4382070067FD3A /* LogoutViewController.m in Sources */,
 				2B3D14620F45EBAA0067FD3A /* GamePickerViewController.m in Sources */,
+				2B3D15A30F461AA30067FD3A /* ToolbarViewController.m in Sources */,
 				2B3D17070F49C99B0067FD3A /* Game.m in Sources */,
 				2B3D175A0F49D18D0067FD3A /* DeveloperViewController.m in Sources */,
 				2B3D18D60F4B25720067FD3A /* AppModel.m in Sources */,
@@ -1092,9 +1059,6 @@
 				A722C8C60FBCD92E009432DB /* SelfRegistrationViewController.m in Sources */,
 				A7C1F6000FC070690045F15D /* NearbyBar.m in Sources */,
 				A7C1F6010FC070690045F15D /* NearbyBarItemView.m in Sources */,
-				A7FA0E7C0FC7048C00941493 /* IndicatorView.m in Sources */,
-				A79830140FCB1CD700C1C2E7 /* WaitingIndicatorViewController.m in Sources */,
-				A7E32E9E0FD1CEFD0058EDB7 /* Player.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1247,7 +1211,7 @@
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
 				);
 				PRODUCT_NAME = ARIS;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "68F0BBDC-446C-4299-B849-80904CA13456";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
 			};
 			name = Distribution;
 		};
@@ -1256,13 +1220,12 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gagnon";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A1F09052-03C8-47A4-8230-E3994056F4EF";
 				SDKROOT = iphoneos2.2.1;
 			};
 			name = Debug;

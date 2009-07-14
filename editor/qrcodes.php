@@ -9,7 +9,7 @@
 	/**********************
 	 PHP My Edit Config
 	 *********************/
-	$opts['triggers']['insert']['before'] = 'triggers/qrcodes_random_id.php';
+	//$opts['triggers']['insert']['after'][0] = 'triggers/uploader.php';
 	//$opts['triggers']['update']['before'][0] = 'triggers/uploader.php';	
 	//$opts['triggers']['insert']['after'][1] = './triggers/quests.php';
 	//$opts['triggers']['update']['before'][1] = './triggers/quests.php';	
@@ -111,9 +111,9 @@
 	 descriptions fields are also possible. Check documentation for this.
 	 */
 	$opts['fdd']['qrcode_id'] = array(
-									  'name'     => 'QR Code #',
+								   'name'     => 'QR Code Index',
 								   'select'   => 'T',
-									  'options'  => 'LCVPDR', // auto increment
+									  'options'  => 'VPDR', // auto increment
 								   'maxlen'   => 11,
 								   'default'  => '0',
 								   'sort'     => true,

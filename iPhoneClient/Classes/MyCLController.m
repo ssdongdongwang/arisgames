@@ -61,7 +61,7 @@
 		self.locationManager = [[[CLLocationManager alloc] init] autorelease];
 		self.locationManager.delegate = self; // Tells the location manager to send updates to this object
 		self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-		self.locationManager.distanceFilter = 5; //Minimum change of .5 meters for update
+		self.locationManager.distanceFilter = 0.5; //Minimum change of .5 meters for update
 	}
 	appModel = model;
 	return self;
@@ -83,7 +83,7 @@
 	[[NSNotificationCenter defaultCenter] postNotification:updatedLocationNotification];
 		
 	//Tell the model to update the server and fetch any nearby locations
-	[NSThread detachNewThreadSelector: @selector(updateServerLocationAndfetchNearbyLocationList) toTarget: appModel withObject: nil];	
+	[appModel updateServerLocationAndfetchNearbyLocationList];
 	
 }
 /*

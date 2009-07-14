@@ -174,7 +174,6 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 		description text,
 		media varchar(50) NOT NULL default 'item_default.jpg',
 		type enum('AV','Image') NOT NULL default 'Image',
-		event_id_when_viewed int(10) unsigned NULL,
 		PRIMARY KEY  (item_id)
 		) ";
 	mysql_query($query);
