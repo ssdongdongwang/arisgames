@@ -32,6 +32,8 @@ class Framework_Module_SelectGame extends Framework_Auth_No
 					   $user->player_id);
 		$available_games = Framework::$db->getAll($sql);
 				
+		//if only one game exists, launch it
+		
 		//if more than one game exists, display a list
 		$this->title = "Select a Game";
 		$this->full_name = $user->first_name . ' ' . $user->last_name;
@@ -43,13 +45,6 @@ class Framework_Module_SelectGame extends Framework_Auth_No
 	{
 		$site = substr($_REQUEST['prefix'], 0, strlen ($_REQUEST['prefix']) - 1);
 		$user = Framework_User::singleton();
-		
-		//Set player site to current game
-		$sql = "UPDATE players
-		SET site = '$site' 
-		WHERE player_id = '{$_SESSION['player_id']}'";
-		$this->db->exec($sql);
-		
 		// Prepare the next site
 		Framework::$site = Framework_Site::factory($site);
 		Framework::$site->prepare();

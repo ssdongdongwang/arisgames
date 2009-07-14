@@ -70,13 +70,11 @@ function postSelection() {
 	select = document.getElementById('playerMessageSelection');
 	if (select.selectedIndex == 0) return;
 	
-	/*
 	if (window.iPhone) {
 		window.iPhone.utils.hideURLBar();
-	//	document.getElementById('footer').style.top = '220px';
+		document.getElementById('footer').style.top = '220px';
 	}
-	*/
-
+	
 	selectOption(select.options[select.selectedIndex].value);
 }
 
@@ -151,7 +149,7 @@ function processUserInput() {
 
 function setNPCMessage() {
     makeRow('left', '...', messageQueue['npc_icon']);
-    setTimeout(writeNPCMessage, message['delay']);
+	setTimeout(writeNPCMessage, message['delay']);
 }
 
 function writeNPCMessage() {
@@ -198,14 +196,14 @@ function postPlayerMessage() {
 var currentY = -150;
 function makeRow(alignment, msg, icon_url) {
     rowID++;
-    var container = document.getElementById('dialog');
+	var container = document.getElementById('dialog');
 
-    container.innerHTML = container.innerHTML +  '<tr><td align="' + alignment + '" id="r' + rowID + '">' + createIcon(alignment, icon_url) + msg + '</td></tr>';
+	container.innerHTML = container.innerHTML +  '<tr><td align="' + alignment + '" id="r' + rowID + '">' + createIcon(alignment, icon_url) + msg + '</td></tr>';
 
-    if (window.iPhone && rowID > 1) {
-	scrollDown(rowID);
-    }
-    else document.getElementById("viewAnchor").scrollIntoView(true);
+	if (window.iPhone && rowID > 1) {
+		scrollDown(rowID);
+	}
+	else document.getElementById("viewAnchor").scrollIntoView(true);
 }
 
 function scrollDown(rowID) {
@@ -216,8 +214,9 @@ function scrollDown(rowID) {
 function scrollDownBy(y) {
 	currentY = currentY + y;
 	window.iPhone.utils.scrollToY(-currentY);
-	//document.getElementById('header').style.top = '0';
-	//document.getElementById('footer').style.top = '368px';
+		
+	document.getElementById('header').style.top = '0';
+	document.getElementById('footer').style.top = '368px';
 }
 
 function setRowMessage(alignment, msg, icon_url) {
@@ -227,8 +226,11 @@ function setRowMessage(alignment, msg, icon_url) {
 }    
 
 function createIcon(alignment, icon_url) {
-    if (alignment == 'left') { padding = "right"; }
-    else { padding = "left"; }
+    if (alignment == 'left') {
+        padding = "right";
+    } else {
+        padding = "left";
+    }
     return '<img alt="icon" width="48" src="' + icon_url +'" style="float:' + alignment +';padding-' + padding + ':5px;"/>';
 }
 

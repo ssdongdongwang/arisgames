@@ -53,7 +53,7 @@ abstract class Framework_Module extends Framework_Object_Web
      * @var         array       $controllers     Array of acceptable controllers
      * @see         Framework_Controller
      */
-    public $controllers = array('Web', 'REST', 'SimpleREST');
+    public $controllers = array('Web', 'REST');
 
     /**
      * $data
@@ -196,109 +196,7 @@ abstract class Framework_Module extends Framework_Object_Web
 
         return $this->data[$var];
     }
-
-    /**
-     * Adds the specified item to the specified player.
-	 *
-	 * @access protected
-     * @return void
-     */
-     protected function giveItemToPlayer($itemID, $userID) {
-    	$sql = Framework::$db->prefix("SELECT * FROM _P_items 
-									  WHERE item_id = $itemID");
-    	$row = Framework::$db->getRow($sql);
-    	
-    	if ($row) {    	
-    		$sql = Framework::$db->prefix("INSERT INTO _P_player_items 
-										  (player_id, item_id) VALUES ($userID, $itemID)
-										  ON duplicate KEY UPDATE item_id = $itemID");
-    		Framework::$db->exec($sql);
-    	}
-	else {
-    		//Throw exception
-    	}
-    }
-	
-	
-	/**
-     * Removes the specified item from the user.
-     */ 
-    static protected function takeItemFromPlayer($itemID, $userID) {
-		$sql = Framework::$db->prefix("SELECT * FROM _P_items
-									  WHERE item_id = $itemID");
-    	$row = Framework::$db->getRow($sql);
-    	
-    	if ($row) {
-    		$sql = Framework::$db->prefix("DELETE FROM _P_player_items 
-										  WHERE player_id = $userID AND item_id = $itemID");
-    		Framework::$db->exec($sql);
-    		return TRUE;
-		}
-		else return FALSE;
-    }
-	
-	/**
-     * Decrement the item_qty at the specified location by the specified amount, default of 1
-     */ 
-    static protected function decrementItemQtyAtLocation($locationID, $qty = 1) {
-   		//If this location has a null item_qty, decrementing it will still be a null
-		$sql = Framework::$db->prefix("UPDATE _P_locations 
-									  SET item_qty=item_qty-1
-									  WHERE location_id = '{$locationID}'");
-    	Framework::$db->exec($sql);
-	}
-	
-	/**
-     * Adds an item to Locations at the specified latitude, longitude
-     */ 
-    static protected function giveItemToWorld($itemID, $lat, $long, $qty = 1) {
-    	
-		//Check that the items exists and lookup the name
-		$sql = Framework::$db->prefix("SELECT * FROM _P_items
-									  WHERE item_id = $itemID");
-    	$itemRow = Framework::$db->getRow($sql);
-    	
-    	if ($itemRow) {
-			//Create a location that points to this item
-    		$sql = Framework::$db->prefix("INSERT INTO _P_locations (name,type,type_id,latitude,longitude, item_qty)
-										  VALUES ('{$itemRow['name']}','Item','{$itemID}','{$lat}','{$long}','{$qty}')");
-    		Framework::$db->exec($sql);
-    		return TRUE;
-		}
-		else return FALSE;
-    }
-	
     
-    /**
-     * Creates a new Item for the game and returns its itemID
-	 *
-	 * name and description are strings, image is the name of an image file, assumed to be in the Site Template or UserFiles
-	 *
-	 * @access protected
-     * @return int
-     */
-	protected function createItem($name, $description, $type, $media = null) {
-   		$sql = Framework::$db->prefix("INSERT INTO _P_items 
-										  (name, description, type, media) 
-										VALUES ('{$name}', '{$description}', '{$type}' , '{$media}')");
-    	Framework::$db->exec($sql);
-		return mysql_insert_id();
-	}	
-
-	/**
-     * Marks the item as viewed by the player
-     */ 
-    static protected function itemViewedByPlayer($itemID, $userID) {
-		//Load the item
-		$sql = Framework::$db->prefix("SELECT * FROM _P_items
-									  WHERE item_id = '$itemID'");
-		//echo $sql;
-		$row = Framework::$db->getRow($sql);
-		
-		//If it has an event to set, give it to the player
-		if ($row['event_id_when_viewed']) self::addEvent($userID, $row['event_id_when_viewed']);
-    }
-	
     /**
      * loadApplications
      *
@@ -329,7 +227,7 @@ abstract class Framework_Module extends Framework_Object_Web
     		. Framework::$site->template . '/templates';
     	$files = array();
     	$pattern = '/\.([pP][nN][gG]|[jJ][pP][eE]?[gG]|[gG][iI][fF])$/';
-    	 
+    	
     	if ($handle = opendir($sitePath)) {
     		while (false !== ($file = readdir($handle))) {
     			if (preg_match($pattern, $file) > 0) $files[] = $file;
@@ -454,23 +352,6 @@ abstract class Framework_Module extends Framework_Object_Web
 		}
     }
 	
-	/** 
-	 * removePlayerEvent
-	 *
-     * Removes the specified event from the Specified player.
-	 *
-	 * @param		string	$userID
-     * @param		string	$eventID
-	 * @access public
-     * @return void
-     */
-    public function removePlayerEvent($userID, $eventID) {
-		$sql = Framework::$db->prefix("DELETE FROM _P_player_events 
-									  WHERE player_id = '{$userID}' AND event_id = '{$eventID}'");
-			Framework::$db->exec($sql);
-
-    }
-	
 	
 	/** 
 	 * checkForEvent
@@ -545,7 +426,7 @@ abstract class Framework_Module extends Framework_Object_Web
      */
     public function findMedia($filename, $default, $defaultPath = null) {
     	$basePath = !is_null($defaultPath) 
-    		? $defaultPath : dirname($_SERVER['PHP_SELF']) . ltrim($this->frameworkTplPath, '.') . '/';
+    		? $defaultPath : $this->frameworkTplPath . '/';
     	if (!empty($filename)) {
     		$sitePath = Framework::$site->getPath() . '/Templates/' . 	
     			Framework::$site->template . '/templates';

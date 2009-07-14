@@ -1,0 +1,348 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
+		A7BBDC500F2AA4AF009D2728 /* Aris Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC3A0F2AA4AF009D2728 /* Aris Logo.png */; };
+		A7BBDC510F2AA4AF009D2728 /* ArisAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC3D0F2AA4AF009D2728 /* ArisAppDelegate.m */; };
+		A7BBDC520F2AA4AF009D2728 /* FlipsideView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC3F0F2AA4AF009D2728 /* FlipsideView.m */; };
+		A7BBDC530F2AA4AF009D2728 /* FlipsideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC410F2AA4AF009D2728 /* FlipsideViewController.m */; };
+		A7BBDC540F2AA4AF009D2728 /* MainView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC430F2AA4AF009D2728 /* MainView.m */; };
+		A7BBDC550F2AA4AF009D2728 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC450F2AA4AF009D2728 /* MainViewController.m */; };
+		A7BBDC560F2AA4AF009D2728 /* MyCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC470F2AA4AF009D2728 /* MyCLController.m */; };
+		A7BBDC570F2AA4AF009D2728 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7BBDC490F2AA4AF009D2728 /* RootViewController.m */; };
+		A7BBDC580F2AA4AF009D2728 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC4A0F2AA4AF009D2728 /* Default.png */; };
+		A7BBDC590F2AA4AF009D2728 /* FlipsideView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC4B0F2AA4AF009D2728 /* FlipsideView.xib */; };
+		A7BBDC5A0F2AA4AF009D2728 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC4C0F2AA4AF009D2728 /* Icon.icns */; };
+		A7BBDC5D0F2AA4AF009D2728 /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC4F0F2AA4AF009D2728 /* MainView.xib */; };
+		A7BBDC6A0F2AA5A8009D2728 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7BBDC690F2AA5A8009D2728 /* Entitlements.plist */; };
+		A7BBDC750F2AA62A009D2728 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7BBDC740F2AA62A009D2728 /* CoreLocation.framework */; };
+		A7C6B3D90F2AF1D70044E5FC /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A7C6B3D80F2AF1D70044E5FC /* Icon.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D6058910D05DD3D006BFB54 /* Aris.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aris.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* Aris_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Aris_Prefix.pch; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7BBDC3A0F2AA4AF009D2728 /* Aris Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Aris Logo.png"; sourceTree = "<group>"; };
+		A7BBDC3C0F2AA4AF009D2728 /* ArisAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArisAppDelegate.h; sourceTree = "<group>"; };
+		A7BBDC3D0F2AA4AF009D2728 /* ArisAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArisAppDelegate.m; sourceTree = "<group>"; };
+		A7BBDC3E0F2AA4AF009D2728 /* FlipsideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlipsideView.h; sourceTree = "<group>"; };
+		A7BBDC3F0F2AA4AF009D2728 /* FlipsideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlipsideView.m; sourceTree = "<group>"; };
+		A7BBDC400F2AA4AF009D2728 /* FlipsideViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlipsideViewController.h; sourceTree = "<group>"; };
+		A7BBDC410F2AA4AF009D2728 /* FlipsideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlipsideViewController.m; sourceTree = "<group>"; };
+		A7BBDC420F2AA4AF009D2728 /* MainView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainView.h; sourceTree = "<group>"; };
+		A7BBDC430F2AA4AF009D2728 /* MainView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainView.m; sourceTree = "<group>"; };
+		A7BBDC440F2AA4AF009D2728 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		A7BBDC450F2AA4AF009D2728 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		A7BBDC460F2AA4AF009D2728 /* MyCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCLController.h; sourceTree = "<group>"; };
+		A7BBDC470F2AA4AF009D2728 /* MyCLController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCLController.m; sourceTree = "<group>"; };
+		A7BBDC480F2AA4AF009D2728 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		A7BBDC490F2AA4AF009D2728 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		A7BBDC4A0F2AA4AF009D2728 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		A7BBDC4B0F2AA4AF009D2728 /* FlipsideView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FlipsideView.xib; sourceTree = "<group>"; };
+		A7BBDC4C0F2AA4AF009D2728 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
+		A7BBDC4F0F2AA4AF009D2728 /* MainView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainView.xib; sourceTree = "<group>"; };
+		A7BBDC690F2AA5A8009D2728 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
+		A7BBDC740F2AA62A009D2728 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		A7C6B3D80F2AF1D70044E5FC /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
+				A7BBDC750F2AA62A009D2728 /* CoreLocation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* Aris.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				A7BBDC3B0F2AA4AF009D2728 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32CA4F630368D1EE00C91783 /* Aris_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A7C6B3D80F2AF1D70044E5FC /* Icon.png */,
+				A7BBDC690F2AA5A8009D2728 /* Entitlements.plist */,
+				A7BBDC3A0F2AA4AF009D2728 /* Aris Logo.png */,
+				A7BBDC4A0F2AA4AF009D2728 /* Default.png */,
+				A7BBDC4B0F2AA4AF009D2728 /* FlipsideView.xib */,
+				A7BBDC4C0F2AA4AF009D2728 /* Icon.icns */,
+				A7BBDC4F0F2AA4AF009D2728 /* MainView.xib */,
+				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A7BBDC740F2AA62A009D2728 /* CoreLocation.framework */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A7BBDC3B0F2AA4AF009D2728 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				A7BBDC3C0F2AA4AF009D2728 /* ArisAppDelegate.h */,
+				A7BBDC3D0F2AA4AF009D2728 /* ArisAppDelegate.m */,
+				A7BBDC3E0F2AA4AF009D2728 /* FlipsideView.h */,
+				A7BBDC3F0F2AA4AF009D2728 /* FlipsideView.m */,
+				A7BBDC400F2AA4AF009D2728 /* FlipsideViewController.h */,
+				A7BBDC410F2AA4AF009D2728 /* FlipsideViewController.m */,
+				A7BBDC420F2AA4AF009D2728 /* MainView.h */,
+				A7BBDC430F2AA4AF009D2728 /* MainView.m */,
+				A7BBDC440F2AA4AF009D2728 /* MainViewController.h */,
+				A7BBDC450F2AA4AF009D2728 /* MainViewController.m */,
+				A7BBDC460F2AA4AF009D2728 /* MyCLController.h */,
+				A7BBDC470F2AA4AF009D2728 /* MyCLController.m */,
+				A7BBDC480F2AA4AF009D2728 /* RootViewController.h */,
+				A7BBDC490F2AA4AF009D2728 /* RootViewController.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* Aris */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Aris" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Aris;
+			productName = Aris;
+			productReference = 1D6058910D05DD3D006BFB54 /* Aris.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Aris" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* Aris */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				A7BBDC500F2AA4AF009D2728 /* Aris Logo.png in Resources */,
+				A7BBDC580F2AA4AF009D2728 /* Default.png in Resources */,
+				A7BBDC590F2AA4AF009D2728 /* FlipsideView.xib in Resources */,
+				A7BBDC5A0F2AA4AF009D2728 /* Icon.icns in Resources */,
+				A7BBDC5D0F2AA4AF009D2728 /* MainView.xib in Resources */,
+				A7BBDC6A0F2AA5A8009D2728 /* Entitlements.plist in Resources */,
+				A7C6B3D90F2AF1D70044E5FC /* Icon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				A7BBDC510F2AA4AF009D2728 /* ArisAppDelegate.m in Sources */,
+				A7BBDC520F2AA4AF009D2728 /* FlipsideView.m in Sources */,
+				A7BBDC530F2AA4AF009D2728 /* FlipsideViewController.m in Sources */,
+				A7BBDC540F2AA4AF009D2728 /* MainView.m in Sources */,
+				A7BBDC550F2AA4AF009D2728 /* MainViewController.m in Sources */,
+				A7BBDC560F2AA4AF009D2728 /* MyCLController.m in Sources */,
+				A7BBDC570F2AA4AF009D2728 /* RootViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: UW Division of Information Technology";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Aris_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Aris;
+				PROVISIONING_PROFILE = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: UW Division of Information Technology";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Aris_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Aris;
+				PROVISIONING_PROFILE = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+			};
+			name = Release;
+		};
+		A7BBDC650F2AA581009D2728 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Don't Code Sign";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos2.2;
+			};
+			name = Distribution;
+		};
+		A7BBDC660F2AA581009D2728 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: UW Division of Information Technology";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Aris_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Aris;
+				PROVISIONING_PROFILE = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EC131F5A-3568-4E52-BB26-7115EF91A6A4";
+			};
+			name = Distribution;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Don't Code Sign";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos2.2;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Don't Code Sign";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos2.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Aris" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+				A7BBDC660F2AA581009D2728 /* Distribution */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Aris" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+				A7BBDC650F2AA581009D2728 /* Distribution */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

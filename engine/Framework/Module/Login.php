@@ -38,7 +38,7 @@ class Framework_Module_Login extends Framework_Auth_No
     	
     		// Query the database
     		$sql = sprintf("SELECT * FROM %s 
-    			WHERE UPPER(user_name) LIKE UPPER('%s') AND password='%s'", 
+    			WHERE user_name='%s' AND password='%s'", 
     			Framework::$site->config->user->userTable,
     			$_POST['user_name'], $_POST['password']);
     		$row = Framework::$db->getRow($sql);
@@ -49,11 +49,6 @@ class Framework_Module_Login extends Framework_Auth_No
     				"$userField" => $row["$userField"]);
     				
     			$session->{$userField} = $row["$userField"];
-				
-				//Set cookie
-				$expire=time()+60*60*24*30;
-				setcookie("ARISUserField", $row["$userField"], $expire);
-				
 
 				header("Location: {$_SERVER['PHP_SELF']}?module=SelectGame&controller=Web&site="
 					. Framework::$site->name);

@@ -28,60 +28,38 @@ configuration stuff here.
 		<app>ARIS</app>
 		<company>ARIS</company>
 		<techEmail>techsupport@gmail.com</techEmail>
-		
+		<tablePrefix>default_</tablePrefix>
 		<main>
 			<title>Player %s</title>
 			<body>Welcome to ARIS</body>
 			<defaultModule>Main</defaultModule>
 		</main>
-		
 		<nodeViewer>
 			<title>Contact List</title>
 		</nodeViewer>
-		
 		<map>
 			<!--ABQIAAAAaBINj42Tz4K8ZaoZWWSnWRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxQkcVoUCrdum-UscUMoKinDrDjThQ is for localhost-->
 			<!--ABQIAAAAKdhUzwbl5RsEXD6h2Ua_HRQsvlSBtAWfm4N2P3iTGfWOp-UrmRRwG9t9N2_fCbAVKXjr59p56Fx_zA is for atsosxdev-->
 			<!--ABQIAAAAKdhUzwbl5RsEXD6h2Ua_HRRloMOfjiI7F4SM41AgXh_4cb6l9xTntP3tXw4zMbRaLS6TOMA3-jBOlw is for arisgames.org-->
-			<googleKey>ABQIAAAAaBINj42Tz4K8ZaoZWWSnWRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxQkcVoUCrdum-UscUMoKinDrDjThQ</googleKey>
-			<defaultLocationIcon>defaultLocationIcon.png</defaultLocationIcon>
-			<defaultPlayerIcon>defaultPlayerIcon.png</defaultPlayerIcon>
+			<googleKey>ABQIAAAA_CE3Nypcp6bilTqyCg-N2hQsvlSBtAWfm4N2P3iTGfWOp-UrmRQgXVI4kOqbJnZJDYqrPvf7deonfw</googleKey>
+			<width>320</width>
+			<height>200</height>
+			<error>0.0005</error>
+			<playerColor>yellow</playerColor>
 		</map>
-		
 		<quest>
 			<title>Quests</title>
 		</quest>
-		
 		<inventory>
 			<title>Inventory</title>
 			<imageIcon>defaultImageIcon.png</imageIcon>
 			<videoIcon>defaultVideoIcon.png</videoIcon>
 			<audioIcon>defaultAudioIcon.png</audioIcon>
 			<pdfIcon>defaultPdfIcon.png</pdfIcon>
-			<startingIDs>
-			</startingIDs>
 		</inventory>
-		
 		<async>
 			<notification>Signal lost.</notification>
 		</async>
-		
-		<applications>
-			<startingIDs>
-				<id>2</id>
-				<id>3</id>
-				<id>4</id>
-				<id>5</id>
-				<id>6</id>
-				<id>7</id>
-			</startingIDs>
-		</applications>
-
-		<events>
-			<startingIDs>
-			</startingIDs>
-		</events>
-
 	</aris>
 
     <!--

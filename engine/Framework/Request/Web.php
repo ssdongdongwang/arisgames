@@ -60,21 +60,21 @@ class Framework_Request_Web extends Framework_Request_Common
      */
     public function __construct()
     {
-        if (!isset($_REQUEST['module']) ||
-            !is_string($_REQUEST['module']) ||
-            !preg_match('/^[A-Z0-9]+$/i',$_REQUEST['module'])) 
+        if (!isset($_GET['module']) ||
+            !is_string($_GET['module']) ||
+            !preg_match('/^[A-Z0-9]+$/i',$_GET['module'])) 
         {
         	// Direct them to the login screen
             $this->module = "Welcome";
         }
-        else $this->module = $_REQUEST['module'];
+        else $this->module = $_GET['module'];
         
-        if (isset($_REQUEST['class'])) {
-            $this->class = $_REQUEST['class'];
+        if (isset($_GET['class'])) {
+            $this->class = $_GET['class'];
         }
 
-        if (isset($_REQUEST['event'])) {
-            $this->event = $_REQUEST['event'];
+        if (isset($_GET['event'])) {
+            $this->event = $_GET['event'];
         }
 
         if (!preg_match('/^([_A-Z]+)([A-Z0-9]+)$/i',$this->event)) {

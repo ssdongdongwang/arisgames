@@ -27,102 +27,50 @@ class Framework_Module_Map extends Framework_Auth_User
     {
     	$site = Framework::$site;
     	$user = Framework_User::singleton();
+
+		$this->title = 'Current Location';
 		
 		// Set up a marker for each location in the locations table
-		$pointsString = '';
 		$sql = Framework::$db->prefix("SELECT * FROM _P_locations 
-									  LEFT OUTER JOIN _P_player_events ON 
-									  _P_locations.require_event_id = _P_player_events.event_id
-									  WHERE latitude != '' AND longitude != ''
-									  AND (require_event_id IS NULL OR player_id = {$user->player_id})
-									  AND (_P_locations.remove_if_event_id IS NULL 
+			LEFT OUTER JOIN _P_player_events ON 
+				_P_locations.require_event_id = _P_player_events.event_id
+			WHERE latitude != '' AND longitude != ''
+				AND (require_event_id IS NULL OR player_id = {$user->player_id})
+				AND (_P_locations.remove_if_event_id IS NULL 
 									  OR _P_locations.remove_if_event_id NOT IN (SELECT event_id FROM _P_player_events WHERE player_id = {$user->player_id}))
-									  AND hidden != '1'");
+				AND hidden != '1'");
 		$rows = Framework::$db->getAll($sql);
 		$this->allLocations = $rows;
+
+		$mapPath = 'http://maps.google.com/staticmap?maptype=mobile&size='
+			. $site->config->aris->map->width . 'x' 
+			. $site->config->aris->map->height . '&key=' 
+			. $site->config->aris->map->googleKey . '&markers=';
+	 	$colors = array('green', 'purple', 'yellow', 'blue', 'gray', 'orange', 'red', 'white', 'black', 'brown');
+		$letters = array('a','b','c','d','e','f','g','h','i','j','k');
 		
-		//Set up all the markers
+		$i = 0;
 		foreach ($rows as $row) {
-			if (isset($row['icon']) and strlen($row['icon'])>0) $icon = $site->getUriPath() . '/templates/' . $row['icon'];
-			else  $icon = $site->getUriPath() . '/templates/' . $site->config->aris->map->defaultLocationIcon;
-			
-			$pointsString  .= "createMarker({$row['latitude']}, {$row['longitude']}, '{$row['name']}', '{$icon}');\n";
+			$lat = $row['latitude'];
+			$long = $row['longitude'];
+			$name = $row['name'];
+			$lid = $row['location_id'];
+			// add a marker (google seems to forgive the trailing | if it exists)
+			$mapPath .= "$lat,$long,{$colors[$i]}{$letters[$i]}|";
+			$i++;
 		}
-		
-		// Set up a player marker
-		if (!$user->latitude or !$user->longitude) {
-			$user->latitude = 1;
-			$user->longitude = 1;
-		}
-			$playerIcon = $site->getUriPath() . '/templates/' . $site->config->aris->map->defaultPlayerIcon;
-			$pointsString  .= "	// Create our player marker icon
-								var playerIcon = new GIcon(G_DEFAULT_ICON);
-								playerIcon.image = '{$playerIcon}';
-								
-								// Set up our GMarkerOptions object
-								var playerMarkerOptions = { icon:playerIcon };
-								var latlng = new GLatLng($user->latitude, $user->longitude);
-								playerMarker = new GMarker(latlng, playerMarkerOptions);
-								map.addOverlay(playerMarker);
-								bounds.extend(playerMarker.getPoint());
-								
-								//Make the Callout
-								GEvent.addListener(playerMarker,'click', function() {
-									var myHtml = '<p>$user->user_name</p>';
-									map.openInfoWindowHtml(latlng, myHtml);
-								});";		
-		
-		
-		
+
+		// Cache the map_path for later updates
+		$this->mapPathCache = $mapPath;
 	
-		
-		$this->rawHead = '<script src="http://www.google.com/jsapi?key=' . $site->config->aris->map->googleKey . '"></script>
-		<script type="text/javascript">
-		google.load("maps", "2");
-		var map;
-		var bounds;
-		var playerMarker;
-							
-		function createMarker(lat, lng, html, iconPath) {
-			// Create our player marker icon
-			var icon = new GIcon(G_DEFAULT_ICON);
-			icon.image = iconPath;
-		
-			// Set up our GMarkerOptions object
-			var markerOptions = { icon:icon };
-			var latlng = new GLatLng(lat, lng);
-			var marker = new GMarker(latlng,markerOptions);
-		
-			// Add it to the map
-			map.addOverlay(marker);
-		
-			//Add it to the bounds (for auto scaling and centering)
-			bounds.extend(marker.getPoint());
-		
-			//Make the Callout
-			GEvent.addListener(marker,"click", function() {
-						   map.openInfoWindowHtml(latlng, html);});	
+		// Set up a player icon and look for a matching location
+		if (!empty($user->latitude) && !empty($user->longitude)) {
+			$mapPath .= $user->latitude . ',' . $user->longtitude . ','
+				. $site->config->aris->map->playerColor;
 		}
 		
-		function initialize() {
-			map = new GMap2(document.getElementById("map_canvas"));
-			map.addControl(new GSmallZoomControl());
-			map.addControl(new GMapTypeControl());
-			bounds = new GLatLngBounds();
-			map.setCenter(new GLatLng(0,0),0);
-			bounds = new GLatLngBounds();
-									
-			' . $pointsString . '
-			map.setZoom(map.getBoundsZoomLevel(bounds) -1);
-			map.setCenter(bounds.getCenter());
-			return true;
-		}
-		</script>';
+		$this->mapPath = $mapPath;
 		
-		$this->mapWidth = $site->config->aris->map->width;
-		$this->mapHeight = $site->config->aris->map->height;
-		$this->title = 'Current Location';
-		$this->onLoad = 'initialize()';
 		$this->loadLocationAdmin($user);
     }
     

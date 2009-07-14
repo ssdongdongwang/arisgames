@@ -41,7 +41,7 @@ class Framework_User extends Framework_Object_DB
      */
     public function __construct($userID=null)
     {
-		parent::__construct();
+        parent::__construct();
         if (is_null($userID)) {
             $session = Framework_Session::singleton();
             $userID = $session->{Framework::$site->config->user->userField};
@@ -52,7 +52,7 @@ class Framework_User extends Framework_Object_DB
             }
         }
 
-        $sql = sprintf("SELECT * FROM %s WHERE UPPER(%s) LIKE UPPER('%d')",
+        $sql = sprintf("SELECT * FROM %s WHERE %s='%d'",
         	Framework::$site->config->user->userTable,
         	Framework::$site->config->user->userField, $userID);
 

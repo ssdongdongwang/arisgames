@@ -32,7 +32,6 @@ class Framework_Module_Logout extends Framework_Auth_No
     {
 	    $_SESSION = array();
     	session_destroy();
-		setcookie("ARISUserField", "", time()-3600);
 		header("Location: {$_SERVER['PHP_SELF']}?module=Welcome&controller=Web&site="
 			. Framework::$site->name);
 		die();

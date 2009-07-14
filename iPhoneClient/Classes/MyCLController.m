@@ -51,40 +51,36 @@
 #define LocStr(key) [[NSBundle mainBundle] localizedStringForKey:(key) value:@"" table:nil]
 
 
+// This is a singleton class, see below
+static MyCLController *sharedCLDelegate = nil;
+
 @implementation MyCLController
 
-@synthesize locationManager;
+@synthesize delegate, locationManager;
 
-- (MyCLController*) initWithAppModel:(AppModel *)model {
+- (id) init {
 	self = [super init];
 	if (self != nil) {
 		self.locationManager = [[[CLLocationManager alloc] init] autorelease];
 		self.locationManager.delegate = self; // Tells the location manager to send updates to this object
-		self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-		self.locationManager.distanceFilter = 5; //Minimum change of .5 meters for update
 	}
-	appModel = model;
 	return self;
-		
 }
 
 
 // Called when the location is updated
-	- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
-
-	NSLog(@"Read %lf, %lf from CLLocationManager with Accuracy of %gm,%gm", newLocation.coordinate.latitude,
-		  newLocation.coordinate.longitude,  newLocation.horizontalAccuracy, newLocation.verticalAccuracy );
-	
-	//Update the Model
-		appModel.lastLocation = newLocation;
-		
-	//Tell the other parts of the client
-	NSNotification *updatedLocationNotification = [NSNotification notificationWithName:@"PlayerMoved" object:nil];
-	[[NSNotificationCenter defaultCenter] postNotification:updatedLocationNotification];
-		
-	//Tell the model to update the server and fetch any nearby locations
-	[NSThread detachNewThreadSelector: @selector(updateServerLocationAndfetchNearbyLocationList) toTarget: appModel withObject: nil];	
-	
+- (void)locationManager:(CLLocationManager *)manager
+	didUpdateToLocation: (CLLocation *)newLocation
+		   fromLocation: (CLLocation *)oldLocation
+{
+	NSLog(@"Read %lf, %lf from CLLocationManager", newLocation.coordinate.latitude,
+		  newLocation.coordinate.longitude);
+	[self.delegate updateLatitude:
+	 [NSString stringWithFormat: @"%lf",
+	  newLocation.coordinate.latitude]
+	 andLongitude:
+	 [NSString stringWithFormat:@"%lf",
+	  newLocation.coordinate.longitude]];
 }
 /*
  - (void)locationManager:(CLLocationManager *)manager
@@ -195,9 +191,37 @@
 		[errorString appendFormat:@"Description: \"%@\"\n", [error localizedDescription]];
 	}
 	
-	//Send the update somewhere?
+	// Send the update to our delegate
+	//[self.delegate newLocationUpdate:errorString];
 }
 
+#pragma mark ---- singleton object methods ----
+
+// See "Creating a Singleton Instance" in the Cocoa Fundamentals Guide for more info
+
++ (MyCLController *)sharedInstance {
+    @synchronized(self) {
+        if (sharedCLDelegate == nil) {
+            [[self alloc] init]; // assignment not done here
+        }
+    }
+    return sharedCLDelegate;
+}
+
++ (id)allocWithZone:(NSZone *)zone {
+    @synchronized(self) {
+        if (sharedCLDelegate == nil) {
+            sharedCLDelegate = [super allocWithZone:zone];
+            return sharedCLDelegate;  // assignment and return on first allocation
+        }
+    }
+    return nil; // on subsequent allocation attempts return nil
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return self;
+}
 
 - (id)retain {
     return self;
@@ -213,11 +237,6 @@
 
 - (id)autorelease {
     return self;
-}
-
-- (void)dealloc {
-	[locationManager release];
-    [super dealloc];
 }
 
 @end

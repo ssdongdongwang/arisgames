@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>files</key>
+	<dict>
+		<key>Aris Logo.png</key>
+		<data>
+		3PAZTbbsQ2j+DqpCmYs3AwmKtu0=
+		</data>
+		<key>Default.png</key>
+		<data>
+		hGyMDkIr24+S/2tgdyUj1fWFTrk=
+		</data>
+		<key>Entitlements.plist</key>
+		<data>
+		s45CsB1sm2EFR9Z1NilFQ5hxXrI=
+		</data>
+		<key>FlipsideView.nib</key>
+		<data>
+		bsJorBc2sZ8jYcYgsSR0w5wcjrw=
+		</data>
+		<key>Icon.icns</key>
+		<data>
+		PivSJv6rhheTWdnqVVZPQn5EgYQ=
+		</data>
+		<key>Icon.png</key>
+		<data>
+		qVkQSkAZGeViq5iKtq9Yh4U6Vrs=
+		</data>
+		<key>MainView.nib</key>
+		<data>
+		1ZTsjEBmjnWoSasZyqVu3hDolMU=
+		</data>
+		<key>MainWindow.nib</key>
+		<data>
+		9k1vWHp+JMY5a6MZkQh6GUXY2vk=
+		</data>
+		<key>PkgInfo</key>
+		<data>
+		n57qDP4tZfLD1rCS43W0B4LQjzE=
+		</data>
+		<key>embedded.mobileprovision</key>
+		<data>
+		KaM+x7cnjR+OpY9mM+myz5ilHgE=
+		</data>
+	</dict>
+	<key>rules</key>
+	<dict>
+		<key>.*</key>
+		<true/>
+		<key>Info.plist</key>
+		<dict>
+			<key>omit</key>
+			<true/>
+			<key>weight</key>
+			<real>10</real>
+		</dict>
+		<key>ResourceRules.plist</key>
+		<dict>
+			<key>omit</key>
+			<true/>
+			<key>weight</key>
+			<real>100</real>
+		</dict>
+	</dict>
+</dict>
+</plist>

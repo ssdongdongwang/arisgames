@@ -1,0 +1,362 @@
+// !$*UTF8*$!
+{
+	1D6058900D05DD3D006BFB54 /* Aris */ = {
+		activeExec = 0;
+		executables = (
+			A7BBDC2B0F2AA3F5009D2728 /* Aris */,
+		);
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Distribution;
+		activeExecutable = A7BBDC2B0F2AA3F5009D2728 /* Aris */;
+		activeSDKPreference = iphoneos2.2;
+		activeTarget = 1D6058900D05DD3D006BFB54 /* Aris */;
+		addToTargets = (
+			1D6058900D05DD3D006BFB54 /* Aris */,
+		);
+		codeSenseManager = A7BBDC380F2AA3F9009D2728 /* Code sense */;
+		executables = (
+			A7BBDC2B0F2AA3F5009D2728 /* Aris */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					348,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					308,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 254472245;
+			PBXWorkspaceStateSaveDate = 254472245;
+		};
+		perUserProjectItems = {
+			A71D37BA0F2ABC3400123B1F = A71D37BA0F2ABC3400123B1F /* PBXTextBookmark */;
+			A79467600F2AAA7D005AA2FC = A79467600F2AAA7D005AA2FC /* PBXTextBookmark */;
+			A7BBDC790F2AA683009D2728 = A7BBDC790F2AA683009D2728 /* PBXTextBookmark */;
+			A7BBDC7A0F2AA683009D2728 = A7BBDC7A0F2AA683009D2728 /* PBXTextBookmark */;
+			A7BBDC7B0F2AA683009D2728 = A7BBDC7B0F2AA683009D2728 /* PBXBookmark */;
+			A7BBDC7C0F2AA683009D2728 = A7BBDC7C0F2AA683009D2728 /* PlistBookmark */;
+			A7BBDC7D0F2AA683009D2728 = A7BBDC7D0F2AA683009D2728 /* PBXBookmark */;
+			A7BBDC7F0F2AA683009D2728 = A7BBDC7F0F2AA683009D2728 /* PBXTextBookmark */;
+			A7BBDC800F2AA683009D2728 = A7BBDC800F2AA683009D2728 /* PBXTextBookmark */;
+			A7BBDC810F2AA683009D2728 = A7BBDC810F2AA683009D2728 /* PBXBookmark */;
+			A7BBDC820F2AA683009D2728 = A7BBDC820F2AA683009D2728 /* PBXBookmark */;
+			A7BBDC830F2AA683009D2728 = A7BBDC830F2AA683009D2728 /* PlistBookmark */;
+			A7BBDC840F2AA683009D2728 = A7BBDC840F2AA683009D2728 /* PlistBookmark */;
+			A7BBDC8E0F2AA712009D2728 = A7BBDC8E0F2AA712009D2728 /* PlistBookmark */;
+			A7C6B3BE0F2AF1030044E5FC /* PBXTextBookmark */ = A7C6B3BE0F2AF1030044E5FC /* PBXTextBookmark */;
+			A7C6B3BF0F2AF1030044E5FC /* PBXTextBookmark */ = A7C6B3BF0F2AF1030044E5FC /* PBXTextBookmark */;
+			A7C6B3C00F2AF1030044E5FC /* PlistBookmark */ = A7C6B3C00F2AF1030044E5FC /* PlistBookmark */;
+			A7C6B3D50F2AF1310044E5FC /* PlistBookmark */ = A7C6B3D50F2AF1310044E5FC /* PlistBookmark */;
+			A7C6B3E00F2AF3480044E5FC /* PlistBookmark */ = A7C6B3E00F2AF3480044E5FC /* PlistBookmark */;
+			A7C6B3E10F2AF3480044E5FC /* PlistBookmark */ = A7C6B3E10F2AF3480044E5FC /* PlistBookmark */;
+			A7C6B3EE0F2AF57C0044E5FC /* PlistBookmark */ = A7C6B3EE0F2AF57C0044E5FC /* PlistBookmark */;
+		};
+		sourceControlManager = A7BBDC370F2AA3F9009D2728 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {526, 492}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 343}";
+		};
+	};
+	32CA4F630368D1EE00C91783 /* Aris_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {519, 126}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 142}";
+		};
+	};
+	8D1107310486CEB800E47090 /* Info.plist */ = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{15, 162}, {773, 711}}";
+		};
+	};
+	A71D37BA0F2ABC3400123B1F /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A7BBDC490F2AA4AF009D2728 /* RootViewController.m */;
+		name = "RootViewController.m: 116";
+		rLen = 0;
+		rLoc = 3728;
+		rType = 0;
+		vrLen = 559;
+		vrLoc = 3390;
+	};
+	A79467600F2AAA7D005AA2FC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A7BBDC490F2AA4AF009D2728 /* RootViewController.m */;
+		name = "RootViewController.m: 116";
+		rLen = 0;
+		rLoc = 3728;
+		rType = 0;
+		vrLen = 693;
+		vrLoc = 3352;
+	};
+	A7BBDC2B0F2AA3F5009D2728 /* Aris */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Aris;
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+	};
+	A7BBDC370F2AA3F9009D2728 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	A7BBDC380F2AA3F9009D2728 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	A7BBDC490F2AA4AF009D2728 /* RootViewController.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1020, 2016}}";
+			sepNavSelRange = "{3728, 0}";
+			sepNavVisRange = "{3390, 617}";
+		};
+	};
+	A7BBDC790F2AA683009D2728 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32CA4F630368D1EE00C91783 /* Aris_Prefix.pch */;
+		name = "Aris_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 142;
+		vrLoc = 0;
+	};
+	A7BBDC7A0F2AA683009D2728 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 343;
+		vrLoc = 0;
+	};
+	A7BBDC7B0F2AA683009D2728 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A7BBDC4A0F2AA4AF009D2728 /* Default.png */;
+	};
+	A7BBDC7C0F2AA683009D2728 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = A7BBDC690F2AA5A8009D2728 /* Entitlements.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			"get-task-allow",
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Entitlements.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7BBDC7D0F2AA683009D2728 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A7BBDC4C0F2AA4AF009D2728 /* Icon.icns */;
+	};
+	A7BBDC7F0F2AA683009D2728 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32CA4F630368D1EE00C91783 /* Aris_Prefix.pch */;
+		name = "Aris_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 142;
+		vrLoc = 0;
+	};
+	A7BBDC800F2AA683009D2728 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 343;
+		vrLoc = 0;
+	};
+	A7BBDC810F2AA683009D2728 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A7BBDC4C0F2AA4AF009D2728 /* Icon.icns */;
+	};
+	A7BBDC820F2AA683009D2728 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A7BBDC4A0F2AA4AF009D2728 /* Default.png */;
+	};
+	A7BBDC830F2AA683009D2728 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleInfoDictionaryVersion,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7BBDC840F2AA683009D2728 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = A7BBDC690F2AA5A8009D2728 /* Entitlements.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			"get-task-allow",
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Entitlements.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7BBDC8E0F2AA712009D2728 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleIconFile,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7C6B3BE0F2AF1030044E5FC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A7BBDC490F2AA4AF009D2728 /* RootViewController.m */;
+		name = "RootViewController.m: 116";
+		rLen = 0;
+		rLoc = 3728;
+		rType = 0;
+		vrLen = 617;
+		vrLoc = 3390;
+	};
+	A7C6B3BF0F2AF1030044E5FC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A7BBDC490F2AA4AF009D2728 /* RootViewController.m */;
+		name = "RootViewController.m: 116";
+		rLen = 0;
+		rLoc = 3728;
+		rType = 0;
+		vrLen = 617;
+		vrLoc = 3390;
+	};
+	A7C6B3C00F2AF1030044E5FC /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleInfoDictionaryVersion,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7C6B3D50F2AF1310044E5FC /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleInfoDictionaryVersion,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7C6B3E00F2AF3480044E5FC /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleInfoDictionaryVersion,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 3;
+		rLoc = 0;
+	};
+	A7C6B3E10F2AF3480044E5FC /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleInfoDictionaryVersion,
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	A7C6B3EE0F2AF57C0044E5FC /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = /Users/davidgagnon/Documents/Aris/Aris/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+}
