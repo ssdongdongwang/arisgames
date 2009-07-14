@@ -27,13 +27,11 @@
 		<a href = 'games.php'>Game Home</a>
 		<a href = 'index.php'>Select a Different Game</a>
 		<a href = 'locations.php'>Locations</a>
-		<a href = 'qrcodes.php'>QR Codes</a>
 		<a href = 'nodes.php'>Nodes</a>
 		<a href = 'npcs.php'>NPCs</a>
 		<a href = 'items.php'>Items</a>
-		<a href = 'events.php'>Events</a>
 		<a href = 'quests.php'>Quests</a>
-		<a href = 'game_players.php'>Registered Players</a>
+		<a href = 'players.php'>Players</a>
 		<a href = 'http://arisdocumentation.pbwiki.com' target = '_blank'>Help</a>
 		<a href = 'logout.php'>Logout</a>
 		</div>";	

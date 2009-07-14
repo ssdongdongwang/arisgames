@@ -40,16 +40,99 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 
 	
 	//Build XML file
-	$defaultConfigFile = "{$engine_sites_path}/{$default_site}/config.xml";
-	$defaultConfigHandle = fopen($defaultConfigFile, 'r') or die("Can't open config file");
-	$defaultConfigContent = fread($defaultConfigHandle, filesize($defaultConfigFile));
-	//$defaultConfigContent = str_replace("%tablePrefix%", $new_game_short . "_", $defaultConfigContent);
-	fclose($defaultConfigHandle);
+	echo '<p>Creating config.xml</p>';
+	$file_data = '<?xml version="1.0" ?>
+<!--
+
+Each Framework_Site must have a config.xml. This is loaded up by Framework_Site
+and can be accessed via Framework::$site->config. Feel free to add your own
+configuration stuff here.
+
+-->
+<framework>
+	<db>
+	<type>MySQL</type>
+	<dsn>mysql:dbname=aris;host=localhost;username=arisuser;password=arispwd</dsn>
+	</db>
+
+<!-- 
+This MUST be readable/writeable by your web servers user (this is
+normally nobody/nogroup or www-data/www-data).
+-->
+<logFile>/tmp/framework.log</logFile>
+
+<!--
+app				-	The name of the ARIS application
+company			-	The "company" that created the application
+techEmail		-	The email address of technical support/help 
+tablePrefix		-	The tables to use in SQL
+-->
+<aris>
+	<app>ARIS</app>
+	<company>ARIS</company>
+	<techEmail>techsupport@gmail.com</techEmail>
+	<tablePrefix>' . $new_game_short . '_</tablePrefix>
 	
+	<main>
+		<title>Player %s</title>
+		<body>Welcome to ARIS</body>
+		<defaultModule>Main</defaultModule>
+	</main>
 	
-	$xmlFile = "{$engine_sites_path}/{$new_game_short}/config.xml";
+	<nodeViewer>
+		<title>Contact List</title>
+	</nodeViewer>
+	
+	<map>
+		<!--ABQIAAAAaBINj42Tz4K8ZaoZWWSnWRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxQkcVoUCrdum-UscUMoKinDrDjThQ is for localhost-->
+		<!--ABQIAAAAKdhUzwbl5RsEXD6h2Ua_HRQsvlSBtAWfm4N2P3iTGfWOp-UrmRRwG9t9N2_fCbAVKXjr59p56Fx_zA is for atsosxdev-->
+		<!--ABQIAAAAKdhUzwbl5RsEXD6h2Ua_HRRloMOfjiI7F4SM41AgXh_4cb6l9xTntP3tXw4zMbRaLS6TOMA3-jBOlw is for arisgames.org-->
+		<googleKey>' . $google_key . '</googleKey>
+		<width>320</width>
+		<height>200</height>
+		<error>0.0005</error>
+		<playerColor>yellow</playerColor>
+	</map>
+	
+	<quest>
+		<title>Quests</title>
+	</quest>
+	
+	<inventory>
+		<title>Inventory</title>
+		<imageIcon>defaultImageIcon.png</imageIcon>
+		<videoIcon>defaultVideoIcon.png</videoIcon>
+		<audioIcon>defaultAudioIcon.png</audioIcon>
+		<pdfIcon>defaultPdfIcon.png</pdfIcon>
+	</inventory>
+	
+	<async>
+		<notification>Signal lost.</notification>
+	</async>
+
+	<developer>
+		<title>Developer</title>
+	</developer>
+
+</aris>
+
+<!--
+userTable       -   The users table to draw user data from 
+userField       -   The primary key for userTable
+defaultUser     -   Create a dummy record and put its primary key here
+-->
+
+<user>
+	<userTable>players</userTable>
+	<userField>player_id</userField> 
+	<defaultUser>0</defaultUser>
+</user>
+
+</framework>';
+	
+	$xmlFile = "{$engine_sites_path}/{$new_game_short}/Config.xml";
 	$file_handle = fopen($xmlFile, 'w') or die("Can't open file");
-	fwrite($file_handle, $defaultConfigContent);
+	fwrite($file_handle, $file_data);
 	fclose($file_handle);
 	
 	
@@ -120,7 +203,6 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 
 
 
-
 	echo '<p>Constructing default data for the new game in SQL</p>';
 	//Create the SQL tables
 	$query = "
@@ -173,8 +255,6 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 		name varchar(100) default NULL,
 		description text,
 		media varchar(50) NOT NULL default 'item_default.jpg',
-		type enum('AV','Image') NOT NULL default 'Image',
-		event_id_when_viewed int(10) unsigned NULL,
 		PRIMARY KEY  (item_id)
 		) ";
 	mysql_query($query);
@@ -182,7 +262,7 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 
 	$query = "CREATE TABLE {$new_game_short}_locations (
 		location_id int(11) NOT NULL auto_increment,
-		icon varchar(30) default NULL,
+		media varchar(30) default NULL,
 		name varchar(50) default NULL,
 		description tinytext,
 		latitude double default '43.0746561',
@@ -190,12 +270,9 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 		error double default '0.0005',												
 		type enum('Node','Event','Item','Npc') default NULL,
 		type_id int(11) default NULL,
-		item_qty int(11) default NULL,
 		require_event_id int(10) unsigned default NULL,
 		remove_if_event_id int(10) unsigned default NULL,
 		add_event_id int(10) unsigned default NULL,
-		hidden enum('0','1') default '0',
-		force_view enum('0','1') NOT NULL DEFAULT '0' COMMENT 'Forces this Location to Display when nearby',
 		PRIMARY KEY  (location_id),
 		KEY require_event_id (require_event_id)
 		)";
@@ -307,30 +384,23 @@ if (isSet($_REQUEST['short']) and isSet($_REQUEST['name'])) {
 	mysql_query($query);
 	echo mysql_error();
 
-
-	$query = "CREATE TABLE IF NOT EXISTS `{$new_game_short}_qrcodes` (
-		`qrcode_id` int(11) NOT NULL auto_increment,
-		`type` enum('Node','Event','Item','Npc') NOT NULL,
-		`type_id` int(11) NOT NULL,
-		PRIMARY KEY  (`qrcode_id`)
-		)";
-	mysql_query($query);
-	echo mysql_error();
-
 	//Create a test player for this game and give them all applications
-	echo '<p>Regster a Test Player</p>';
+	echo "<p>Creating a test player for this game and give them default applicaitons</p>";
 	$query = "INSERT INTO players (first_name,last_name,user_name,password,site) 
 				VALUES 	('{$new_game_short}', 'Tester', '{$new_game_short}', '{$new_game_short}','{$new_game_short}')";
 	mysql_query($query);
 	echo mysql_error();
 	$test_player_id = mysql_insert_id();
 
-	$query = "INSERT INTO game_players (game_id,player_id) VALUES ('$game_id','$test_player_id')";
-	mysql_query($query);
+	$query = "SELECT * FROM {$new_game_short}_applications";
+	$result = mysql_query($query);
 	echo mysql_error();
-
-	echo '<p>Setting up Starting Assets for new Player</p>';
-	new_player_setup($new_game_short,$game_id, $test_player_id);
+	while ($application = mysql_fetch_array($result)) {
+			$new_player_application_query = "INSERT INTO {$new_game_short}_player_applications (player_id,application_id)
+			VALUES ('{$test_player_id}','{$application['application_id']}')";
+			mysql_query($new_player_application_query);
+			echo mysql_error();
+	}
 
 
 

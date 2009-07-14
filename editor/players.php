@@ -3,14 +3,25 @@
 include_once('common.inc.php');
 
 
+if (isset($_SESSION['current_game_prefix'])) {	
+	$short_name = substr($_SESSION['current_game_prefix'], 0, strlen($_SESSION['current_game_prefix']) - 1);
+	print_header( "$short_name Players");
+	$opts['filters'] = "site = '{$short_name}'";
+	print_general_navigation();
+	echo "<div class = 'nav'>
+	<a href = 'player_events.php'>Player Events</a>
+	<a href = 'player_items.php'>Player Items</a>	
+	<a href = 'player_applications.php'>Player Applications</a>
+	</div>";
+}
+else {
 	print_header( 'Global Players');
 	echo "<div class = 'nav'>
 	<a href = 'index.php'>Back to Game Selection</a>
-	<a href = 'game_players.php'>Player Resistration to Games</a>
 	<a href = 'http://arisdocumentation.pbwiki.com' target = '_blank'>Help</a>
 	<a href = 'logout.php'>Logout</a>
 	</div>";	
-
+}	
 	
 /**********************
  PHP My Edit Config
@@ -174,11 +185,22 @@ $opts['fdd']['longitude'] = array(
 								  'sort'     => true
 );
 
+if (isset($_SESSION['current_game_prefix'])) {	
+	$opts['fdd']['site'] = array(
+								 'name'     => 'Game Prefix',
+								 'select'   => 'T',
+								 'maxlen'   => 20,
+								 'options'  => 'APDR',
+								 'sort'     => true,
+								 'default'	=> "$short_name"
+								 );
+}
+else {
 	$opts['fdd']['site'] = array(
 								 'name'     => 'Game',
 								 'select'   => 'T',
 								 'maxlen'   => 20,
-								 'options'  => 'LVCPD',
+								 'options'  => 'ALVCPD',
 								 'sort'     => true,
 								 'default'    => '',
 								 'values'     => array(
@@ -190,7 +212,7 @@ $opts['fdd']['longitude'] = array(
 								 
 								 );
 	
-
+}
 
 
 

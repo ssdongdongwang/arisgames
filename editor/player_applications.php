@@ -6,7 +6,7 @@ print_header( 'Players\' Applications');
 print_general_navigation();
 
 	echo "<div class = 'nav'>
-	<a href = 'game_players.php'>Players</a>
+	<a href = 'players.php'>Players</a>
 	<a href = 'applications.php'>Applications</a>
 	</div>";	
 
@@ -109,37 +109,21 @@ $opts['language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'] . '-UTF8';
  This is useful for giving more meaning to column values. Multiple
  descriptions fields are also possible. Check documentation for this.
  */
-	
-		
 
 $opts['fdd']['player_id'] = array(
 								  'name'     => 'Player ID',
 								  'select'   => 'T',
 								  'maxlen'   => 10,
 								  'default'  => '0',
-								  'sort'     => true,
-								  'values'     => array(
-											'db'          	=> $opts['db'],
-											'table'       	=> 'players',
-											'column'      	=> 'player_id',
-											'description'	=> array('columns' => array('0' => 'user_name')),
-											'orderby'     => 'player_id')
-								  );	
-
+								  'sort'     => true
+								  );
 $opts['fdd']['application_id'] = array(
-									'name'     => 'Application ID',
-									'select'   => 'T',
-									'maxlen'   => 10,
-									'default'  => '0',
-									'sort'     => true,
-									'values'     => array(
-											'db'          	=> $opts['db'],
-											'table'       	=> $_SESSION['current_game_prefix'] . 'applications',
-											'column'      	=> 'application_id',
-											'description'	=> array('columns' => array('0' => 'name')),
-											'orderby'     => 'application_id')
+									   'name'     => 'Application ID',
+									   'select'   => 'T',
+									   'maxlen'   => 10,
+									   'default'  => '0',
+									   'sort'     => true
 									   );
-	
 $opts['fdd']['id'] = array(
 						   'name'     => 'ID',
 						   'select'   => 'T',

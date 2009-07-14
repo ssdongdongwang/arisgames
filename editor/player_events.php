@@ -5,10 +5,7 @@
 	print_header( 'Players\' Events');
 	print_general_navigation();
 	
-	echo "<div class = 'nav'>
-	<a href = 'game_players.php'>Players</a>
-	<a href = 'events.php'>Events</a>
-	</div>";	
+	
 	
 	/**********************
 	 PHP My Edit Config

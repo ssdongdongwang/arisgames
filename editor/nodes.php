@@ -129,14 +129,6 @@
 	
 	//Main Fields
 	
-	$opts['fdd']['title'] = array(
-								  'name'     => 'Title',
-								  'select'   => 'T',
-								  'maxlen'   => 100,
-								  'sort'     => true,
-								  'options'	=> 'LAVCPD'
-								  );
-	
 	$opts['fdd']['text'] = array(
 								 'name'     => 'Text for the node',
 								 'select'   => 'T',
@@ -145,6 +137,15 @@
 								 'sort'     => true,
 								 'help'		=> 'Use &lt;p&gt; and &lt;/p&gt; tags to break your text into paragraphs'
 								 );		
+	
+	$opts['fdd']['title'] = array(
+								  'name'     => 'Title',
+								  'select'   => 'T',
+								  'maxlen'   => 100,
+								  'sort'     => true,
+								  'options'	=> 'AVCPD'
+								  );
+	
 	
 	$opts['fdd']['media'] = array(
 								 //  'colattrs|LF'   => '',
@@ -196,7 +197,6 @@
 											'default'    => '',
 											'maxlen'     => 20,
 											'name'       => 'Requirements failed, goto node',
-											'help'       => 'If the player does not have a required event, item or the correct answer to a question, redirect them to this node',
 											'options'    => 'AVCPD',
 											'required'   => false,
 											'select'     => 'T',
@@ -207,10 +207,7 @@
 																  'db'          	=> $opts['db'],
 																  'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 																  'column'      	=> 'node_id',
-																  'description'	=> array(
-																						 'columns' => array('0' => 'title', '1' => 'text'),
-																						 'divs' => array('0' => ' : ')
-																						 ),
+																  'description'	=> array('columns' => array('0' => 'text')),
 																  'orderby'     => 'node_id')
 											);	
 	$opts['fdd']['required_condition_not_met_node_id']['values2'] = array(
@@ -277,8 +274,8 @@
 														  'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 														  'column'      	=> 'node_id',
 														  'description'	=> array(
-																				 'columns' => array('0' => 'title', '1' => 'text'),
-																				 'divs' => array('0' => ' : ')
+																				 'columns' => array('0' => 'text')
+			
 																				 ),
 														  'orderby'     => 'node_id')
 									);	
@@ -320,10 +317,8 @@
 															   'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 															   'column'      	=> 'node_id',
 															   'description'	=> array(
-																						 'columns' => array('0' => 'title', '1' => 'text'),
-																						 'divs' => array('0' => ' : ')
+																						 'columns' => array('0' => 'text')
 																						 ),
-															   
 															   'orderby'     => 'node_id')
 										 );	
 	
@@ -357,8 +352,8 @@
 															   'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 															   'column'      	=> 'node_id',
 															   'description'	=> array(
-																						 'columns' => array('0' => 'title', '1' => 'text'),
-																						 'divs' => array('0' => ' : ')
+																						 'columns' => array('0' => 'text')
+																						 
 																						 ),
 															   'orderby'     => 'node_id')
 										 );	
@@ -375,7 +370,7 @@
 	//Add to Player
 
 	$opts['fdd']['add_item_id'] = array(
-											 'tab'		=> 'Modify the Player',
+											 'tab'		=> 'Modily the Player',
 											 'default'    => '',
 											 'maxlen'     => 20,
 											 'name'       => 'Give the player this Item',
@@ -450,34 +445,12 @@
 														);		
 	
 	
-	$opts['fdd']['remove_event_id'] = array(
-										 'default'    => '',
-										 'maxlen'     => 20,
-										 'name'       => 'Remove an Event from the Player',
-										 'options'    => 'AVCPD',
-										 'required'   => false,
-										 'select'     => 'T',
-										 'size|ACP'   => 20,
-										 'sqlw'		=>'IF($val_qas = "", NULL, $val_qas)',	 
-										 'sort'       => true,
-										 'values'     => array(
-															   'db'          	=> $opts['db'],
-															   'table'       	=> $_SESSION['current_game_prefix'] . 'events',
-															   'column'      	=> 'event_id',
-															   'description'	=> array('columns' => array('0' => 'description')),
-															   'orderby'     => 'event_id')
-										 );	
-	$opts['fdd']['remove_event_id']['values2'] = array(
-													null => '-Not Used-',
-													'ADD' => '-Add a new Event-'
-													);
 	
 	
 	
 	//Ask a question
 	$opts['fdd']['require_answer_string'] = array(
 												  'name'     => 'Ask a question. The correct answer is',
-												  'help'	=> 'If the correct answer is given, goto the correct node ID below. If an incorect answer is given, goto the "required condition not met ID" on the Requirements page',
 												  'select'   => 'T',
 												  'maxlen'   => 50,
 												  'sort'     => true,
@@ -505,8 +478,8 @@
 															   'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 															   'column'      	=> 'node_id',
 															   'description'	=> array(
-																						 'columns' => array('0' => 'title', '1' => 'text'),
-																						 'divs' => array('0' => ' : ')
+																						 'columns' => array('0' => 'text')
+																						 
 																						 ),
 															   'orderby'     => 'node_id')
 										 );	

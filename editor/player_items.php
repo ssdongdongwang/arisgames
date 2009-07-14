@@ -4,11 +4,6 @@
 	
 	print_header( 'Players\' Items');
 	print_general_navigation();
-
-	echo "<div class = 'nav'>
-	<a href = 'game_players.php'>Players</a>
-	<a href = 'items.php'>Items</a>
-	</div>";
 	
 	$short_name = substr($_SESSION['current_game_prefix'], 0, strlen($_SESSION['current_game_prefix']) - 1);	
 
@@ -142,7 +137,7 @@
 													'2' => 'last_name'),
        								'divs'    => array('0' => ' - ', '1' => ' ')
      								),
-					
+					'filters'     => "site = '{$short_name}'",
     					'orderby'     => 'player_id')
 	);
 	

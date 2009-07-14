@@ -154,10 +154,7 @@
 															   'db'          	=> $opts['db'],
 															   'table'       	=> $_SESSION['current_game_prefix'] . 'nodes',
 															   'column'      	=> 'node_id',
-															   'description'	=> array(
-																						 'columns' => array('0' => 'title', '1' => 'text'),
-																						 'divs' => array('0' => ' : ')
-																						 ),
+															   'description'	=> array('columns' => array('0' => 'text')),
 															   'orderby'     => 'node_id')
 										 );	
 	
