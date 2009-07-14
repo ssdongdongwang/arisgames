@@ -174,15 +174,6 @@
 			
 			if (isset($_REQUEST['location_id'])) $this->decrementItemQtyAtLocation($_REQUEST['location_id'], 1);
 		}		
-
-		public function viewedItem() {
-			$this->chromeless = true;
-			$this->pageTemplateFile = 'empty.tpl';
-			
-			$this->itemViewedByPlayer( $_REQUEST['item_id'], $_SESSION['player_id']);
-		}	
-		
-		
 		
 	}
 	?>

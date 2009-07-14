@@ -7,7 +7,7 @@
 //
 
 #import "QuestsViewController.h"
-#import "ARISAppDelegate.h"
+
 
 @implementation QuestsViewController
 
@@ -36,7 +36,7 @@
 
 
 - (void)viewDidAppear {
-
+	[webview loadRequest:[appModel getURLForModule:moduleName]];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -50,12 +50,6 @@
 		appModel = model;
 		[appModel retain];
 	}
-	
-	webview.hidden = YES;
-	
-	//Show waiting Indicator
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator:@"Loading..."];
-	
 	[webview loadRequest:[appModel getURLForModule:moduleName]];
 	NSLog(@"model set for QUEST" );
 }
@@ -69,26 +63,14 @@
 #pragma mark WebView Delegate
 - (void)webViewDidStartLoad:(UIWebView *)webView {
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-	webview.hidden = NO;
-	
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	
-	//Stop Waiting Indicator
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-	webview.hidden = NO;
-	
-	//Display an error message to user about the connection
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];
-	
-	//Stop Waiting Indicator
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
-}
 
 
 @end

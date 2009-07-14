@@ -25,7 +25,6 @@
 
 @property(copy, readwrite) NSString *name;
 @property(readwrite, assign) nearbyObjectKind kind;
-- (nearbyObjectKind) kind;
 @property(readwrite, assign) BOOL forcedDisplay;
 
 @property(readonly, assign) int itemId;

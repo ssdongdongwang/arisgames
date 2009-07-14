@@ -17,7 +17,6 @@
 @synthesize moduleName;
 @synthesize imagePickerController;
 @synthesize scanButton;
-@synthesize manualCode;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -61,16 +60,10 @@
 	 
 }
 
-- (IBAction)codeEnteredAction: (id) sender{
-	NSLog(@"Code Entered");
-	[self loadResult:manualCode.text];
-}
-
-
 #pragma mark UIImagePickerControllerDelegate Protocol Methods
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo {
-	[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 	CGRect cropRect;
 	//if ([editInfo objectForKey:UIImagePickerControllerCropRect]) {  //do we have a user specified cropRect?
 	//	cropRect = [[editInfo objectForKey:UIImagePickerControllerCropRect] CGRectValue];
@@ -86,13 +79,13 @@
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-	[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark QRCScan delegate methods
 
 - (void)decoder:(Decoder *)decoder didDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset withResult:(TwoDDecoderResult *)twoDResult {
-	//Stop Waiting Indicator
+	//Start Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
 	[appDelegate removeWaitingIndicator];
 	
@@ -103,11 +96,6 @@
 	[decoder release];
 	NSLog(@"QR Scanner: Decode Complete. QR Code ID = %@", result);
 	
-	[self loadResult:result];
-}	
-
--(void) loadResult:(NSString *)result {
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
 	//Start Waiting Indicator
 	[appDelegate showWaitingIndicator:@"Loading Content..."];
 	

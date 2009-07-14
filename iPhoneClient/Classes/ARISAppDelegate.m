@@ -21,7 +21,6 @@
 @synthesize nearbyObjectNavigationController;
 @synthesize myCLController;
 @synthesize waitingIndicator;
-@synthesize networkAlert;
 
 //@synthesize toolbarViewController;
 
@@ -107,12 +106,12 @@
 	
 	//Add the view controllers to the Tab Bar
 	tabBarController.viewControllers = [NSMutableArray arrayWithObjects: 
-										questsNavigationController, 
 										gpsNavigationController,
+										questsNavigationController, 
 										inventoryNavigationController,
 										qrScannerNavigationController,
 										cameraNavigationController,
-										/* imNavigationController, */
+										imNavigationController,
 										gamePickerNavigationController,
 										logoutNavigationController,
 										developerNavigationController,
@@ -151,50 +150,24 @@
 	
 }
 
-
-- (void) showNetworkAlert{
-	NSLog (@"AppDelegate: Showing Network Alert");
-	
-	if (!self.networkAlert) {
-		networkAlert = [[UIAlertView alloc] initWithTitle:@"Network Error" message:
-						@"ARIS is not able to communicate with the server. Check your internet connection."
-												 delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-	}
-	
-	if (self.networkAlert.visible == NO) [networkAlert show];
-		
-}
-
-- (void) removeNetworkAlert {
-	NSLog (@"AppDelegate: Removing Network Alert");
-	
-	if (self.networkAlert != nil) {
-		[self.networkAlert dismissWithClickedButtonIndex:0 animated:YES];
-	}
-}
-
-
-
-
 - (void) showWaitingIndicator:(NSString *)message {
-	NSLog (@"AppDelegate: Showing Waiting Indicator");
-	
-	if (!self.waitingIndicator) {
-		self.waitingIndicator = [[WaitingIndicatorViewController alloc] initWithNibName:@"WaitingIndicator" bundle:nil];
-	}
+	[self removeWaitingIndicator];
+	self.waitingIndicator = [[WaitingIndicatorViewController alloc] initWithNibName:@"WaitingIndicator" bundle:nil];
+	[self.waitingIndicator retain];
 	
 	self.waitingIndicator.message = message;
 	
-	//by adding a subview to window, we make sure it is put on top
-	if (appModel.loggedIn == YES) [self.window addSubview:self.waitingIndicator.view]; 
+	[self.window addSubview:self.waitingIndicator.view];
+	
 }
 
 - (void) removeWaitingIndicator {
-	NSLog (@"AppDelegate: Removing Waiting Indicator");
-	
-	if (self.waitingIndicator != nil) [self.waitingIndicator.view removeFromSuperview ];
+	if (self.waitingIndicator != nil) {
+		[self.waitingIndicator.view removeFromSuperview];
+		[self.waitingIndicator release];
+	}
 
-	
+
 }
 
 
@@ -250,16 +223,11 @@
 
 	[gamePickerNavigationController.view removeFromSuperview];
 	
-	//Set the model to this game
-	appModel.site = selectedGame.site;
-	
-	//Notify the Server
-	NSLog(@"AppDelegate: Game Selected. Notifying Server");
-	NSURLRequest *request = [appModel getURLForModule:@"RESTSelectGame&event=setGame"];	
-	[appModel fetchURLData:request];
-	
 	//Set tabBar to the first item
 	tabBarController.selectedIndex = 0;
+	
+	//Set the model to this game
+	appModel.site = selectedGame.site;
 	
 	//Display the tabBar (and it's content)
 	tabBarController.view.hidden = NO;
@@ -276,7 +244,6 @@
 		visibleViewController = viewController;
 		[visibleViewController performSelector:@selector(setModel:) withObject:appModel];
 	}
-	[appModel updateServerLocationAndfetchNearbyLocationList];
 }
 
 - (void)setGameList:(NSNotification *)notification {

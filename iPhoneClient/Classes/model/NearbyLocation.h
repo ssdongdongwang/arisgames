@@ -15,6 +15,7 @@
 	BOOL forcedDisplay;
 	
 	int locationId;
+	NSString *type;
 	NSString *iconURL;
 	NSString *URL;
 }
@@ -25,6 +26,7 @@
 @property(readwrite, assign) BOOL forcedDisplay;
 
 @property(readwrite, assign) int locationId;
+@property(copy, readwrite) NSString *type;
 @property(copy, readwrite) NSString *iconURL;
 @property(copy, readwrite) NSString *URL;
 

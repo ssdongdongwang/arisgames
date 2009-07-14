@@ -33,11 +33,7 @@
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
-	//Show waiting Indicator in own thread so it appears on time
-	[NSThread detachNewThreadSelector: @selector(showWaitingIndicator:) toTarget: (ARISAppDelegate *)[[UIApplication sharedApplication] delegate] withObject: @"Loading..."];	
-	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator:@"Loading..."];
-	
-	[super viewDidLoad];
+    [super viewDidLoad];
 	NSLog(@"Inventory View Loaded");
 }
 
@@ -52,10 +48,6 @@
 		[appModel retain];
 	}
 	
-	//Show waiting Indicator in own thread so it appears on time
-	[NSThread detachNewThreadSelector: @selector(showWaitingIndicator:) toTarget: (ARISAppDelegate *)[[UIApplication sharedApplication] delegate] withObject: @"Loading..."];	
-	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator:@"Loading..."];
-	
 	//Populate inventory
 	[appModel fetchInventory];
 	
@@ -66,8 +58,6 @@
 	NSLog(@"Inventory Recieved message recieved in FilesViewController");
 	inventoryTableData = appModel.inventory;
 	[inventoryTable reloadData];
-	//Stop Waiting Indicator
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
 	
 }
 
@@ -137,10 +127,7 @@
 	lblTemp1.text = [[inventoryTableData objectAtIndex: [indexPath row]] name];
 	
 	UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
-	NSString *description = [[inventoryTableData objectAtIndex: [indexPath row]] description];
-	int targetIndex = MIN([self indexOf:'.' inString:description] + 1, 
-						  [description length] - 1);
-	lblTemp2.text = [description substringToIndex:targetIndex];
+	lblTemp2.text = [[inventoryTableData objectAtIndex: [indexPath row]] description];
 	
 	UIImageView *iconView = (UIImageView *)[cell viewWithTag:3];
 	
@@ -152,14 +139,6 @@
 	iconView.image = icon;
 
 	return cell;
-}
-					 
- - (unsigned int) indexOf:(char) searchChar inString:(NSString *)searchString {
-	NSRange searchRange;
-	searchRange.location = (unsigned int) searchChar;
-	searchRange.length = 1;
-	NSRange foundRange = [searchString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithRange:searchRange]];
-	return foundRange.location;	
 }
 
 // Customize the height of each row

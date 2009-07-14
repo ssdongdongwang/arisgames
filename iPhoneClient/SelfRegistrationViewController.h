@@ -37,7 +37,6 @@
 -(void) setModel:(AppModel *)model;
 -(IBAction)submitButtonTouched: (id) sender;
 -(IBAction)cancelButtonTouched: (id) sender;
--(void)submitRegistration;
 
 
 @end

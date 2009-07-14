@@ -16,8 +16,7 @@
 @interface QRScannerViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, DecoderDelegate, QRScannerParserDelegateDelegate> {
 	NSString *moduleName;
 	AppModel *appModel;
-	IBOutlet UIButton *scanButton;
-	IBOutlet UITextField *manualCode;
+	UIButton *scanButton;
     UIImagePickerController *imagePickerController;
 }
 
@@ -26,15 +25,11 @@
 - (void) qrParserDidFinish:(id<QRCodeProtocol>)qrcode;
 
 @property(copy, readwrite) NSString *moduleName;
-@property (nonatomic, retain) IBOutlet UIButton *scanButton;
-@property (nonatomic, retain) IBOutlet UITextField *manualCode;
+@property (nonatomic, retain) UIButton *scanButton;
 @property (nonatomic, retain) UIImagePickerController *imagePickerController;
 
 
 - (IBAction)scanButtonTouchAction: (id) sender;
-- (IBAction)codeEnteredAction: (id) sender;
-
--(void) loadResult:(NSString *)result;
 
 
 @end
