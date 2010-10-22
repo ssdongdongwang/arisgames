@@ -15,26 +15,22 @@
 @class Node;
 
 @interface DialogViewController : UIViewController<SceneParserDelegate, UIScrollViewDelegate, UITextFieldDelegate> {
-	IBOutlet	AsyncImageView	*npcImage;
-	IBOutlet	AsyncImageView	*pcImage;
-	IBOutlet	UIWebView	*npcWebView;
-	IBOutlet	UIWebView	*pcWebView;
-	IBOutlet	UITableView	*pcTableView;
-	IBOutlet	UITextField	*pcAnswerView;
-	IBOutlet	UIScrollView *npcScrollView;
-	IBOutlet	UIScrollView *pcScrollView;
-	IBOutlet	UIScrollView *npcImageScrollView;
-	IBOutlet	UIScrollView *pcImageScrollView;
-	IBOutlet	UIActivityIndicatorView *pcActivityIndicator;
-	IBOutlet	UILabel		*nothingElseLabel;
-	IBOutlet	UIButton	*pcContinueButton;
-	IBOutlet	UIButton	*npcContinueButton;
+	AsyncImageView	*npcImage;
+	AsyncImageView	*pcImage;
+	UIWebView	*npcWebView;
+	UIWebView	*pcWebView;
+	UITableView	*pcTableView;
+	UITextField	*pcAnswerView;
+	UIScrollView *npcScrollView;
+	UIScrollView *pcScrollView;
+	UILabel		 *pcLabel;
+	UILabel *nothingElseLabel;
 	
-	IBOutlet	UIView	*mainView;
-	IBOutlet	UIView	*npcView;
-	IBOutlet	UIView	*pcView;
+	UIView	*mainView;
+	UIView	*npcView;
+	UIView	*pcView;
 	
-	IBOutlet	UITableViewController	*pcTableViewController;
+	UITableViewController	*pcTableViewController;
 	NSString	*resourcePath;
 	
 	NSArray			*currentScript;
@@ -52,10 +48,8 @@
 	
 	Npc				*currentNpc;
 	Node			*currentNode;
-	NSArray			*optionList;
+	NSMutableArray	*optionList;
 }
-
-
 
 @property(nonatomic, retain) IBOutlet AsyncImageView	*npcImage;
 @property(nonatomic, retain) IBOutlet AsyncImageView	*pcImage;
@@ -63,33 +57,22 @@
 @property(nonatomic, retain) IBOutlet UIWebView		*pcWebView;
 @property(nonatomic, retain) IBOutlet UITableView	*pcTableView;
 @property(nonatomic, retain) IBOutlet UITextField	*pcAnswerView;
+@property(nonatomic, retain) IBOutlet UILabel		*pcLabel;
 @property(nonatomic, retain) IBOutlet UILabel		*nothingElseLabel;
-@property(nonatomic, retain) IBOutlet UIButton *npcContinueButton;
-@property(nonatomic, retain) IBOutlet UIButton *pcContinueButton;
+
 
 @property(nonatomic, retain) IBOutlet UIScrollView	*npcScrollView;
 @property(nonatomic, retain) IBOutlet UIScrollView	*pcScrollView;
-@property(nonatomic, retain) IBOutlet UIScrollView	*npcImageScrollView;
-@property(nonatomic, retain) IBOutlet UIScrollView	*pcImageScrollView;
-@property(nonatomic, retain) IBOutlet UIActivityIndicatorView *pcActivityIndicator;
-
 
 @property(nonatomic, retain) IBOutlet UIView		*mainView;
 @property(nonatomic, retain) IBOutlet UIView		*npcView;
 @property(nonatomic, retain) IBOutlet UIView		*pcView;
 
-- (IBAction)continueButtonTouchAction;
-- (IBAction)npcScrollerTouchAction;
-
 - (void) beginWithNPC:(Npc *)aNpc;
+- (void) loadPCImage:(NSInteger)mediaId;
 - (void) loadNPCImage:(NSInteger)mediaId;
 - (void) continueScript;
 - (void) didFinishParsing;
-- (void) applyNPCWithGreeting;
-- (void) applyPlayerOptions;
-- (void) finishApplyingPlayerOptions:(NSArray*)options;
-- (void) showWaitingIndicatorForPlayerOptions;
-- (void) dismissWaitingIndicatorForPlayerOptions;
 - (void) stopAllAudio;
 
 @end

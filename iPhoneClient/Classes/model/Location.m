@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 2/26/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "Location.h"
@@ -25,7 +25,6 @@
 @synthesize objectId;
 @synthesize hidden;
 @synthesize forcedDisplay;
-@synthesize allowsQuickTravel;
 @synthesize qty;
 
 -(nearbyObjectKind) kind {
@@ -42,19 +41,18 @@
 	AppModel *model = [appDelegate appModel];
 	
 	if (self.kind == NearbyObjectItem) {
-		Item *item = [model itemForItemId:objectId]; 		
+		Item *item = [model fetchItem:objectId]; 
 		item.locationId = self.locationId;
-		item.qty = self.qty;
 		[item display];	
 	}
 	
 	if (self.kind == NearbyObjectNode) {
-		Node *node = [model nodeForNodeId: objectId]; 
+		Node *node = [model fetchNode:objectId]; 
 		[node display];	
 	}
 	
 	if (self.kind == NearbyObjectNPC) {
-		Npc *npc = [model npcForNpcId: objectId]; 
+		Npc *npc = [model fetchNpc:objectId]; 
 		[npc display];	
 	}
 }
@@ -62,7 +60,7 @@
 - (void)dealloc {
 	[name release];
 	[location release];
-	[objectType release];
+	[objectType release]; 
     [super dealloc];
 }
 

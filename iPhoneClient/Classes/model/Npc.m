@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 9/2/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "ARISAppDelegate.h"
@@ -19,6 +19,8 @@
 @synthesize mediaId;
 @synthesize kind;
 @synthesize forcedDisplay;
+@synthesize numberOfOptions;
+@synthesize options;
 
 
 -(nearbyObjectKind) kind {
@@ -28,11 +30,19 @@
 - (Npc *)init {
 	self = [super init];
     if (self) {
+		options = [[NSMutableArray alloc] init];
     }
+	
     return self;	
 }
 
+- (NSInteger) numberOfOptions {
+	return [options count];
+}
 
+- (void) addOption:(NodeOption *)newOption{
+	[options addObject:newOption];
+}
 
 - (void) display{
 	NSLog(@"Npc: Display Self Requested");
@@ -41,17 +51,7 @@
 	[dialogController beginWithNPC:self];
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
 	[appDelegate displayNearbyObjectView:dialogController];
-	[dialogController release];
 }
 
-
-- (void) dealloc {
-	[name release];
-	[description release];
-	[greeting release];
-	[location release];
-	[super dealloc];
-}
- 
 
 @end

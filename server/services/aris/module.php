@@ -29,12 +29,6 @@ abstract class Module
 	const kREQ_PLAYER_VIEWED_NPC = 'PLAYER_VIEWED_NPC';
 	const kREQ_PLAYER_HAS_NOT_VIEWED_NPC = 'PLAYER_HAS_NOT_VIEWED_NPC';
 	const kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM = 'PLAYER_HAS_UPLOADED_MEDIA_ITEM';
-	const kREQ_PLAYER_HAS_COMPLETED_QUEST = 'PLAYER_HAS_COMPLETED_QUEST';
-	
-	const kRESULT_DISPLAY_NODE = 'Node';
-	const kRESULT_DISPLAY_QUEST = 'QuestDisplay';
-	const kRESULT_COMPLETE_QUEST = 'QuestComplete';
-	const kRESULT_DISPLAY_LOCATION = 'Location';
 
 	//constants for player_state_changes table enums
 	const kPSC_GIVE_ITEM = 'GIVE_ITEM';
@@ -44,10 +38,8 @@ abstract class Module
 	
 	public function Module()
 	{
-		$this->conn = mysql_connect(Config::dbHost, Config::dbUser, Config::dbPass);
+		$this->conn = mysql_pconnect(Config::dbHost, Config::dbUser, Config::dbPass);
       	mysql_select_db (Config::dbSchema);
-      	mysql_query("set names utf8");
-		mysql_query("set charset set utf8");
 	}	
 	
 	/**
@@ -84,73 +76,27 @@ abstract class Module
     /**
      * Adds the specified item to the specified player.
      */
-     protected function giveItemToPlayer($strGamePrefix, $intItemID, $intPlayerID, $qtyToGive=1) {
-		Module::adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $qtyToGive);
+     protected function giveItemToPlayer($strGamePrefix, $intItemID, $intPlayerID) {
+		    	
+    	$query = "INSERT INTO {$strGamePrefix}_player_items 
+										  (player_id, item_id) VALUES ($intPlayerID, $intItemID)
+										  ON duplicate KEY UPDATE item_id = $intItemID";
+		NetDebug::trace($query);
+		@mysql_query($query);
+		
     }
 	
 	
 	/**
      * Removes the specified item from the user.
      */ 
-    protected function takeItemFromPlayer($strGamePrefix, $intItemID, $intPlayerID, $qtyToTake=1) {
-		Module::adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, -$qtyToTake);
-    }
- 
+    protected function takeItemFromPlayer($strGamePrefix, $intItemID, $intPlayerID) {
 
-     protected function removeItemFromAllPlayerInventories($strGamePrefix, $intItemID ) {
-		$query = "DELETE FROM {$strGamePrefix}_player_items 
-					WHERE item_id = $intItemID";
-    	$result = @mysql_query($query);
-    	NetDebug::trace($query . mysql_error());    
-    }
- 
-    /**
-    * Updates the qty a player has of an item
-    */ 
-    protected function adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $amountOfAdjustment) {
-		
-		//Get any existing record
-		$query = "SELECT * FROM {$strGamePrefix}_player_items 
-					WHERE player_id = $intPlayerID AND item_id = $intItemID LIMIT 1";
-    	$result = @mysql_query($query);
-    	NetDebug::trace($query . mysql_error());
-
-    	if ($existingPlayerItem = @mysql_fetch_object($result)) {
-    		NetDebug::trace("We have an existing record for that player and item");
-
- 			//Check if this change will make the qty go to < 1, if so delete the record
- 			$newQty = $existingPlayerItem->qty + $amountOfAdjustment;
- 			if ($newQty < 1) {
- 				NetDebug::trace("Adjustment would result in a qty of $newQty so delete the record");
- 				$query = "DELETE FROM {$strGamePrefix}_player_items 
+    	$query = "DELETE FROM {$strGamePrefix}_player_items 
 					WHERE player_id = $intPlayerID AND item_id = $intItemID";
-    			NetDebug::trace($query);
-    			@mysql_query($query);
-    		}
-    		else {
- 				//Update the qty
- 				NetDebug::trace("Updating Qty to $newQty");
- 				$query = "UPDATE {$strGamePrefix}_player_items 
- 							SET qty = $newQty
-							WHERE player_id = $intPlayerID AND item_id = $intItemID";
-    			NetDebug::trace($query);
-    			@mysql_query($query);
- 			}
-    	}
-    	else if ($amountOfAdjustment > 0) {
-    		//Create a record
-    		NetDebug::trace("Creating a new player_item record");
-
-    		$query = "INSERT INTO {$strGamePrefix}_player_items 
-										  (player_id, item_id, qty) VALUES ($intPlayerID, $intItemID, $amountOfAdjustment)
-										  ON duplicate KEY UPDATE item_id = $intItemID";
-			NetDebug::trace($query);
-			@mysql_query($query);
-    	}
-    	else NetDebug::trace("Decrementing the qty of an item the player does not have. Ignored.");
-    	
+    	NetDebug::trace($query);
+    	@mysql_query($query);    	
     }
-    
 	
 	/**
      * Decrement the item_qty at the specified location by the specified amount, default of 1
@@ -159,7 +105,7 @@ abstract class Module
    		//If this location has a null item_qty, decrementing it will still be a null
 		$query = "UPDATE {$strGamePrefix}_locations 
 					SET item_qty = item_qty-{$intQty}
-					WHERE location_id = '{$intLocationID}' AND item_qty > 0";
+					WHERE location_id = '{$intLocationID}'";
    		NetDebug::trace($query);	
     	@mysql_query($query);    	
 	}
@@ -169,49 +115,15 @@ abstract class Module
      * Adds an item to Locations at the specified latitude, longitude
      */ 
     protected function giveItemToWorld($strGamePrefix, $intItemID, $floatLat, $floatLong, $intQty = 1) {
-		//Find any items on the map nearby
-		$clumpingRangeInMeters = 10;
+		$itemName = $this->getItemName($strGamePrefix, $intItemID);
+		$error = 100; //Use 100 meters
+		$icon_media_id = $this->getItemIconMediaId($strGamePrefix, $intItemID); //Set the map icon = the item's icon
 		
-		$query = "SELECT *,((ACOS(SIN($floatLat * PI() / 180) * SIN(latitude * PI() / 180) + 
-					COS($floatLat * PI() / 180) * COS(latitude * PI() / 180) * 
-					COS(($floatLong - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1609.344
-				AS `distance` FROM `{$strGamePrefix}_locations` HAVING `distance`<= {$clumpingRangeInMeters} ORDER BY `distance` ASC"; 	
-    	$result = @mysql_query($query);
-    	NetDebug::trace($query . mysql_error());  
-    	
-    	if ($closestLocationWithinClumpingRange = @mysql_fetch_object($result)) {
-    		//We have a match
-    		NetDebug::trace("An item exists nearby, adding to that location");   	
-
-    		$query = "UPDATE {$strGamePrefix}_locations
-    				SET item_qty = item_qty + {$intQty}";
-			NetDebug::trace($query);   	
-			@mysql_query($query);
-    	}
-		else {
-			NetDebug::trace("No item exists nearby, creating a new location");   	
-
-			$itemName = $this->getItemName($strGamePrefix, $intItemID);
-			$error = 100; //Use 100 meters
-			$icon_media_id = $this->getItemIconMediaId($strGamePrefix, $intItemID); //Set the map icon = the item's icon
-			
-			$query = "INSERT INTO {$strGamePrefix}_locations (name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
-											  VALUES ('{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
-			NetDebug::trace($query);   	
-			@mysql_query($query);
-    	}
+		$query = "INSERT INTO {$strGamePrefix}_locations (name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
+										  VALUES ('{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
+ 		NetDebug::trace($query);   	
+    	@mysql_query($query);    	
     }
-	
-	protected function metersBetweenLatLngs($lat1, $lon1, $lat2, $lon2) { 
-
-		$theta = $lon1 - $lon2; 
-		$dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)); 
-		$dist = acos($dist); 
-		$dist = rad2deg($dist); 
-		$miles = $dist * 60 * 1.1515;
-	 	$unit = strtoupper($unit);
-		return ($miles * 1609.344); //convert to meters
-	}
 	
     
     /**
@@ -292,27 +204,6 @@ abstract class Module
 		else return false;
     }		
     
-    
-	/** 
-	 * itemQtyInPlayerInventory
-	 *
-     * Checks if the specified user has the specified item in the specified game.
-     * @return qty a player has of a given item
-     */
-    protected function itemQtyInPlayerInventory($intGameID, $intPlayerID, $intItemID) {
-    	$prefix = $this->getPrefix($intGameID);
-		if (!$prefix) return FALSE;
-    
-		$query = "SELECT * FROM {$prefix}_player_items 
-									  WHERE player_id = '{$intPlayerID}' 
-									  AND item_id = '{$intItemID}'";
-		
-		$rsResult = @mysql_query($query);
-		$playerItem = mysql_fetch_object($rsResult);
-		
-		return $playerItem->qty;
-    }	    
-    
 	/** 
 	 * playerHasUploadedMedia
 	 *
@@ -349,100 +240,60 @@ abstract class Module
      * @return boolean
      */	
 	protected function objectMeetsRequirements ($strPrefix, $intPlayerID, $strObjectType, $intObjectID) {		
-		NetDebug::trace("Checking Requirements for {$strObjectType}:{$intObjectID} for playerID:$intPlayerID in gameID:$strPrefix");
-
+		
 		//Fetch the requirements
 		$query = "SELECT * FROM {$strPrefix}_requirements 
 					WHERE content_type = '{$strObjectType}' AND content_id = '{$intObjectID}'";
 		$rsRequirments = @mysql_query($query);
 		
-		$andsMet = FALSE;
-		$requirementsExist = FALSE;
 		while ($requirement = mysql_fetch_array($rsRequirments)) {
-			$requirementsExist = TRUE;
 			NetDebug::trace("Requirement for {$strObjectType}:{$intObjectID} is {$requirement['requirement']}:{$requirement['requirement_detail_1']}");
+
 			//Check the requirement
-			
-			$requirementMet = FALSE;
-			
 			switch ($requirement['requirement']) {
 				//Log related
 				case Module::kREQ_PLAYER_VIEWED_ITEM:
-					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
-						$requirement['requirement_detail_1']);
+					if (!Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_ITEM:
-					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
-						$requirement['requirement_detail_1']);
+					if (Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_VIEWED_NODE:
-					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
-						$requirement['requirement_detail_1']);
+					if (!Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NODE:
-					$requirementMet =  !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
-						$requirement['requirement_detail_1']);
+					if (Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_VIEWED_NPC:
-					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
-						$requirement['requirement_detail_1']);
+					if (!Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NPC:
-					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
-						$requirement['requirement_detail_1']);
+					if (Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;					
 				//Inventory related	
 				case Module::kREQ_PLAYER_HAS_ITEM:
-					$requirementMet = Module::playerHasItem($strPrefix, $intPlayerID, 
-						$requirement['requirement_detail_1']);
+					if (!Module::playerHasItem($strPrefix, $intPlayerID, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				case Module::kREQ_PLAYER_DOES_NOT_HAVE_ITEM:
-					$requirementMet = !Module::playerHasItem($strPrefix, $intPlayerID, 
-						$requirement['requirement_detail_1']);
+					if (Module::playerHasItem($strPrefix, $intPlayerID, 
+						$requirement['requirement_detail_1'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
 				//Data Collection
 				case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM:
-					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
+					if (!Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
 						$requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
-						$requirement['requirement_detail_3']);
+						$requirement['requirement_detail_3'])) { NetDebug::trace("FAILED"); return FALSE;}
 					break;
-				case Module::kREQ_PLAYER_HAS_COMPLETED_QUEST:
-					$requirementMet = Module::objectMeetsRequirements ($strPrefix, $intPlayerID, Module::kRESULT_COMPLETE_QUEST, 
-						$requirement['requirement_detail_1']);
-					break;	
-			}//switch
-			if ($requirement['boolean_operator'] == "AND" && $requirementMet == FALSE) {
-				NetDebug::trace("An AND requirement was not met. Requirements Failed.");
-				return FALSE;
 			}
-
-			if ($requirement['boolean_operator'] == "AND" && $requirementMet == TRUE) {
-				NetDebug::trace("An AND requirement was met. Remembering");
-				$andsMet = TRUE;
-			}
-			
-			if ($requirement['boolean_operator'] == "OR" && $requirementMet == TRUE){
-				NetDebug::trace("An OR requirement was met. Requirements Passed.");
-				return TRUE;
-			}
-			
-			if ($requirement['boolean_operator'] == "AND" && $requirementMet == FALSE) $requirementsMet = FALSE;
-
-		}//while
-		NetDebug::trace("At the end of all the requirements for this object and any AND were passed, no ORs were passed.");
-		//So no ORs were met, and possibly all ands were met
-		if (!$requirementsExist) {
-			NetDebug::trace("No requirements exist. Requirements Passed.");
-			return TRUE;
 		}
-		if ($andsMet) {
-			NetDebug::trace("All AND requirements exist. Requirements Passed.");
-			return TRUE;
-		}
-		else {
-			NetDebug::trace("At end. Requirements Not Passed.");			
-			return FALSE;
-		}
+		return TRUE;
 	}	
 	
 	
@@ -471,12 +322,12 @@ abstract class Module
 			switch ($stateChange['action']) {
 				case Module::kPSC_GIVE_ITEM:
 					//echo 'Running a GIVE_ITEM';
-					Module::giveItemToPlayer($strPrefix, $stateChange['action_detail'], $intPlayerID,$stateChange['action_amount']);
+					Module::giveItemToPlayer($strPrefix, $stateChange['action_detail'], $intPlayerID);
 					$changeMade = TRUE;
 					break;
 				case Module::kPSC_TAKE_ITEM:
 					//echo 'Running a TAKE_ITEM';
-					Module::takeItemFromPlayer($strPrefix, $stateChange['action_detail'], $intPlayerID,$stateChange['action_amount']);
+					Module::takeItemFromPlayer($strPrefix, $stateChange['action_detail'], $intPlayerID);
 					$changeMade = TRUE;
 					break;
 			}

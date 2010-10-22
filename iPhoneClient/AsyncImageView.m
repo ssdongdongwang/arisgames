@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 11/18/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "AsyncImageView.h"
@@ -64,8 +64,7 @@
 	
 	//Save the image in the media
 	media.image = image;
-	[media.image retain];
-	
+
 	[self updateViewWithNewImage:image];
 }
 
@@ -101,7 +100,6 @@
 	[UIView setAnimationDuration:0.25];
 	self.alpha = 1.0;
 	[UIView commitAnimations];
-
 }
 
 - (UIImage*) getImage {

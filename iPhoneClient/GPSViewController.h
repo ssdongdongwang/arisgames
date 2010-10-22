@@ -11,37 +11,37 @@
 #import "Location.h"
 #import <MapKit/MapKit.h>
 #import "Annotation.h"
+#import "ARISMoviePlayerViewController.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 
 
-@interface GPSViewController : UIViewController <MKMapViewDelegate, UIActionSheetDelegate> {
+
+@interface GPSViewController : UIViewController <MKMapViewDelegate> {
 	AppModel *appModel;
-	IBOutlet MKMapView *mapView;
 	NSArray *locations;
-	BOOL tracking;
-	BOOL appSetNextRegionChange;
-	IBOutlet UIBarButtonItem *mapTypeButton;
-	IBOutlet UIBarButtonItem *playerTrackingButton;
-	IBOutlet UIToolbar *toolBar;
+	BOOL autoCenter;
+	BOOL somethingNearby;
+
+	IBOutlet MKMapView *mapView;
+	IBOutlet UIButton *mainButton;
 	BOOL silenceNextServerUpdate;
-	NSTimer *refreshTimer;
+	
+	MPMoviePlayerController *mMoviePlayer; //only used if item is a video
+	Location *lastNearbyLocation;
+	
+	UIActivityIndicatorView *spinner;
+	
+
 
 }
 
 -(void) refresh;
 -(void) zoomAndCenterMap;
--(void) showLoadingIndicator;
+- (IBAction)mainButtonTouchAction;
 
 
-@property (nonatomic, retain) MKMapView *mapView;
+@property BOOL autoCenter;
 @property (nonatomic, retain) NSArray *locations;
-
-@property BOOL tracking;
-
-
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *mapTypeButton;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *playerTrackingButton;
-@property (nonatomic, retain) IBOutlet UIToolbar *toolBar;
-
 
 @end

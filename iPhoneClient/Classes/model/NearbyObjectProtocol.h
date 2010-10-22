@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by Brian Deith on 5/15/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <CoreLocation/CoreLocation.h>
@@ -23,6 +23,6 @@ typedef UInt32 nearbyObjectKind;
 - (nearbyObjectKind)kind;
 - (BOOL)forcedDisplay;
 - (void)display;
-//- (CLLocation *) location;
+- (CLLocation *) location;
 
 @end

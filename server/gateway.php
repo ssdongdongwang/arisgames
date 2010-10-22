@@ -124,9 +124,7 @@
 	//Read above large note for explanation of charset handling
 	//The main contributor (Patrick Mineault) is French, 
 	//so don't be afraid if he forgot to turn off iconv by default!
-	//$gateway->setCharsetHandler("utf8_decode", "ISO-8859-1", "ISO-8859-1");
-	$gateway->setCharsetHandler("iconv","UTF-8","UTF-8");
-
+	$gateway->setCharsetHandler("utf8_decode", "ISO-8859-1", "ISO-8859-1");
 	
 	//Error types that will be rooted to the NetConnection debugger
 	$gateway->setErrorHandling(E_ALL ^ E_NOTICE);

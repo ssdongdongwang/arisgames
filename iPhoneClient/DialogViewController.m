@@ -17,9 +17,12 @@
 const NSInteger kStartingIndex = 0;
 const NSInteger kPcIndex = 0;
 const NSInteger kMaxOptions = 20;
-const NSInteger kOptionsFontSize = 15;
+const NSInteger kOptionsFontSize = 17;
 NSString *const kOutAnimation = @"out";
 NSString *const kInAnimation = @"in";
+NSString *const kPcContinue = @"Tap to continue.";
+NSString *const kPcReview = @"Tap to review.";
+NSString *const kPlayerName = @"You";
 
 
 NSString *const kDialogHtmlTemplate = 
@@ -32,9 +35,6 @@ NSString *const kDialogHtmlTemplate =
 @"		color: #FFFFFF;"
 @"		font-size: 19px;"
 @"		font-family: Helvetia, Sans-Serif;"
-@"      text-align: center;"
-@"      margin:0;"
-@"      padding:0;"
 @"	}"
 @"	--></style>"
 @"</head>"
@@ -58,40 +58,19 @@ NSString *const kDialogHtmlTemplate =
 
 
 @implementation DialogViewController
-@synthesize npcImage, pcImage, npcWebView, pcWebView, pcTableView;
-@synthesize npcScrollView, pcScrollView, npcImageScrollView, pcImageScrollView, pcActivityIndicator;
-@synthesize npcContinueButton, pcContinueButton;
-@synthesize pcAnswerView, mainView, npcView, pcView, nothingElseLabel;
-
-
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(optionsRecievedFromNotification:)
-													 name:@"ConversationNodeOptionsReady"
-												   object:nil];
-    }
-	
-    return self;
-}
-
-
+@synthesize npcImage, pcImage, npcWebView, pcWebView, pcTableView, npcScrollView, pcScrollView;
+@synthesize pcAnswerView, mainView, npcView, pcView, pcLabel, nothingElseLabel;
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
-	[super viewDidLoad];
-	
 	assert(npcImage && @"npcImage not connected.");
 	assert(pcImage && @"pcImage not connected.");
 	assert(npcWebView && @"npcWebView not connected.");
 	assert(pcWebView && @"pcWebView not connected.");
 	assert(npcScrollView && @"npcScrollView not connected.");
 	assert(pcScrollView && @"pcScrollView not connected.");
-	assert(npcImageScrollView && @"npcImageScrollView not connected.");
-	assert(pcImageScrollView && @"pcImageScrollView not connected.");
+	assert(pcLabel && @"pcLabel not connected.");
 
 	assert(pcTableView && @"pcTableView not connected.");
 	assert(pcAnswerView && @"pcAnswerView not connected.");
@@ -99,19 +78,23 @@ NSString *const kDialogHtmlTemplate =
 	assert(npcView && @"npcView not connected.");
 	assert(pcView && @"pcView not connected.");
 	
-	//General Setup
-	lastPcId = 0;
-	currentNode = nil;
-	
-	//View Setup
+	//Create a close button
 	self.navigationItem.leftBarButtonItem = 
 	[[UIBarButtonItem alloc] initWithTitle:@"End Conversation"
 									 style: UIBarButtonItemStyleBordered
 									target:self 
 									action:@selector(backButtonTouchAction:)];		
 	
-	npcImageScrollView.contentSize = [npcView frame].size;
-	pcImageScrollView.contentSize = [pcView frame].size;
+	
+    [super viewDidLoad];
+	
+	self.title = currentNpc.name;
+	
+	[self loadNPCImage:currentNpc.mediaId];
+	
+
+	npcScrollView.contentSize = [npcView frame].size;
+	pcScrollView.contentSize = [pcView frame].size;
 	
 	[npcWebView setBackgroundColor:[UIColor clearColor]];	
 	[pcWebView setBackgroundColor:[UIColor clearColor]];
@@ -119,21 +102,9 @@ NSString *const kDialogHtmlTemplate =
 	pcTableViewController = [[UITableViewController alloc] initWithStyle:UITableViewCellStyleDefault];
 	pcTableViewController.view = pcTableView;
 
-	[npcContinueButton setTitle: NSLocalizedString(@"DialogContinue",@"") forState: UIControlStateNormal];
-	[npcContinueButton setTitle: NSLocalizedString(@"DialogContinue",@"") forState: UIControlStateHighlighted];	
-	[pcContinueButton setTitle: NSLocalizedString(@"DialogContinue",@"") forState: UIControlStateNormal];
-	[pcContinueButton setTitle: NSLocalizedString(@"DialogContinue",@"") forState: UIControlStateHighlighted];	
-	
-	npcWebView.hidden = NO;
-	pcAnswerView.hidden = YES;
-	pcTableView.hidden = NO;
-	pcWebView.hidden = YES;
-	pcActivityIndicator.hidden = YES;
-
-	
-	//Check if the game specifies a PC image
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
 	AppModel *appModel = appDelegate.appModel;
+	
 	if (appModel.gamePcMediaId != 0) {
 		//Load the image from the media Table
 		Media *pcMedia = [appModel mediaForMediaId:appModel.gamePcMediaId];
@@ -141,9 +112,22 @@ NSString *const kDialogHtmlTemplate =
 	}
 	else [pcImage updateViewWithNewImage:[UIImage imageNamed:@"defaultCharacter.png"]];
 
-	[self applyNPCWithGreeting];
 	
-/*  SAMPLE DIALOG FORMAT
+	npcWebView.hidden = NO;
+	[npcWebView loadHTMLString:[NSString stringWithFormat:kDialogHtmlTemplate, [currentNpc greeting]] 
+					   baseURL:nil];
+
+	pcAnswerView.delegate = self;
+	
+	pcTableView.hidden = NO;
+	pcWebView.hidden = YES;
+	pcAnswerView.hidden = YES;
+	lastPcId = 0;
+	currentNode = nil;
+	
+	[self moveNpcIn];	// Always start with the NPC Conversation list?
+	
+/*
 	NSString *xmlData = 
 	@"<dialog>"
 	@"<pc bgSound='1'>Tell me more.</pc>"
@@ -155,8 +139,6 @@ NSString *const kDialogHtmlTemplate =
 	@"</dialog>";
 */
 }
-
-
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -180,43 +162,13 @@ NSString *const kDialogHtmlTemplate =
 	
 	//tell the server
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	appDelegate.nearbyBar.hidden = NO;
 	AppModel *appModel = appDelegate.appModel;
 	[appModel updateServerNpcViewed:currentNpc.npcId];
 	
 	[self dismissModalViewControllerAnimated:YES];
-	appDelegate.nearbyBar.hidden = NO;
-
 }
 
-- (IBAction)continueButtonTouchAction{
-	[self continueScript];
-}
-
-- (void)reviewScript {
-	if (currentScript != nil && scriptIndex > [currentScript count]) {
-		//We are midscript, go back one step
-		scriptIndex = [currentScript count] - 1;
-		[self continueScript];
-	}
-	else {
-		//We must be right at the begining, load up the NPC again
-		[self moveAllOutWithPostSelector:nil];
-		[self applyNPCWithGreeting];
-	}
-
-}
-
-- (IBAction)npcScrollerTouchAction{
-	NSLog(@"DialogViewController: NPC ScrollView Touched");
-
-}
-
-- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSLog(@"DialogViewController: touchesBegan");
-	
-	[pcAnswerView resignFirstResponder];
-	
-}
 
 - (void)dealloc {
 	[currentNpc release];
@@ -228,22 +180,22 @@ NSString *const kDialogHtmlTemplate =
     [super dealloc];
 }
 
-
-- (void)applyNPCWithGreeting{
-	self.title = currentNpc.name;
-	[self loadNPCImage:currentNpc.mediaId];
-	[npcWebView loadHTMLString:[NSString stringWithFormat:kDialogHtmlTemplate, [currentNpc greeting]] baseURL:nil];
-	[self moveNpcIn];
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	//[pcAnswerView resignFirstResponder];
+	if (scriptIndex > [currentScript count]) scriptIndex = [currentScript count] - 1;
+	[self continueScript];
 }
 
+#pragma mark NPC Control
 - (void) beginWithNPC:(Npc *)aNpc {
-	if (currentNpc) [currentNpc release];
-	currentNpc = aNpc;
-	[currentNpc retain];
+	currentNpc = [aNpc retain];
 		
 	parser = [[SceneParser alloc] initWithDefaultNpcId:[aNpc mediaId]];
 	parser.delegate = self;
-
+	
+	optionList = currentNpc.options;
+	assert(optionList == aNpc.options);
+	NSLog(@"OptionList: %@", optionList);
 }
 
 - (void) loadNPCImage:(NSInteger)mediaId {
@@ -264,96 +216,62 @@ NSString *const kDialogHtmlTemplate =
 	*priorId = mediaId;
 }
 
+#pragma mark Script Control
 - (void) continueScript {
-	if (scriptIndex < [currentScript count]) { //Load up this scene of the script
-
+	if (scriptIndex < [currentScript count]) {
 		Scene *currentScene = [currentScript objectAtIndex:scriptIndex];
+
 		[self applyScene:currentScene];
+
 		currentCharacter = currentScene.characterId;
+		pcLabel.text = kPcContinue;
+
 		++scriptIndex;
 	}
-	else { 	//End of Script. Display Player Options
-		[self stopAllAudio];
-		[self applyPlayerOptions];
-	}
-}
-
-- (void) applyPlayerOptions{
-	
-	pcWebView.hidden = YES;
-	pcContinueButton.hidden = YES;
-	
-	cachedScrollView = pcImage;
-	[pcImageScrollView zoomToRect:[pcImage frame] animated:NO];
-	
-	currentCharacter = 0;
-	self.title = NSLocalizedString(@"DialogPlayerName",@"");
-	++scriptIndex;
-	
-	// Display the appropriate question for the PC
-	if ([currentNode.answerString length] > 0) {
-		pcTableView.hidden = YES;
-		pcAnswerView.hidden = NO;
-	}
 	else {
-		pcTableView.hidden = NO;
-		pcAnswerView.hidden = YES;
+		[self stopAllAudio];
+
 		
-		if (currentNode.numberOfOptions > 0) {
-			//There are node options
-			[self finishApplyingPlayerOptions:currentNode.options];
+		// Display the appropriate question for the PC
+		if ([currentNode.answerString length] > 0) {
+			pcTableView.hidden = YES;
+			pcWebView.hidden = YES;
+			pcAnswerView.hidden = NO;
 		}
 		else {
-			//No node options, load the conversations
-			AppModel *appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-			[appModel fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
-			[self showWaitingIndicatorForPlayerOptions];
+			if (currentNode.numberOfOptions > 0) optionList = currentNode.options;
+			else {
+				//refresh our option list
+				AppModel *appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
+				Npc *newNpc = [appModel fetchNpc:currentNpc.npcId];
+				optionList = newNpc.options;
+			}
+			int optionCount = [optionList count];
+			if (optionCount == 0) {
+				nothingElseLabel.hidden = NO;
+			}
+			pcTableView.hidden = NO;
+			pcWebView.hidden = YES;
+			pcAnswerView.hidden = YES;
+			[pcTableView reloadData];
 		}
-	}
-	
-	[self moveAllOutWithPostSelector:nil];
-	[self movePcIn];
-	
-}
-
-- (void) optionsRecievedFromNotification:(NSNotification*) notification{
-	[self dismissWaitingIndicatorForPlayerOptions];
-	[self finishApplyingPlayerOptions: (NSArray*)[notification object]];
-}
-
-- (void) finishApplyingPlayerOptions:(NSArray*)options{
-	//Now our options are populated with node or conversation choices, display
-	if ([options count] == 0) {
-		nothingElseLabel.hidden = NO;
-		pcTableView.hidden = YES;
-		pcTableView.alpha = 0;
-	}
-	else {
-		pcTableView.hidden = NO;
-		pcWebView.hidden = YES;
-		pcAnswerView.hidden = YES;
-		optionList = options;
-		[optionList retain];
-		[pcTableView reloadData];
+		
+		cachedScrollView = pcImage;
+		[pcScrollView zoomToRect:[pcImage frame] animated:NO];
+		[pcWebView loadHTMLString:[NSString stringWithFormat:kDialogHtmlTemplate, @""] 
+								 baseURL:nil];
+		
+		[self moveAllOutWithPostSelector:nil];
+		[self movePcIn];
+		currentCharacter = 0;
+		pcLabel.text = kPcReview;
+		self.title = kPlayerName;
+		++scriptIndex;
 	}
 }
 
-- (void) showWaitingIndicatorForPlayerOptions{
-	pcTableViewController.view.hidden = YES;
-	pcActivityIndicator.hidden = NO;
-	[pcActivityIndicator startAnimating];
-}
-- (void) dismissWaitingIndicatorForPlayerOptions{
-	pcTableViewController.view.hidden = NO;	
-	pcActivityIndicator.hidden = YES;
-	[pcActivityIndicator stopAnimating];
-}
-
-- (void) applyScene:(Scene *)aScene {	
+- (void) applyScene:(Scene *)aScene {
 	UIWebView *characterWebView;
-	UIScrollView *characterScrollView;
-	UIScrollView *characterImageScrollView;
-	
 	BOOL isCurrentlyDisplayed;
 	cachedScene = [aScene retain];
 	
@@ -377,9 +295,6 @@ NSString *const kDialogHtmlTemplate =
 	}
 	
 	characterWebView = aScene.isPc ? pcWebView : npcWebView;
-	characterScrollView = aScene.isPc ? pcScrollView : npcScrollView;
-	characterImageScrollView = aScene.isPc ? pcImageScrollView : npcImageScrollView;
-
 	isCurrentlyDisplayed = currentCharacter == aScene.characterId;
 	
 	if (isCurrentlyDisplayed) {
@@ -403,61 +318,30 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) finishScene {
 	UIWebView *characterWebView;
-	UIScrollView *lastCharacterScrollView;
-	UIScrollView *lastCharacterImageScrollView;
-
-	UIScrollView *currentCharacterScrollView;
-	UIScrollView *currentCharacterImageScrollView;
-
-	UIButton *continueButton;
+	UIScrollView *characterScrollView;
 	BOOL isCurrentlyDisplayed;
 		 
 	if (cachedScene.isPc) {
-		self.title = NSLocalizedString(@"DialogPlayerName",@"");
+		self.title = kPlayerName;
 		characterWebView = pcWebView;
-		lastCharacterScrollView = npcScrollView;
-		lastCharacterImageScrollView = npcImageScrollView;
-
-		currentCharacterScrollView = pcScrollView;		
-		currentCharacterImageScrollView = pcImageScrollView;		
-
+		characterScrollView = pcScrollView;		
 		cachedScrollView = pcImage;
-		continueButton = pcContinueButton;
 	}
 	else {
 		self.title = currentNpc.name;
 		characterWebView = npcWebView;
-		lastCharacterScrollView = pcScrollView;
-		lastCharacterImageScrollView = pcImageScrollView;
-
-		currentCharacterScrollView = npcScrollView;		
-		currentCharacterImageScrollView = npcImageScrollView;		
-
-		continueButton = npcContinueButton;
+		characterScrollView = npcScrollView;
+		
 		[self loadNPCImage:cachedScene.characterId];
 		cachedScrollView = npcImage;
-
 	}
-	
-	//Try resetting the height to 0 each time for proper content height calculation
-	CGRect webViewFrame = [characterWebView frame];	
-	webViewFrame.size = CGSizeMake(webViewFrame.size.width,10);
-	[characterWebView setFrame:webViewFrame];
-	
-	//Reset it's scroll view
-	[currentCharacterScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
-
 	
 	isCurrentlyDisplayed = [characterWebView alpha] < 1;
 	NSLog(@"Character %d IsCurrentlyDisplayed: %d", currentCharacter, isCurrentlyDisplayed);
 	
-	NSString *dialogString = [NSString stringWithFormat:kDialogHtmlTemplate, cachedScene.text];
-	[characterWebView loadHTMLString:dialogString baseURL:nil];
-	
-	continueButton.hidden = NO;
-	
+	[characterWebView loadHTMLString:[NSString stringWithFormat:kDialogHtmlTemplate, cachedScene.text] 
+							 baseURL:nil];
 	if (isCurrentlyDisplayed) {
-		[currentCharacterScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		[UIView beginAnimations:@"dialog" context:nil];
 		[UIView setAnimationCurve:UIViewAnimationCurveLinear];
 		[UIView setAnimationDuration:0.25];
@@ -465,86 +349,34 @@ NSString *const kDialogHtmlTemplate =
 		[UIView commitAnimations];
 	}
 	
+	NSLog(@"Scrolling to %g, %g, %g, %g", cachedScene.zoomRect.origin.x,
+		  cachedScene.zoomRect.origin.y, cachedScene.zoomRect.size.width,
+		  cachedScene.zoomRect.size.height);
+	
 	if (!isCurrentlyDisplayed) {
+		// This should share zoom code
+		[characterScrollView zoomToRect:cachedScene.zoomRect animated:NO];
 		if (cachedScene.isPc) [self movePcIn];
 		else [self moveNpcIn];
 	}
-	
-	NSLog(@"Moving Camera From Ofset: (%g, %g) Zoom: %g To Rect: %g, %g, %g, %g",
-		  currentCharacterImageScrollView.contentOffset.x,currentCharacterImageScrollView.contentOffset.y,
-		  currentCharacterScrollView.zoomScale,
-		  cachedScene.zoomRect.origin.x,cachedScene.zoomRect.origin.y, 
-		  cachedScene.zoomRect.size.width,cachedScene.zoomRect.size.height);
-	
-	
-	[UIView beginAnimations:@"cameraMove" context:nil];
-	[UIView setAnimationCurve:UIViewAnimationCurveLinear];
-	[UIView setAnimationDuration:cachedScene.zoomTime];
-	
-	float imageScrollViewWidth = currentCharacterImageScrollView.contentSize.width;
-	float imageScrollViewHeight = currentCharacterImageScrollView.contentSize.height;
-	
-	CGFloat horizScale = imageScrollViewWidth / cachedScene.zoomRect.size.width;
-	CGFloat vertScale  = imageScrollViewHeight / cachedScene.zoomRect.size.height;
-	
-	CGAffineTransform transformation = CGAffineTransformMakeScale(horizScale, vertScale);
-	transformation = CGAffineTransformTranslate(transformation, 
-												(imageScrollViewWidth/2 - (cachedScene.zoomRect.origin.x + cachedScene.zoomRect.size.width / 2.0)),
-												(imageScrollViewHeight/2 - (cachedScene.zoomRect.origin.y + cachedScene.zoomRect.size.height / 2.0)));
-	[currentCharacterImageScrollView setTransform:transformation];
-	[UIView commitAnimations];
-
+	else {
+		[UIView beginAnimations:@"zooming" context:nil];
+		[UIView setAnimationCurve:UIViewAnimationCurveLinear];
+		[UIView setAnimationDuration:0.25];
+		
+		CGFloat horizScale = 320.0 / cachedScene.zoomRect.size.width;
+		CGFloat vertScale  = 460.0 / cachedScene.zoomRect.size.height;
+		
+		CGAffineTransform transformation = CGAffineTransformMakeScale(horizScale, vertScale);
+		transformation = CGAffineTransformTranslate(transformation, 
+													(160.0 - (cachedScene.zoomRect.origin.x + cachedScene.zoomRect.size.width / 2.0)),
+													(230.0 - (cachedScene.zoomRect.origin.y + cachedScene.zoomRect.size.height / 2.0)));
+		[characterScrollView setTransform:transformation];
+		[UIView commitAnimations];
+	}
 	
 	[cachedScene release];
 }
-
-- (void)webViewDidFinishLoad:(UIWebView *)webView {	
-	UIButton *continueButton;
-	UIScrollView *scrollView;
-	
-	if (webView == npcWebView) {
-		NSLog(@"DialogViewController: NPC WebView loaded: Update Sizes");
-		continueButton = npcContinueButton;
-		scrollView = npcScrollView;
-	}
-	else {
-		NSLog(@"DialogViewController: PC WebView loaded: Update Sizes");
-		continueButton = pcContinueButton;
-		scrollView = pcScrollView;
-
-	}
-
-	
-	//Size the webView
-	CGRect webViewFrame = [webView frame];	
-	float newHeight = [[webView stringByEvaluatingJavaScriptFromString:@"document.body.offsetHeight;"] floatValue];
-	webViewFrame.size = CGSizeMake(webViewFrame.size.width, newHeight);
-	[webView setFrame:webViewFrame];
-	[[[webView subviews] lastObject] setScrollEnabled:NO]; //Disable scrolling in webview
-	NSLog(@"DialogViewController: UIWebView frame set to {%f, %f, %f, %f}", 
-		  webViewFrame.origin.x, 
-		  webViewFrame.origin.y, 
-		  webViewFrame.size.width,
-		  webViewFrame.size.height);
-	
-
-	//position the continue button
-	CGRect continueButtonFrame = [continueButton frame];	
-	continueButtonFrame.origin = CGPointMake(continueButtonFrame.origin.x, webViewFrame.origin.y+webViewFrame.size.height+5);
-	[continueButton setFrame:continueButtonFrame];
-	/*
-	NSLog(@"DialogViewController: Continue Button frame set to {%f, %f, %f, %f}", 
-		  continueButtonFrame.origin.x, 
-		  continueButtonFrame.origin.y, 
-		  continueButtonFrame.size.width,
-		  continueButtonFrame.size.height);	
-	*/
-	//Size the scroll view's content
-	scrollView.contentSize = CGSizeMake(scrollView.contentSize.width, continueButtonFrame.origin.y + continueButtonFrame.size.height + 30);
-	//NSLog(@"DialogViewController: ScrollView size set to {%f, %f}",scrollView.contentSize.width, scrollView.contentSize.height);
-	
-}
-
 
 #pragma mark Movement 
 - (void) moveAllOutWithPostSelector:(SEL)postSelector {	
@@ -628,31 +460,25 @@ NSString *const kDialogHtmlTemplate =
 		
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
 	AppModel *appModel = appDelegate.appModel;
-
-
-	Node *newNode = [appModel nodeForNodeId: targetNode];
-
-	// TODO: This might need to check for answer string
 		
-	if (currentNode) [currentNode release];
+	[currentNode release];
+	Node *newNode = [appModel fetchNode:targetNode];
+	// TODO: This might need to check for answer string
+	optionList = newNode.numberOfOptions > 0 ? newNode.options : currentNpc.options;
 	currentNode = newNode;
-	[currentNode retain];
-	[newNode release];
-	
 	[parser parseText:newNode.text];
 	
 	return YES;
 }
 
-#pragma mark PC options table view
+#pragma mark Table view
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 2;
+	return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-	if (section == 0) return [optionList count];
-	else return 1;
+	return [optionList count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -662,19 +488,13 @@ NSString *const kDialogHtmlTemplate =
 									   reuseIdentifier:@"Dialog"] autorelease];
 	}
 	
-	if (indexPath.section == 0) {
-		NodeOption *option = [optionList objectAtIndex:indexPath.row];
-		cell.textLabel.text = option.text;
-	}
-	else {
-		cell.textLabel.text = NSLocalizedString(@"DialogReview",@"");
-	}
+	NodeOption *option = [optionList objectAtIndex:indexPath.row];
 
-	
-	
-	cell.textLabel.textAlignment = UITextAlignmentCenter;
+	cell.textLabel.text = option.text;
+	cell.textLabel.textColor = [UIColor whiteColor];
 	cell.textLabel.minimumFontSize = kOptionsFontSize;
-	cell.textLabel.textColor = [UIColor colorWithRed:(50.0/255.0) green:(79.0/255.0) blue:(133.0/255.0) alpha:1];
+	
+	//Automatically size based on contents
 	cell.textLabel.numberOfLines = 0;
 	[cell.textLabel sizeToFit];
 	
@@ -683,9 +503,6 @@ NSString *const kDialogHtmlTemplate =
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (indexPath.section == 1) return 35;
-
-	
 	NodeOption *option = [optionList objectAtIndex:indexPath.row];
 
 	CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 50;
@@ -695,28 +512,28 @@ NSString *const kDialogHtmlTemplate =
     CGSize expectedLabelSize = [option.text sizeWithFont:[UIFont systemFontOfSize:kOptionsFontSize] 
 									   constrainedToSize:maximumLabelSize lineBreakMode:UILineBreakModeWordWrap]; 
 	
-	return expectedLabelSize.height + 15;	
+	return expectedLabelSize.height + 40;
+	
+	
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
-	//Check if it is the "review option"
-	if (indexPath.section == 1 && indexPath.row == 0) {
-		[self reviewScript];
-		return;
-	}
-	
+	// TODO: Find the node option and load up the next node
 	NodeOption *selectedOption = [optionList objectAtIndex:[indexPath row]];
 	NSLog(@"Going to node #%d for prompt '%@'", selectedOption.nodeId, selectedOption.text);
 	
-	AppModel *appModel = [(ARISAppDelegate *) [[UIApplication sharedApplication] delegate] appModel];	
-	Node *newNode = [appModel nodeForNodeId:selectedOption.nodeId];
-
-	if (currentNode) [currentNode release];
+	//Create a reference to the delegate using the application singleton.
+	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	AppModel *appModel = appDelegate.appModel;
+	
+	[currentNode release];
+	Node *newNode = [appModel fetchNode:selectedOption.nodeId];
+	[appModel updateServerNodeViewed:selectedOption.nodeId];
+	optionList = newNode.numberOfOptions > 0 ? newNode.options : currentNpc.options;
 	currentNode = newNode;
-	[currentNode retain];
-
 	[parser parseText:newNode.text];
 }
 

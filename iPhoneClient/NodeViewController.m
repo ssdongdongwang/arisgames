@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by Kevin Harris on 5/11/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "NodeViewController.h"
@@ -22,15 +22,6 @@ static NSString * const OPTION_CELL = @"option";
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(movieFinishedCallback:)
-													 name:MPMoviePlayerPlaybackDidFinishNotification
-												   object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self 
-												 selector:@selector(movieLoadStateChanged:) 
-													 name:MPMoviePlayerLoadStateDidChangeNotification 
-												   object:nil];
     }
 
     return self;
@@ -44,7 +35,7 @@ static NSString * const OPTION_CELL = @"option";
 	
 	//Create a close button
 	self.navigationItem.leftBarButtonItem = 
-	[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"BackButtonKey",@"")
+	[[UIBarButtonItem alloc] initWithTitle:@"Back"
 									 style: UIBarButtonItemStyleBordered
 									target:self 
 									action:@selector(backButtonTouchAction:)];	
@@ -56,8 +47,7 @@ static NSString * const OPTION_CELL = @"option";
 
 - (void) refreshView {
 	self.title = self.node.name;
-	int topMargin = 10;
-	
+		
 	//Throw out an existing scroller subviews
 	for(UIView *subview in [self.scrollView subviews]) {
 		[subview removeFromSuperview];
@@ -73,30 +63,24 @@ static NSString * const OPTION_CELL = @"option";
 		//Add the image view to the scroller
 		[scrollView addSubview:mediaImageView];
 		imageSize = mediaImageView.frame.size;
-		[mediaImageView release];
 	}
 	else if (([media.type isEqualToString: @"Video"] || [media.type isEqualToString: @"Audio"]) && media.url) {
 		NSLog(@"ItemDetailsViewController:  Video Layout Selected");
 		
-		//Setup the Button
-		mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 295)];
-		[mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
-		[mediaPlaybackButton setBackgroundImage:[UIImage imageNamed:@"clickToPlay.png"] forState:UIControlStateNormal];
-		[mediaPlaybackButton setTitle:NSLocalizedString(@"PreparingToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = NO;
-		mediaPlaybackButton.titleLabel.font = [UIFont boldSystemFontOfSize:24];
-		[mediaPlaybackButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
-		[mediaPlaybackButton setContentVerticalAlignment:UIControlContentVerticalAlignmentBottom];
-		[scrollView addSubview:mediaPlaybackButton];	
+		//Add a button
+		UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 320)];
+		[button addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
+		[button setImage:[UIImage imageNamed:@"clickToPlay.png"] forState:UIControlStateNormal];
+		[scrollView addSubview:button];	
+		imageSize = button.frame.size;
 		
-		imageSize = mediaPlaybackButton.frame.size;
-		topMargin = 50; 
-
 		//Create movie player object
 		mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
 		[mMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
-
-		[mMoviePlayer.moviePlayer prepareToPlay];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(movieFinishedCallback:)
+													 name:MPMoviePlayerPlaybackDidFinishNotification
+												   object:nil];
 	}
 	
 	else {
@@ -105,8 +89,8 @@ static NSString * const OPTION_CELL = @"option";
 	
 	
 	//Set Up Text Area
-	int sideMargin = 10;
-	UILabel *nodeTextView = [[UILabel alloc] initWithFrame:CGRectMake(sideMargin, imageSize.height + topMargin, 320 - (2 * sideMargin),
+	int margin = 10;
+	UILabel *nodeTextView = [[UILabel alloc] initWithFrame:CGRectMake(margin, imageSize.height + margin, 320 - (2 * margin),
 																			 [self calculateTextHeight:self.node.text])];
 	nodeTextView.text = self.node.text;
 	nodeTextView.backgroundColor = [UIColor blackColor];
@@ -117,7 +101,6 @@ static NSString * const OPTION_CELL = @"option";
 										  + nodeTextView.frame.size.height)];
 	//Add the text to the scroller
 	[scrollView addSubview:nodeTextView];
-	[nodeTextView release];
 	
 	//Refresh the tableView
 	[tableView reloadData];
@@ -130,16 +113,24 @@ static NSString * const OPTION_CELL = @"option";
 	[appModel updateServerNodeViewed:node.nodeId];
 	
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	appDelegate.nearbyBar.hidden = NO;
 	
 	//[self.view removeFromSuperview];
 	[self dismissModalViewControllerAnimated:YES];
-	appDelegate.nearbyBar.hidden = NO;
-
 }
 
 -(IBAction)playMovie:(id)sender {
 	[self presentMoviePlayerViewControllerAnimated:mMoviePlayer];
 }
+
+- (void)movieFinishedCallback:(NSNotification*) aNotification
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+										name:MPMoviePlayerPlaybackDidFinishNotification
+										object:mMoviePlayer];
+	[self dismissMoviePlayerViewControllerAnimated];
+}
+
 
 - (int) calculateTextHeight:(NSString *)text {
 	CGRect frame = CGRectMake(0, 0, self.view.bounds.size.width, 200000);
@@ -150,65 +141,6 @@ static NSString * const OPTION_CELL = @"option";
 	NSLog(@"Found height of %f", frame.size.height);
 	return frame.size.height;
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
-}
-
-
-- (void)dealloc {
-	NSLog(@"NodeViewController: Dealloc");
-    
-	[mMoviePlayer release];
-	[node release];
-	[tableView release];
-	[scrollView release];
-	[mediaPlaybackButton release];
-	
-	//remove listeners
-	[[NSNotificationCenter defaultCenter] removeObserver:self
-													name:MPMoviePlayerPlaybackDidFinishNotification
-												  object:mMoviePlayer];
-	[[NSNotificationCenter defaultCenter] removeObserver:self
-													name:MPMoviePlayerLoadStateDidChangeNotification
-												  object:mMoviePlayer];	
-	
-    [super dealloc];
-}
-
-#pragma mark MPMoviePlayerController Notification Handlers
-
-
-- (void)movieLoadStateChanged:(NSNotification*) aNotification{
-	MPMovieLoadState state = [(MPMoviePlayerController *) aNotification.object loadState];
-
-	if( state & MPMovieLoadStateUnknown ) {
-		NSLog(@"NodeViewController: Unknown Load State");
-	}
-	if( state & MPMovieLoadStatePlayable ) {
-		NSLog(@"NodeViewController: Playable Load State");
-	} 
-	if( state & MPMovieLoadStatePlaythroughOK ) {
-		NSLog(@"NodeViewController: Playthrough OK Load State");
-		[mediaPlaybackButton setTitle:NSLocalizedString(@"TouchToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = YES;	
-	} 
-	if( state & MPMovieLoadStateStalled ) {
-		NSLog(@"NodeViewController: Stalled Load State");
-	} 
-		
-}
-
-
-- (void)movieFinishedCallback:(NSNotification*) aNotification
-{
-	[self dismissMoviePlayerViewControllerAnimated];
-}
-
-
-
-
 
 /*
 // Override to allow orientations other than the default portrait orientation.
@@ -274,8 +206,7 @@ static NSString * const OPTION_CELL = @"option";
 	NSLog(@"Displaying option ``%@''", selectedOption.text);
 	
 	int newNodeId = selectedOption.nodeId;
-	//Node *newNode = [appModel fetchNode:newNodeId];
-	Node *newNode = [appModel nodeForNodeId: newNodeId];
+	Node *newNode = [appModel fetchNode:newNodeId];
 	self.node = newNode;
 	[self refreshView];
 }
@@ -284,7 +215,18 @@ static NSString * const OPTION_CELL = @"option";
 	return @"Options";
 }
 
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
 
+
+- (void)dealloc {
+	// free our movie player
+    [mMoviePlayer release];
+	
+    [super dealloc];
+}
 
 
 @end

@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 8/27/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "JSONResult.h"
@@ -21,8 +21,11 @@
 
 - (JSONResult*)initWithJSONString:(NSString *)JSONString{
 	
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+	
 	//Calculate the hash
-	self.hash = JSONString;
+	hash = [JSONString hash];
 	
 	// Parse JSON into a resultObject
 	SBJSON *json = [[SBJSON new] autorelease];
@@ -31,8 +34,8 @@
 	NSDictionary *resultDictionary = [json objectWithString:JSONString error:&jsonError];
 
 	if (jsonError.code) {
-		NSLog(@"JSONResult: SERVER RESPONSE ERROR - Error %d parsing JSON String: %@. There must be a problem with the server",jsonError.code, JSONString);
-		//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showServerAlert]; //This is not technically a network issue.
+		NSLog(@"JSONResult: Error %d parsing JSON String: %@. There must be a problem with the server",jsonError.code, JSONString);
+		[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];
 		return nil;
 	}
 	self.returnCode = [[resultDictionary objectForKey:@"returnCode"]intValue];
@@ -46,9 +49,9 @@
 		NSLog(@"JSONResult: The return code was 0, continue to parse out the data");
 		self.data = [self parseJSONData:dataObject];
 	}
-	else NSLog(@"JSONResult: SERVER RESPONSE ERROR - The return code was NOT 0, do not parse out the data. Return Code Description: %@",self.returnCodeDescription);
-	//Todo: Better communication back to the rest of the program when this happens
-		
+	else NSLog(@"JSONResult: The return code was NOT 0, do not parse out the data. Return Code Description: %@",self.returnCodeDescription);
+
+	[pool release];	
 	return self;
 }
 
@@ -62,14 +65,6 @@
 	
 	//Check if this dictionary contains a rows/cols pair or is just an object
 	if (!([dataDictionary objectForKey:@"columns"] && [dataDictionary objectForKey:@"rows"])) {
-		//If any of the fields in this dictionary are also dictionaries, we need to parse them as well
-		NSEnumerator *dictionaryEnumerator = [dataDictionary objectEnumerator];
-		NSObject *objectInDictionary;
-		while (objectInDictionary = [dictionaryEnumerator nextObject]) {	
-			//parse it
-			objectInDictionary = [self parseJSONData:objectInDictionary];
-		}
-	
 		return dataDictionary;
 	}
 
@@ -95,13 +90,12 @@
 }
 
 
-
 - (void)dealloc {
 	[returnCodeDescription release];
 	[data release];
+	
     [super dealloc];
 }
-
 
 
 

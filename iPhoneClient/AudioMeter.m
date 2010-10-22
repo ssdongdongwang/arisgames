@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 4/6/10.
-//  Copyright 2010 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
 #import "AudioMeter.h"
@@ -23,9 +23,9 @@
     if ((self = [super initWithFrame:frame])) {
         
 		self.backgroundColor = [UIColor clearColor];
-		self.numberofBars = 30;
-		self.spacingBetweenBars = 2;
-		self.activeColor = [UIColor lightTextColor];
+		self.numberofBars = 20;
+		self.spacingBetweenBars = 1;
+		self.activeColor = [UIColor blueColor];
 		self.inactiveColor = [UIColor clearColor];
 		
 		

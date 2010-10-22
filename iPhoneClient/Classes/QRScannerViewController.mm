@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 3/4/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "QRScannerViewController.h"
@@ -24,14 +24,8 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"QRScannerTitleKey", @"");
+        self.title = @"Decoder";
         self.tabBarItem.image = [UIImage imageNamed:@"qrscanner.png"];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(finishLoadingResult:)
-													 name:@"QRCodeObjectReady"
-												   object:nil];
-		
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
     }
     return self;
@@ -42,10 +36,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 		
-	[scanButton setTitle:NSLocalizedString(@"ScanUsingCameraKey",@"") forState:UIControlStateNormal];
-	manualCode.placeholder = NSLocalizedString(@"EnterCodeKey",@"");
-	
 	self.imagePickerController = [[UIImagePickerController alloc] init];
+	self.imagePickerController.allowsImageEditing = YES;
 	self.imagePickerController.delegate = self;
 	
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
@@ -114,7 +106,7 @@
 - (void)decoder:(Decoder *)decoder didDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset withResult:(TwoDDecoderResult *)twoDResult {
 	//Stop Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
+	[appDelegate removeWaitingIndicator];
 	
 	//get the result
 	NSString *encodedText = twoDResult.text;
@@ -128,32 +120,23 @@
 
 -(void) loadResult:(NSString *)code {
 	//Fetch the coresponding object from the server
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate showNewWaitingIndicator:NSLocalizedString(@"LoadingKey",@"") displayProgressBar:NO];
-	[appModel fetchQRCode:code];
-}
-
--(void) finishLoadingResult:(NSNotification*) notification{
+	NSObject<QRCodeProtocol> *qrCodeObject = [appModel fetchQRCode:code];
 	
-	NSObject<QRCodeProtocol> *qrCodeObject = notification.object;
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
-
 	if (qrCodeObject == nil) {
+		ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 		[appDelegate playAudioAlert:@"error" shouldVibrate:NO];
 		
 		//Display an alert
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerErrorTitleKey", @"")
-														message:NSLocalizedString(@"QRScannerErrorMessageKey", @"")
-													   delegate:self 
-											  cancelButtonTitle:NSLocalizedString(@"OkKey", @"")
-											  otherButtonTitles:nil];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Scan Successful, But..." message:@"This code doesn't mean anything right now. You should come back later."
+			 delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
 		[alert show];	
 		[alert release];
-		
+					  
 	}
 	else {	
-		[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];		
+		ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
+		[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
+		
 		//Display the content
 		[qrCodeObject display];
 	}
@@ -169,14 +152,11 @@
 	
 	//Stop Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
+	[appDelegate removeWaitingIndicator];
 	[appDelegate playAudioAlert:@"error" shouldVibrate:YES];
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerDecodingErrorTitleKey", @"")
-													message:NSLocalizedString(@"QRScannerDecodingErrorMessageKey", @"")
-												   delegate:self 
-										  cancelButtonTitle:NSLocalizedString(@"OkKey", @"")
-										  otherButtonTitles:nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Decoding Error" message:@"Try scanning the code again: Step back 2 feet and hold the camera as still as possible"
+												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
 	[alert show];	
 	[alert release];
 }
@@ -191,7 +171,7 @@
 	
 	//Start Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate showNewWaitingIndicator:NSLocalizedString(@"QRScannerDecodingKey",@"") displayProgressBar:NO];
+	[appDelegate showWaitingIndicator:@"Decoding..." displayProgressBar:NO];
 	
 }
 

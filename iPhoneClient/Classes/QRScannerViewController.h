@@ -26,6 +26,7 @@
 
 
 - (IBAction)scanButtonTouchAction: (id) sender;
+- (IBAction)codeEnteredAction: (id) sender;
 
 -(void) loadResult:(NSString *)result;
 

@@ -3,10 +3,15 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 4/6/10.
-//  Copyright 2010 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
 #import "TitleAndDecriptionFormViewController.h"
+
+NSString *const kTitlePrompt = @"Enter a Title";
+NSString *const kDescriptionPrompt = @"Enter a Description";
+
+
 
 @implementation TitleAndDecriptionFormViewController
 
@@ -19,7 +24,7 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
         // Custom initialization
-		self.title = NSLocalizedString(@"TitleAndDescriptionTitleKey",@"");
+		self.title = @"Title";
     }
     return self;
 }
@@ -31,15 +36,15 @@
     [super viewDidLoad];
 	
 	self.titleField = [[UITextField alloc]initWithFrame:CGRectMake(10, 10, 290, 30) ];
-	self.titleField.placeholder = NSLocalizedString(@"TitleAndDescriptionTitlePrompt",@"");
+	self.titleField.placeholder = kTitlePrompt;
 	self.titleField.returnKeyType =  UIReturnKeyDone;
 	self.titleField.delegate = self;
 	self.descriptionField = [[UITextField alloc]initWithFrame:CGRectMake(10, 10, 290, 30) ];
-	self.descriptionField.placeholder = NSLocalizedString(@"TitleAndDescriptionDescriptionPrompt",@"");;
+	self.descriptionField.placeholder = kDescriptionPrompt;
 	self.descriptionField.returnKeyType =  UIReturnKeyDone;
 	self.descriptionField.delegate = self;
 	
-	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"SaveKey",@"") style: 
+	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Save" style: 
 							   UIBarButtonItemStyleDone target:self action:@selector(notifyDelegate)];
 
 	self.navigationItem.rightBarButtonItem = button;

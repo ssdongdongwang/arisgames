@@ -121,27 +121,26 @@ class Locations extends Module
 	public function createLocation($intGameID, $strLocationName, $intIconMediaID, 
 								$dblLatitude, $dblLongitude, $dblError,
 								$strObjectType, $intObjectID,
-								$intQuantity, $boolHidden, $boolForceView, $boolAllowQuickTravel) {
+								$intQuantity, $boolHidden, $boolForceView) {
 														
 		$prefix = $this->getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 		if (!$intQuantity) $intQuantity = 1;
-		if (!$boolAllowQuickTravel) $boolAllowQuickTravel = 0;
 		
 		$strLocationName = addslashes($strLocationName);
 		if ($dblError < 5) $dblError = 25;
 		
 		//Check the object Type is good or null
-		if ( !Locations::isValidObjectType($intGameID, $strObjectType) or !strlen($strObjectType) > 0 )
+		if ( !$this->isValidObjectType($intGameID, $strObjectType) or !strlen($strObjectType) > 0 )
 			return new returnData(4, NULL, "invalid object type");
 
 		$query = "INSERT INTO {$prefix}_locations 
 					(name, icon_media_id, latitude, longitude, error, 
-					type, type_id, item_qty, hidden, force_view, allow_quick_travel)
+					type, type_id, item_qty, hidden, force_view)
 					VALUES ('{$strLocationName}', '{$intIconMediaID}',
 							'{$dblLatitude}','{$dblLongitude}','{$dblError}',
 							'{$strObjectType}','{$intObjectID}','{$intQuantity}',
-							'{$boolHidden}','{$boolForceView}', '{$boolAllowQuickTravel}')";
+							'{$boolHidden}','{$boolForceView}')";
 		
 		NetDebug::trace("createLocation: Running a query = $query");	
 	
@@ -170,7 +169,7 @@ class Locations extends Module
 	public function updateLocation($intGameID, $intLocationID, $strLocationName, $intIconMediaID, 
 								$dblLatitude, $dblLongitude, $dblError,
 								$strObjectType, $intObjectID,
-								$intQuantity, $boolHidden, $boolForceView, $boolAllowQuickTravel = 0)
+								$intQuantity, $boolHidden, $boolForceView)
 	{
 		$prefix = $this->getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
@@ -193,8 +192,7 @@ class Locations extends Module
 				type_id = '{$intObjectID}',
 				item_qty = '{$intQuantity}',
 				hidden = '{$boolHidden}',
-				force_view = '{$boolForceView}',
-				allow_quick_travel = '{$boolAllowQuickTravel}'
+				force_view = '{$boolForceView}'
 				WHERE location_id = '{$intLocationID}'";
 		
 		NetDebug::trace("updateLocation: Query: $query");		
@@ -240,48 +238,15 @@ class Locations extends Module
 		}
 		else {
 			return new returnData(0, FALSE);
-		}	
-	}
-	
-	public function deleteLocationsForObject($intGameID, $strObjectType, $intObjectId)
-	{
-		$prefix = $this->getPrefix($intGameID);
-		if (!$prefix) return new returnData(1, NULL, "invalid game id");
-
-		//Check the object Type is good or null
-		if ( !Locations::isValidObjectType($intGameID, $strObjectType) or !strlen($strObjectType) > 0 )
-			return new returnData(4, NULL, "invalid object type");
+		}	}
 			
-		//Delete the Locations and related QR Codes
-		$query = "DELETE {$prefix}_locations,{$prefix}_qrcodes 
-			FROM {$prefix}_locations OUTER JOIN {$prefix}_qrcodes
-			WHERE 
-			{$prefix}_qrcodes.link_type='Location' AND 
-			{$prefix}_locations.location_id={$prefix}_qrcodes.link_id AND
-			{$prefix}_locations.type = '{$strObjectType}' AND
-			{$prefix}_locations.type_id = '{$intObjectId}'";
-
-		NetDebug::trace("Query: $query");		
-		
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error");
-		
-			
-		if (mysql_affected_rows()) {
-			return new returnData(0, TRUE);
-		}
-		else {
-			return new returnData(0, FALSE);
-		}	
-	}	
-	
 	
 	/**
      * Fetch the valid content types from the requirements table
      * @returns an array of strings
      */
 	public function objectTypeOptions($intGameID){	
-		$options = Locations::lookupObjectTypeOptionsFromSQL($intGameID);
+		$options = $this->lookupObjectTypeOptionsFromSQL($intGameID);
 		if (!$options) return new returnData(1, NULL, "invalid game id");
 		return new returnData(0, $options);
 	}
@@ -292,7 +257,7 @@ class Locations extends Module
      * @returns TRUE if valid
      */
 	private function isValidObjectType($intGameID, $strObjectType) {
-		$validTypes = Locations::lookupObjectTypeOptionsFromSQL($intGameID);
+		$validTypes = $this->lookupObjectTypeOptionsFromSQL($intGameID);
 		return in_array($strObjectType, $validTypes);
 	}
 	

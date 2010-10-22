@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 4/1/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "Item.h"
@@ -21,7 +21,6 @@
 @synthesize itemId;
 @synthesize mediaId;
 @synthesize locationId;
-@synthesize qty,maxQty;
 @synthesize description;
 @synthesize iconMediaId;
 
@@ -48,7 +47,6 @@
 
 	//Have AppDelegate display
 	[appDelegate displayNearbyObjectView:itemDetailsViewController];
-	[itemDetailsViewController release];
 	
 }
 
@@ -69,6 +67,5 @@
 	[description release];
     [super dealloc];
 }
- 
 
 @end

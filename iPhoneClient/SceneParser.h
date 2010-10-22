@@ -14,7 +14,7 @@
 @end
 
 
-@interface SceneParser : NSObject <NSXMLParserDelegate> {
+@interface SceneParser : NSObject {
 	Boolean			isPc;
 	NSInteger		currentCharacterId;
 	NSMutableString	*currentText;
@@ -25,7 +25,6 @@
 	NSMutableArray	*script;
 	NSString		*sourceText;
 	CGRect			zoomRect;
-	float			zoomTime;
 	
 	int				fgSound;
 	int				bgSound;

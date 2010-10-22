@@ -1,6 +1,6 @@
 //
-//  NearbyBarItem.m
-//  A single button, representing a nearby object, on a NearbyBar
+//  InventoryBarItem.m
+//  fun with button bars
 //
 //  Created by Brian Deith on 5/6/09.
 //  Copyright 2009 Brian Deith. All rights reserved.
@@ -10,9 +10,6 @@
 
 #define RIGHT_STRING_MARGIN 5
 #define ICON_WIDTH 30
-#define kNearbyBarItemWidth 150
-#define kNearbyBarItemHeight 30
-
 
 @implementation NearbyBarItemView
 
@@ -22,11 +19,14 @@
 
 
 - (id)init {
-	CGRect frame = CGRectMake(0, 7, kNearbyBarItemWidth, kNearbyBarItemHeight);
+//	UIImage *image = [UIImage imageNamed:@"NearbyBarButtonBackground.png"];
+	CGRect frame = CGRectMake(0, 7, 150, 30);
 
+	// Set self's frame to encompass the image
 	if (self = [self initWithFrame:frame]) {
 		
 		self.opaque = NO;
+		//placardImage = image;
 		
 	}
 	return self;
@@ -43,6 +43,7 @@
 		nearbyObject = newObject;
 		[nearbyObject retain];
 		[self setTitle:[nearbyObject name]];
+		//NSLog(@"Item type is %d", [nearbyObject kind]);
 		switch ([nearbyObject kind]) {
 			case NearbyObjectNPC:
 				//NSLog(@"There's an NPC nearby.");
@@ -68,14 +69,14 @@
 - (void)setTitle:(NSString *)newTitle {
 	[title release];
 	title = [newTitle copy];
-	UIFont *font = [UIFont boldSystemFontOfSize:12.0];
+	UIFont *font = [UIFont systemFontOfSize:12.0];
 	// Precalculate size of text and size of font so that text fits inside placard
-	textSize = [title sizeWithFont:font minFontSize:12.0 actualFontSize:&fontSize forWidth:(self.bounds.size.width-RIGHT_STRING_MARGIN - ICON_WIDTH) lineBreakMode:UILineBreakModeTailTruncation];
+	textSize = [title sizeWithFont:font minFontSize:9.0 actualFontSize:&fontSize forWidth:(self.bounds.size.width-RIGHT_STRING_MARGIN - ICON_WIDTH) lineBreakMode:UILineBreakModeMiddleTruncation];
 	[self setNeedsDisplay];
 }
 
 - (void)drawRect:(CGRect)rect {
-	float radius = 8.0;
+	float radius = 10.0;
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	CGMutablePathRef path = CGPathCreateMutable();
 	CGPathMoveToPoint(path, NULL, rect.origin.x, rect.origin.y + radius);
@@ -100,19 +101,16 @@
 	CGGradientRef myGradient;
 	CGColorSpaceRef myColorspace;
 	size_t num_locations = 2;
-	CGFloat locations[2] = { 0.0, 0.5};
-	
+	CGFloat locations[3] = { 0.0, 0.5, 1.0 };
 	CGFloat components[12] = { 
-		40/255.0, 135/255.0, 31/255.0, 1.0,
-
-		34/255.0, 92/255.0, 31/255.0, 1.0
-
-	}; 
-	 
+		0.82, 0.01, 0.01, 1.0,
+		0.50, 0.20, 0.01, 1.0,
+		0.70, 0.01, 0.01, 1.0
+	};
 	
 	myColorspace = CGColorSpaceCreateDeviceRGB();
 	myGradient = CGGradientCreateWithColorComponents (myColorspace, components,
-												  locations, num_locations);
+													  locations, num_locations);
 	CGPoint myStartPoint, myEndPoint;
 	myStartPoint = self.bounds.origin;
 	myEndPoint.x = self.bounds.origin.x;
@@ -129,12 +127,17 @@
 	CGPoint point;
 	
 	// Get the font of the appropriate size
-	UIFont *font = [UIFont boldSystemFontOfSize:fontSize];
+	UIFont *font = [UIFont systemFontOfSize:fontSize];
+	
+	[[UIColor blackColor] set];
+	point = CGPointMake(x, y + 0.5);
+	[title drawAtPoint:point forWidth:(self.bounds.size.width - ICON_WIDTH - RIGHT_STRING_MARGIN) withFont:font fontSize:fontSize lineBreakMode:UILineBreakModeMiddleTruncation baselineAdjustment:UIBaselineAdjustmentAlignBaselines];
 	
 	[[UIColor whiteColor] set];
 	point = CGPointMake(x, y);
-	[title drawAtPoint:point forWidth:(self.bounds.size.width - ICON_WIDTH - RIGHT_STRING_MARGIN) withFont:font fontSize:fontSize lineBreakMode:UILineBreakModeTailTruncation baselineAdjustment:UIBaselineAdjustmentAlignCenters]; 
+	[title drawAtPoint:point forWidth:(self.bounds.size.width - ICON_WIDTH - RIGHT_STRING_MARGIN) withFont:font fontSize:fontSize lineBreakMode:UILineBreakModeMiddleTruncation baselineAdjustment:UIBaselineAdjustmentAlignBaselines]; 
 	
+	//UIImage *iconImage = [UIImage imageNamed:@"item.png"];
 	CGFloat iconImageX = self.bounds.origin.x + 5.0;
 	CGFloat iconImageY = ((self.bounds.size.height - iconImage.size.height) / 2.0) + self.bounds.origin.y;
 	[self.iconImage drawAtPoint:(CGPointMake(iconImageX, iconImageY))];
@@ -143,5 +146,24 @@
 	CGColorSpaceRelease(myColorspace);
 	CGGradientRelease(myGradient);
 }
+
+//- (void)olddrawRect:(CGRect)rect {
+//	[placardImage drawAtPoint:(CGPointMake(0.0, 0.0))];
+//
+//	CGFloat x = self.bounds.size.width/2 - textSize.width/2;
+//	CGFloat y = self.bounds.size.height/2 - textSize.height/2;
+//	CGPoint point;
+//
+//	// Get the font of the appropriate size
+//	UIFont *font = [UIFont systemFontOfSize:fontSize];
+//
+//	[[UIColor blackColor] set];
+//	point = CGPointMake(x, y + 0.5);
+//	[title drawAtPoint:point forWidth:(self.bounds.size.width-STRING_INDENT) withFont:font fontSize:fontSize lineBreakMode:UILineBreakModeMiddleTruncation baselineAdjustment:UIBaselineAdjustmentAlignBaselines];
+//
+//	[[UIColor whiteColor] set];
+//	point = CGPointMake(x, y);
+//	[title drawAtPoint:point forWidth:(self.bounds.size.width-STRING_INDENT) withFont:font fontSize:fontSize lineBreakMode:UILineBreakModeMiddleTruncation baselineAdjustment:UIBaselineAdjustmentAlignBaselines]; 
+//}
 
 @end

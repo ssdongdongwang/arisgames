@@ -1,5 +1,5 @@
 <?php
-require_once("module.php");
+require("module.php");
 
 
 class PlayerStateChanges extends Module
@@ -52,8 +52,7 @@ class PlayerStateChanges extends Module
      * Create a Player State Change
      * @returns the new playerStateChangeID on success
      */
-	public function createPlayerStateChange($intGameID, $strEventType, $intEventDetail, 
-											$strActionType, $strActionDetail, $intActionAmount)
+	public function createPlayerStateChange($intGameID, $strEventType, $strEventDetail, $strActionType, $strActionDetail)
 	{
 		$prefix = $this->getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
@@ -66,8 +65,8 @@ class PlayerStateChanges extends Module
 		
 		
 		$query = "INSERT INTO {$prefix}_player_state_changes 
-					(event_type, event_detail, action, action_detail, action_amount)
-					VALUES ('{$strEventType}','{$intEventDetail}','{$strActionType}','{$strActionDetail}','{$intActionAmount}')";
+					(event_type, event_detail, action, action_detail)
+					VALUES ('{$strEventType}','{$strEventDetail}','{$strActionType}','{$strActionDetail}')";
 		
 		NetDebug::trace("Running a query = $query");	
 		
@@ -83,8 +82,7 @@ class PlayerStateChanges extends Module
      * Update a specific Player State Change
      * @returns true if edit was done, false if no changes were made
      */
-	public function updatePlayerStateChange($intGameID, $intPlayerStateChangeID, $strEventType, 
-								$intEventDetail, $strActionType, $strActionDetail, $intActionAmount)
+	public function updatePlayerStateChange($intGameID, $intPlayerStateChangeID, $strEventType, $strEventDetail, $strActionType, $strActionDetail)
 	{
 		$prefix = $this->getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
@@ -100,10 +98,9 @@ class PlayerStateChanges extends Module
 		$query = "UPDATE {$prefix}_player_state_changes 
 					SET 
 					event_type = '{$strEventType}',
-					event_detail = '{$intEventDetail}',
+					event_detail = '{$strEventDetail}',
 					action = '{$strActionType}',
 					action_detail = '{$strActionDetail}'
-					action_amount = '{$intActionAmount}'
 					WHERE id = '{$intPlayerStateChangeID}'";
 		
 		NetDebug::trace("Running a query = $query");	
@@ -137,57 +134,14 @@ class PlayerStateChanges extends Module
 			return new returnData(2, NULL, 'invalid player state change id');
 		}
 		
-	}
-	
-
-	public function deletePlayerStateChangesThatRefrenceObject($intGameID, $strObjectType, $intObjectId)
-	{
-		$prefix = $this->getPrefix($intGameID);
-		if (!$prefix) return new returnData(1, NULL, "invalid game id");
-
-		$whereClause = '';
-		
-		switch ($strObjectType) {
-			case 'Node':
-				$whereClause = "event_type = 'VIEW_NODE' AND event_detail = '{$intObjectId}'";
-				break;			
-			case 'Item':
-				$whereClause = "(event_type = 'VIEW_ITEM' AND event_detail = '{$intObjectId}') OR
-								((action = 'GIVE_ITEM' OR action = 'TAKE_ITEM') AND action_detail = '{$intObjectId}')";
-				break;
-			case 'Npc':
-				$whereClause = "event_type = 'VIEW_NPC' AND event_detail = '{$intObjectId}'";
-				break;
-			default:
-				return new returnData(4, NULL, "invalid object type");
-		}
-			
-		//Delete the Locations and related QR Codes
-		$query = "DELETE FROM {$prefix}_player_state_changes WHERE {$whereClause}";
-		
-		@mysql_query($query);
-		
-		NetDebug::trace("Query: $query" . mysql_error());		
-
-		
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error");
-		
-			
-		if (mysql_affected_rows()) {
-			return new returnData(0, TRUE);
-		}
-		else {
-			return new returnData(0, FALSE);
-		}	
-	}			
-	
+	}	
 	
 	/**
      * Fetch the valid content types from the requirements table
      * @returns an array of strings
      */
 	public function eventTypeOptions($intGameID){	
-		$options = $this->lookupEventTypeOptionsFromSQL($intGameID);
+		$options = $this->lookupContentTypeOptionsFromSQL($intGameID);
 		if (!$options) return new returnData(1, NULL, "invalid game id");
 		return new returnData(0, $options);
 	}

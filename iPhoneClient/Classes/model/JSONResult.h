@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 8/27/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -13,13 +13,14 @@
 	int returnCode;
 	NSString *returnCodeDescription;
 	NSObject *data;
-	NSString *hash;
+	NSInteger hash;
 }
 
 @property(readwrite) int returnCode;
 @property(copy, readwrite) NSString *returnCodeDescription;
 @property(copy, readwrite) NSObject *data;
-@property(copy, readwrite) NSString *hash;
+@property(readonly) NSInteger hash;
+
 
 
 - (JSONResult*)initWithJSONString:(NSString *)JSONString;

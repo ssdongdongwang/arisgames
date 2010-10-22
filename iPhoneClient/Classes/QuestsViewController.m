@@ -53,7 +53,7 @@ NSString *const kQuestsHtmlTemplate =
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"QuestViewTitleKey",@"");
+        self.title = @"Quests";
         self.tabBarItem.image = [UIImage imageNamed:@"quest.png"];
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
 		silenceNextServerUpdate = YES;
@@ -62,8 +62,7 @@ NSString *const kQuestsHtmlTemplate =
 		
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-		[dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ReceivedQuestList" object:nil];
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewQuestListReady" object:nil];
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedQuestList" object:nil];
 		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
 
     }
@@ -95,27 +94,11 @@ NSString *const kQuestsHtmlTemplate =
 - (void)refresh {
 	NSLog(@"QuestsViewController: refresh requested");
 	if (appModel.loggedIn) [appModel fetchQuestList];
-	[self showLoadingIndicator];
-}
-
-
--(void)showLoadingIndicator{
-	UIActivityIndicatorView *activityIndicator = 
-		[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
-	[activityIndicator release];
-	[[self navigationItem] setRightBarButtonItem:barButton];
-	[barButton release];
-	[activityIndicator startAnimating];
-}
-
--(void)removeLoadingIndicator{
-	[[self navigationItem] setRightBarButtonItem:nil];
 }
 
 -(void)refreshViewFromModel {
 	NSLog(@"QuestsViewController: Refreshing view from model");
-	
+
 	//Add a badge if this is NOT the first time data has been loaded
 	if (silenceNextServerUpdate == NO) {
 		self.tabBarItem.badgeValue = @"!";
@@ -235,8 +218,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 	
 	CGRect descriptionFrame = [descriptionView frame];	
 	descriptionFrame.size = CGSizeMake(descriptionFrame.size.width,newHeight);
-	[descriptionView setFrame:descriptionFrame];
-	[[[descriptionView subviews] lastObject] setScrollEnabled:NO];
+	[descriptionView setFrame:descriptionFrame];	
 	NSLog(@"QuestViewController: description UIWebView frame set to {%f, %f, %f, %f}", 
 		  descriptionFrame.origin.x, 
 		  descriptionFrame.origin.y, 
@@ -268,7 +250,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 	UIWebView *descriptionView;
 	AsyncImageView *iconView;
 	
-	UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:cellFrame] autorelease];
+	UITableViewCell *cell = [[UITableViewCell alloc] initWithFrame:cellFrame];
 	
 	//Setup Cell
 	UIView *transparentBackground = [[UIView alloc] initWithFrame:CGRectZero];
@@ -293,7 +275,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 	
 	//Set the icon
 	if (quest.iconMediaId > 0) {
-		Media *iconMedia = [appModel mediaForMediaId:quest.iconMediaId];
+		Media *iconMedia = [appModel.mediaList objectForKey:[NSNumber numberWithInt:quest.iconMediaId]];
 		[iconView loadImageFromMedia:iconMedia];
 	}
 	else {
@@ -346,8 +328,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 */
 
 - (NSString *)tableView:(UITableView *)view titleForHeaderInSection:(NSInteger)section {
-	if (section == ACTIVE_SECTION) return NSLocalizedString(@"QuestsActiveTitleKey",@"");	
-	else if (section == COMPLETED_SECTION) return NSLocalizedString(@"QuestsCompleteTitleKey",@"");
+	if (section == ACTIVE_SECTION) return @"Active Quests";	
+	else if (section == COMPLETED_SECTION) return @"Completed Quests";
 	return @"Quests";
 }
 

@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 2/26/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -20,8 +20,7 @@
 	nearbyObjectKind kind; //for the protocol
 	int objectId;
 	bool hidden;
-	bool forcedDisplay;	
-	bool allowsQuickTravel;
+	bool forcedDisplay;
 	int qty;
 }
 
@@ -37,7 +36,6 @@
 @property(readwrite) int objectId;
 @property(readwrite) bool hidden;
 @property(readwrite) bool forcedDisplay;
-@property(readwrite) bool allowsQuickTravel;
 @property(readwrite) int qty;
 
 - (void) display;

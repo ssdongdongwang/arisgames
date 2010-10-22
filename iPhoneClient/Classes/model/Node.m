@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 8/31/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "Node.h"
@@ -39,7 +39,6 @@
 	nodeViewController.appModel = appModel;
 	
 	[appDelegate displayNearbyObjectView:nodeViewController];
-	[nodeViewController release];
 }
 
 - (NSInteger) numberOfOptions {
@@ -51,14 +50,7 @@
 }
 
 
-- (void) dealloc {
-	[name release];
-	[text release];
-	[options release];
-	[answerString release];
-	[super dealloc];
-}
- 
+
 
 
 @end

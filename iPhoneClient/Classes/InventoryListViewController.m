@@ -21,15 +21,14 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"InventoryViewTitleKey",@"");
+        self.title = @"Inventory";
         self.tabBarItem.image = [UIImage imageNamed:@"inventory.png"];
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
 		silenceNextServerUpdate = YES;
 		
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-		[dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ReceivedInventory" object:nil];
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewInventoryReady" object:nil];
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedInventory" object:nil];
 		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
 
     }
@@ -62,21 +61,6 @@
 -(void)refresh {
 	NSLog(@"InventoryListViewController: Refresh Requested");
 	[appModel fetchInventory];
-	[self showLoadingIndicator];
-}
-
--(void)showLoadingIndicator{
-	UIActivityIndicatorView *activityIndicator = 
-	[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
-	[activityIndicator release];
-	[[self navigationItem] setRightBarButtonItem:barButton];
-	[barButton release];
-	[activityIndicator startAnimating];
-}
-
--(void)removeLoadingIndicator{
-	[[self navigationItem] setRightBarButtonItem:nil];
 }
 
 -(void)refreshViewFromModel {
@@ -92,7 +76,7 @@
 	}
 	else silenceNextServerUpdate = NO;
 	
-	self.inventory = [appModel.inventory allValues];
+	inventory = appModel.inventory;
 	[inventoryTable reloadData];
 	
 	//Stop Waiting Indicator
@@ -164,17 +148,15 @@
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];	
 	if(cell == nil) cell = [self getCellContentView:CellIdentifier];
 	
-	Item *item = [inventory objectAtIndex: [indexPath row]];
-	
 	UILabel *lblTemp1 = (UILabel *)[cell viewWithTag:1];
-	lblTemp1.text = item.name;								   
+	lblTemp1.text = [[inventory objectAtIndex: [indexPath row]] name];
 	
 	UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
-	if (item.qty > 1) lblTemp2.text = [NSString stringWithFormat:@"x %d ",item.qty];
-	else lblTemp2.text = @"";
+	lblTemp2.text = [[inventory objectAtIndex: [indexPath row]] description];
 	
 	AsyncImageView *iconView = (AsyncImageView *)[cell viewWithTag:3];
 	
+	Item *item = [inventory objectAtIndex:[indexPath row]];
 	Media *media = [appModel mediaForMediaId: item.mediaId];
 
 	if (item.iconMediaId != 0) {
@@ -219,7 +201,6 @@
 	itemDetailsViewController.navigationItem.title = selectedItem.name;
 	itemDetailsViewController.inInventory = YES;
 	itemDetailsViewController.hidesBottomBarWhenPushed = YES;
-	appDelegate.nearbyBar.hidden = YES;
 
 	//Put the view on the screen
 	[[self navigationController] pushViewController:itemDetailsViewController animated:YES];

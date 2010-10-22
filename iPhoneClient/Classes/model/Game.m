@@ -24,10 +24,6 @@
 
 - (void)dealloc {
 	[name release];
-	[site release];
-	[description release];
-	[authors release];
-	[location release];	
     [super dealloc];
 }
 
@@ -39,7 +35,7 @@
 
 - (double)distanceFromPlayer {
 	AppModel *appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-	if (appModel.playerLocation) return [self.location distanceFromLocation:appModel.playerLocation];
+	if (appModel.playerLocation) return [self.location getDistanceFrom:appModel.playerLocation];
 	else return 0;
 }
 

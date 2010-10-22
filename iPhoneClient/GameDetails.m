@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 4/18/10.
-//  Copyright 2010 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
 #import "GameDetails.h"
@@ -41,8 +41,6 @@ NSString *const kGameDetailsHtmlTemplate =
 @synthesize titleLabel;
 @synthesize playersLabel;
 @synthesize authorsLabel;
-@synthesize descriptionLabel;
-@synthesize mapLabel;
 @synthesize locationLabel;
 @synthesize iconView;
 @synthesize scrollView;
@@ -68,11 +66,7 @@ NSString *const kGameDetailsHtmlTemplate =
 
 - (void)viewWillAppear:(BOOL)animated {
 	NSLog(@"GameDetails: View Will Appear, Refresh");
-	self.title = NSLocalizedString(@"GameDetailsTitleKey",@"");
-	
-	descriptionLabel.text = NSLocalizedString(@"DescriptionKey",@"");
-	mapLabel.text = NSLocalizedString(@"MapKey",@"");
-
+	self.title = @"Details";
 	
 	scrollView.contentSize = CGSizeMake(contentView.frame.size.width,contentView.frame.size.height);
 	
@@ -89,8 +83,8 @@ NSString *const kGameDetailsHtmlTemplate =
 	[map setRegion:region animated:YES];
 	[map regionThatFits:region];
 	
-	playersLabel.text = [NSString stringWithFormat:@"%@: %d", NSLocalizedString(@"PlayersKey",@""),game.numPlayers];
-	authorsLabel.text = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"AuthorsKey",@""),game.authors];
+	playersLabel.text = [NSString stringWithFormat:@"Players: %d",game.numPlayers];
+	authorsLabel.text = [NSString stringWithFormat:@"Authors: %@",game.authors];
 	
 	if (game.iconMediaId != 0) {
 		AppModel *appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
@@ -103,7 +97,6 @@ NSString *const kGameDetailsHtmlTemplate =
 	MKReverseGeocoder *reverseGeocoder = [[MKReverseGeocoder alloc] initWithCoordinate:self.game.location.coordinate];
 	reverseGeocoder.delegate = self;
 	[reverseGeocoder start];
-	[reverseGeocoder release];
 	
 	titleLabel.text = game.name;
 	

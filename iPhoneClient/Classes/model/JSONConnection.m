@@ -3,14 +3,13 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 8/28/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "JSONConnection.h"
 #import "AppModel.h"
 #import "ARISAppDelegate.h"
 #import "ARISURLConnection.h"
-#import "ASIHTTPRequest.h"
 
 @implementation JSONConnection
 
@@ -34,7 +33,7 @@
 
 - (JSONResult*) performSynchronousRequest{
 	//Build the base URL string
-	NSMutableString *requestString = [[NSMutableString alloc] initWithFormat:@"%@.%@.%@", 
+	NSMutableString *requestString = [NSMutableString stringWithFormat:@"%@.%@.%@", 
 							   self.jsonServerBaseURL, self.serviceName, self.methodName];
 	
 	//Add the Arguments
@@ -48,33 +47,32 @@
 	NSLog(@"JSONConnection: JSON URL for sync request is : %@", requestString);
 	
 	//Convert into a NSURLRequest
-	NSURL *url = [NSURL URLWithString:requestString];
-	[requestString release];
-	
-	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-	[request setNumberOfTimesToRetryOnTimeout: 2];
-
+	NSURL *requestURL = [NSURL URLWithString:requestString];
+	NSURLRequest *requestURLRequest = [NSURLRequest requestWithURL:requestURL
+													   cachePolicy:NSURLRequestReturnCacheDataElseLoad
+												   timeoutInterval:60];
 	
 	// Make synchronous request
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNewWaitingIndicator: @"Loading" displayProgressBar:NO];
+	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator: @"Loading" displayProgressBar:NO];
 	
-	[request startSynchronous];
-				  
-	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeNewWaitingIndicator];
+	[[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the activity indicator show before doing the sync request
+	
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+	NSData *resultData = [NSURLConnection sendSynchronousRequest:requestURLRequest
+											   returningResponse:&response
+														   error:&error];	
 
-	NSError *error = [request error];
-	if (error) {
-		NSLog(@"*** JSONConnection: performSynchronousRequest Error: %@ %@",
-			  [error localizedDescription],
-			  [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
-		[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];
-		return nil;		
-	}				  
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
+
+	if (error != nil) {
+		NSLog(@"JSONConnection: Error communicating with server.");
+		[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];	
+	}	
 	
-		
-	NSString *jsonString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+	NSString *jsonString = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
 	
 	//Get the JSONResult here
 	JSONResult *jsonResult = [[[JSONResult alloc] initWithJSONString:jsonString] autorelease];
@@ -96,68 +94,94 @@
 		[requestString appendString:argument];
 	}
 	
-	NSLog(@"JSONConnection: Begining Async request.  %@", requestString);
-	
 	//Convert into a NSURLRequest
-	NSURL *requestURL = [NSURL URLWithString:requestString];
-	[requestString release];
+	NSURL *requestURL = [[NSURL alloc]initWithString:requestString];
+	NSURLRequest *request = [NSURLRequest requestWithURL:requestURL
+													   cachePolicy:NSURLRequestReturnCacheDataElseLoad
+												   timeoutInterval:60];
+	[requestURL release];
 	
-	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
-	[request setNumberOfTimesToRetryOnTimeout:2];
-	[request setDelegate:self];
-
-
-	//Store the parser in the request
-	if (parser) [request setUserInfo:[NSDictionary dictionaryWithObject:NSStringFromSelector(parser) forKey:@"parser"]]; 
-	[self retain];
-	
-	[request startAsynchronous];
-	
-	
-	//Set up indicators
+	//set up indicators
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator: @"Loading"];
+	
+	//do it
+	ARISURLConnection *urlConnection = [[ARISURLConnection alloc] initWithRequest:request delegate:self parser:parser];
+	asyncData = [NSMutableData dataWithCapacity:1000];
+	[asyncData retain];
+	[urlConnection start];
+	[urlConnection release];
+	
+	NSLog(@"JSONConnection: Begining Async request.  %@", requestString);
+	[requestString release];
+
+}
+
+-(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse*)response
+{
+	NSLog(@"JSONConnection: didRevieveResponse");
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
 }
 
 
-- (void)requestFinished:(ASIHTTPRequest *)request {
-	NSLog(@"JSONConnection: requestFinished");
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+	NSString* tempData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	NSLog(@"JSONConnection: Recieved Data: %@", tempData);
+	[tempData release];
+	
+	[asyncData appendData:data];
+
+	//NSString* tempAsyncData = [[NSString alloc] initWithData:asyncData encoding:NSUTF8StringEncoding];
+
+	//NSLog(@"JSONConnection: Async Data is now: %@", tempAsyncData);
+
+	
+
+}
+
+
+
+
+- (void)connectionDidFinishLoading:(ARISURLConnection *)connection {
+	NSLog(@"JSONConnection: Finished Loading Data");
+	
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	
 	//end the loading and spinner UI indicators
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
+
 	
-	NSString *jsonString = [[NSString alloc] initWithData:[request responseData] 
-												 encoding:NSUTF8StringEncoding];
+	//Create a reference to the delegate using the application singleton.
+	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	AppModel *appModel = appDelegate.appModel;
+	
+	NSString *jsonString = [[NSString alloc] initWithData:asyncData encoding:NSUTF8StringEncoding];
 	
 	//Get the JSONResult here
 	JSONResult *jsonResult = [[JSONResult alloc] initWithJSONString:jsonString];
 	[jsonString release];
 	
-	SEL parser = NSSelectorFromString([[request userInfo] objectForKey:@"parser"]);   
-
-	if (parser) {
-		ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-		AppModel *appModel = appDelegate.appModel;		
-		[appModel performSelector:parser withObject:jsonResult];
-	}
+	if (connection.parser) [appModel performSelector:connection.parser withObject:jsonResult];
 	
 	[jsonResult release];
+	
+	[asyncData release];
+	
+	[pool release];
 }
 
-- (void)requestFailed:(ASIHTTPRequest *)request {	
-	NSError *error = [request error];
-	
-	// inform the user
-    NSLog(@"*** JSONConnection: requestFailed: %@ %@",
-          [error localizedDescription],
-          [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
+- (void)connection:(ARISURLConnection *)connection didFailWithError:(NSError *)error {
+	NSLog(@"JSONConnection: Error communicating with server.");
 	
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
 	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showNetworkAlert];	
 	
+	[asyncData release];
 }
-
 
 
 - (void)dealloc {
@@ -165,11 +189,9 @@
 	[serviceName release];
 	[methodName release];
 	[arguments release];
-	[asyncData release];
+	
     [super dealloc];
 }
- 
-
 
 
 @end

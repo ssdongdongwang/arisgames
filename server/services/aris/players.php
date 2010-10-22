@@ -1,6 +1,6 @@
 <?php
 require_once("module.php");
-require_once("items.php");
+
 
 class Players extends Module
 {	
@@ -116,9 +116,6 @@ class Players extends Module
 	{
 		$timeLimitInMinutes = 20;
 		
-		/*
-		Unoptimized becasue an index cant be used for the timestamp
-	
 		$query = "SELECT players.player_id, players.user_name, 
 				players.latitude, players.longitude, 
 				player_log.timestamp 
@@ -130,18 +127,6 @@ class Players extends Module
 				UNIX_TIMESTAMP( NOW( ) ) - UNIX_TIMESTAMP( player_log.timestamp ) <= ( $timeLimitInMinutes * 60 )
 				GROUP BY player_id
 				";
-		 */
-		
-		$query = "SELECT players.player_id, players.user_name, 
-					players.latitude, players.longitude, player_log.timestamp
-					FROM players
-					LEFT JOIN player_log ON players.player_id = player_log.player_id
-					WHERE players.last_game_id =  '{$intGameID}' AND 
-					players.player_id != '{$intPlayerID}' AND
-					player_log.timestamp > DATE_SUB( NOW( ) , INTERVAL 20 MINUTE ) 
-					GROUP BY player_id";
-		
-		
 		NetDebug::trace($query);
 
 
@@ -258,40 +243,32 @@ class Players extends Module
      * Removes an Item from the Map and Gives it to the Player
      * @returns returnData with data=true if changes were made
      */
-	public function pickupItemFromLocation($intGameID, $intPlayerID, $intItemID, $intLocationID, $qty=1)
+	public function pickupItemFromLocation($intGameID, $intPlayerID, $intItemID, $intLocationID)
 	{	
 		$prefix = Module::getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 		
-		$currentQty = Module::itemQtyInPlayerInventory($intGameID, $intPlayerID, $intItemID);
-		$item = Items::getItem($intGameID, $intItemID)->data;
-		if ($currentQty+$qty > $item->maxQty && $item->maxQty != -1) {
-			//we are going over the limit
-			$quantity =  $item->maxQty - $currentQty+$qty;
-			if ($quantity < 1) return new returnData(0, FALSE);
-		}
+		Module::giveItemToPlayer($prefix, $intItemID, $intPlayerID);
+		Module::decrementItemQtyAtLocation($prefix, $intLocationID, 1); 
 		
-		Module::giveItemToPlayer($prefix, $intItemID, $intPlayerID, $qty);
-		Module::decrementItemQtyAtLocation($prefix, $intLocationID, $qty); 
-		
-		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_PICKUP_ITEM, $intItemID, $qty);
+		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_PICKUP_ITEM, $intItemID);
 
-		return new returnData(0, TRUE);
+		return new returnData(0, FALSE);
 	}
 	
 	/**
      * Removes an Item from the players Inventory and Places it on the map
      * @returns returnData with data=true if changes were made
      */
-	public function dropItem($intGameID, $intPlayerID, $intItemID, $floatLat, $floatLong, $qty=1)
+	public function dropItem($intGameID, $intPlayerID, $intItemID, $floatLat, $floatLong)
 	{
 		$prefix = Module::getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 		
-		Module::takeItemFromPlayer($prefix, $intItemID, $intPlayerID, $qty);
-		Module::giveItemToWorld($prefix, $intItemID, $floatLat, $floatLong, $qty);
+		Module::takeItemFromPlayer($prefix, $intItemID, $intPlayerID);
+		Module::giveItemToWorld($prefix, $intItemID, $floatLat, $floatLong, 1);
 		
-		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_DROP_ITEM, $intItemID, $qty);
+		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_DROP_ITEM, $intItemID);
 
 		return new returnData(0, FALSE);
 	}		
@@ -300,14 +277,14 @@ class Players extends Module
      * Removes an Item from the players Inventory
      * @returns returnData with data=true if changes were made
      */
-	public function destroyItem($intGameID, $intPlayerID, $intItemID, $qty=1)
+	public function destroyItem($intGameID, $intPlayerID, $intItemID)
 	{
 		$prefix = Module::getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 		
-		Module::takeItemFromPlayer($prefix, $intItemID, $intPlayerID, $qty);
+		Module::takeItemFromPlayer($prefix, $intItemID, $intPlayerID);
 		
-		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_DESTROY_ITEM, $intItemID, $qty);
+		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_DESTROY_ITEM, $intItemID);
 
 		
 		return new returnData(0, FALSE);

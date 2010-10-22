@@ -14,40 +14,39 @@
 #import "AnnotationView.h"
 #import "Media.h"
 #import "Annotation.h"
-#import <UIKit/UIActionSheet.h>
 
 
-static float INITIAL_SPAN = 0.001;
+//static int DEFAULT_ZOOM = 16;
+//static float INITIAL_SPAN = 0.001;
 
 @implementation GPSViewController
 
 @synthesize locations;
-@synthesize mapView;
-@synthesize tracking;
-@synthesize mapTypeButton;
-@synthesize playerTrackingButton;
-@synthesize toolBar;
+@synthesize autoCenter;
+
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"MapViewTitleKey",@"");
+        self.title = @"GPS";
         self.tabBarItem.image = [UIImage imageNamed:@"gps.png"];
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
 		silenceNextServerUpdate = YES;
-		tracking = YES;
-		playerTrackingButton.style = UIBarButtonItemStyleDone;
-
+		autoCenter = YES;
 		
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
 		[dispatcher addObserver:self selector:@selector(refresh) name:@"PlayerMoved" object:nil];
-		[dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ReceivedLocationList" object:nil];
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewLocationListReady" object:nil];
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedLocationList" object:nil];
+		[dispatcher addObserver:self selector:@selector(processNearbyLocationsList:) name:@"ReceivedNearbyLocationList" object:nil];
 		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
+		[dispatcher addObserver:self selector:@selector(movieFinishedPreloading:) name:MPMoviePlayerContentPreloadDidFinishNotification object:nil];
+		[dispatcher addObserver:self selector:@selector(movieFinishedPlayback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
 		
+		//create a time for automatic map refresh
+		NSTimer *refreshTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(refresh) userInfo:nil repeats:YES];
 	}
 	
     return self;
@@ -57,6 +56,136 @@ static float INITIAL_SPAN = 0.001;
 	silenceNextServerUpdate = YES;
 }
 		
+- (IBAction)mainButtonTouchAction{
+	NSLog(@"GPSViewController: Main Button Touched");
+	if (somethingNearby) {
+		NSLog(@"GPSViewController: Display the closest object");
+		if ([mMoviePlayer respondsToSelector:@selector(view)]) mMoviePlayer.view.hidden = NO;
+		mainButton.hidden = YES;
+		[mMoviePlayer play];
+	}
+	else {
+		NSLog(@"GPSViewController: Launch the recorder");
+		//launch the recorder
+		AudioRecorderViewController *audioRecorderVC = [[AudioRecorderViewController alloc] initWithNibName:@"AudioRecorderViewController" bundle:nil];
+		[self.view addSubview:audioRecorderVC.view];
+	}
+
+}
+
+
+- (void)movieFinishedCallback:(NSNotification*) aNotification
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:MPMoviePlayerPlaybackDidFinishNotification
+												  object:mMoviePlayer];
+	[self dismissMoviePlayerViewControllerAnimated];
+}
+
+
+
+- (void)processNearbyLocationsList:(NSNotification *)notification {
+    NSLog(@"GPSViewController: Recieved a Nearby Locations List Notification");
+	NSArray *nearbyLocations = notification.object;
+	
+	bool nearbyLocationsThatAreNotPlayersExist = NO;
+	for (NSObject <NearbyObjectProtocol> *curLocation in nearbyLocations) {
+		if ([curLocation kind] != NearbyObjectPlayer) nearbyLocationsThatAreNotPlayersExist = YES;
+	}
+	
+	if (!nearbyLocationsThatAreNotPlayersExist) { 
+		NSLog(@"GPSViewController: No nearby Locations");
+		[mainButton setTitle: @"Record" forState: UIControlStateNormal];
+		[mainButton setTitle: @"Record" forState: UIControlStateHighlighted];	
+
+		lastNearbyLocation = nil;
+		
+		somethingNearby = NO;
+		if ([mMoviePlayer respondsToSelector:@selector(view)]) [mMoviePlayer.view removeFromSuperview];
+		
+		[spinner stopAnimating];
+		[spinner removeFromSuperview];
+		mainButton.enabled = YES;
+	
+		return;
+	}
+	
+	else {
+		NSLog(@"GPSViewController: Atleast one nearby Location");
+				
+		somethingNearby = YES;
+		
+		double bestDist = INFINITY;
+		Location *bestLocation;
+		
+		//Get the closest location
+		for (Location *curLocation in appModel.locationList) {
+			if (curLocation.kind == NearbyObjectPlayer) continue;
+			double curDist = [curLocation.location getDistanceFrom:appModel.playerLocation];
+			if ( curDist < bestDist) {
+				bestDist = curDist;
+				bestLocation = curLocation;
+			}
+		}
+		
+		if (bestLocation.locationId != lastNearbyLocation.locationId) {
+			[lastNearbyLocation release];
+			lastNearbyLocation = bestLocation;
+			[lastNearbyLocation retain];
+			ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
+			[appDelegate playAudioAlert:@"bikeBell" shouldVibrate:YES];
+			
+			int mediaId;
+			
+			switch (bestLocation.kind) {
+				case NearbyObjectItem:
+					NSLog(@"It was an Item");
+					Item *item = [appModel fetchItem:bestLocation.objectId]; 
+					mediaId = item.mediaId;
+					break;
+				case NearbyObjectNode:
+					NSLog(@"It was a Node");
+					Node *node = [appModel fetchNode:bestLocation.objectId]; 
+					mediaId = node.mediaId;
+					break;	
+				default:
+					break;
+			}
+			
+			Media *media = [appModel mediaForMediaId:mediaId];
+			
+			//Create movie player object
+			if (mMoviePlayer) {
+				if ([mMoviePlayer respondsToSelector:@selector(view)]) [mMoviePlayer.view removeFromSuperview];
+				[mMoviePlayer release];
+			}
+			
+			mMoviePlayer = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
+			
+			if ([mMoviePlayer respondsToSelector:@selector(view)]) {
+				[mMoviePlayer setFullscreen:NO]; 
+				[mMoviePlayer.view setFrame:CGRectMake(10, 415, 300, 20)];
+				[mMoviePlayer prepareToPlay];
+				mMoviePlayer.view.hidden = YES;
+				[self.view addSubview:mMoviePlayer.view];
+			}
+			
+			[mainButton setTitle: @"Preparing to Play" forState: UIControlStateNormal];
+			[mainButton setTitle: @"Preparing to Play" forState: UIControlStateHighlighted];	
+			mainButton.enabled = NO;
+			[mainButton addSubview:spinner];
+			spinner.frame = CGRectMake(40, 8, 20, 20);
+			[spinner startAnimating];			
+
+		}	
+
+		return;
+	}
+	
+}
+
+
+
 - (IBAction)changeMapType: (id) sender {
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate playAudioAlert:@"ticktick" shouldVibrate:NO];
@@ -80,10 +209,6 @@ static float INITIAL_SPAN = 0.001;
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate playAudioAlert:@"ticktick" shouldVibrate:NO];
 	
-	//resume auto centering
-	tracking = YES;
-	playerTrackingButton.style = UIBarButtonItemStyleDone;
-
 	
 	//Force a location update
 	[appDelegate.myCLController.locationManager stopUpdatingLocation];
@@ -99,25 +224,23 @@ static float INITIAL_SPAN = 0.001;
     [super viewDidLoad];
 	
 	NSLog(@"Begin Loading GPS View");
-	mapView.showsUserLocation = YES;
-	[mapView setDelegate:self];
-	[self.view addSubview:mapView];
-	NSLog(@"GPSViewController: Mapview inited and added to view");
-	
-	
-	//Setup the buttons
-	mapTypeButton.target = self; 
-	mapTypeButton.action = @selector(changeMapType:);
-	mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
-	
-	playerTrackingButton.target = self; 
-	playerTrackingButton.action = @selector(refreshButtonAction:);
-	playerTrackingButton.style = UIBarButtonItemStyleDone;
 
+	//Setup the Map	
+	NSLog(@"GPSViewController: Mapview about to be inited.");
+	MKCoordinateRegion region = mapView.region;
+	region.span.latitudeDelta=0.001;
+	region.span.longitudeDelta=0.001;
+	[mapView setRegion:region animated:NO];
+	[mapView regionThatFits:region];
+	mapView.showsUserLocation = YES;
+	[mapView setDelegate:self]; //View will request annotation views from us
+	NSLog(@"GPSViewController: Mapview inited and added to view");
 	
 	//Force an update of the locations
 	[appModel forceUpdateOnNextLocationListFetch];
 	
+	spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+
 	[self refresh];	
 	
 	
@@ -126,28 +249,12 @@ static float INITIAL_SPAN = 0.001;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-	[appModel updateServerMapViewed];
-	
+	NSLog(@"GPSVC viewDidAppear: Refreshing");
 	[self refresh];		
 	
 	//remove any existing badge
 	self.tabBarItem.badgeValue = nil;
 	
-	//create a time for automatic map refresh
-	NSLog(@"GPSViewController: Starting Refresh Timer");
-	if (refreshTimer != nil && [refreshTimer isValid]) [refreshTimer invalidate];
-	refreshTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(refresh) userInfo:nil repeats:YES];
-
-	
-	NSLog(@"GPSViewController: view did appear");
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-	NSLog(@"GPSViewController: Stopping Refresh Timer");
-	if (refreshTimer) {
-		[refreshTimer invalidate];
-		refreshTimer = nil;
-	}
 }
 
 
@@ -156,12 +263,10 @@ static float INITIAL_SPAN = 0.001;
 	if (mapView) {
 		NSLog(@"GPSViewController: refresh requested");	
 	
-		if (appModel.loggedIn) [appModel fetchLocationList];
-		[self showLoadingIndicator];
-
+		[appModel fetchLocationList];
+	
 		//Zoom and Center
-		if (tracking) [self zoomAndCenterMap];
-
+		[self zoomAndCenterMap];
 	} else {
 		NSLog(@"GPSViewController: refresh requested but ignored, as mapview is nil");	
 		
@@ -170,30 +275,15 @@ static float INITIAL_SPAN = 0.001;
 
 -(void) zoomAndCenterMap {
 	
-	appSetNextRegionChange = YES;
-	
 	//Center the map on the player
 	MKCoordinateRegion region = mapView.region;
 	region.center = appModel.playerLocation.coordinate;
-	region.span = MKCoordinateSpanMake(INITIAL_SPAN, INITIAL_SPAN);
-
 	[mapView setRegion:region animated:YES];
-		
+	
+	//Set to default zoom
+	//mapView.contents.zoom = DEFAULT_ZOOM;
 }
 
--(void)showLoadingIndicator{
-	UIActivityIndicatorView *activityIndicator = 
-	[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
-	[activityIndicator release];
-	[[self navigationItem] setRightBarButtonItem:barButton];
-	[barButton release];
-	[activityIndicator startAnimating];
-}
-
--(void)removeLoadingIndicator{
-	[[self navigationItem] setRightBarButtonItem:nil];
-}
 
 
 - (void)refreshViewFromModel {
@@ -205,10 +295,6 @@ static float INITIAL_SPAN = 0.001;
 		//Add a badge if this is NOT the first time data has been loaded
 		if (silenceNextServerUpdate == NO) {
 			self.tabBarItem.badgeValue = @"!";
-			
-			//ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-			//[appDelegate playAudioAlert:@"mapChange" shouldVibrate:YES]; //this is a little annoying becasue it happens even when players move
-			
 		}
 		else silenceNextServerUpdate = NO;
 	
@@ -232,14 +318,13 @@ static float INITIAL_SPAN = 0.001;
 			CLLocationCoordinate2D locationLatLong = location.location.coordinate;
 			
 			Annotation *annotation = [[Annotation alloc]initWithCoordinate:locationLatLong];
-			annotation.location = location;
-			
 			
 			annotation.title = location.name;
-			if (location.kind == NearbyObjectItem && location.qty > 1) 
-				annotation.subtitle = [NSString stringWithFormat:@"x %d",location.qty];
-			annotation.iconMediaId = location.iconMediaId;
-			annotation.kind = location.kind;
+			//if (location.kind == NearbyObjectItem) annotation.subtitle = [NSString stringWithFormat:@"Quantity: %d",location.qty];
+			NSLog(@"GPSViewController: Annotation title is %@; subtitle is %@.", annotation.title, annotation.subtitle);
+			
+			annotation.iconMediaId = location.iconMediaId; //if we have a custom icon
+			annotation.kind = location.kind; //if we want a default icon
 
 			[mapView addAnnotation:annotation];
 			if (!mapView) {
@@ -271,9 +356,33 @@ static float INITIAL_SPAN = 0.001;
 }
 
 - (void)dealloc {
-	[mapView release];
+	[appModel release];
     [super dealloc];
 }
+
+-(void)movieFinishedPreloading:(NSNotification*)notification
+{
+	NSLog(@"Preloading Complete");
+	[mainButton setTitle: @"Play" forState: UIControlStateNormal];
+	[mainButton setTitle: @"Play" forState: UIControlStateHighlighted];
+	[spinner stopAnimating];
+	[spinner removeFromSuperview];
+	mainButton.enabled = YES;
+	
+	
+
+}
+
+-(void)movieFinishedPlayback:(NSNotification*)notification
+{
+	NSLog(@"Playback Complete");
+	if ([mMoviePlayer respondsToSelector:@selector(view)]) mMoviePlayer.view.hidden = YES;
+	mainButton.hidden = NO;
+
+}
+
+
+
 
 -(UIImage *)addTitle:(NSString *)imageTitle quantity:(int)quantity toImage:(UIImage *)img {
 	
@@ -325,25 +434,38 @@ static float INITIAL_SPAN = 0.001;
 }
 
 
+//-(UIImage *)addText:(NSString *)text1 toImage:(UIImage *)img {
+//    int w = img.size.width;
+//    int h = img.size.height; 
+//    //lon = h - lon;
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGContextRef context = CGBitmapContextCreate(NULL, w, h, 8, 4 * w, colorSpace, kCGImageAlphaPremultipliedFirst);
+//    
+//    CGContextDrawImage(context, CGRectMake(0, 0, w, h), img.CGImage);
+//    CGContextSetRGBFillColor(context, 0.0, 0.0, 1.0, 1);
+//	
+//    char* text	= (char *)[text1 cStringUsingEncoding:NSASCIIStringEncoding];// "05/05/09";
+//    CGContextSelectFont(context, "Arial", 18, kCGEncodingMacRoman);
+//    CGContextSetTextDrawingMode(context, kCGTextFill);
+//    CGContextSetRGBFillColor(context, 255, 255, 255, 1);
+//	
+//	
+//    //rotate text
+//    CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( -M_PI/4 ));
+//	
+//    CGContextShowTextAtPoint(context, 4, 52, text, strlen(text));
+//	
+//	
+//    CGImageRef imageMasked = CGBitmapContextCreateImage(context);
+//    CGContextRelease(context);
+//    CGColorSpaceRelease(colorSpace);
+//	
+//    return [UIImage imageWithCGImage:imageMasked];
+//}
+//
+#pragma mark Views for annotations
 
-#pragma mark MKMapViewDelegate
-
-- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-	//User must have moved the map. Turn off Tracking
-	NSLog(@"GPSVC: regionDidChange delegate metohd fired");
-
-	if (!appSetNextRegionChange) {
-		NSLog(@"GPSVC: regionDidChange without appSetNextRegionChange, it must have been the user");
-		tracking = NO;
-		playerTrackingButton.style = UIBarButtonItemStyleBordered;
-	}
-	
-	appSetNextRegionChange = NO;
-
-
-}
-
-- (MKAnnotationView *)mapView:(MKMapView *)myMapView viewForAnnotation:(id <MKAnnotation>)annotation{
+- (MKAnnotationView *)mapView:(MKMapView *)myMapView viewForAnnotation:(Annotation*) annotation{
 	NSLog(@"GPSViewController: In viewForAnnotation");
 
 	
@@ -354,61 +476,23 @@ static float INITIAL_SPAN = 0.001;
 		 return nil; //Let it do it's own thing
 	}
 	
-	//Everything else
-	else {
-		NSLog(@"GPSViewController: Getting the annotation view for a game object: %@", annotation.title);
-		AnnotationView *annotationView=[[AnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
-		return annotationView;
-	}
-}
+	//Other Players
+	if ([annotation kind] == NearbyObjectPlayer) {
+		NSLog(@"GPSViewController: Getting the annotation view for another player: %@", annotation.title);
 
+		MKAnnotationView *playerAnnotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"OtherPlayerAnnotation"];
+		playerAnnotationView.image = [UIImage imageNamed:@"player.png"];
+		playerAnnotationView.canShowCallout = YES;
+		return playerAnnotationView;	
+	} 
 
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-	Location *location = ((Annotation*)view.annotation).location;
-	NSLog(@"GPSViewController: didSelectAnnotationView for location: %@",location.name);
-	
-	//Set up buttons
-	NSMutableArray *buttonTitles = [NSMutableArray arrayWithCapacity:1];
-	int cancelButtonIndex = 0;
-	if (location.allowsQuickTravel)	{
-		[buttonTitles addObject: @"Quick Travel"];
-		cancelButtonIndex = 1;
-	}
-	[buttonTitles addObject: @"Cancel"];
-	
-	
-	
-	
-	//Create and Display Action Sheet
-	UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:location.name 
-															delegate:self 
-												   cancelButtonTitle:nil 
-											  destructiveButtonTitle:nil 
-												   otherButtonTitles:nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-	actionSheet.cancelButtonIndex = cancelButtonIndex;
-	
-	for (NSString *title in buttonTitles) {
-		[actionSheet addButtonWithTitle:title];
-	}
-	
-	[actionSheet showInView:view];
-	
-	
-	
-}
+	MKAnnotationView *annotationView=[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"marker"];
+	annotationView.image = [UIImage imageNamed:@"item.png"];
+	annotationView.canShowCallout = YES;
+	return annotationView;
 
-#pragma mark UIActionSheet Delegate
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
-	NSLog(@"GPSViewController: action sheet button %d was clicked",buttonIndex);
-	
-	Annotation *currentAnnotation = [mapView.selectedAnnotations lastObject];
-	
-	if (buttonIndex == actionSheet.cancelButtonIndex) [mapView deselectAnnotation:currentAnnotation animated:YES]; 
-	else [currentAnnotation.location display];
 
 }
-
 
 
 @end

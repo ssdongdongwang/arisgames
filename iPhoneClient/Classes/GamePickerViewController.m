@@ -22,15 +22,19 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"GamePickerTitleKey",@"");
+        self.title = @"Select Game";
         self.tabBarItem.image = [UIImage imageNamed:@"game.png"];
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
 		
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewGameListReady" object:nil];
-		[dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"RecievedGameList" object:nil];
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedGameList" object:nil];
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"PlayerMoved" object:nil];
 		
+		//create game lists
+		self.nearGameList = [[NSMutableArray alloc] initWithCapacity:10];
+		self.farGameList = [[NSMutableArray alloc] initWithCapacity:10];
+
     }
     return self;
 }
@@ -43,15 +47,11 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-	NSLog(@"GamePickerViewController: View Appeared");	
-	[self refresh];
+	NSLog(@"GamePickerViewController: View Appeared, reloading data");	
+	[appModel fetchGameList];
 }
 
--(void)refresh {
-	NSLog(@"GamePickerViewController: Refresh Requested");
-	[appModel fetchGameList];
-	[self showLoadingIndicator];
-}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
@@ -59,19 +59,6 @@
 }
 
 #pragma mark custom methods, logic
--(void)showLoadingIndicator{
-	UIActivityIndicatorView *activityIndicator = 
-	[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
-	[activityIndicator release];
-	[[self navigationItem] setRightBarButtonItem:barButton];
-	[barButton release];
-	[activityIndicator startAnimating];
-}
-
--(void)removeLoadingIndicator{
-	[[self navigationItem] setRightBarButtonItem:nil];
-}
 
 - (void)refreshViewFromModel {
 	NSLog(@"GamePickerViewController: Refresh View from Model");
@@ -91,13 +78,27 @@
 
 	}
 
+	if (self.nearGameList) [self.nearGameList release];
 	self.nearGameList = tempNearArray;
-	[tempNearArray release];
+	[self.nearGameList retain];
 	
+	if (self.farGameList) [self.farGameList release];
 	self.farGameList = tempFarArray;
-	[tempFarArray release];
+	[self.farGameList retain];
 
 	[gameTable reloadData];
+}
+
+- (void)slideIn {	
+	[UIView beginAnimations:nil context:nil];
+	self.view.frame = CGRectMake(0.0f, 64.0f, 320.0f, 416.0f);
+	[UIView commitAnimations];
+}
+
+- (void)slideOut {	
+	[UIView beginAnimations:nil context:nil];
+	self.view.frame = CGRectMake(0.0f, 485.0f, 320.0f, 416.0f);
+	[UIView commitAnimations];
 }
 
 #pragma mark Table view methods
@@ -132,7 +133,7 @@
 
 	cell.textLabel.text = currentGame.name;
 	double dist = currentGame.distanceFromPlayer;
-	cell.detailTextLabel.text = [NSString stringWithFormat:@"%1.1f %@",  dist/1000, NSLocalizedString(@"KilometersKey", @"") ];
+	cell.detailTextLabel.text = [NSString stringWithFormat:@"%1.1f Kilometers",  dist/1000];
 	cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
 
     return cell;
@@ -204,10 +205,10 @@
  */
 
 - (NSString *)tableView:(UITableView *)view titleForHeaderInSection:(NSInteger)section {
-	if (nearGameList && section == 0 && [nearGameList count] == 0) return NSLocalizedString(@"GamePickerNoNearbyGamesKey",@"");
-	else if (section == 0) return NSLocalizedString(@"GamePickerNearbyGamesKey", @"");	
-	else if (section == 1) return NSLocalizedString(@"GamePickerOtherGamesKey", @"");
-	return @"";
+	if (section == 0 && [nearGameList count] == 0) return @"No Nearby Games Found";
+	else if (section == 0) return @"Nearby Games Found";	
+	else if (section == 1) return @"Other Games";
+	return @"Quests";
 }
 
 

@@ -13,7 +13,6 @@
 #import "Node.h"
 #import "Npc.h"
 #import "Media.h"
-#import "JSONResult.h"
 
 extern NSDictionary *InventoryElements;
 
@@ -36,18 +35,14 @@ extern NSDictionary *InventoryElements;
 
 	NSMutableArray *gameList;
 	NSMutableArray *locationList;
-	NSString *locationListHash;
+	NSInteger locationListHash;
 	NSMutableArray *playerList;
 	NSMutableArray *nearbyLocationsList;
-	NSMutableDictionary *inventory;
-	NSString *inventoryHash; 
+	NSMutableArray *inventory;
+	NSInteger inventoryHash; 
 	NSMutableDictionary *questList;
-	NSString *questListHash;
-	NSMutableDictionary *gameMediaList;
-	NSMutableDictionary *gameItemList;
-	NSMutableDictionary *gameNodeList;
-	NSMutableDictionary *gameNpcList;
-
+	NSInteger questListHash;
+	NSMutableDictionary *mediaList;
 }
 
 @property(copy) NSString *serverName;
@@ -62,21 +57,15 @@ extern NSDictionary *InventoryElements;
 @property(readwrite) int gameId;
 @property(readwrite) int gamePcMediaId;
 @property(copy, readwrite) NSMutableArray *gameList;	
-@property(nonatomic, retain) NSMutableArray *locationList;
-@property(nonatomic, retain) NSString *locationListHash;
+@property(copy, readwrite) NSMutableArray *locationList;
 @property(copy, readwrite) NSMutableArray *playerList;
 @property(copy, readwrite) NSMutableDictionary *questList;
-@property(nonatomic, retain) NSString *questListHash;
+@property(copy, readwrite) NSMutableDictionary *mediaList;
 @property(copy, readwrite) NSMutableArray *nearbyLocationsList;	
 @property(copy, readwrite) CLLocation *playerLocation;	
-@property(nonatomic, retain) NSMutableDictionary *inventory;
-@property(nonatomic, retain) NSString *inventoryHash;
-@property(retain) UIAlertView *networkAlert;
+@property(copy, readwrite) NSMutableArray *inventory;
 
-@property(copy, readwrite) NSMutableDictionary *gameMediaList;
-@property(copy, readwrite) NSMutableDictionary *gameItemList;
-@property(copy, readwrite) NSMutableDictionary *gameNodeList;
-@property(copy, readwrite) NSMutableDictionary *gameNpcList;
+@property(retain) UIAlertView *networkAlert;
 
 
 - (id)init;
@@ -85,7 +74,7 @@ extern NSDictionary *InventoryElements;
 - (void)saveUserDefaults;
 - (void)initUserDefaults;
 
-- (void)login;
+- (BOOL)login;
 
 - (id) fetchFromService:(NSString *)aService usingMethod:(NSString *)aMethod 
 			   withArgs:(NSArray *)arguments usingParser:(SEL)aSelector;
@@ -93,55 +82,36 @@ extern NSDictionary *InventoryElements;
 - (void)fetchGameList;
 - (void)fetchLocationList;
 - (void)forceUpdateOnNextLocationListFetch;
-- (void)resetAllPlayerLists;
-- (void)fetchAllGameLists;
+- (void)fetchMediaList;
 - (void)fetchInventory;
 - (void)fetchQuestList;
-- (void)fetchNpcConversations:(int)npcId afterViewingNode:(int)nodeId;
-- (void)fetchGameNpcListAsynchronously:(BOOL)YesForAsyncOrNoForSync;
-- (void)fetchGameMediaListAsynchronously:(BOOL)YesForAsyncOrNoForSync;
-- (void)fetchGameItemListAsynchronously:(BOOL)YesForAsyncOrNoForSync;
-- (void)fetchGameNodeListAsynchronously:(BOOL)YesForAsyncOrNoForSync;
 - (Item *)fetchItem:(int)itemId;
 - (Node *)fetchNode:(int)nodeId;
 - (Npc *)fetchNpc:(int)npcId;
 - (Media *)mediaForMediaId:(int)mId;
-- (Item *)itemForItemId: (int)mId;
-- (Node *)nodeForNodeId: (int)mId;
-- (Npc *)npcForNpcId: (int)mId;
 
-
-- (void)createItemAndGiveToPlayerFromFileData:(NSData *)fileData fileName:(NSString *)fileName 
-										title:(NSString *)title description:(NSString*)description;
 	
 - (void)updateServerLocationAndfetchNearbyLocationList;
-- (void)rebuildNearbyLocationList;
 - (void)updateServerNodeViewed: (int)nodeId;
 - (void)updateServerItemViewed: (int)itemId;
 - (void)updateServerNpcViewed: (int)npcId;
 - (void)updateServerMapViewed;
 - (void)updateServerQuestsViewed;
 - (void)updateServerInventoryViewed;
-- (void)updateServerPickupItem: (int)itemId fromLocation: (int)locationId qty: (int)qty;
-- (void)updateServerDropItemHere: (int)itemId qty:(int)qty;
-- (void)updateServerDestroyItem: (int)itemId qty:(int)qty;
+- (void)updateServerPickupItem: (int)itemId fromLocation: (int)locationId;
+- (void)updateServerDropItemHere: (int)itemId;
+- (void)updateServerDestroyItem: (int)itemId;
 - (void)startOverGame;
 - (void)silenceNextServerUpdate;
-
-- (void)modifyQuantity: (int)quantityModifier forLocationId: (int)locationId;
-- (void)removeItemFromInventory: (Item*)item qtyToRemove:(int)qty;
-
-- (void)registerNewUser:(NSString*)userName password:(NSString*)pass 
+- (void)createItemAndGiveToPlayerFromFileData:(NSData *)fileData andFileName:(NSString *)fileName;
+- (BOOL)registerNewUser:(NSString*)userName password:(NSString*)pass 
 			  firstName:(NSString*)firstName lastName:(NSString*)lastName email:(NSString*)email;
-- (void)parseGameListFromJSON: (JSONResult *)jsonResult;
-- (void)parseGameMediaListFromJSON: (JSONResult *)jsonResult;
-- (void)parseGameNpcListFromJSON: (JSONResult *)jsonResult;
-- (void)parseGameItemListFromJSON: (JSONResult *)jsonResult;
-- (void)parseGameNodeListFromJSON: (JSONResult *)jsonResult;
+
+
 - (Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary;
 - (Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary;
 - (Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary;
 - (void)updateServerGameSelected;
-- (void)fetchQRCode:(NSString*)QRcodeId;
+-(NSObject<QRCodeProtocol> *)fetchQRCode:(NSString*)QRcodeId;
 
 @end

@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David J Gagnon on 9/2/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -18,6 +18,8 @@
 	NSString *greeting;
 	NSString *description;
 	int	mediaId;
+	NSMutableArray *options;
+	NSInteger numberOfOptions;
 	CLLocation *location;
 	BOOL forcedDisplay; //We only need this for the proto, might be good to define a new one
 }
@@ -29,9 +31,13 @@
 @property(copy, readwrite) NSString *greeting;
 @property(copy, readwrite) NSString *description;
 @property(readwrite, assign) int mediaId;
+@property(readonly) NSMutableArray *options;
+@property(readonly) NSInteger numberOfOptions;
+- (NSInteger) numberOfOptions;
 @property(readwrite, assign) BOOL forcedDisplay; //see note above
 
 
+- (void) addOption: (NodeOption *)newOption;
 - (void) display;
 
 

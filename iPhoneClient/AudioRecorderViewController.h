@@ -17,12 +17,12 @@ typedef enum {
 	kAudioRecorderRecording,
 	kAudioRecorderRecordingComplete,
 	kAudioRecorderPlaying
-} AudioRecorderModeType;
+} modeType;
 
 
 @interface AudioRecorderViewController : UIViewController <AVAudioSessionDelegate, AVAudioRecorderDelegate, AVAudioPlayerDelegate> {
 	AppModel *appModel;	
-	
+
 	AudioMeter *meter;
 	AVAudioRecorder *soundRecorder;
 	AVAudioPlayer *soundPlayer;
@@ -30,12 +30,12 @@ typedef enum {
 	NSData *audioData;
 	IBOutlet UIButton *recordStopOrPlayButton;
 	IBOutlet UIButton *uploadButton;
-	IBOutlet UIButton *discardButton;
-	AudioRecorderModeType mode;
+	IBOutlet UIButton *backButton;
+	modeType mode;
 	BOOL recording;
 	BOOL playing;
 	NSTimer *meterUpdateTimer;
-	
+
 }
 
 @property(readwrite, retain) AudioMeter *meter;
@@ -48,7 +48,7 @@ typedef enum {
 
 - (IBAction) recordStopOrPlayButtonAction: (id) sender;
 - (IBAction) uploadButtonAction: (id) sender;
-- (IBAction) discardButtonAction: (id) sender;
+- (IBAction) backButtonAction: (id) sender;
 - (void) updateButtonsForCurrentMode;
 
 

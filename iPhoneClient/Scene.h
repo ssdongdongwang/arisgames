@@ -19,7 +19,6 @@ enum soundConstants {
 	NSString	*text;
 	int			characterId;
 	CGRect		zoomRect;
-	float		zoomTime;
 	
 	int			bgSound;
 	int			fgSound;
@@ -29,7 +28,6 @@ enum soundConstants {
 @property(readonly)	NSString	*text;
 @property(readonly) int			characterId;
 @property(readonly) CGRect		zoomRect;
-@property(readonly) float		zoomTime;
 @property(readonly) int			bgSound;
 @property(readonly) int			fgSound;
 
@@ -37,8 +35,7 @@ enum soundConstants {
 - (id) initWithText:(NSString *)aText 
 			andIsPc:(Boolean)isPcYorN
 	   andCharacter:(int)aCharacterId 
-			andZoom:(CGRect)aRect
-		andZoomTime:(float)zoomSeconds
+			andZoom:(CGRect)aRect 
 	  withForeSound:(int)aFgSound 
 	   andBackSound:(int)aBgSound;
 

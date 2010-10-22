@@ -2,8 +2,6 @@
 require_once("module.php");
 require_once("media.php");
 require_once("games.php");
-require_once("locations.php");
-require_once("playerStateChanges.php");
 
 class Items extends Module
 {
@@ -40,12 +38,11 @@ class Items extends Module
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
 		
-		$query = "SELECT {$prefix}_items.*, {$prefix}_player_items.qty 
-					FROM {$prefix}_items
-					JOIN {$prefix}_player_items 
-					ON {$prefix}_items.item_id = {$prefix}_player_items.item_id
-					WHERE player_id = $intPlayerID";
-		NetDebug::trace($query);
+		$query = "SELECT * FROM {$prefix}_items
+									 JOIN {$prefix}_player_items 
+									 ON {$prefix}_items.item_id = {$prefix}_player_items.item_id
+									 WHERE player_id = $intPlayerID";
+		//NetDebug::trace($query);
 		
 		$rsResult = @mysql_query($query);
 		if (!$rsResult) return new returnData(0, NULL);
@@ -82,7 +79,7 @@ class Items extends Module
      * @returns the new itemID on success
      */
 	public function createItem($intGameID, $strName, $strDescription, 
-								$intIconMediaID, $intMediaID, $boolDropable, $boolDestroyable, $intMaxQuantityInPlayerInventory)
+								$intIconMediaID, $intMediaID, $boolDropable, $boolDestroyable)
 	{
 		$strName = addslashes($strName);	
 		$strDescription = addslashes($strDescription);	
@@ -91,14 +88,13 @@ class Items extends Module
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
 		$query = "INSERT INTO {$prefix}_items 
-					(name, description, icon_media_id, media_id, dropable, destroyable,max_qty_in_inventory)
+					(name, description, icon_media_id, media_id, dropable, destroyable)
 					VALUES ('{$strName}', 
 							'{$strDescription}',
 							'{$intIconMediaID}', 
 							'{$intMediaID}', 
 							'$boolDropable',
-							'$boolDestroyable',
-							'$intMaxQuantityInPlayerInventory')";
+							'$boolDestroyable')";
 		
 		NetDebug::trace("createItem: Running a query = $query");	
 		
@@ -113,55 +109,6 @@ class Items extends Module
      * @returns with returnData object (0 on success) 
      */
 	public function createItemAndGiveToPlayer($intGameID, $intPlayerID, $strName, $strDescription, 
-								$strFileName, $boolDropable, $boolDestroyable, $latitude, $longitude)
-	{
-		$prefix = $this->getPrefix($intGameID);
-		if (!$prefix) return new returnData(1, NULL, "invalid game id");
-		
-		$strName = addslashes($strName);
-		$strDescription = addslashes($strDescription);
-		
-		//Create the Media
-		$newMediaResultData = Media::createMedia($intGameID, $strName, $strFileName, 0);
-		$newMediaID = $newMediaResultData->data;
-		
-		//Does game allow players to drop items?
-		if ($boolDropable) { 
-			$game = Games::getGame($intGameID);
-			$boolDropable = $game->data->allow_player_created_locations;
-		}
-		
-		//Create the Item
-		$query = "INSERT INTO {$prefix}_items 
-					(name, description, media_id, dropable, destroyable,
-					creator_player_id, origin_latitude, origin_longitude)
-					VALUES ('{$strName}', 
-							'{$strDescription}',
-							'{$newMediaID}', 
-							'$boolDropable',
-							'$boolDestroyable',
-							'$intPlayerID', '$latitude', '$longitude')";
-		
-		NetDebug::trace("createItem: Running a query = $query");	
-		
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error:" . mysql_error());
-		
-		$newItemID = mysql_insert_id();
-		
-		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_UPLOAD_MEDIA_ITEM, $newItemID);
-
-		$qty = 1;
-		Module::giveItemToPlayer($prefix, $newItemID, $intPlayerID, $qty); 
-		
-		return new returnData(0, TRUE);
-	}	
-
-	/**
-     * Create an Item and place it on the map
-     * @returns with returnData object (0 on success) 
-     */
-	public function createItemAndPlaceOnMap($intGameID, $intPlayerID, $strName, $strDescription, 
 								$strFileName, $boolDropable, $boolDestroyable, $latitude, $longitude)
 	{
 		$prefix = $this->getPrefix($intGameID);
@@ -200,13 +147,11 @@ class Items extends Module
 		
 		Module::appendLog($intPlayerID, $intGameID, Module::kLOG_UPLOAD_MEDIA_ITEM, $newItemID);
 
-		Locations::createLocation($intGameID, $strName, 0, 
-								$latitude, $longitude, 25,
-								"Item", $newItemID,
-								1, 0, 0);
+		Module::giveItemToPlayer($prefix, $newItemID, $intPlayerID); 
 		
 		return new returnData(0, TRUE);
 	}	
+
 	
 	
 	/**
@@ -214,7 +159,7 @@ class Items extends Module
      * @returns true if edit was done, false if no changes were made
      */
 	public function updateItem($intGameID, $intItemID, $strName, $strDescription, 
-								$intIconMediaID, $intMediaID, $boolDropable, $boolDestroyable, $intMaxQuantityInPlayerInventory)
+								$intIconMediaID, $intMediaID, $boolDropable, $boolDestroyable)
 	{
 		$prefix = $this->getPrefix($intGameID);
 		
@@ -230,7 +175,6 @@ class Items extends Module
 						media_id = '{$intMediaID}', 
 						dropable = '{$boolDropable}',
 						destroyable = '{$boolDestroyable}'
-						max_qty_in_inventory = '{$intMaxQuantityInPlayerInventory}',
 					WHERE item_id = '{$intItemID}'";
 		
 		NetDebug::trace("updateNpc: Running a query = $query");	
@@ -253,11 +197,6 @@ class Items extends Module
 	{
 		$prefix = $this->getPrefix($intGameID);
 		if (!$prefix) return new returnData(1, NULL, "invalid game id");
-		
-		Locations::deleteLocationsForObject($intGameID, 'Item', $intItemID);
-		Requirements::deleteRequirementsForRequirementObject($intGameID, 'Item', $intItemID);
-		PlayerStateChanges::deletePlayerStateChangesThatRefrenceObject($intGameID, 'Item', $intItemID);
-		Module::removeItemFromAllPlayerInventories($prefix, $intItemID );
 		
 		$query = "DELETE FROM {$prefix}_items WHERE item_id = {$intItemID}";
 		

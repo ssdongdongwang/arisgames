@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 3/4/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "CameraViewController.h"
@@ -23,7 +23,7 @@
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle {
     if (self = [super initWithNibName:nibName bundle:nibBundle]) {
-        self.title = NSLocalizedString(@"CameraTitleKey",@"");
+        self.title = @"Camera";
         self.tabBarItem.image = [UIImage imageNamed:@"camera.png"];
 		
 		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
@@ -38,12 +38,6 @@
 	
 	self.imagePickerController = [[UIImagePickerController alloc] init];
 	
-	[libraryButton setTitle: NSLocalizedString(@"CameraLibraryButtonTitleKey",@"") forState: UIControlStateNormal];
-	[libraryButton setTitle: NSLocalizedString(@"CameraLibraryButtonTitleKey",@"") forState: UIControlStateHighlighted];	
-	
-	[cameraButton setTitle: NSLocalizedString(@"CameraCameraButtonTitleKey",@"") forState: UIControlStateNormal];
-	[cameraButton setTitle: NSLocalizedString(@"CameraCameraButtonTitleKey",@"") forState: UIControlStateHighlighted];	
-		
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
 		self.cameraButton.enabled = YES;
 		self.cameraButton.alpha = 1.0;
@@ -113,6 +107,7 @@
 													   initWithNibName:@"TitleAndDecriptionFormViewController" bundle:nil];
 	
 	titleAndDescForm.delegate = self;
+	//[self presentModalViewController:titleAndDescForm animated:NO];
 	[self.view addSubview:titleAndDescForm.view];
 }
 

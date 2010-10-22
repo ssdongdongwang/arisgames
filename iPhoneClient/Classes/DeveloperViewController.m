@@ -30,7 +30,7 @@
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
 		[dispatcher addObserver:self selector:@selector(updateAccuracy) name:@"PlayerMoved" object:nil];	
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewLocationListReady" object:nil];	
+		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedLocationList" object:nil];	
 	
     }
     return self;
@@ -56,7 +56,7 @@
 -(void) refresh {	
 	NSLog(@"DeveloperViewController: Refresh Began");
 
-	//[appModel fetchLocationList];
+	[appModel fetchLocationList];
 }
 
 -(void) refreshViewFromModel {
