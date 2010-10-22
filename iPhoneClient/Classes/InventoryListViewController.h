@@ -13,18 +13,18 @@
 #import "ItemDetailsViewController.h";
 
 @interface InventoryListViewController : UIViewController {
+	NSString *moduleName;
 	AppModel *appModel;	
 	UITableView *inventoryTable;
-	NSArray *inventory;
-	BOOL silenceNextServerUpdate;
-
+	NSMutableArray *inventoryTableData;
 }
 
-@property(nonatomic, retain) IBOutlet UITableView *inventoryTable;
-@property(nonatomic, retain) NSArray *inventory;
-
-- (void) refresh;
+-(void) setModel:(AppModel *)model;
+-(void) refreshInventory;
 - (unsigned int) indexOf:(char) searchChar inString:(NSString *)searchString;
-- (void)showLoadingIndicator;
+
+@property(copy, readwrite) NSString *moduleName;
+@property(nonatomic, retain) IBOutlet UITableView *inventoryTable;
+@property(nonatomic, retain) IBOutlet NSMutableArray *inventoryTableData;
 
 @end

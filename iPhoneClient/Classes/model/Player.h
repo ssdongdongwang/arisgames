@@ -3,20 +3,22 @@
 //  ARIS
 //
 //  Created by David Gagnon on 5/30/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
+
 
 @interface Player : NSObject {
 	NSString *name;
-	CLLocation *location;
+	double latitude;
+	double longitude;
 	BOOL hidden;
 }
 
 @property(copy, readwrite) NSString *name;
-@property(copy, readwrite) CLLocation *location;
+@property(readwrite) double latitude;
+@property(readwrite) double longitude;
 @property(readwrite) BOOL hidden;
 
 @end

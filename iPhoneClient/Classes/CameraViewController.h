@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 3/4/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -11,25 +11,22 @@
 
 
 @interface CameraViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
-	AppModel *appModel;	
-	IBOutlet UIButton *cameraButton;
-	IBOutlet UIButton *libraryButton;
-
+	NSString *moduleName;
+	AppModel *appModel;
+	
+	IBOutlet UIButton *takePhotoButton;
+	IBOutlet UIButton *uploadPhotoButton;
+    IBOutlet UIImageView *image;
     UIImagePickerController *imagePickerController;
-	NSData *mediaData;
-	NSString *mediaFilename;
 }
 
-@property (nonatomic, retain) IBOutlet UIButton *cameraButton;
-@property (nonatomic, retain) IBOutlet UIButton *libraryButton;
-@property (nonatomic, retain) UIImagePickerController *imagePickerController;
-@property (nonatomic, retain) NSData *mediaData;
-@property (nonatomic, retain) NSString *mediaFilename;
 
-
-
+- (void) setModel:(AppModel *)model;
 - (IBAction)cameraButtonTouchAction;
-- (IBAction)libraryButtonTouchAction;
+
+
+@property(copy, readwrite) NSString *moduleName;
+@property (nonatomic, retain) UIImagePickerController *imagePickerController;
 
 
 @end

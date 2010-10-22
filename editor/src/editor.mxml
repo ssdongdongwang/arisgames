@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="org.arisgames.editor.view.*"
+	xmlns:model="org.arisgames.editor.model.*"
+	layout="horizontal" horizontalGap="2"
+	backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #9EE6F8]"
+	applicationComplete="init()" xmlns:maps="com.google.maps.*">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ListEvent;
+			import mx.core.UITextField;
+			import mx.core.UIComponent;
+			import mx.controls.Image;
+			import mx.core.DragSource;
+			import mx.events.DragEvent;
+			import mx.managers.DragManager;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+		    import com.google.maps.LatLng;
+		    import com.google.maps.Map;
+	    	import com.google.maps.MapEvent;
+		    import com.google.maps.MapType;
+			import com.google.maps.MapOptions;
+			import com.google.maps.controls.PositionControl;
+			import com.google.maps.controls.ZoomControl;
+			import com.google.maps.controls.ZoomControlOptions;
+			import com.google.maps.controls.MapTypeControl;
+			import com.google.maps.controls.ScaleControl;
+			import com.google.maps.overlays.Marker;
+			import com.google.maps.overlays.MarkerOptions;	
+			import org.arisgames.editor.model.Model;
+			import org.arisgames.editor.model.GameObject;
+			import org.arisgames.editor.model.GameObjectEvent;
+			import org.arisgames.editor.model.Media;
+			import org.arisgames.editor.model.GPSInstanceProperties;
+			import org.arisgames.editor.model.QRCodeInstanceProperties;
+			import org.arisgames.editor.model.InstanceProperties;
+			import org.arisgames.editor.model.InstantiatedObject;
+			import org.arisgames.editor.model.Item;
+			import org.arisgames.editor.view.GameObjectMarker;
+
+			
+			[Bindable]
+			public var currentModel:Model = new Model();
+
+			[Bindable]
+			public var currentGameObject:GameObject;
+			
+			[Bindable]
+			[Embed("assets/editor icons/character.png")]
+			public var characterIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/item2.png")]
+			public var itemIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/media2.png")]
+			public var soundIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/quest.png")]
+			public var questIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/video.png")]
+			public var videoIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/newObjectIcon.png")]
+			public var newObjectIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/page2.png")]
+			public var pageIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/folder.png")]
+			public var folderIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/picture.png")]
+			public var imageIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/question.png")]
+			public var secretEventIcon:Class;
+					    
+			[Bindable]
+			[Embed("assets/editor icons/upload.png")]
+			public var uploaderIcon:Class;
+					    
+		    private function onMapPreinitialize(event:MapEvent):void
+			{
+				map.setInitOptions
+				(
+					new MapOptions
+					({
+						center: new LatLng(43.0746561,-89.384422),
+						zoom: 14,
+						mapType: MapType.NORMAL_MAP_TYPE
+					 })
+				);
+			}
+	
+		    private function onMapReady(event:Event):void {
+				var zco:ZoomControlOptions = new ZoomControlOptions();
+				zco.hasScrollTrack = false;
+				map.addControl(new ZoomControl(zco));			
+				map.addControl(new PositionControl());
+				map.addControl(new MapTypeControl());
+				map.addControl(new ScaleControl());
+				map.enableControlByKeyboard();
+				map.enableScrollWheelZoom();
+	    	}
+			
+			private function init():void {
+				currentModel.populateGameList();
+				for(var i:int=0; i < currentModel.XMLDataProvider.length; i++)
+				{
+					objectNavigator.expandItem(currentModel.XMLDataProvider.getItemAt(i), true);
+				}
+				currentGameObject = null;
+				propertiesView.removeChild(leftView);
+				propertiesView.removeChild(middleView);
+				propertiesView.removeChild(rightView);
+				middleView.removeChild(instanceNavigatorView);
+				middleView.removeChild(itemSpecificPropertiesView);
+				middleView.removeChild(choicesView);
+				this.addEventListener(GameObjectEvent.CHANGE, updateCurrentGameObject);
+			}
+			
+			private function updateCurrentGameObject(event:GameObjectEvent):void
+			{
+				changePropertiesView((event.target as GameObjectMarker).getSourceObject());
+			}
+						
+			private function canvasDragEnterHandler(event:DragEvent):void
+			{
+				var targetCanvas:Canvas = event.target.parent as Canvas;
+				var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+				var idNum:int = dragXML.attribute("id");
+                if (dragXML.name() == "object"
+                	&& idNum >= 0
+                	&& dragXML.attribute("type") != GameObject.QUEST
+                	&& targetCanvas is Canvas) 
+                {
+					targetCanvas.setStyle("borderColor", "#008800");
+                    DragManager.acceptDragDrop(targetCanvas);
+                    DragManager.showFeedback(DragManager.COPY);
+                }
+			}
+			
+			private function mediaDragEnterHandler(event:DragEvent):void
+			{
+				var targetCanvas:Canvas = event.target.parent as Canvas;
+				var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+				var idNum:int = dragXML.attribute("id");
+                if (dragXML.name() == "media"
+                	&& idNum >= 0
+                	&& targetCanvas is Canvas) 
+                {
+					targetCanvas.setStyle("borderColor", "#008800");
+					targetCanvas.setStyle("borderThickness", "2");
+                    DragManager.acceptDragDrop(targetCanvas);
+                    DragManager.showFeedback(DragManager.COPY);
+                }
+			}
+
+			private function qrCodeDragEnterHandler(event:DragEvent):void
+			{
+				var targetCanvas:Canvas = event.target.parent as Canvas;
+				if(event.dragSource.hasFormat("treeItems"))
+				{
+					var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+					var idNum:int = dragXML.attribute("id");
+	                if (dragXML.name() != "folder"
+	                	&& idNum >= 0
+	                	&& dragXML.attribute("type") != GameObject.QUEST
+	                	&& dragXML.attribute("type") != Media.SOUND
+	                	&& dragXML.attribute("type") != Media.VIDEO
+	                	&& targetCanvas is Canvas) 
+	                {
+						targetCanvas.setStyle("borderColor", "#008800");
+	                    DragManager.acceptDragDrop(targetCanvas);
+	                    DragManager.showFeedback(DragManager.COPY);
+	                }
+	   			}
+	   			else if(event.dragSource.hasFormat(InstanceProperties.QR_CODE))
+	   			{
+                    DragManager.acceptDragDrop(targetCanvas);
+                    DragManager.showFeedback(DragManager.MOVE);	   				
+	   			}
+			}
+			
+			private function choicesDragEnterHandler(event:DragEvent):void
+			{
+				if(event.dragSource.hasFormat("treeItems"))
+				{
+					var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+					var idNum:int = dragXML.attribute("id");
+	                if (dragXML.name() == "object" //make sure object is a page or character
+	                	&& idNum >= 0
+	                	&& (dragXML.attribute("type") == GameObject.PAGE)
+	                	) 
+	                {
+	                    DragManager.acceptDragDrop(choicesDataGrid);
+	                    DragManager.showFeedback(DragManager.COPY);
+	                }
+	   			}
+	   			else if(event.dragSource.hasFormat(InstanceProperties.QR_CODE))
+	   			{
+	   			}
+			}
+			
+			private function qrCodeDragOverHandler(event:DragEvent):void
+			{
+               if(event.dragSource.hasFormat(InstanceProperties.QR_CODE))
+               {
+                    DragManager.acceptDragDrop(qrCodeContainer);
+                    DragManager.showFeedback(DragManager.MOVE);	   				
+               }
+			}
+			
+			private function mapDragExitHandler(event:DragEvent):void
+			{
+				revertMapBorder();
+			}
+			
+			private function mediaDragExitHandler(event:DragEvent):void
+			{
+				revertMediaBorder();
+			}
+			
+			private function qrCodeDragExitHandler(event:DragEvent):void
+			{
+				revertQRCodeBorder();
+			}
+
+			private function mapDragDropHandler(event:DragEvent):void
+			{
+				var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+				var xFrac:Number = (event.localX - 4) / map.width;
+				var yFrac:Number = (event.localY - 4) / map.height;
+				if(   xFrac >= 0 && xFrac <= 1
+				   && yFrac >= 0 && yFrac <= 1)
+				{
+					var northWest:LatLng = map.getLatLngBounds().getNorthWest();
+					var southEast:LatLng = map.getLatLngBounds().getSouthEast();
+					var markerPos:LatLng = new LatLng(southEast.lat() + (1 - yFrac) * (northWest.lat() - southEast.lat()),
+													  northWest.lng() +      xFrac  * (southEast.lng() - northWest.lng()));
+					var sourceObject:InstantiatedObject = currentModel.getGameObject(dragXML) as InstantiatedObject;
+					var newProps:GPSInstanceProperties = new GPSInstanceProperties(sourceObject);
+					var toolMarker:GameObjectMarker = new GameObjectMarker(newProps, map);
+					sourceObject.addInstance(newProps);
+					newProps.setGameMarker(toolMarker);
+					toolMarker.setGoogleMapsMarker(new Marker(markerPos, new MarkerOptions({icon: toolMarker, draggable: true, hasShadow: true})));
+					map.addOverlay(toolMarker.getGoogleMapsMarker());
+				}
+				revertMapBorder();		
+			}
+			
+			private function mediaDragDropHandler(event:DragEvent):void
+			{
+				var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+				mediaFileNameLabel.text = dragXML.attribute("label");
+				currentGameObject.setMedia(currentModel.getMedia(dragXML));
+				revertMediaBorder();				
+			}
+						
+			private function qrCodeDragDropHandler(event:DragEvent):void
+			{
+				if(event.dragSource.hasFormat("treeItems"))
+				{
+					var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+					if(dragXML.name() == "object") //if we are dropping an InstantiatedObject
+					{
+						//make sure object is dropped inside container (adjusting for border)
+						var border:Number = 4;
+						if(   event.localX >= border && event.localX <= qrCodeContainer.width - border 
+						   && event.localY >= border && event.localY <= qrCodeContainer.height - border)
+						{
+							var sourceObject:InstantiatedObject = currentModel.getGameObject(dragXML) as InstantiatedObject;
+							var newProps:QRCodeInstanceProperties = new QRCodeInstanceProperties(sourceObject);
+							sourceObject.addInstance(newProps);
+							var instanceView:UIComponent = new UIComponent();
+							newProps.setContentDisplayWrapper(instanceView);
+							instanceView.addEventListener(MouseEvent.MOUSE_DOWN, centerOnQRCode);
+							instanceView.addEventListener(MouseEvent.CLICK, centerOnQRCode);
+							instanceView.name = dragXML.toXMLString();
+							instanceView.x = event.localX;
+							instanceView.y = event.localY;
+							qrCodeContainer.addChild(instanceView);
+						}	
+					}
+					else if(dragXML.name() == "media") //if we are dropping a new background image
+					{
+						
+					}		
+				}
+	            else if (event.dragSource.hasFormat(InstanceProperties.QR_CODE)) 
+	            {
+	            	var draggedCode:UIComponent = event.dragSource.dataForFormat(InstanceProperties.QR_CODE) as UIComponent;
+	                draggedCode.x = qrCodeContainer.mouseX;
+	                draggedCode.y = qrCodeContainer.mouseY;
+	            }
+				revertQRCodeBorder();		
+			}
+			
+			private function choicesDragDropHandler(event:DragEvent):void
+			{
+				var dragXML:XML = (event.dragSource.dataForFormat("treeItems") as Array)[0] as XML;
+				var newChoice:Object = new Object();
+				newChoice.label = dragXML.attribute("label");
+				newChoice.choiceText = "Click to enter text shown to user";
+				currentGameObject.addChoice(newChoice);
+				choicesDataGrid.dataProvider = currentGameObject.choicesDataProvider;
+			}
+			
+			private function updateExitChoice(event:Event):void
+			{
+				currentGameObject.toggleExitChoice();
+				choicesDataGrid.dataProvider = currentGameObject.choicesDataProvider;
+			}
+
+			private function revertMapBorder():void
+			{
+				mapContainer.setStyle("borderColor", "#000000");
+			}
+			
+			private function revertMediaBorder():void
+			{
+				mediaCanvas.setStyle("borderColor", "#000000");
+				mediaCanvas.setStyle("borderThickness", "1");
+			}
+			
+			private function revertQRCodeBorder():void
+			{
+				qrCodeContainer.setStyle("borderColor", "#000000");
+			}
+			
+			private function centerOnQRCode(event:Event = null):void
+			{
+				var newObject:GameObject = currentModel.getGameObject(XML(event.currentTarget.name));
+				if(newObject != null)
+				{
+					changePropertiesView(newObject);
+				}
+			}
+			
+			private function onTreeDragComplete(event:DragEvent):void
+			{
+				event.preventDefault();
+			}
+			
+			private function onTreeClick(event:MouseEvent):void
+			{
+				var selectedNode:XML = objectNavigator.selectedItem as XML;
+				if(selectedNode.attribute("generator") == "true")
+				{
+					objectNavigator.selectedItem = currentModel.createNewGameObject(selectedNode.attribute("type"));
+					selectedNode = objectNavigator.selectedItem as XML;
+				}
+				else if(selectedNode.attribute("uploader") == "true")
+				{
+					currentModel.uploadNewMedia(selectedNode.attribute("type"));
+				}
+				if(selectedNode.name() == "object")
+				{
+					changePropertiesView(currentModel.getGameObject(selectedNode));
+				}
+			}
+			
+			private function changePropertiesView(newObj:GameObject):void
+			{
+				if(currentGameObject == null)
+				{
+					propertiesView.addChild(leftView);
+					propertiesView.addChild(middleView);
+					propertiesView.addChild(rightView);
+				}
+				currentGameObject = newObj;
+				objectNameField.text = currentGameObject.getName();
+				descriptionTextArea.text = currentGameObject.getDescription();
+				notesTextArea.text = currentGameObject.getNotes();
+				if(currentGameObject.hasMedia())
+				{
+					mediaFileNameLabel.text = currentGameObject.getMedia().getFileName();				
+				}
+				else
+				{
+					mediaFileNameLabel.text = "";
+				}
+				var type:String = currentGameObject.getType();
+				displayPropertiesView.visible = (type != GameObject.SECRET_EVENT);
+				if(type == GameObject.QUEST)
+				{
+					if( middleView.contains(instanceNavigatorView) )
+					{
+						middleView.removeChild(instanceNavigatorView);
+					}
+				}
+				else
+				{
+					if( !(middleView.contains(instanceNavigatorView)) )
+					{
+						middleView.addChild(instanceNavigatorView);
+					}
+				}
+				if(type == GameObject.ITEM)
+				{
+					if( !(middleView.contains(itemSpecificPropertiesView)) )
+					{
+						middleView.addChild(itemSpecificPropertiesView);
+					}
+					droppableCheckBox.selected = (currentGameObject as Item).isDroppable();
+					destroyableCheckBox.selected = (currentGameObject as Item).isDestroyable();
+				}
+				else
+				{
+					if( middleView.contains(itemSpecificPropertiesView) )
+					{
+						middleView.removeChild(itemSpecificPropertiesView);					
+					}
+				}
+				if(type == GameObject.PAGE || type == GameObject.CHARACTER)
+				{
+					if( !(middleView.contains(choicesView)) )
+					{
+						middleView.addChild(choicesView);					
+					}
+				}
+				else
+				{
+					if( middleView.contains(choicesView) )
+					{
+						middleView.removeChild(choicesView);					
+					}
+				}
+			}
+						
+			private function getTreeIcon(node:Object):Object
+			{
+				var name:String = (node as XML).name().toString();
+				if(name == "folder")
+				{
+					return folderIcon;
+				}
+				var type:String = (node as XML).attribute("type");
+				if(name == "object")
+				{
+					var generator:String = (node as XML).attribute("generator");
+					if(generator == "true")
+					{
+						return newObjectIcon;
+					}
+					if(type == GameObject.ITEM)
+					{
+						return itemIcon;
+					}
+					if(type == GameObject.CHARACTER)
+					{
+						return characterIcon;
+					}
+					if(type == GameObject.PAGE)
+					{
+						return pageIcon;
+					}
+					if(type == GameObject.QUEST)
+					{
+						return questIcon;
+					}
+					if(type == GameObject.SECRET_EVENT)
+					{
+						return secretEventIcon;
+					}
+				}
+				if(name == "media")
+				{
+					var uploader:String = (node as XML).attribute("uploader");
+					if(uploader == "true")
+					{
+						return uploaderIcon;
+					}
+					if(type == Media.IMAGE)
+					{
+						return imageIcon;
+					}
+					if(type == Media.SOUND)
+					{
+						return soundIcon;
+					}
+					if(type == Media.VIDEO)
+					{
+						return videoIcon;
+					}					
+				}
+				return null;
+			}
+			
+			private function centerOnPreviousInstance(event:Event):void
+			{
+				var gameInstance:InstanceProperties = (currentGameObject as InstantiatedObject).getPreviousInstance();
+				centerOnGameMarker(gameInstance);
+			}
+
+			private function centerOnNextInstance(event:Event):void
+			{
+				var gameInstance:InstanceProperties = (currentGameObject as InstantiatedObject).getNextInstance();
+				centerOnGameMarker(gameInstance);
+			}
+			
+			private function centerOnGameMarker(gameInstance:InstanceProperties):void
+			{
+				if(gameInstance.getType() == InstanceProperties.GPS)
+				{
+					tabNavigator.selectedChild = mapContainer;
+					var gameMarker:GameObjectMarker = (gameInstance as GPSInstanceProperties).getGameMarker();
+					map.setCenter(gameMarker.getGoogleMapsMarker().getLatLng());
+					gameMarker.showInfoWindow();								
+				}
+				else if(gameInstance.getType() == InstanceProperties.QR_CODE)
+				{
+					tabNavigator.selectedChild = qrCodeContainer;
+				}
+			}
+			
+			private function updateName(event:Event):void
+			{
+				currentModel.changeName(currentGameObject.getType(), currentGameObject.getID(), objectNameField.text);
+				if(currentGameObject is InstantiatedObject)
+				{
+					(currentGameObject as InstantiatedObject).updateAllInstances();
+				}
+			}
+			
+			private function updateDescription(event:Event):void
+			{
+				currentGameObject.setDescription(descriptionTextArea.text);
+			}
+			
+			private function updateNotes(event:Event):void
+			{
+				currentGameObject.setNotes(notesTextArea.text);
+			}
+			
+			private function updateDroppable(event:Event):void
+			{
+				(currentGameObject as Item).setDroppable(droppableCheckBox.selected);				
+			}
+			
+			private function updateDestroyable(event:Event):void
+			{
+				(currentGameObject as Item).setDestroyable(destroyableCheckBox.selected);
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:VBox width="200" height="100%">
+		<mx:MenuBar id="gameMenuBar" width="100%" labelField="@label">
+			<mx:XMLList>
+				<menuItem label="File">
+					<menuItem label="New Game"/>
+					<menuItem label="Load Game"/>
+					<menuItem type="separator"/>
+					<menuItem label="Save As..."/>
+					<menuItem label="Rename"/>
+					<menuItem type="separator"/>
+					<menuItem label="Exit Editor"/>
+				</menuItem>
+				<menuItem label="Help">
+					<menuItem label="Show Help Window" type="checkbox"/>
+					<menuItem label="Enable Tutorial Mode" type="checkbox"/>
+					<menuItem label="Open Web Documentation"/>
+				</menuItem>
+			</mx:XMLList>
+		</mx:MenuBar>
+		<mx:Tree id="objectNavigator"
+			height="100%" width="100%"
+			borderStyle="solid" borderColor="#000000" borderThickness="4" cornerRadius="5"
+			dataProvider="{currentModel.XMLDataProvider}" labelField="@label"
+			click="onTreeClick(event)" allowMultipleSelection="false"
+			horizontalScrollPolicy="on" verticalScrollPolicy="auto"
+			iconFunction="getTreeIcon"
+			dropEnabled="false" dragEnabled="true" dragMoveEnabled="false" dragComplete="onTreeDragComplete(event)"/>
+	</mx:VBox>
+	<mx:VBox height="100%" width="100%">
+		<mx:HBox height="100%" width="100%">
+			<mx:TabNavigator id="tabNavigator"
+				width="100%" height="100%">
+				<mx:Canvas id="mapContainer" 
+					label="GPS Map" width="100%" height="100%"
+					dragExit="mapDragExitHandler(event);"
+					dragDrop="mapDragDropHandler(event);"
+					borderStyle="solid" borderColor="#000000" borderThickness="4" cornerRadius="5">
+					<maps:Map xmlns:maps="com.google.maps.*" id="map" 
+						mapevent_mapready="onMapReady(event)"
+						mapevent_mappreinitialize="onMapPreinitialize(event)"
+						width="100%" height="100%" 
+						key="ABQIAAAAaBINj42Tz4K8ZaoZWWSnWRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxQkcVoUCrdum-UscUMoKinDrDjThQ"
+						dragEnter="canvasDragEnterHandler(event);"/> 		
+				</mx:Canvas>
+				<mx:Canvas id="qrCodeContainer" 
+					label="QR Codes" width="100%" height="100%"
+					borderStyle="solid" borderColor="#000000" borderThickness="4" cornerRadius="5"
+					dragExit="qrCodeDragExitHandler(event)"
+					dragDrop="qrCodeDragDropHandler(event)"
+					dragOver="qrCodeDragOverHandler(event)">
+					<mx:Image id="qrCodeBackground"
+						width="100%" height="100%"
+						dragEnter="qrCodeDragEnterHandler(event)"/>
+				</mx:Canvas>
+				<mx:Canvas id="linkDiagramContainer" 
+					label="Link Diagram" width="100%" height="100%">
+				</mx:Canvas>
+			</mx:TabNavigator>
+			<mx:Canvas id="previewWindow"
+				width="320" height="370"
+				borderStyle="solid" borderColor="#B7BABC" cornerRadius="5" borderThickness="4" backgroundColor="#000000">				
+			</mx:Canvas>			
+		</mx:HBox>
+		<mx:HBox id="propertiesView"
+			width="100%" height="100%" horizontalGap="5"
+			borderStyle="solid" borderColor="#000000" cornerRadius="5" borderThickness="4" backgroundColor="#FFFFFF">
+			<mx:VBox id="leftView"
+				width="100%" height="100%"
+				verticalGap="5" paddingLeft="5" paddingTop="5" paddingRight="5" paddingBottom="5">
+				<mx:Label text="Name"/>
+				<mx:TextInput id="objectNameField"
+					maxChars="255" displayAsPassword="false" editable="true" enabled="true" 
+					width="100%" borderStyle="solid" borderColor="#000000" borderThickness="1"
+					change="updateName(event)"/>
+				<mx:VBox id="displayPropertiesView"
+					width="100%" height="100%">
+					<mx:Label text="Media"/>
+					<mx:HBox width="100%" verticalAlign="middle">
+						<mx:Canvas  id="mediaCanvas" width="40" height="40" verticalScrollPolicy="off" horizontalScrollPolicy="off"
+							borderStyle="solid" borderColor="#000000" borderThickness="1"
+							dragExit="mediaDragExitHandler(event)"
+							dragDrop="mediaDragDropHandler(event)">
+							<mx:Image width="40" height="40" source="@Embed('assets/editor icons/media.png')"
+								dragEnter="mediaDragEnterHandler(event)"/>
+						</mx:Canvas>
+						<mx:TextInput id="mediaFileNameLabel" editable="false"
+							width="100%" borderStyle="solid" borderColor="#000000" borderThickness="1"/>											
+					</mx:HBox>
+					<mx:Label text="Description"/>
+					<mx:TextArea id="descriptionTextArea"
+						width="100%" height="100%"
+						change="updateDescription(event)"/>					
+				</mx:VBox>
+			</mx:VBox>
+			<mx:VBox id="middleView"
+				width="100%" height="100%"
+				verticalGap="5" paddingLeft="5" paddingTop="5" paddingRight="5" paddingBottom="5">
+				<mx:HBox id="instanceNavigatorView"
+					width="100%" >
+					<mx:Canvas  width="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+						<mx:VBox horizontalCenter="0">
+							<mx:Text>
+								<mx:htmlText>
+								<![CDATA[Previous<br>Local Copy]]>
+								</mx:htmlText>
+							</mx:Text>
+							<mx:Image width="60" height="60" 
+								source="@Embed('assets/editor icons/previous.png')"
+								click="centerOnPreviousInstance(event)"/>
+						</mx:VBox>
+					</mx:Canvas>
+					<mx:Canvas  width="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+						<mx:VBox horizontalCenter="0">
+							<mx:Text>
+								<mx:htmlText>
+								<![CDATA[Next<br>Local Copy]]>
+								</mx:htmlText>
+							</mx:Text>
+							<mx:Image width="60" height="60" 
+								source="@Embed('assets/editor icons/next.png')"
+								click="centerOnNextInstance(event)"/>
+						</mx:VBox>
+					</mx:Canvas>
+				</mx:HBox>
+				<mx:VBox id="itemSpecificPropertiesView"
+					width="100%">
+					<mx:Label text="All copies of this item are..."/>
+					<mx:HBox 
+						width="100%">
+						<mx:Canvas  width="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+							<mx:VBox horizontalCenter="0">
+								<mx:Label text="Droppable"/>
+								<mx:HBox>
+									<mx:CheckBox id="droppableCheckBox"
+										change="updateDroppable(event)"/>
+									<mx:Image width="60" height="60" horizontalCenter="0"
+										source="@Embed('assets/editor icons/drop.png')"/>																
+								</mx:HBox>
+							</mx:VBox>
+						</mx:Canvas>
+						<mx:Canvas  width="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+							<mx:VBox horizontalCenter="0">
+								<mx:Label text="Destroyable"/>
+								<mx:HBox>
+									<mx:CheckBox id="destroyableCheckBox"
+										change="updateDestroyable(event)"/>
+									<mx:Image width="60" height="60" horizontalCenter="0"
+										source="@Embed('assets/editor icons/destroy.png')"/>																
+								</mx:HBox>
+							</mx:VBox>
+						</mx:Canvas>					
+					</mx:HBox>
+				</mx:VBox>
+				<mx:VBox id="choicesView"
+					width="100%" height="100%">
+					<mx:HBox width="100%">
+						<mx:Label text="Choices offered to player from here:"/>
+						<mx:Spacer width="100%"/>
+						<mx:CheckBox id="exitChoiceCheckBox"
+							change="updateExitChoice(event)"/>
+						<mx:Label text="Exit"/>												
+					</mx:HBox>
+					<mx:DataGrid id="choicesDataGrid"
+						dataProvider="{currentGameObject.choicesDataProvider}"
+						width="100%" height="100%"
+						editable="true"
+						dragEnter="choicesDragEnterHandler(event)"
+						dragDrop="choicesDragDropHandler(event)"
+						variableRowHeight="true">
+						<mx:columns>
+							<mx:DataGridColumn dataField="label"
+								headerText="Game Object"
+								editable="false" draggable="false"/>
+							<mx:DataGridColumn dataField="choiceText"
+								headerText="Displayed Text"
+								editable="true" draggable="false"/>
+						</mx:columns>
+					</mx:DataGrid>
+				</mx:VBox>
+			</mx:VBox>
+			<mx:VBox id="rightView"
+				width="100%" height="100%"
+				verticalGap="5" paddingLeft="5" paddingTop="5" paddingRight="5" paddingBottom="5">
+				<mx:Label text="When this object is encountered..."/>
+				<mx:HBox width="100%" height="100%">
+					<mx:VBox width="100%" height="100%">
+						<mx:Label text="Add/Reveal"/>
+						<mx:TextArea id="addBox"
+							width="100%" height="100%"/>
+					</mx:VBox>					
+					<mx:VBox width="100%" height="100%">
+						<mx:Label text="Take/Hide"/>
+						<mx:TextArea id="takeBox"
+							width="100%" height="100%"/>
+					</mx:VBox>					
+				</mx:HBox>					
+				<mx:Label text="My Notes (not visible to players)"/>
+				<mx:TextArea id="notesTextArea"
+					width="100%" height="100%"
+					change="updateNotes(event)"/>
+			</mx:VBox>
+		</mx:HBox>
+	</mx:VBox>
+	
+	
+		
+</mx:Application>

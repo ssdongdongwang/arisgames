@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 4/1/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,35 +11,33 @@
 #import "QRCodeProtocol.h"
 
 @interface Item : NSObject <NearbyObjectProtocol,QRCodeProtocol> {
-	int itemId;
 	NSString *name;
-	int mediaId;
-	int iconMediaId;
-	int locationId; //null if in the player's inventory
-	int qty;
-	int maxQty;
-	NSString *description;	
-	BOOL forcedDisplay;
-	BOOL dropable;
-	BOOL destroyable;
 	nearbyObjectKind kind;
+	BOOL forcedDisplay;
+	
+	int itemId;
+	int locationId; //null if in the player's inventory
+	NSString *description;
+	NSString *type;
+	NSString *mediaURL;
+	NSString *iconURL;
 }
 
 @property(copy, readwrite) NSString *name;
 @property(readwrite, assign) nearbyObjectKind kind;
 - (nearbyObjectKind) kind;
 @property(readwrite, assign) BOOL forcedDisplay;
-@property(readwrite, assign) int itemId;
-@property(readwrite, assign) int locationId;
-@property(readwrite, assign) int mediaId;
-@property(readwrite, assign) int qty;
-@property(readwrite, assign) int maxQty;
+
+@property(readonly, assign) int itemId;
+@property(readonly, assign) int locationId;
+- (void) setItemId:(NSString *)fromStringValue;
+- (void) setLocationId:(NSString *)fromStringValue;
+
 @property(copy, readwrite) NSString *description;
-@property(readwrite, assign) int iconMediaId;
-@property (readwrite, assign) BOOL dropable;
-@property (readwrite, assign) BOOL destroyable;
+@property(copy, readwrite) NSString *type;
+@property(copy, readwrite) NSString *mediaURL;
+@property(copy, readwrite) NSString *iconURL;
 
 - (void) display;
-
 
 @end

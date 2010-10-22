@@ -10,32 +10,24 @@
 #import "model/AppModel.h";
 
 #import "LoginViewController.h";
+#import "GenericWebViewController.h";
 #import "MyCLController.h"
 
 #import "model/Game.h"
+#import "NearbyLocation.h"
 #import "NearbyBar.h"
 #import "Item.h"
 #import "ItemDetailsViewController.h"
 
 #import "QuestsViewController.h"
-#import "GPSViewController.h"
 #import "InventoryListViewController.h"
 #import "CameraViewController.h"
-#import "AudioRecorderViewController.h"
-#import "ARViewViewControler.h"
 #import "QRScannerViewController.h"
+#import "IMViewController.h"
 #import "GamePickerViewController.h"
 #import "LogoutViewController.h"
-#import "StartOverViewController.h"
 #import "DeveloperViewController.h"
 #import "WaitingIndicatorViewController.h"
-#import "WaitingIndicatorView.h"
-
-#import "AudioToolbox/AudioToolbox.h"
-
-#import "Reachability.h"
-
-
 
 @interface ARISAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate> {
 	AppModel *appModel;
@@ -49,15 +41,7 @@
 	UINavigationController *gamePickerNavigationController;
 	UINavigationController *nearbyObjectNavigationController;
 	WaitingIndicatorViewController *waitingIndicator;
-	WaitingIndicatorView *waitingIndicatorView;
-
 	UIAlertView *networkAlert;
-	
-	
-	UIWindow* tvOutWindow;
-	UIImageView *tvOutMirrorView;
-	BOOL tvOutDone;
-	
 }
 
 @property (nonatomic, retain) AppModel *appModel;
@@ -71,21 +55,12 @@
 @property (nonatomic, retain) IBOutlet NearbyBar *nearbyBar;
 @property (nonatomic, retain) IBOutlet UINavigationController *nearbyObjectNavigationController;
 @property (nonatomic, retain) WaitingIndicatorViewController *waitingIndicator;
-@property (nonatomic, retain) WaitingIndicatorView *waitingIndicatorView;
-
 @property (nonatomic, retain) UIAlertView *networkAlert;
 
-- (void)attemptLoginWithUserName:(NSString *)userName andPassword:(NSString *)password;
-- (void) displayNearbyObjectView:(UIViewController *)nearbyObjectViewController;
-- (void) setApplicationYOrigin: (CGFloat)yOrigin;
-- (void) showWaitingIndicator:(NSString *)message displayProgressBar:(BOOL)yesOrNo;
-- (void) showNewWaitingIndicator:(NSString *)message displayProgressBar:(BOOL)displayProgressBar;
+- (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController;
+- (void) showWaitingIndicator:(NSString *)message;
 - (void) removeWaitingIndicator;
-- (void) removeNewWaitingIndicator;
 - (void) showNetworkAlert;
 - (void) removeNetworkAlert;
-- (void) returnToHomeView;
-- (void) playAudioAlert:(NSString*)wavFileName shouldVibrate:(BOOL)shouldVibrate;
-- (void) startTVOut;
 
 @end

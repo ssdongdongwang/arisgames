@@ -3,7 +3,7 @@
 //  ARIS
 //
 //  Created by David Gagnon on 4/1/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "Item.h"
@@ -19,14 +19,19 @@
 @synthesize forcedDisplay;
 
 @synthesize itemId;
-@synthesize mediaId;
 @synthesize locationId;
-@synthesize qty,maxQty;
 @synthesize description;
-@synthesize iconMediaId;
+@synthesize type;
+@synthesize mediaURL;
+@synthesize iconURL;
 
-@synthesize dropable;
-@synthesize	destroyable;
+- (void) setItemId:(NSString *)fromStringValue {
+	itemId = [fromStringValue intValue];
+}
+
+- (void) setLocationId:(NSString *)fromStringValue {
+	locationId = [fromStringValue intValue];
+}
 
 -(nearbyObjectKind) kind {
 	return NearbyObjectItem;
@@ -48,27 +53,17 @@
 
 	//Have AppDelegate display
 	[appDelegate displayNearbyObjectView:itemDetailsViewController];
-	[itemDetailsViewController release];
+
 	
 }
-
-- (BOOL)isEqual:(id)anObject {
-	if (![anObject isKindOfClass:[Item class]]) return NO;
-	Item *anItem = (Item*)anObject;
-	if (anItem.itemId == self.itemId) return YES;
-	return NO;
-}
-
-- (NSUInteger)hash {
-	return itemId;
-}
-
 
 - (void)dealloc {
 	[name release];
 	[description release];
+	[type release];
+	[mediaURL release];
+	[iconURL release];
     [super dealloc];
 }
- 
 
 @end

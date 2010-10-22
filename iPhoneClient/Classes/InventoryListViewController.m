@@ -7,106 +7,73 @@
 //
 
 #import "InventoryListViewController.h"
-#import "Media.h"
-#import "AsyncImageView.h"
 
 
 @implementation InventoryListViewController
 
+@synthesize moduleName;
 @synthesize inventoryTable;
-@synthesize inventory;
+@synthesize inventoryTableData;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"InventoryViewTitleKey",@"");
-        self.tabBarItem.image = [UIImage imageNamed:@"inventory.png"];
-		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-		silenceNextServerUpdate = YES;
+        self.title = @"Mochila";
+        self.tabBarItem.image = [UIImage imageNamed:@"Inventory.png"];
+		self.moduleName = @"Inventory";
 		
 		//register for notifications
 		NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-		[dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ReceivedInventory" object:nil];
-		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewInventoryReady" object:nil];
-		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
-
+		[dispatcher addObserver:self selector:@selector(refreshInventory) name:@"ReceivedInventory" object:nil];
     }
     return self;
 }
 
-- (void)silenceNextUpdate {
-	silenceNextServerUpdate = YES;
-}
-
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {	
+- (void)viewDidLoad {
+	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator:@"Loading..."];
+	
 	[super viewDidLoad];
 	NSLog(@"Inventory View Loaded");
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-	[appModel updateServerInventoryViewed];
-	
-	[self refresh];		
-	
-	//remove any existing badge
-	self.tabBarItem.badgeValue = nil;
-	
-	NSLog(@"InventoryListViewController: view did appear");
-	
-	
+- (void)viewDidAppear {
 }
 
--(void)refresh {
-	NSLog(@"InventoryListViewController: Refresh Requested");
-	[appModel fetchInventory];
-	[self showLoadingIndicator];
-}
 
--(void)showLoadingIndicator{
-	UIActivityIndicatorView *activityIndicator = 
-	[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
-	[activityIndicator release];
-	[[self navigationItem] setRightBarButtonItem:barButton];
-	[barButton release];
-	[activityIndicator startAnimating];
-}
-
--(void)removeLoadingIndicator{
-	[[self navigationItem] setRightBarButtonItem:nil];
-}
-
--(void)refreshViewFromModel {
-	NSLog(@"InventoryListViewController: Refresh View from Model");
-	
-	//Add a badge if this is NOT the first time data has been loaded
-	if (silenceNextServerUpdate == NO) {
-		self.tabBarItem.badgeValue = @"!";
-
-		ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-		[appDelegate playAudioAlert:@"inventoryChange" shouldVibrate:YES];
-		
+-(void) setModel:(AppModel *)model {
+	if(appModel != model) {
+		[appModel release];
+		appModel = model;
+		[appModel retain];
 	}
-	else silenceNextServerUpdate = NO;
 	
-	self.inventory = [appModel.inventory allValues];
+	//Show waiting Indicator in own thread so it appears on time
+	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] showWaitingIndicator:@"Loading..."];
+	
+	//Populate inventory
+	[appModel fetchInventory];
+	
+	NSLog(@"Inventory: Model Set");
+}
+
+-(void)refreshInventory {
+	NSLog(@"Inventory Recieved message recieved in FilesViewController");
+	inventoryTableData = appModel.inventory;
 	[inventoryTable reloadData];
-	
 	//Stop Waiting Indicator
 	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
-	
-	
+
 	
 }
 
 - (UITableViewCell *) getCellContentView:(NSString *)cellIdentifier {
-	CGRect CellFrame = CGRectMake(0, 0, 320, 60);
-	CGRect IconFrame = CGRectMake(5, 5, 50, 50);
-	CGRect Label1Frame = CGRectMake(70, 10, 240, 25);
-	CGRect Label2Frame = CGRectMake(70, 33, 240, 25);
+	CGRect CellFrame = CGRectMake(0, 0, 300, 60);
+	CGRect IconFrame = CGRectMake(10, 10, 50, 50);
+	CGRect Label1Frame = CGRectMake(70, 10, 290, 25);
+	CGRect Label2Frame = CGRectMake(70, 33, 290, 25);
 	UILabel *lblTemp;
 	UIImageView *iconViewTemp;
 	
@@ -135,7 +102,7 @@
 	[lblTemp release];
 	
 	//Init Icon with tag 3
-	iconViewTemp = [[AsyncImageView alloc] initWithFrame:IconFrame];
+	iconViewTemp = [[UIImageView alloc] initWithFrame:IconFrame];
 	iconViewTemp.tag = 3;
 	iconViewTemp.backgroundColor = [UIColor blackColor];
 	[cell.contentView addSubview:iconViewTemp];
@@ -153,7 +120,7 @@
 
 // returns the # of rows in each component..
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return [inventory count];
+	return [inventoryTableData count];
 }
 
 
@@ -164,33 +131,26 @@
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];	
 	if(cell == nil) cell = [self getCellContentView:CellIdentifier];
 	
-	Item *item = [inventory objectAtIndex: [indexPath row]];
-	
 	UILabel *lblTemp1 = (UILabel *)[cell viewWithTag:1];
-	lblTemp1.text = item.name;								   
+	lblTemp1.text = [[inventoryTableData objectAtIndex: [indexPath row]] name];
 	
 	UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
-	if (item.qty > 1) lblTemp2.text = [NSString stringWithFormat:@"x %d ",item.qty];
-	else lblTemp2.text = @"";
+	NSString *description = [[inventoryTableData objectAtIndex: [indexPath row]] description];
+	int targetIndex = MIN([self indexOf:'.' inString:description] + 1, 
+						  [description length] - 1);
+	lblTemp2.text = [description substringToIndex:targetIndex];
 	
-	AsyncImageView *iconView = (AsyncImageView *)[cell viewWithTag:3];
+	UIImageView *iconView = (UIImageView *)[cell viewWithTag:3];
 	
-	Media *media = [appModel mediaForMediaId: item.mediaId];
+	NSString *relativeURL = [[[inventoryTableData objectAtIndex:[indexPath row]] iconURL] stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding];	
+	NSURLRequest *iconRequest = [appModel getURL:relativeURL];
+	NSData *iconData = [appModel fetchURLData: iconRequest];
 
-	if (item.iconMediaId != 0) {
-		Media *iconMedia = [appModel mediaForMediaId: item.iconMediaId];
-		[iconView loadImageFromMedia:iconMedia];
-	}
-	else {
-		//Load the Default
-		if ([media.type isEqualToString: @"Image"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultImageIcon.png"]];
-		if ([media.type isEqualToString: @"Audio"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultAudioIcon.png"]];
-		if ([media.type isEqualToString: @"Video"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultVideoIcon.png"]];
-	}
-	
+	UIImage *icon = [UIImage imageWithData:iconData];
+	iconView.image = icon;
+
 	return cell;
 }
-
 					 
  - (unsigned int) indexOf:(char) searchChar inString:(NSString *)searchString {
 	NSRange searchRange;
@@ -206,11 +166,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {	
-	Item *selectedItem = [inventory objectAtIndex:[indexPath row]];
+	Item *selectedItem = [inventoryTableData objectAtIndex:[indexPath row]];
 	NSLog(@"Displaying Detail View: %@", selectedItem.name);
-	
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
 	
 	ItemDetailsViewController *itemDetailsViewController = [[ItemDetailsViewController alloc] 
 															initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
@@ -218,13 +175,9 @@
 	itemDetailsViewController.item = selectedItem;
 	itemDetailsViewController.navigationItem.title = selectedItem.name;
 	itemDetailsViewController.inInventory = YES;
-	itemDetailsViewController.hidesBottomBarWhenPushed = YES;
-	appDelegate.nearbyBar.hidden = YES;
 
 	//Put the view on the screen
 	[[self navigationController] pushViewController:itemDetailsViewController animated:YES];
-	
-	[itemDetailsViewController release];
 	
 }
 
@@ -236,6 +189,7 @@
 
 - (void)dealloc {
 	[appModel release];
+	[moduleName release];
     [super dealloc];
 }
 @end
