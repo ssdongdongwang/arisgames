@@ -3,427 +3,219 @@
 //  ARIS
 //
 //  Created by David Gagnon on 4/2/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "ItemDetailsViewController.h"
 #import "ARISAppDelegate.h"
-#import "Media.h"
-#import "Item.h"
-
-
-NSString *const kItemDetailsDescriptionHtmlTemplate = 
-@"<html>"
-@"<head>"
-@"	<title>Aris</title>"
-@"	<style type='text/css'><!--"
-@"	body {"
-@"		background-color: #000000;"
-@"		color: #FFFFFF;"
-@"		font-size: 17px;"
-@"		font-family: Helvetia, Sans-Serif;"
-@"	}"
-@"	--></style>"
-@"</head>"
-@"<body>%@</body>"
-@"</html>";
-
-
 
 @implementation ItemDetailsViewController
-@synthesize appModel, item, inInventory,mode;
 
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(movieFinishedCallback:)
-													 name:MPMoviePlayerPlaybackDidFinishNotification
-												   object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self 
-												 selector:@selector(movieLoadStateChanged:) 
-													 name:MPMoviePlayerLoadStateDidChangeNotification 
-												   object:nil];
-		mode = kItemDetailsViewing;
-    }
-	
-    return self;
-}
+@synthesize appModel;
+@synthesize item;
+@synthesize inInventory;
+@synthesize dropButton;
+@synthesize deleteButton;
+@synthesize backButton;
+@synthesize pickupButton;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
-	//Show waiting Indicator in own thread so it appears on time
-	//[NSThread detachNewThreadSelector: @selector(showWaitingIndicator:) toTarget: (ARISAppDelegate *)[[UIApplication sharedApplication] delegate] withObject: @"Loading..."];	
-	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate]showWaitingIndicator:NSLocalizedString(@"LoadingKey",@"") displayProgressBar:NO];
-	
-	
-	//Setup the Toolbar Buttons
-	dropButton.title = NSLocalizedString(@"ItemDropKey", @"");
-	pickupButton.title = NSLocalizedString(@"ItemPickupKey", @"");
-	deleteButton.title = NSLocalizedString(@"ItemDeleteKey",@"");
-	detailButton.title = NSLocalizedString(@"ItemDetailKey", @"");
-	
-	if (inInventory == YES) {		
-		dropButton.width = 75.0;
-		deleteButton.width = 75.0;
-		detailButton.width = 140.0;
-		
-		[toolBar setItems:[NSMutableArray arrayWithObjects: dropButton, deleteButton, detailButton,  nil] animated:NO];
+	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate]showWaitingIndicator:@"Loading..."];
 
-		if (!item.dropable) dropButton.enabled = NO;
-		if (!item.destroyable) deleteButton.enabled = NO;
+	
+	if (inInventory == YES) {
+		pickupButton.hidden = YES;
+		dropButton.hidden = NO;
+		deleteButton.hidden = NO;
 	}
 	else {
-		pickupButton.width = 150.0;
-		detailButton.width = 150.0;
-
-		[toolBar setItems:[NSMutableArray arrayWithObjects: pickupButton,detailButton, nil] animated:NO];
+		pickupButton.hidden = NO;
+		dropButton.hidden = YES;
+		deleteButton.hidden = YES;
 	}
-	
-	//Create a close button
-	self.navigationItem.leftBarButtonItem = 
-	[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"BackButtonKey",@"")
-									 style: UIBarButtonItemStyleBordered
-									target:self 
-									action:@selector(backButtonTouchAction:)];	
-	
-	
-
-	NSLog(@"ItemDetailsViewController: View Loaded. Current item: %@", item.name);
+	NSString *mediaURL = [appModel getURLString:item.mediaURL];
+	NSLog(@"ItemDetailsViewController: View Loaded. Current item: %@; mediaURL: %@", item.name, mediaURL);
 
 
 	//Set Up General Stuff
-	NSString *htmlDescription = [NSString stringWithFormat:kItemDetailsDescriptionHtmlTemplate, item.description];
-	[itemDescriptionView loadHTMLString:htmlDescription baseURL:nil];
-
-	Media *media = [appModel mediaForMediaId: item.mediaId];
-
-	if ([media.type isEqualToString: @"Image"] && media.url) {
+	int margin = 10;
+	UILabel *itemDescriptionView = [[UILabel alloc] initWithFrame:CGRectMake(margin, 220 + margin, 320 - (2 * margin),
+																			 [self calculateTextHeight:item.description])];
+	itemDescriptionView.text = item.description;
+	itemDescriptionView.backgroundColor = [UIColor blackColor];
+	itemDescriptionView.textColor = [UIColor whiteColor];
+	itemDescriptionView.lineBreakMode = UILineBreakModeWordWrap;
+	itemDescriptionView.numberOfLines = 0;
+	
+	[scrollView addSubview:itemDescriptionView];
+	[scrollView setContentSize:CGSizeMake(320, itemDescriptionView.frame.origin.y
+										  + itemDescriptionView.frame.size.height)];
+	
+	if ([item.type isEqualToString: @"Image"]) {
 		NSLog(@"ItemDetailsViewController: Image Layout Selected");
-		[itemImageView loadImageFromMedia:media];
-	}
-	else if (([media.type isEqualToString: @"Video"] || [media.type isEqualToString: @"Audio"]) && media.url) {
-		NSLog(@"ItemDetailsViewController:  AV Layout Selected");
+		//Setup the image view
+		[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+		NSData* imageData = [[NSData alloc]initWithContentsOfURL:[NSURL URLWithString:mediaURL]];
+		[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
-		//Setup the Button
-		mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 295)];
-		[mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
-		[mediaPlaybackButton setBackgroundImage:[UIImage imageNamed:@"clickToPlay.png"] forState:UIControlStateNormal];
-		[mediaPlaybackButton setTitle:NSLocalizedString(@"PreparingToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = NO;
-		mediaPlaybackButton.titleLabel.font = [UIFont boldSystemFontOfSize:24];
-		[mediaPlaybackButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
-		[mediaPlaybackButton setContentVerticalAlignment:UIControlContentVerticalAlignmentBottom];
-		[scrollView addSubview:mediaPlaybackButton];	
-				
-		//Create movie player object
-		mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
-		[mMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
+		UIImage* image = [[UIImage alloc] initWithData:imageData];
+		UIImageView* imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 220)];
+		imageView.image = image;
 		
-		[mMoviePlayer.moviePlayer prepareToPlay];		
+		//Add the image view
+		[scrollView addSubview:imageView];
+		
+		//clean up
+		[imageData release];
+		[image release];
+		[imageView release];
+	}
+	else if ([item.type isEqualToString: @"AV"]) {
+		NSLog(@"ItemDetailsViewController:  Video Layout Selected");
+
+		//Create movie player object
+		mMoviePlayer = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:mediaURL]];
+		
+		// Register to receive a notifications
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePreloadDidFinish:) name:MPMoviePlayerContentPreloadDidFinishNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlayBackDidFinish:) name:MPMoviePlayerPlaybackDidFinishNotification object:mMoviePlayer];
+		
+		//Configure Movie Player
+		mMoviePlayer.scalingMode = MPMovieScalingModeFill; // Movie scaling mode can be one of: MPMovieScalingModeNone, MPMovieScalingModeAspectFit,MPMovieScalingModeAspectFill, MPMovieScalingModeFill.
+		mMoviePlayer.movieControlMode = MPMovieControlModeDefault; //Movie control mode can be one of: MPMovieControlModeDefault, MPMovieControlModeVolumeOnly, MPMovieControlModeHidden.
+		mMoviePlayer.backgroundColor = [UIColor blackColor];
+		
+		//Add a button
+		UIButton *button = [[UIButton buttonWithType:UIButtonTypeCustom] 
+							initWithFrame:CGRectMake(120, 60, 80, 80)];
+		[button addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
+		[button setImage:[UIImage imageNamed:@"playArrow.png"] forState:UIControlStateNormal];
+		[scrollView addSubview:button];		
 	}
 	
-	else {
-		NSLog(@"ItemDetailsVC: Error Loading Media ID: %d. It etiher doesn't exist or is not of a valid type.", item.mediaId);
-	}
-
+	
+	//Notify server that the item was viewed
+	NSURLRequest *request = [appModel getURLForModule:[ NSString stringWithFormat:@"Inventory&controller=SimpleREST&event=viewedItem&item_id=%d", self.item.itemId]];
+	NSLog(@"ItemDetialsViewController: Notifying server this item was viewed using URL:%@",request.URL.absoluteString);
+	[NSThread detachNewThreadSelector: @selector(fetchURLData:) toTarget: appModel withObject: request];	
+	//[appModel fetchURLData:request];
+	
+	[mediaURL release];
+	
 	//Stop Waiting Indicator
-	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
-	[self updateQuantityDisplay];
+	//[NSThread detachNewThreadSelector: @selector(removeWaitingIndicator) toTarget: (ARISAppDelegate *)[[UIApplication sharedApplication] delegate] withObject: nil];
+	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeWaitingIndicator];
+	
 	
 	[super viewDidLoad];
 }
 
-- (void)updateQuantityDisplay {
-	if (item.qty > 1) self.title = [NSString stringWithFormat:@"%@ x%d",item.name,item.qty];
-	else self.title = item.name;
+
+- (int) calculateTextHeight:(NSString *)text {
+	CGRect frame = CGRectMake(0, 0, self.view.bounds.size.width, 200000);
+	CGSize calcSize = [text sizeWithFont:[UIFont systemFontOfSize:18.0]
+					   constrainedToSize:frame.size lineBreakMode:UILineBreakModeWordWrap];
+	frame.size = calcSize;
+	frame.size.height += 0;
+	NSLog(@"Found height of %f", frame.size.height);
+	return frame.size.height;
 }
 
-- (IBAction)backButtonTouchAction: (id) sender{
-	NSLog(@"ItemDetailsViewController: Notify server of Item view and Dismiss Item Details View");
-	
-	//Notify the server this item was displayed
-	[appModel updateServerItemViewed:item.itemId];
-	
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	
-	[self.navigationController popToRootViewControllerAnimated:YES];
-	[self dismissModalViewControllerAnimated:YES];
-	
-	appDelegate.nearbyBar.hidden = NO;
-	
-	
-}
+//  Notification called when the movie finished preloading.
+- (void) moviePreloadDidFinish:(NSNotification*)notification { }
 
--(IBAction)playMovie:(id)sender {
-	[self presentMoviePlayerViewControllerAnimated:mMoviePlayer];
-}
-
+//  Notification called when the movie finished playing.
+- (void) moviePlayBackDidFinish:(NSNotification*)notification { }
 
 - (IBAction)dropButtonTouchAction: (id) sender{
-	NSLog(@"ItemDetailsVC: Drop Button Pressed");
+	//Fire off a request to the REST Module and display an alert when it is successfull
+	NSString *baseURL = [appModel getURLStringForModule:@"Inventory"];
+	NSString *URLparams = [ NSString stringWithFormat:@"&controller=SimpleREST&event=dropItemHere&item_id=%d", self.item.itemId];
+	NSString *fullURL = [ NSString stringWithFormat:@"%@%@", baseURL, URLparams];
 	
-	mode = kItemDetailsDropping;
+	NSLog([NSString stringWithFormat:@"ItemDetailsViewController: Dropping Item Here using REST Call: %@", fullURL ]);
 	
-	//Create and Display Action Sheet
-	UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:nil
-															delegate:self 
-												   cancelButtonTitle:@"Cancel" 
-											  destructiveButtonTitle:nil 
-												   otherButtonTitles:@"Drop 1",@"Drop All",nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-	[actionSheet showInView:self.view];
+	NSString *result = [[NSString alloc] initWithContentsOfURL:[NSURL URLWithString:fullURL]];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Item Dropped" message: @"Your Item was dropped here on the map. Other players will not see this object on their map." delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
 	
+	[alert show];
+	[result release];
+	[alert release];
+	
+	
+	//Dismiss Item Details View
+	[self.navigationController popToRootViewControllerAnimated:YES];
+	
+	//Refresh the Nearby Locations
+	[appModel updateServerLocationAndfetchNearbyLocationList];
+	
+	//Refresh Map Locations
+	[appModel fetchLocationList];
+	
+	//Refresh the inventory
+	[appModel fetchInventory];
 }
 
 - (IBAction)deleteButtonTouchAction: (id) sender{
-	NSLog(@"ItemDetailsVC: Destroy Button Pressed");
+	//Fire off a request to the REST Module and display an alert when it is successfull
+	NSString *baseURL = [appModel getURLStringForModule:@"Inventory"];
+	NSString *URLparams = [ NSString stringWithFormat:@"&controller=SimpleREST&event=destroyPlayerItem&item_id=%d", self.item.itemId];
+	NSString *fullURL = [ NSString stringWithFormat:@"%@%@", baseURL, URLparams];
+	
+	NSLog([NSString stringWithFormat:@"ItemDetailsViewController: Deleting all Items for this Player on server: %@", fullURL ]);
+	
+	NSString *result = [[NSString alloc] initWithContentsOfURL:[NSURL URLWithString:fullURL]];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Item destroyed" message: @"This object was removed from your inventory" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
+	
+	[alert show];
+	[result release];
+	[alert release];
+	
+	//Refresh the inventory
+	[appModel fetchInventory];
+	
+	//Dismiss Item Details View
+	[self.navigationController popToRootViewControllerAnimated:YES];
+}
 
-	
-	mode = kItemDetailsDropping;
-	
-	//Create and Display Action Sheet
-	UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:nil
-															delegate:self 
-												   cancelButtonTitle:@"Cancel" 
-											  destructiveButtonTitle:nil 
-												   otherButtonTitles:@"Destroy 1",@"Destroy All",nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-	[actionSheet showInView:self.view];
+- (IBAction)backButtonTouchAction: (id) sender{
+	NSLog(@"ItemDetailsViewController: Dismiss Item Details View");
+	[self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+-(IBAction)playMovie:(id)sender {
+    [mMoviePlayer play];
 }
 
 - (IBAction)pickupButtonTouchAction: (id) sender{
 	NSLog(@"ItemDetailsViewController: pickupButtonTouched");
-
 	
-	mode = kItemDetailsPickingUp;
+	//Fire off a request to the REST Module and display an alert when it is successfull
+	NSString *baseURL = [appModel getURLStringForModule:@"Inventory"];
+	NSString *URLparams = [NSString stringWithFormat:@"&controller=SimpleREST&event=pickupItem&item_id=%d&location_id=%d", self.item.itemId, self.item.locationId];
+	NSString *fullURL = [NSString stringWithFormat:@"%@%@", baseURL, URLparams];
 	
-	//Create and Display Action Sheet
-	UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:nil
-															delegate:self 
-												   cancelButtonTitle:@"Cancel" 
-											  destructiveButtonTitle:nil 
-												   otherButtonTitles:@"Pickup 1",@"Pickup All",nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-	[actionSheet showInView:self.view];
+	NSLog([NSString stringWithFormat:@"ItemDetailsViewController: Telling server to pickup this item using URL: %@", fullURL ]);
+	
+	NSString *result = [[NSString alloc] initWithContentsOfURL:[NSURL URLWithString:fullURL]];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Picked up an Item" message: @"It is available in your inventory" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
+	
+	[alert show];
+	[result release];
+	[alert release];
+	
+	//Refresh the Nearby Locations
+	[appModel updateServerLocationAndfetchNearbyLocationList];
+	
+	//Refresh Map Locations
+	[appModel fetchLocationList];
+	
+	//Refresh the inventory
+	[appModel fetchInventory];
+	
+	[self.navigationController.view removeFromSuperview];
 }
-
-
-
-#pragma mark UIActionSheet Delegate
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
-	NSLog(@"GPSViewController: action sheet button %d was clicked",buttonIndex);
-
-	//Was it just a cancel?
-	if (buttonIndex == actionSheet.cancelButtonIndex) {
-		return;
-	}
-	
-	//Setup
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate playAudioAlert:@"drop" shouldVibrate:YES];
-	[appModel silenceNextServerUpdate];
-	
-	//Determine the Quantity Effected based on the button touched
-	int quantity;
-	if (buttonIndex == 0) quantity = 1;
-	if (buttonIndex == 1) quantity = item.qty; 
-	
-	
-	//Do the action based on the mode of the VC
-	if (mode == kItemDetailsDropping) {
-		NSLog(@"ItemDetailsVC: Dropping %d",quantity);
-		[appModel updateServerDropItemHere:item.itemId qty:quantity];
-		[appModel removeItemFromInventory:item qtyToRemove:quantity];
-
-		/*
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ItemDroppedTitleKey",@"")
-														message: NSLocalizedString(@"ItemDroppedMessageKey",@"") 
-													   delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey",@"") otherButtonTitles: nil];
-		[alert show];
-		[alert release];
-		 */
-	}
-	else if (mode == kItemDetailsDestroying) {
-		NSLog(@"ItemDetailsVC: Destroying %d",quantity);
-		[appModel updateServerDestroyItem:self.item.itemId qty:quantity];
-		[appModel removeItemFromInventory:item qtyToRemove:quantity];
-		
-		/*
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ItemDestroyedTitleKey", @"")
-														message: NSLocalizedString(@"ItemDestroyedMessageKey", @"")
-													   delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
-		[alert show];
-		[alert release];
-		 */
-	}
-	else if (mode == kItemDetailsPickingUp) {
-		
-		//Determine if this item can be picked up
-		Item *itemInInventory  = [appModel.inventory objectForKey:[NSString stringWithFormat:@"%d",item.itemId]];
-		if (itemInInventory.qty + quantity > item.maxQty && item.maxQty != -1) {
-		
-			[appDelegate playAudioAlert:@"error" shouldVibrate:YES];
-			
-			NSString *errorMessage;
-			if (itemInInventory.qty < item.maxQty) {
-				quantity = item.maxQty - itemInInventory.qty;
-				errorMessage = [NSString stringWithFormat:@"You can only carry %d of this item. Only %d picked up",item.maxQty,quantity];
-			}
-			else if (item.maxQty == 0) {
-				errorMessage = @"This item cannot be picked up.";
-				quantity = 0;
-			}
-			else {
-				errorMessage = @"You cannot carry any more of this item.";
-				quantity = 0;
-			}
-
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Inventory over Limit"
-															message: errorMessage
-														   delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
-			[alert show];
-			[alert release];
-			 
-
-		}
-
-		if (quantity > 0) {
-			[appModel updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
-			[appModel modifyQuantity:-quantity forLocationId:self.item.locationId];
-			item.qty -= quantity; //the above line does not give us an update, only the map
-			
-			/*
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ItemPickedUpTitleKey", @"")
-															message: NSLocalizedString(@"ItemPickedUpMessageKey", @"") 
-														   delegate: self 
-												cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
-			 
-			
-			[alert show];
-			[alert release];
-			 */
-		}
-		
-	}
-	
-	[self updateQuantityDisplay];
-	
-	//Possibly Dismiss Item Details View
-	if (item.qty < 1) {
-		[self.navigationController popToRootViewControllerAnimated:YES];
-		[self dismissModalViewControllerAnimated:YES];
-		appDelegate.nearbyBar.hidden = NO;
-
-	}
-	
-	
-}
-
-
-
-#pragma mark MPMoviePlayerController Notification Handlers
-
-
-- (void)movieLoadStateChanged:(NSNotification*) aNotification{
-	MPMovieLoadState state = [(MPMoviePlayerController *) aNotification.object loadState];
-	
-	if( state & MPMovieLoadStateUnknown ) {
-		NSLog(@"ItemDetailsViewController: Unknown Load State");
-	}
-	if( state & MPMovieLoadStatePlayable ) {
-		NSLog(@"ItemDetailsViewController: Playable Load State");
-	} 
-	if( state & MPMovieLoadStatePlaythroughOK ) {
-		NSLog(@"ItemDetailsViewController: Playthrough OK Load State");
-		[mediaPlaybackButton setTitle:NSLocalizedString(@"TouchToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = YES;	
-	} 
-	if( state & MPMovieLoadStateStalled ) {
-		NSLog(@"ItemDetailsViewController: Stalled Load State");
-	} 
-	
-}
-
-
-- (void)movieFinishedCallback:(NSNotification*) aNotification
-{
-	[self dismissMoviePlayerViewControllerAnimated];
-}
-
-
-
-
-
-
-#pragma mark Zooming delegate methods
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-	NSLog(@"got a viewForZooming.");
-	return itemImageView;
-}
-
-- (void) scrollViewDidEndZooming: (UIScrollView *) scrollView withView: (UIView *) view atScale: (float) scale
-{
-	NSLog(@"got a scrollViewDidEndZooming. Scale: %f", scale);
-	CGAffineTransform transform = CGAffineTransformIdentity;
-	transform = CGAffineTransformScale(transform, scale, scale);
-	itemImageView.transform = transform;
-}
-
-- (void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
-{
-    UITouch       *touch = [touches anyObject];
-	NSLog(@"got a touchesEnded.");
-	
-    if([touch tapCount] == 2) {
-		//NSLog(@"TouchCount is 2.");
-		CGAffineTransform transform = CGAffineTransformIdentity;
-		transform = CGAffineTransformScale(transform, 1.0, 1.0);
-		itemImageView.transform = transform;
-    }
-}
-
-#pragma mark Animate view show/hide
-
-- (void)showView:(UIView *)aView {
-	CGRect superFrame = [aView superview].bounds;
-	CGRect viewFrame = [aView frame];
-	viewFrame.origin.y = superFrame.origin.y + superFrame.size.height - 175;
-	[UIView beginAnimations:nil context:NULL]; //we animate the transition
-	[aView setFrame:viewFrame];
-	[UIView commitAnimations]; //run animation
-}
-
-- (void)hideView:(UIView *)aView {
-	CGRect superFrame = [aView superview].bounds;
-	CGRect viewFrame = [aView frame];
-	viewFrame.origin.y = superFrame.origin.y + superFrame.size.height;
-	[UIView beginAnimations:nil context:NULL]; //we animate the transition
-	[aView setFrame:viewFrame];
-	[UIView commitAnimations]; //run animation
-}
-
-- (void)toggleDescription:(id)sender {
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
-	
-	if (descriptionShowing) { //description is showing, so hide
-		[self hideView:itemDescriptionView];
-		//[notesButton setStyle:UIBarButtonItemStyleBordered]; //set button style
-		descriptionShowing = NO;
-	} else {  //description is not showing, so show
-		[self showView:itemDescriptionView];
-		//[notesButton setStyle:UIBarButtonItemStyleDone];
-		descriptionShowing = YES;
-	}
-}
-
-
-
-#pragma mark Memory Management
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
@@ -435,18 +227,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	
 	// free our movie player
     [mMoviePlayer release];
-	
-	[mediaPlaybackButton release];
-	
-	//remove listeners
-	[[NSNotificationCenter defaultCenter] removeObserver:self
-													name:MPMoviePlayerPlaybackDidFinishNotification
-												  object:mMoviePlayer];
-	[[NSNotificationCenter defaultCenter] removeObserver:self
-													name:MPMoviePlayerLoadStateDidChangeNotification
-												  object:mMoviePlayer];	
 	[super dealloc];
 }
-
 
 @end

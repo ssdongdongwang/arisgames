@@ -7,21 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppModel.h"
+
 
 @interface GamePickerViewController : UITableViewController {
-	AppModel *appModel;
-	NSMutableArray *nearGameList;
-	NSMutableArray *farGameList;
+	NSMutableArray *gameList;
 	UITableView *gameTable;
 }
 
--(void) refresh;
--(void)showLoadingIndicator;
+-(void) slideIn;
+-(void) slideOut;
+-(void) setGameList:(NSMutableArray *)list;
 
-@property (nonatomic, retain) NSMutableArray *nearGameList;
-@property (nonatomic, retain) NSMutableArray *farGameList;
 @property (nonatomic, retain) IBOutlet UITableView *gameTable;
-
 
 @end

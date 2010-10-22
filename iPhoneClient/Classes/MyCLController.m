@@ -61,9 +61,9 @@
 		self.locationManager = [[[CLLocationManager alloc] init] autorelease];
 		self.locationManager.delegate = self; // Tells the location manager to send updates to this object
 		self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-		self.locationManager.distanceFilter = 5; //Minimum change of 5 meters for update
-		appModel = model;
+		self.locationManager.distanceFilter = 5; //Minimum change of .5 meters for update
 	}
+	appModel = model;
 	return self;
 		
 }
@@ -72,20 +72,84 @@
 // Called when the location is updated
 	- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
 
-	NSLog(@"MyCLCController: Read %lf, %lf from CLLocationManager with Accuracy of %gm,%gm", newLocation.coordinate.latitude,
+	NSLog(@"Read %lf, %lf from CLLocationManager with Accuracy of %gm,%gm", newLocation.coordinate.latitude,
 		  newLocation.coordinate.longitude,  newLocation.horizontalAccuracy, newLocation.verticalAccuracy );
 	
 	//Update the Model
-		appModel.playerLocation = newLocation;
+		appModel.lastLocation = newLocation;
 		
 	//Tell the other parts of the client
 	NSNotification *updatedLocationNotification = [NSNotification notificationWithName:@"PlayerMoved" object:nil];
 	[[NSNotificationCenter defaultCenter] postNotification:updatedLocationNotification];
 		
 	//Tell the model to update the server and fetch any nearby locations
-	[appModel updateServerLocationAndfetchNearbyLocationList];	
+	[NSThread detachNewThreadSelector: @selector(updateServerLocationAndfetchNearbyLocationList) toTarget: appModel withObject: nil];	
 	
 }
+/*
+ - (void)locationManager:(CLLocationManager *)manager
+ didUpdateToLocation:(CLLocation *)newLocation
+ fromLocation:(CLLocation *)oldLocation
+ {
+ NSMutableString *update = [[[NSMutableString alloc] init] autorelease];
+ 
+ // Timestamp
+ NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init]  autorelease];
+ [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+ [dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
+ [update appendFormat:@"%@\n\n", [dateFormatter stringFromDate:newLocation.timestamp]];
+ 
+ // Horizontal coordinates
+ if (signbit(newLocation.horizontalAccuracy)) {
+ // Negative accuracy means an invalid or unavailable measurement
+ [update appendString:LocStr(@"LatLongUnavailable")];
+ } else {
+ // CoreLocation returns positive for North & East, negative for South & West
+ [update appendFormat:LocStr(@"LatLongFormat"), // This format takes 4 args: 2 pairs of the form coordinate + compass direction
+ fabs(newLocation.coordinate.latitude), signbit(newLocation.coordinate.latitude) ? LocStr(@"South") : LocStr(@"North"),
+ fabs(newLocation.coordinate.longitude),	signbit(newLocation.coordinate.longitude) ? LocStr(@"West") : LocStr(@"East")];
+ [update appendString:@"\n"];
+ [update appendFormat:LocStr(@"MeterAccuracyFormat"), newLocation.horizontalAccuracy];
+ }
+ [update appendString:@"\n\n"];
+ 
+ // Altitude
+ if (signbit(newLocation.verticalAccuracy)) {
+ // Negative accuracy means an invalid or unavailable measurement
+ [update appendString:LocStr(@"AltUnavailable")];
+ } else {
+ // Positive and negative in altitude denote above & below sea level, respectively
+ [update appendFormat:LocStr(@"AltitudeFormat"), fabs(newLocation.altitude),	(signbit(newLocation.altitude)) ? LocStr(@"BelowSeaLevel") : LocStr(@"AboveSeaLevel")];
+ [update appendString:@"\n"];
+ [update appendFormat:LocStr(@"MeterAccuracyFormat"), newLocation.verticalAccuracy];
+ }
+ [update appendString:@"\n\n"];
+ 
+ // Calculate disatance moved and time elapsed, but only if we have an "old" location
+ //
+ // NOTE: Timestamps are based on when queries start, not when they return. CoreLocation will query your
+ // location based on several methods. Sometimes, queries can come back in a different order from which
+ // they were placed, which means the timestamp on the "old" location can sometimes be newer than on the
+ // "new" location. For the example, we will clamp the timeElapsed to zero to avoid showing negative times
+ // in the UI.
+ //
+ if (oldLocation != nil) {
+ CLLocationDistance distanceMoved = [newLocation getDistanceFrom:oldLocation];
+ NSTimeInterval timeElapsed = [newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp];
+ 
+ [update appendFormat:LocStr(@"LocationChangedFormat"), distanceMoved];
+ if (signbit(timeElapsed)) {
+ [update appendString:LocStr(@"FromPreviousMeasurement")];
+ } else {
+ [update appendFormat:LocStr(@"TimeElapsedFormat"), timeElapsed];
+ }
+ [update appendString:@"\n\n"];
+ }
+ 
+ // Send the update to our delegate
+ [self.delegate newLocationUpdate:update];
+ }
+ */
 
 // Called when there is an error getting the location
 - (void)locationManager:(CLLocationManager *)manager

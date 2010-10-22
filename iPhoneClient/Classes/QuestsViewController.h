@@ -7,32 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ARISAppDelegate.h";
 #import "model/AppModel.h";
-#import "Quest.h"
 
-
-@interface QuestsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate, UIWebViewDelegate> {
+@interface QuestsViewController : UIViewController <UIWebViewDelegate> {
+	NSString *moduleName;
+	UIWebView *webview;
 	AppModel *appModel;
-	NSMutableArray *quests;
-	NSMutableArray *questCells;
-	int cellsLoaded;
-	IBOutlet UITableView *tableView;
-	BOOL silenceNextServerUpdate;
 }
 
-@property(nonatomic, retain) NSMutableArray *quests;
-@property(nonatomic, retain) NSMutableArray *questCells;
+-(void) setModel:(AppModel *)model;
 
-
-- (void)refresh;
-- (void)showLoadingIndicator;
-- (void)removeLoadingIndicator;
-- (void)constructCells;
-- (UITableViewCell*) getCellContentViewForQuest:(Quest*)quest inSection:(int)section;
-- (void)updateCellSize:(UITableViewCell*)cell;
-
-
-
+@property(copy, readwrite) NSString *moduleName;
+@property (nonatomic, retain) IBOutlet UIWebView *webview;
 
 @end

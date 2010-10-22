@@ -3,31 +3,24 @@
 //  ARIS
 //
 //  Created by David Gagnon on 3/4/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "CameraViewController.h"
-#import "ARISAppDelegate.h"
-#import "AppModel.h"
-#import <MobileCoreServices/UTCoreTypes.h>
-#import "TitleAndDecriptionFormViewController.h"
+
 
 @implementation CameraViewController
 
+@synthesize moduleName;
 @synthesize imagePickerController;
-@synthesize cameraButton;
-@synthesize libraryButton;
-@synthesize mediaData;
-@synthesize mediaFilename;
 
 //Override init for passing title and icon to tab bar
-- (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle {
-    if (self = [super initWithNibName:nibName bundle:nibBundle]) {
-        self.title = NSLocalizedString(@"CameraTitleKey",@"");
+- (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
+{
+    self = [super initWithNibName:nibName bundle:nibBundle];
+    if (self) {
+        self.title = @"Camera";
         self.tabBarItem.image = [UIImage imageNamed:@"camera.png"];
-		
-		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-
     }
     return self;
 }
@@ -36,119 +29,109 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
-	self.imagePickerController = [[UIImagePickerController alloc] init];
-	
-	[libraryButton setTitle: NSLocalizedString(@"CameraLibraryButtonTitleKey",@"") forState: UIControlStateNormal];
-	[libraryButton setTitle: NSLocalizedString(@"CameraLibraryButtonTitleKey",@"") forState: UIControlStateHighlighted];	
-	
-	[cameraButton setTitle: NSLocalizedString(@"CameraCameraButtonTitleKey",@"") forState: UIControlStateNormal];
-	[cameraButton setTitle: NSLocalizedString(@"CameraCameraButtonTitleKey",@"") forState: UIControlStateHighlighted];	
+	moduleName = @"RESTCamera";
 		
-	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		self.cameraButton.enabled = YES;
-		self.cameraButton.alpha = 1.0;
-	}
-	else {
-		self.cameraButton.enabled = NO;
-		self.cameraButton.alpha = 0.6;
-	}
-	
+	self.imagePickerController = [[UIImagePickerController alloc] init];
+	self.imagePickerController.allowsImageEditing = YES;
 	self.imagePickerController.delegate = self;
 	
 	NSLog(@"Camera Loaded");
 }
 
+-(void) setModel:(AppModel *)model {
+	if(appModel != model) {
+		[appModel release];
+		appModel = model;
+		[appModel retain];
+	}	
+	NSLog(@"model set for Camera");
+}
 
 - (IBAction)cameraButtonTouchAction {
 	NSLog(@"Camera Button Pressed");
-	
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	appDelegate.nearbyBar.hidden = YES;
-	
 	self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-	self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:self.imagePickerController.sourceType];
-	self.imagePickerController.allowsEditing = YES;
-	self.imagePickerController.showsCameraControls = YES;
 	[self presentModalViewController:self.imagePickerController animated:YES];
 }
-
-
-- (IBAction)libraryButtonTouchAction {
-	NSLog(@"Library Button Pressed");
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	appDelegate.nearbyBar.hidden = YES;
-	
-	self.imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-	[self presentModalViewController:self.imagePickerController animated:YES];
-}
-
 
 #pragma mark UIImagePickerControllerDelegate Protocol Methods
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary  *)info
-
-{
-	NSLog(@"CameraViewController: User Selected an Image or Video");
-		
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo {
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
-
-	//Get the data for the selected image or video
-	NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
 	
-	if ([mediaType isEqualToString:@"public.image"]){
-		UIImage* image = [info objectForKey:UIImagePickerControllerEditedImage];
-        if (!image) image = [info objectForKey:UIImagePickerControllerOriginalImage];             
-		
-		NSLog(@"CameraViewController: Found an Image");
-		self.mediaData = UIImageJPEGRepresentation(image, .8);
-		self.mediaFilename = @"image.jpg";
-	}	
-	else if ([mediaType isEqualToString:@"public.movie"]){
-		NSLog(@"CameraViewController: Found a Movie");
-		NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
-		self.mediaData = [NSData dataWithContentsOfURL:videoURL];
-		self.mediaFilename = @"video.mp4";
-	}	
+	NSLog(@"Preparing to send file from camera to Server");
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 	
-	TitleAndDecriptionFormViewController *titleAndDescForm = [[TitleAndDecriptionFormViewController alloc] 
-													   initWithNibName:@"TitleAndDecriptionFormViewController" bundle:nil];
 	
-	titleAndDescForm.delegate = self;
-	[self.view addSubview:titleAndDescForm.view];
+	//turning the image in the UIView into a NSData JPEG object at 90% quality
+	NSData *imageData = UIImageJPEGRepresentation(img, .9);
+	
+	
+	// setting up the request object now
+	NSURL* url = [[NSURL alloc] initWithString:appModel.baseAppURL];
+	NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL: url];
+	[request setHTTPMethod: @"POST"];
+	
+	//Add headers
+	NSString *boundary = [NSString stringWithString:@"---------------------------14737809831466499882746641449"];
+	NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
+	[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
+	
+	//body
+	NSMutableData *body = [NSMutableData data];
+	[body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	//other post vars
+	[body appendData:[[NSString stringWithString:@"Content-Disposition: form-data; name=\"user_name\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"\r\n%@\r\n", appModel.username] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	[body appendData:[[NSString stringWithString:@"Content-Disposition: form-data; name=\"password\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"\r\n%@\r\n", appModel.password] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	[body appendData:[[NSString stringWithString:@"Content-Disposition: form-data; name=\"site\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"\r\n%@\r\n", appModel.site] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	[body appendData:[[NSString stringWithString:@"Content-Disposition: form-data; name=\"module\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"\r\n%@\r\n", self.moduleName] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	//image
+	
+	[body appendData:[[NSString stringWithString:@"Content-Disposition: form-data; name=\"image\"; filename=\"ipodfile.jpg\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[[NSString stringWithString:@"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[NSData dataWithData:imageData]];
+	[body appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	
+	// setting the body of the post to the reqeust
+	[request setHTTPBody:body];
+	
+	// post it
+	NSData *returnData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+	NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
+	NSLog([NSString stringWithFormat: @"Camera file posted. Result from Server: %@", returnString]);
+	
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [pool release];
+	
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Photo Taken" message: @"It is available in your inventory" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
+	[alert show];
+	[alert release];
+	
 }
-
-
-- (void)titleAndDescriptionFormDidFinish:(TitleAndDecriptionFormViewController*)titleAndDescForm{
-	NSLog(@"CameraVC: Back from form");
-	[titleAndDescForm.view removeFromSuperview];
-	
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	appDelegate.nearbyBar.hidden = NO;
-	
-	[appModel createItemAndGiveToPlayerFromFileData:self.mediaData 
-										   fileName:self.mediaFilename 
-											  title:titleAndDescForm.titleField.text 
-										description:titleAndDescForm.descriptionField.text];
-
-	
-}
-
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-	
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
-	
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	appDelegate.nearbyBar.hidden = NO;
 }
 
 #pragma mark UINavigationControllerDelegate Protocol Methods
-- (void)navigationController:(UINavigationController *)navigationController 
-	   didShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
 	//nada
 }
 
-- (void)navigationController:(UINavigationController *)navigationController 
-	  willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
 	//nada
 }
 
@@ -160,7 +143,6 @@
 
 
 - (void)dealloc {
-	[imagePickerController release];
     [super dealloc];
 }
 

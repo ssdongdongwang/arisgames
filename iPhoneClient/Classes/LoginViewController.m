@@ -8,11 +8,14 @@
 
 #import "LoginViewController.h"
 #import "SelfRegistrationViewController.h"
-#import "ARISAppDelegate.h"
 
 
 @implementation LoginViewController
 
+@synthesize username;
+@synthesize password;
+@synthesize login;
+//@synthesize titleItem;
 
 
 //Override init for passing title and icon to tab bar
@@ -20,7 +23,7 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"LoginTitleKey", @"");
+        self.title = @"Login to ARIS";
     }
     return self;
 }
@@ -29,23 +32,28 @@
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-		
-	usernameField.placeholder = NSLocalizedString(@"UsernameKey", @"");
-	passwordField.placeholder = NSLocalizedString(@"PasswordKey", @"");
-	[loginButton setTitle:NSLocalizedString(@"LoginKey",@"") forState:UIControlStateNormal];
-	newAccountMessageLabel.text = NSLocalizedString(@"NewAccountMessageKey", @"");
-	[newAccountButton setTitle:NSLocalizedString(@"CreateAccountKey",@"") forState:UIControlStateNormal];
-		
+	
+	[login addTarget:self action:@selector(performLogin) forControlEvents:UIControlEventTouchUpInside];
+	
 	NSLog(@"Login View Loaded");
 }
 
+-(void) setModel:(AppModel *)model {
+	if(appModel != model) {
+		[appModel release];
+		appModel = model;
+		[appModel retain];
+	}
+	
+	NSLog(@"Login: Model Set");
+}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-	if (textField == usernameField) {
-		[passwordField becomeFirstResponder];
+	if (textField == username) {
+		[password becomeFirstResponder];
 	}	
-	if(textField == passwordField) {
-		[self loginButtonTouched:self];
+	if(textField == password) {
+		[self performLogin];
 	}
 
     return YES;
@@ -57,34 +65,33 @@
     // Release anything that's not essential, such as cached data
 }
 
--(IBAction)loginButtonTouched: (id) sender {
-	NSLog(@"Login: Login Button Touched");
-
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate attemptLoginWithUserName:usernameField.text andPassword:passwordField.text]; 
-		
-	[usernameField resignFirstResponder];
-	[passwordField resignFirstResponder];
+- (void)performLogin {
+	
+	NSArray *keys = [NSArray arrayWithObjects:@"username", @"password", nil];
+	NSArray *objects = [NSArray arrayWithObjects:username.text, password.text, nil];
+	NSDictionary *dictionary = [NSDictionary dictionaryWithObjects:objects forKeys:keys];
+	NSNotification *loginNotification = [NSNotification notificationWithName:@"PerformUserLogin" object:self userInfo:dictionary];
+	[[NSNotificationCenter defaultCenter] postNotification:loginNotification];
+	
+	[username resignFirstResponder];
+	[password resignFirstResponder];
 }
 
--(IBAction)newAccountButtonTouched: (id) sender{
+-(IBAction)newUserButtonTouched: (id) sender{
 	NSLog(@"Login: New User Button Touched");
 	SelfRegistrationViewController *selfRegistrationViewController = [[SelfRegistrationViewController alloc] 
 															initWithNibName:@"SelfRegistration" bundle:[NSBundle mainBundle]];
+	[selfRegistrationViewController setModel:appModel];
 	
 	//Put the view on the screen
 	[[self navigationController] pushViewController:selfRegistrationViewController animated:YES];
-	[selfRegistrationViewController release];
 	
 }
 
-
 - (void)dealloc {
-	[usernameField release];
-	[passwordField release];
-	[loginButton release];
-	[newAccountMessageLabel release];
-	[newAccountButton release];
+	[username release];
+	[password release];
+	[login release];
     [super dealloc];
 }
 

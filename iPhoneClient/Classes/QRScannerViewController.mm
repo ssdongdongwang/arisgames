@@ -3,18 +3,18 @@
 //  ARIS
 //
 //  Created by David Gagnon on 3/4/09.
-//  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "QRScannerViewController.h"
 #import "Decoder.h"
 #import "TwoDDecoderResult.h"
 #import "ARISAppDelegate.h"
-#import "AppModel.h"
 
 
 @implementation QRScannerViewController 
 
+@synthesize moduleName;
 @synthesize imagePickerController;
 @synthesize scanButton;
 @synthesize manualCode;
@@ -24,15 +24,8 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = NSLocalizedString(@"QRScannerTitleKey", @"");
-        self.tabBarItem.image = [UIImage imageNamed:@"qrscanner.png"];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(finishLoadingResult:)
-													 name:@"QRCodeObjectReady"
-												   object:nil];
-		
-		appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
+        self.title = @"Transporte";
+        self.tabBarItem.image = [UIImage imageNamed:@"QRScanner.png"];
     }
     return self;
 }
@@ -41,50 +34,37 @@
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-		
-	[scanButton setTitle:NSLocalizedString(@"ScanUsingCameraKey",@"") forState:UIControlStateNormal];
-	manualCode.placeholder = NSLocalizedString(@"EnterCodeKey",@"");
+	moduleName = @"RESTQRScanner";
+	
 	
 	self.imagePickerController = [[UIImagePickerController alloc] init];
+	self.imagePickerController.allowsImageEditing = YES;
 	self.imagePickerController.delegate = self;
 	
-	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		self.scanButton.enabled = YES;
-		self.scanButton.alpha = 1.0;
-	}
-	else {
-		self.scanButton.enabled = NO;
-		self.scanButton.alpha = 0.6;
-	}
-	
-	
-	NSLog(@"QRScannerViewController: Loaded");
+	NSLog(@"QRScannerViewController Loaded");
+}
+
+-(void) setModel:(AppModel *)model {
+	if(appModel != model) {
+		[appModel release];
+		appModel = model;
+		[appModel retain];
+	}	
+	NSLog(@"model set for QRScannerViewController");
 }
 
 - (IBAction)scanButtonTouchAction: (id) sender{
-	NSLog(@"QRScannerViewController: Scan Button Pressed");
+	NSLog(@"Scan Button Pressed");
 	
 	self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
 	[self presentModalViewController:self.imagePickerController animated:YES];
 	 
 }
 
-
-#pragma mark Delegate for text entry
-
--(BOOL) textFieldShouldReturn:(UITextField*) textField {
-	NSLog(@"QRScannerViewController: Code Entered");
-	
-	[textField resignFirstResponder]; 
-	
-	[[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the keyboard go away before loading the object
-	
+- (IBAction)codeEnteredAction: (id) sender{
+	NSLog(@"Code Entered");
 	[self loadResult:manualCode.text];
-	
-	return YES;
-	
 }
-
 
 
 #pragma mark UIImagePickerControllerDelegate Protocol Methods
@@ -114,49 +94,40 @@
 - (void)decoder:(Decoder *)decoder didDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset withResult:(TwoDDecoderResult *)twoDResult {
 	//Stop Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
+	[appDelegate removeWaitingIndicator];
 	
 	//get the result
-	NSString *encodedText = twoDResult.text;
+	NSString *result = twoDResult.text;
 
 	//we are done with the scanner, so release it
 	[decoder release];
-	NSLog(@"QRScannerViewController: Decode Complete. QR Code ID = %@", encodedText);
+	NSLog(@"QR Scanner: Decode Complete. QR Code ID = %@", result);
 	
-	[self loadResult:encodedText];
+	[self loadResult:result];
 }	
 
--(void) loadResult:(NSString *)code {
-	//Fetch the coresponding object from the server
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate showNewWaitingIndicator:NSLocalizedString(@"LoadingKey",@"") displayProgressBar:NO];
-	[appModel fetchQRCode:code];
-}
-
--(void) finishLoadingResult:(NSNotification*) notification{
+-(void) loadResult:(NSString *)result {
+	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	//Start Waiting Indicator
+	[appDelegate showWaitingIndicator:@"Loading Content..."];
 	
-	NSObject<QRCodeProtocol> *qrCodeObject = notification.object;
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
-
-	if (qrCodeObject == nil) {
-		[appDelegate playAudioAlert:@"error" shouldVibrate:NO];
-		
-		//Display an alert
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerErrorTitleKey", @"")
-														message:NSLocalizedString(@"QRScannerErrorMessageKey", @"")
-													   delegate:self 
-											  cancelButtonTitle:NSLocalizedString(@"OkKey", @"")
-											  otherButtonTitles:nil];
-		[alert show];	
-		[alert release];
-		
-	}
-	else {	
-		[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];		
-		//Display the content
-		[qrCodeObject display];
-	}
+	//init url
+	NSString *baseURL = [appModel getURLStringForModule:@"RESTQRScanner"];
+	NSString *fullURL = [ NSString stringWithFormat:@"%@&qrcode_id=%@", baseURL, result];
+	NSLog([NSString stringWithFormat:@"Fetching QR Code from : %@", fullURL]);
+	
+	//setup the xml parser to use a qrparser delegate and the deleage to use this view controller as a delegate
+	NSXMLParser *parser = [[NSXMLParser alloc] initWithContentsOfURL:[NSURL URLWithString:fullURL]];
+	QRScannerParserDelegate *parserDelegate = [[QRScannerParserDelegate alloc] init];
+	[parser setDelegate: parserDelegate];
+	[parserDelegate setDelegate: self];
+	
+	//init parser
+	[parser setShouldProcessNamespaces:NO];
+	[parser setShouldReportNamespacePrefixes:NO];
+	[parser setShouldResolveExternalEntities:NO];
+	[parser parse];
+	[parser release];
 }
 
 - (void)decoder:(Decoder *)decoder decodingImage:(UIImage *)image usingSubset:(UIImage *)subset progress:(NSString *)message {
@@ -169,21 +140,16 @@
 	
 	//Stop Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
-	[appDelegate playAudioAlert:@"error" shouldVibrate:YES];
+	[appDelegate removeWaitingIndicator];
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerDecodingErrorTitleKey", @"")
-													message:NSLocalizedString(@"QRScannerDecodingErrorMessageKey", @"")
-												   delegate:self 
-										  cancelButtonTitle:NSLocalizedString(@"OkKey", @"")
-										  otherButtonTitles:nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Decoding Error" message:@"Try scanning the code again: Step back 2 feet and hold the camera as still as possible"
+												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
 	[alert show];	
 	[alert release];
-}
-
-- (void) qrParserDidFinish:(id<QRCodeProtocol>)qrcode {
-	NSLog(@"Not implemented.");
-	assert(false);
+	
+	
+	
+	
 }
 
 - (void)decoder:(Decoder *)decoder willDecodeImage:(UIImage *)image usingSubset:(UIImage *)subset {
@@ -191,7 +157,7 @@
 	
 	//Start Waiting Indicator
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
-	[appDelegate showNewWaitingIndicator:NSLocalizedString(@"QRScannerDecodingKey",@"") displayProgressBar:NO];
+	[appDelegate showWaitingIndicator:@"Decoding..."];
 	
 }
 
@@ -204,7 +170,25 @@
 	//nada
 }
 
-
+#pragma mark QRScannerParserDelegate Methods
+- (void) qrParserDidFinish:(id<QRCodeProtocol>)qrcode{
+	//Stop Waiting Indicator
+	ARISAppDelegate *appDelegate = (ARISAppDelegate *) [[UIApplication sharedApplication] delegate];
+	[appDelegate removeWaitingIndicator];
+	
+	if (qrcode == nil) {
+		//Display an alert
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Decoding Error" message:@"This code is not a part of your current ARIS game"
+													   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+		[alert show];	
+		[alert release];
+		
+	}
+	else {	
+		//Display the content
+		[qrcode display];
+	}
+}
 
 
 #pragma mark Memory Management

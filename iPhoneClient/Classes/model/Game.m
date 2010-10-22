@@ -7,41 +7,16 @@
 //
 
 #import "Game.h"
-#import "AppModel.h"
-#import "ARISAppDelegate.h"
- 
+
 @implementation Game
 
 @synthesize gameId;
 @synthesize name;
-@synthesize description;
 @synthesize site;
-@synthesize pcMediaId;
-@synthesize iconMediaId;
-@synthesize numPlayers;
-@synthesize location;
-@synthesize authors;
 
 - (void)dealloc {
 	[name release];
-	[site release];
-	[description release];
-	[authors release];
-	[location release];	
     [super dealloc];
 }
-
-- (NSComparisonResult)compareDistanceFromPlayer:(Game*)otherGame{
-	if (self.distanceFromPlayer < otherGame.distanceFromPlayer) return NSOrderedAscending;
-	else if (self.distanceFromPlayer > otherGame.distanceFromPlayer) return NSOrderedDescending;
-	else return NSOrderedSame;
-}
-
-- (double)distanceFromPlayer {
-	AppModel *appModel = [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] appModel];
-	if (appModel.playerLocation) return [self.location distanceFromLocation:appModel.playerLocation];
-	else return 0;
-}
-
 
 @end
