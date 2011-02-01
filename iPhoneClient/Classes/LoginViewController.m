@@ -23,7 +23,7 @@
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
-        self.title = @"Login to ARIS";
+        self.title = @"Mentira";
     }
     return self;
 }

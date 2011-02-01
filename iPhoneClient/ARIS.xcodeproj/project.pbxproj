@@ -844,7 +844,14 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ARIS" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* ARIS */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1109,7 +1116,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos;
 			};
 			name = Distribution;
 		};
@@ -1119,7 +1126,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
 				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ARIS_Prefix.pch;
@@ -1138,8 +1145,8 @@
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
 				);
 				PRODUCT_NAME = ARIS;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D14C3F02-C8B2-42ED-B71D-FC92CB362494";
-				SDKROOT = iphoneos4.0;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
 			};
 			name = Distribution;
 		};
@@ -1155,7 +1162,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A1F09052-03C8-47A4-8230-E3994056F4EF";
-				SDKROOT = iphoneos2.2.1;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};

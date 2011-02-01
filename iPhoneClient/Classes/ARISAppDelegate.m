@@ -110,7 +110,7 @@
 										/*cameraNavigationController,*/
 										/* imNavigationController, */
 										logoutNavigationController,
-										gamePickerNavigationController,
+										//gamePickerNavigationController,
 										developerNavigationController,
 										nil];	
 
