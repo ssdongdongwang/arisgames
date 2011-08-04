@@ -316,6 +316,13 @@ class Players extends Module
 		return new returnData(0, TRUE);
 	}
 	
+ 	public function giveItemToPlayer($intGameId, $intItemID, $intPlayerID, $qtyToGive=1) {
+		Module::giveItemToPlayer($intGameId, $intItemID, $intPlayerID, $qtyToGive=1);
+	}
+	
+	public function takeItemFromPlayer($intGameId, $intItemID, $intPlayerID, $qtyToGive=1) {
+		Module::takeItemFromPlayer($intGameId, $intItemID, $intPlayerID, $qtyToGive=1);
+	}
 
 	/**
      * Removes an Item from the Map and Gives it to the Player
