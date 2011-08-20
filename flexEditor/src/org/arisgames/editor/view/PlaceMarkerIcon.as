@@ -5,17 +5,13 @@
 */
 package org.arisgames.editor.view {
 
-import flash.display.Bitmap;
-import flash.display.Loader;
 import flash.display.Shape;
 import flash.display.Sprite;
-import flash.events.Event;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
-import flash.net.URLRequest;
 
 
 public class PlaceMarkerIcon extends Sprite {
@@ -31,15 +27,9 @@ public class PlaceMarkerIcon extends Sprite {
 	private var format:TextFormat;
 	private var ct:ColorTransform;
 	public var isHighlighted:Boolean;
-	public var bmp:Bitmap;
-	
-	public var ldr:Loader;
   
   public function PlaceMarkerIcon(label:String) {
 	  super();
-	  
-	  ldr= new Loader();
-	  ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, handleNewIcon);
 	  
 	  //Label
 	  labelMc = new TextField();
@@ -125,7 +115,7 @@ public class PlaceMarkerIcon extends Sprite {
   public function highlight():void {
 	  trace("Highlighting...");
 	  isHighlighted = true;
-	  ct.color = 0xFFFFFF;//FFE96E;
+	  ct.color = 0xFFE96E;
 	  container.transform.colorTransform = ct;
 	  container.alpha = 10;
 	  labelMc.textColor = 0x000000;
@@ -156,27 +146,6 @@ public class PlaceMarkerIcon extends Sprite {
 	  else{
 		  unHighlight();
 	  }
-  }
-  
-  public function setNewIcon(url:String):void {
-	  if(url)
-	  	ldr.load(new URLRequest(url));
-  }
-  
-  public function handleNewIcon(evt:Event):void {
-	  //Delete below line once fully implemented
-	  return;
-	  
-	  
-	  if(bmp)
-	  	removeChild(bmp);
-	  bmp = ldr.content as Bitmap;
-	  bmp.x = -16;
-	  bmp.y = 0;
-	  var tempW:int = bmp.width;
-	  bmp.width = 32;
-	  bmp.height *= (bmp.width/tempW)
-	  addChild(bmp);
   }
   
 }

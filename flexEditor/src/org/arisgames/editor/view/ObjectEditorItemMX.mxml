@@ -22,14 +22,13 @@
 					<mx:String>Normal</mx:String>
 					<mx:String>Web Item</mx:String>
 					<mx:String>Attribute</mx:String>
-					<mx:String>Note</mx:String>
 				</mx:ArrayCollection>
 			</mx:ComboBox>
 			</mx:FormItem>
 			<mx:FormItem label="URL (optional)" id="urlFI">
 			<mx:TextInput id="url" width="300"/>
 			</mx:FormItem>
-            <mx:FormItem id="descLabel" label="Description" textAlign="left">
+            <mx:FormItem label="Description" textAlign="left">
             <mx:TextArea id="description" width="200" height="60"/>
 			</mx:FormItem>
         </mx:Form>
@@ -56,7 +55,6 @@
 
     <mx:ControlBar id="folderControlBar">
         <mx:Spacer width="100%" id="spacer"/>
-		<mx:Button x="200" y="-20" id="duplicate" label="Duplicate Item" click="duplicateObject(event)"/>
         <mx:Button id="saveButton" label="Save And Close"/>
     </mx:ControlBar>
 

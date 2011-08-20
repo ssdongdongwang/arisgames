@@ -1,11 +1,8 @@
 package org.arisgames.editor.view
 {
-import flash.events.Event;
-
 import mx.containers.Canvas;
 import mx.controls.Alert;
 import mx.controls.Label;
-import mx.events.DynamicEvent;
 import mx.events.FlexEvent;
 import mx.rpc.Responder;
 import mx.rpc.events.ResultEvent;
@@ -20,7 +17,6 @@ import org.arisgames.editor.data.businessobjects.ObjectPaletteItemBO;
 import org.arisgames.editor.models.GameModel;
 import org.arisgames.editor.services.AppServices;
 import org.arisgames.editor.util.AppConstants;
-import org.arisgames.editor.util.AppDynamicEventManager;
 import org.arisgames.editor.util.AppUtils;
 
 public class ObjectEditorView extends Canvas
@@ -76,10 +72,6 @@ public class ObjectEditorView extends Canvas
         }
     }
 
-	public function duplicateObject(evt:Event):void {
-		AppServices.getInstance().duplicateObject(GameModel.getInstance().game, objectPaletteItem.id, new Responder(handleDupedObject, handleFault));
-	}
-	
     private function handleGetContent(obj:Object):void
     {
         trace("In handleGetContent() Result called with obj = " + obj + "; Result = " + obj.result);
@@ -112,12 +104,6 @@ public class ObjectEditorView extends Canvas
                 m.isDefault = obj.result.data.icon_media.is_default;
 
                 op.iconMedia = m;
-				
-				trace("ObjectEditorView: sending notification that new media was set");
-				var de:DynamicEvent = new DynamicEvent(AppConstants.DYNAMICEVENT_OBJECTPALETTEITEMICONSET);
-				de.objectPaletteItem = op;
-				de.iconURL = m.urlPath + m.fileName;
-				AppDynamicEventManager.getInstance().dispatchEvent(de);		
             }
 
             op.mediaId = obj.result.data.media_id;
@@ -313,23 +299,6 @@ public class ObjectEditorView extends Canvas
 			augBubbleEditor.includeInLayout = true;
 		}
     }
-	
-	public function handleDupedObject(obj:Object):void
-	{
-		trace("In handleDupedObject() Result called with obj = " + obj + "; Result = " + obj.result);
-		if (obj.result.returnCode != 0)
-		{
-			trace("Bad dub object attempt... let's see what happened.  Error = '" + obj.result.returnCodeDescription + "'");
-			var msg:String = obj.result.returnCodeDescription;
-			Alert.show("Error Was: " + msg, "Error While Getting Content For Editor");
-		}
-		else
-		{
-			trace("refresh the sideBar");
-			var de:DynamicEvent = new DynamicEvent(AppConstants.APPLICATIONDYNAMICEVENT_REDRAWOBJECTPALETTE);
-			AppDynamicEventManager.getInstance().dispatchEvent(de);	
-		}
-	}
 
     public function handleFault(obj:Object):void
     {

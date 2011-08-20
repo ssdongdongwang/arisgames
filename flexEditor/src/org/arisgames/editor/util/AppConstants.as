@@ -4,9 +4,9 @@ public class AppConstants
 {
 	//Server URL
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/stagingserver1"; //For other URL's to append to- Staging
-	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to- Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://atsosxdev.doit.wisc.edu/aris/server"; //For other URL's to append to- Dev
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
+	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
 
 	
 	//Server Version
@@ -18,9 +18,9 @@ public class AppConstants
 	public static const APPLICATION_ENVIRONMENT_GATEWAY_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/gateway.php"; //services-config.xml
 
 	//Google API
-	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBRloMOfjiI7F4SM41AgXh_4cb6l9xTHRyPNO3mgDcJkTIE742EL8ZoQ_Q"; //arisgames.org
+	public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBRloMOfjiI7F4SM41AgXh_4cb6l9xTHRyPNO3mgDcJkTIE742EL8ZoQ_Q"; //arisgames.org
 	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAArdp0t4v0pcA_JogLZhjrjBTf4EykMftsP7dwAfDsLsFl_zB7rBTq5-3Hy0k3tU1tgyomozB1YmIfNg"; //davembp
-	public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAAo0AIYqWK4StlyQiw0FkCnhTFFMM2iSZ1Oq9cs2gegUR1k01AuBShe9g60gh2q1UpWRotcj3RpzpT2A"; //Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAAo0AIYqWK4StlyQiw0FkCnhTFFMM2iSZ1Oq9cs2gegUR1k01AuBShe9g60gh2q1UpWRotcj3RpzpT2A"; //Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBQsvlSBtAWfm4N2P3iTGfWOp-UrmRRTU3pFPQwMJB92SZ3plLjvRpMIIw"; //atsosxdev
 
 
@@ -40,7 +40,6 @@ public class AppConstants
     public static const DYNAMICEVENT_PLACEMARKSELECTED:String = "DynamicEventPlaceMarkSelected";
     public static const DYNAMICEVENT_PLACEMARKREQUESTSDELETION:String = "DynamicEventPlaceMarkRequestsDeletion";
 	public static const DYNAMICEVENT_EDITOBJECTPALETTEITEM:String = "EditObjectPaletteItem";
-	public static const DYNAMICEVENT_OBJECTPALETTEITEMICONSET:String = "ObjectPaletteItemIconSetSoSetItsLocationsIcons";
 	public static const DYNAMICEVENT_HIGHLIGHTOBJECTPALETTEITEM:String = "HighlightObjectPaletteItem";
     public static const DYNAMICEVENT_CLOSEOBJECTPALETTEITEMEDITOR:String = "CloseObjectPaletteItemEditor";
     public static const DYNAMICEVENT_CLOSEMEDIAPICKER:String = "CloseMediaPicker";
@@ -116,8 +115,6 @@ public class AppConstants
 	public static const ITEM_TYPE_NORMAL:String = "NORMAL";
 	public static const ITEM_TYPE_ATTRIBUTE:String = "ATTRIB";
 	public static const ITEM_TYPE_URL:String = "URL";
-	public static const ITEM_TYPE_NOTE:String = "NOTE";
-
 	
 	//Player State Changes
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_ITEM:String = "VIEW_ITEM";
@@ -132,12 +129,13 @@ public class AppConstants
 	public static const PLAYERSTATECHANGE_ACTION_TAKEITEM:String = "TAKE_ITEM";
 	public static const PLAYERSTATECHANGE_ACTION_TAKEITEM_HUMAN:String = "Take Item";
 	
-    // Requirement Types (what are the requirements for)
+    // Requirement Types
     public static const REQUIREMENTTYPE_LOCATION:String = "Location";
 	public static const REQUIREMENTTYPE_QUESTDISPLAY:String = "QuestDisplay";
 	public static const REQUIREMENTTYPE_QUESTCOMPLETE:String = "QuestComplete";
 	public static const REQUIREMENTTYPE_NODE:String = "Node";
 	public static const REQUIREMENTTYPE_WEBHOOK:String = "OutgoingWebHook";
+
 
     // Requirement Options
     public static const REQUIREMENT_PLAYER_HAS_ITEM_DATABASE:String = "PLAYER_HAS_ITEM";
@@ -174,8 +172,6 @@ public class AppConstants
 	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_HUMAN:String = "Player Has Uploaded Video";
 	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_DATABASE:String = "PLAYER_HAS_COMPLETED_QUEST";
 	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN:String = "Player Has Completed Quest";
-	public static const REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_DATABASE:String = "PLAYER_HAS_NOT_COMPLETED_QUEST";
-	public static const REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_HUMAN:String = "Player Has Not Completed Quest";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE:String = "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN:String = "Player Has Received Incoming Web Hook";
 
@@ -183,19 +179,6 @@ public class AppConstants
 	public static const REQUIREMENT_BOOLEAN_AND_HUMAN:String = "All";
 	public static const REQUIREMENT_BOOLEAN_OR_DATABASE:String = "OR";
 	public static const REQUIREMENT_BOOLEAN_OR_HUMAN:String = "Only this one";
-	
-	// Tab Bar Server Type
-	public static const TAB_BAR_TYPE_QUESTS:String = "QUESTS";
-	public static const TAB_BAR_TYP_GPSE:String = "GPS";
-	public static const TAB_BAR_TYPE_INVENTORY:String = "INVENTORY";
-	public static const TAB_BAR_TYPE_QR:String = "QR";
-	public static const TAB_BAR_TYPE_PLAYER:String = "PLAYER";
-	public static const TAB_BAR_TYPE_CAMERA:String = "CAMERA";
-	public static const TAB_BAR_TYPE_MICROPHONE:String = "MICROPHONE";
-	public static const TAB_BAR_TYPE_NOTE:String = "NOTE";
-	public static const TAB_BAR_TYPE_PICKGAME:String = "PICKGAME";
-	public static const TAB_BAR_TYPE_LOGOUT:String = "LOGOUT";
-	public static const TAB_BAR_TYPE_STARTOVER:String = "STARTOVER";
 	
     // Defaults
     public static const DEFAULT_ICON_MEDIA_ID_NPC:Number = 1;

@@ -50,10 +50,6 @@ extern NSDictionary *InventoryElements;
 	NSMutableDictionary *gameNpcList;
     NSMutableDictionary *gameWebPageList;
     NSMutableDictionary *gamePanoramicList;
-    NSArray *gameTabList;
-    NSArray *defaultGameTabList;
-
-
 
 	//Training Flags
 	BOOL hasSeenNearbyTabTutorial;
@@ -94,13 +90,8 @@ extern NSDictionary *InventoryElements;
 @property(nonatomic, retain) NSMutableDictionary *gameMediaList;
 @property(nonatomic, retain) NSMutableDictionary *gameItemList;
 @property(nonatomic, retain) NSMutableDictionary *gameNodeList;
-@property(nonatomic, retain) NSArray *gameTabList;
-@property(nonatomic, retain) NSArray *defaultGameTabList;
-
-
 @property(nonatomic, retain) NSMutableDictionary *gameNpcList;
 @property(nonatomic, retain) NSMutableDictionary *gameWebPageList;
-
 @property(nonatomic, retain) NSMutableDictionary *gamePanoramicList;
 
 

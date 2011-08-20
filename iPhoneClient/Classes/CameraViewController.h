@@ -18,8 +18,6 @@
     UIImagePickerController *imagePickerController;
 	NSData *mediaData;
 	NSString *mediaFilename;
-    BOOL showVid;
-    id delegate;
 }
 
 @property (nonatomic, retain) IBOutlet UIButton *cameraButton;
@@ -28,11 +26,12 @@
 @property (nonatomic, retain) UIImagePickerController *imagePickerController;
 @property (nonatomic, retain) NSData *mediaData;
 @property (nonatomic, retain) NSString *mediaFilename;
-@property (nonatomic, retain) id delegate;
-@property(readwrite,assign) BOOL showVid;
+
+
 
 - (IBAction)cameraButtonTouchAction;
 - (IBAction)libraryButtonTouchAction;
 - (IBAction)profileButtonTouchAction;
-- (BOOL) isVideoCameraAvailable;
+
+
 @end

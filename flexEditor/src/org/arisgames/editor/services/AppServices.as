@@ -6,7 +6,6 @@ import mx.rpc.IResponder;
 import org.arisgames.editor.dao.AppDAO;
 import org.arisgames.editor.data.Game;
 import org.arisgames.editor.data.PlaceMark;
-import org.arisgames.editor.data.TabBarItem;
 import org.arisgames.editor.data.arisserver.AugBubble;
 import org.arisgames.editor.data.arisserver.Conversation;
 import org.arisgames.editor.data.arisserver.Item;
@@ -111,13 +110,6 @@ public class AppServices
 
 	}
 
-	public function duplicateObject(game:Game, obId:int, resp:IResponder):void
-	{
-		trace("Appservices: duplicateItem");
-		var r:Object;
-		r = AppDAO.getInstance().getContentServer().duplicateObject(game.gameId, obId);
-		r.addResponder(resp);
-	}
 
     public function loadGamesByUserId(userId:Number, resp:IResponder):void
     {
@@ -386,23 +378,6 @@ public class AppServices
         l = AppDAO.getInstance().getContentServer().deleteContent(gid, opi.id);
         l.addResponder(resp);
     }
-	
-	public function getTabBarItemsForGame(gid:Number, resp:IResponder):void
-	{
-		var l:Object;
-		trace("GetTabBarItemsForGame: GameId = " + gid);
-		l = AppDAO.getInstance().getGameServer().getTabBarItemsForGame(gid);
-		l.addResponder(resp);
-	}
-	
-	public function saveTab(gid:Number, tab:TabBarItem, resp:IResponder):void
-	{
-		var l:Object;
-		trace("Saving tab...");
-		if(!tab.enabled) tab.index = 0;
-		l =  AppDAO.getInstance().getGameServer().saveTab(gid, tab.type, tab.index);
-		l.addResponder(resp);
-	}
 
     public function getFoldersAndContentByGameId(gid:Number, resp:IResponder):void
     {
@@ -527,9 +502,9 @@ public class AppServices
         l.addResponder(resp);
     }
 	
-	public function updateAugBubbleMediaIndex(augId:Number, mediaId:Number, name:String, game:Game, index:Number, resp:IResponder):void{
+	public function updateAugBubbleMediaIndex(augId:Number, mediaId:Number, game:Game, index:Number, resp:IResponder):void{
 		var l:Object;
-		l = AppDAO.getInstance().getAugBubbleServer().updateAugBubbleMediaIndex(augId, mediaId, name, game.gameId, index);
+		l = AppDAO.getInstance().getAugBubbleServer().updateAugBubbleMediaIndex(augId, mediaId, game.gameId, index);
 		l.addResponder(resp);
 	}
 	

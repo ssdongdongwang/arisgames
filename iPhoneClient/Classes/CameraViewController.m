@@ -12,7 +12,6 @@
 #import "AppServices.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "TitleAndDecriptionFormViewController.h"
-#import "GPSViewController.h"
 
 @implementation CameraViewController
 
@@ -21,7 +20,7 @@
 @synthesize libraryButton;
 @synthesize mediaData;
 @synthesize mediaFilename;
-@synthesize profileButton, delegate,showVid;
+@synthesize profileButton;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle {
@@ -67,32 +66,14 @@
 
 - (IBAction)cameraButtonTouchAction {
 	NSLog(@"Camera Button Pressed");
-    if([self isVideoCameraAvailable] && self.showVid){
-        self.imagePickerController.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeMovie];
-
-    }
-    else {self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:self.imagePickerController.sourceType];
-    }
-        self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-    
-		self.imagePickerController.allowsEditing = YES;
+	
+	self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+	self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:self.imagePickerController.sourceType];
+	self.imagePickerController.allowsEditing = YES;
 	self.imagePickerController.showsCameraControls = YES;
 	[self presentModalViewController:self.imagePickerController animated:YES];
 }
 
-        
-- (BOOL) isVideoCameraAvailable{
-        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        NSArray *sourceTypes = [UIImagePickerController availableMediaTypesForSourceType:picker.sourceType];
-        [picker release];
-        
-        if (![sourceTypes containsObject:(NSString *)kUTTypeMovie ]){
-            
-            return NO;
-        }
-        
-        return YES;
-    }
 
 - (IBAction)libraryButtonTouchAction {
 	NSLog(@"Library Button Pressed");
@@ -154,41 +135,31 @@
 	
 	titleAndDescForm.delegate = self;
 	[self.view addSubview:titleAndDescForm.view];
-    [titleAndDescForm release];
 }
 
 - (void)titleAndDescriptionFormDidFinish:(TitleAndDecriptionFormViewController*)titleAndDescForm{
 	NSLog(@"CameraVC: Back from form");
 	[titleAndDescForm.view removeFromSuperview];
-    if([self.delegate isKindOfClass:[GPSViewController class]]){
-        [[AppServices sharedAppServices] createItemAndPlaceOnMapFromFileData:self.mediaData fileName:self.mediaFilename title:titleAndDescForm.titleField.text description:titleAndDescForm.descriptionField.text];
-    }
-    else{
+
 	[[AppServices sharedAppServices] createItemAndGiveToPlayerFromFileData:self.mediaData 
 										   fileName:self.mediaFilename 
 											  title:titleAndDescForm.titleField.text 
 										description:titleAndDescForm.descriptionField.text];
-    }
+    
     [titleAndDescForm release];	
     NSString *tab;
     ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];        
 
-    if ([self.delegate isKindOfClass:[GPSViewController class]]){
-        
-    }
-    else{
-        //Exit to Inventory Tab
-        for(int i = 0;i < [appDelegate.tabBarController.customizableViewControllers count];i++)
+    for(int i = 0;i < [appDelegate.tabBarController.customizableViewControllers count];i++)
+    {
+        tab = [[appDelegate.tabBarController.customizableViewControllers objectAtIndex:i] title];
+        tab = [tab lowercaseString];
+        if([tab isEqualToString:@"inventory"])
         {
-            tab = [[appDelegate.tabBarController.customizableViewControllers objectAtIndex:i] title];
-            tab = [tab lowercaseString];
-            if([tab isEqualToString:@"inventory"])
-            {
-                appDelegate.tabBarController.selectedIndex = i;
-            }
+            appDelegate.tabBarController.selectedIndex = i;
         }
     }
-    [self.navigationController popToRootViewControllerAnimated:NO];
+
 }
 
 

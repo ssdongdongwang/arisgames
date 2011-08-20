@@ -37,7 +37,6 @@
 	if ([self.objectType isEqualToString:@"Player"]) returnValue = NearbyObjectPlayer;
     if ([self.objectType isEqualToString:@"WebPage"]) returnValue = NearbyObjectWebPage;
     if ([self.objectType isEqualToString:@"AugBubble"]) returnValue = NearbyObjectPanoramic;
-    if ([self.objectType isEqualToString:@"Note"]) returnValue = NearbyObjectNote;
 	return returnValue;
 }
 
@@ -63,9 +62,7 @@
     if (self.kind == NearbyObjectWebPage) {
 		return [[AppModel sharedAppModel] webPageForWebPageID: objectId]; 
 	}
-    if (self.kind == NearbyObjectNote) {
-		return [[AppModel sharedAppModel] noteForNoteId: objectId]; 
-	}
+	
     if (self.kind == NearbyObjectPanoramic) {
 		return [[AppModel sharedAppModel] panoramicForPanoramicId: objectId]; 
 	}

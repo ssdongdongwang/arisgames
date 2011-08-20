@@ -89,6 +89,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[jsonConnection release];
     
 }
+
 - (void)updateServerPanoramicViewed: (int)panoramicId {
 	NSLog(@"Model: Panoramic %d Viewed, update server", panoramicId);
 	
@@ -324,83 +325,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[request startAsynchronous];
 }
 
--(void)createItemAndPlaceOnMap:(Item *)item {
-    NSLog(@"AppModel: Creating Note: %@",item.name);
-	
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects:
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-                          item.name,
-						  item.description,
-                          @"note123",
-						  @"1", //dropable
-						  @"1", //destroyable
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
-                          @"NOTE",
-						  nil];
-	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
-                                                            andServiceName:@"items" 
-                                                             andMethodName:@"createItemAndPlaceOnMap" 
-                                                              andArguments:arguments];
-	[jsonConnection performAsynchronousRequestWithParser:@selector(fetchAllPlayerLists)]; 
-	[jsonConnection release];
-    
-}
-
-- (void)createItemAndPlaceOnMapFromFileData:(NSData *)fileData fileName:(NSString *)fileName 
-										title:(NSString *)title description:(NSString*)description {
-    
-	// setting up the request object now
-	NSURL *url = [[AppModel sharedAppModel].serverURL URLByAppendingPathComponent:@"services/aris/uploadHandler.php"];
-	ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-	request.timeOutSeconds = 60;
-	
- 	[request setPostValue:[NSString stringWithFormat:@"%d", [AppModel sharedAppModel].currentGame.gameId] forKey:@"gameID"];	 
-	[request setPostValue:fileName forKey:@"fileName"];
-	[request setData:fileData forKey:@"file"];
-	[request setDidFinishSelector:@selector(uploadItemRequestFinished:)];
-	[request setDidFailSelector:@selector(uploadItemRequestFailed:)];
-	[request setDelegate:self];
-	
-	//We need these after the upload is complete to create the item on the server
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:title, @"title", description, @"description", nil];
-	[request setUserInfo:userInfo];
-	
-	NSLog(@"Model: Uploading File. gameID:%d fileName:%@ title:%@ description:%@",[AppModel sharedAppModel].currentGame.gameId,fileName,title,description );
-	
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate showNewWaitingIndicator:@"Uploading" displayProgressBar:YES];
-	[request setUploadProgressDelegate:appDelegate.waitingIndicator.progressView];
-	[request startAsynchronous];
-}
-
-
--(void)createItemAndGivetoPlayer:(Item *)item {
-    NSLog(@"AppModel: Creating Note: %@",item.name);
-	
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects:
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-                          item.name,
-						  item.description,
-                           @"note123",
-						  @"1", //dropable
-						  @"1", //destroyable
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
-                          @"NOTE",
-						  nil];
-	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
-                                                            andServiceName:@"items" 
-                                                             andMethodName:@"createItemAndGiveToPlayer" 
-                                                              andArguments:arguments];
-	[jsonConnection performAsynchronousRequestWithParser:@selector(fetchAllPlayerLists)]; 
-	[jsonConnection release];
-
-}
 
 - (void)createItemAndGiveToPlayerFromFileData:(NSData *)fileData fileName:(NSString *)fileName 
 										title:(NSString *)title description:(NSString*)description {
@@ -429,32 +353,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[request startAsynchronous];
 }
 
--(void)updateItem:(Item *)item {
-    NSLog(@"Model: Updating Item");
-	
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  [NSString stringWithFormat:@"%d",item.itemId],
-						  item.name,
-						  item.description,
-                          [NSString stringWithFormat:@"%d",item.iconMediaId],
-						  [NSString stringWithFormat:@"%d",item.mediaId],
-						  [NSString stringWithFormat:@"%d",item.dropable],
-                          [NSString stringWithFormat:@"%d",item.destroyable],
-						  [NSString stringWithFormat:@"%d",item.isAttribute],
-						  [NSString stringWithFormat:@"%d",item.maxQty],
-                          [NSString stringWithFormat:@"%d",item.weight],
-						  item.url,
-						  item.type,
-						  nil];
-	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
-                                                            andServiceName:@"items" 
-                                                             andMethodName:@"updateItem" 
-                                                              andArguments:arguments];
-	[jsonConnection performAsynchronousRequestWithParser:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
-	[jsonConnection release];
 
-}
 
 - (void)uploadImageForMatchingRequestFinished:(ASIFormDataRequest *)request
 {
@@ -487,57 +386,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 }
 
 
-- (void)uploadItemForMapRequestFinished:(ASIFormDataRequest *)request
-{
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
-	
-	NSString *response = [request responseString];
-    
-	NSLog(@"Model: Upload Media Request Finished. Response: %@", response);
-	
-	NSString *title = [[request userInfo] objectForKey:@"title"];
-	NSString *description = [[request userInfo] objectForKey:@"description"];
-	
-	if (description == NULL) description = @""; 
-	
-	NSString *newFileName = [request responseString];
-    
-	NSLog(@"AppModel: Creating Item for Title:%@ Desc:%@ File:%@",title,description,newFileName);
-	
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects:
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-						  title, //[title stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding],
-						  description, //[description stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding],
-						  newFileName,
-						  @"1", //dropable
-						  @"1", //destroyable
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
-                          @"NORMAL",
-						  nil];
-	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
-                                                            andServiceName:@"items" 
-                                                             andMethodName:@"createItemAndPlaceOnMap" 
-                                                              andArguments:arguments];
-	[jsonConnection performAsynchronousRequestWithParser:@selector(fetchAllPlayerLists)]; 
-	[jsonConnection release];
-    
-}
 
-- (void)uploadForMapRequestFailed:(ASIHTTPRequest *)request
-{
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate removeNewWaitingIndicator];
-	NSError *error = [request error];
-	NSLog(@"Model: uploadRequestFailed: %@",[error localizedDescription]);
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Upload Failed" message: @"An network error occured while uploading the file" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
-	
-	[alert show];
-	[alert release];
-}
 
 - (void)uploadItemRequestFinished:(ASIFormDataRequest *)request
 {
@@ -568,7 +417,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 						  @"1", //destroyable
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
-                          @"NORMAL",
 						  nil];
 	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
                                                             andServiceName:@"items" 
@@ -753,19 +601,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
     
 }
 
--(void)fetchTabBarItemsForGame:(int)gameId {
-    NSLog(@"Fetching TabBar Items for game: %d",gameId);
-    NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  nil];
-    
-    JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
-                                                            andServiceName:@"games"
-                                                             andMethodName:@"getTabBarItemsForGame"
-                                                              andArguments:arguments];
-	[jsonConnection performAsynchronousRequestWithParser:@selector(parseGameTabListFromJSON:)]; 
-	[jsonConnection release];
-
-}
 
 -(void)fetchQRCode:(NSString*)code{
 	NSLog(@"Model: Fetch Requested for QRCode Code: %@", code);
@@ -842,7 +677,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
     
 	
 }
-
 - (void)fetchGameMediaListAsynchronously:(BOOL)YesForAsyncOrNoForSync {
 	NSLog(@"AppModel: Fetching Media List");
 	
@@ -1182,8 +1016,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
     item.isAttribute = [[itemDictionary valueForKey:@"is_attribute"] boolValue];
     item.weight = [[itemDictionary valueForKey:@"weight"] intValue];
     item.url = [itemDictionary valueForKey:@"url"];
-	item.type = [itemDictionary valueForKey:@"type"];
-    item.creatorId = [[itemDictionary valueForKey:@"creator_player_id"] intValue];
+	
 	NSLog(@"\tadded item %@", item.name);
 	
 	return item;	
@@ -1250,13 +1083,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	return npc;	
 }
 
-- (Tab *)parseTabFromDictionary:(NSDictionary *)tabDictionary{
-    Tab *tab = [[[Tab alloc] init] autorelease];
-    tab.tabName = [tabDictionary valueForKey:@"tab"];
-    tab.tabIndex = [[tabDictionary valueForKey:@"tab_index"] intValue];
-    return tab;
-}
-
+ 
 -(WebPage *)parseWebPageFromDictionary: (NSDictionary *)webPageDictionary {
 	WebPage *webPage = [[[WebPage alloc] init] autorelease];
 	webPage.webPageId = [[webPageDictionary valueForKey:@"web_page_id"] intValue];
@@ -1340,6 +1167,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ConversationNodeOptionsReady" object:conversationNodeOptions]];
 	
 }
+
 
 -(void)parseLoginResponseFromJSON: (JSONResult *)jsonResult{
 	NSLog(@"AppModel: parseLoginResponseFromJSON");
@@ -1681,7 +1509,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[tempItemList release];
 }
 
-
 -(void)parseGameNodeListFromJSON: (JSONResult *)jsonResult{
 	NSArray *nodeListArray = (NSArray *)jsonResult.data;
 	NSMutableDictionary *tempNodeList = [[NSMutableDictionary alloc] init];
@@ -1696,23 +1523,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	
 	[AppModel sharedAppModel].gameNodeList = tempNodeList;
 	[tempNodeList release];
-}
-
--(void)parseGameTabListFromJSON: (JSONResult *)jsonResult{
-	NSArray *tabListArray = (NSArray *)jsonResult.data;
-	NSArray *tempTabList = [[NSMutableArray alloc] initWithCapacity:10];
-	NSEnumerator *enumerator = [tabListArray objectEnumerator];
-	NSDictionary *dict;
-	while ((dict = [enumerator nextObject])) {
-		Tab *tmpTab = [self parseTabFromDictionary:dict];
-		tempTabList = [tempTabList arrayByAddingObject:tmpTab];
-		//[node release];
-	}
-	
-	[AppModel sharedAppModel].gameTabList = tempTabList;
-    ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate changeTabBar];
-	//[tempTabList release];
 }
 
 
@@ -1747,6 +1557,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
 	[AppModel sharedAppModel].gameWebPageList = tempWebPageList;
 	[tempWebPageList release];
 }
+
 -(void)parseGamePanoramicListFromJSON: (JSONResult *)jsonResult{
 	NSArray *panListArray = (NSArray *)jsonResult.data;
 	
@@ -1807,8 +1618,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
         item.isAttribute = [[itemDictionary valueForKey:@"is_attribute"] boolValue];
         item.weight = [[itemDictionary valueForKey:@"weight"] intValue];
         item.url = [itemDictionary valueForKey:@"url"];
-        item.type = [itemDictionary valueForKey:@"type"];
-        item.creatorId = [[itemDictionary valueForKey:@"creator_player_id"] intValue];
 		NSLog(@"Model: Adding Item: %@", item.name);
         if(item.isAttribute)[tempAttributes setObject:item forKey:[NSString stringWithFormat:@"%d",item.itemId]]; 
             else [tempInventory setObject:item forKey:[NSString stringWithFormat:@"%d",item.itemId]]; 

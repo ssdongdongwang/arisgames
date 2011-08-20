@@ -10,7 +10,6 @@
 #import "SynthesizeSingleton.h"
 #import "AppModel.h"
 #import "Game.h"
-#import "Tab.h"
 #import "Item.h"
 #import "Node.h"
 #import "Npc.h"
@@ -25,6 +24,8 @@
 #import "ASIFormDataRequest.h"
 #import "ARISAppDelegate.h"
 #import "Comment.h"
+
+
 
 @interface AppServices : NSObject {
     //Fetcher Flags
@@ -61,7 +62,6 @@
 - (void)fetchMiniGamesListLocations;
 - (void)fetchOneGame:(int)gameId;
 
--(void)fetchTabBarItemsForGame:(int)gameId;
 - (void)fetchLocationList;
 - (void)forceUpdateOnNextLocationListFetch;
 - (void)fetchGameListBySearch: (NSString *) searchText;
@@ -81,14 +81,11 @@
 - (Item *)fetchItem:(int)itemId;
 - (Node *)fetchNode:(int)nodeId;
 - (Npc *)fetchNpc:(int)npcId;
--(void)createItemAndPlaceOnMap:(Item *)item;
-- (void)createItemAndPlaceOnMapFromFileData:(NSData *)fileData fileName:(NSString *)fileName 
-                                      title:(NSString *)title description:(NSString*)description;
 
-- (void)updateItem:(Item *) item;
+
 - (void)createItemAndGiveToPlayerFromFileData:(NSData *)fileData fileName:(NSString *)fileName 
 										title:(NSString *)title description:(NSString*)description;
--(void)createItemAndGivetoPlayer: (Item *) item;
+
 - (void)uploadImageForMatching:(NSData *)fileData;
 
 - (void)updateServerWithPlayerLocation;
@@ -116,7 +113,6 @@
 - (void)parseGameNodeListFromJSON: (JSONResult *)jsonResult;
 - (void)parseGameWebPageListFromJSON: (JSONResult *)jsonResult;
 - (void)parseGamePanoramicListFromJSON: (JSONResult *)jsonResult;
-- (void)parseGameTabListFromJSON:(JSONResult *)jsonResult;
 -(void)parseRecentGameListFromJSON: (JSONResult *)jsonResult;
 - (Location*)parseLocationFromDictionary: (NSDictionary *)locationDictionary;
 - (Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary;
@@ -124,13 +120,9 @@
 - (Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary;
 -(WebPage *)parseWebPageFromDictionary: (NSDictionary *)webPageDictionary;
 -(Panoramic *)parsePanoramicFromDictionary: (NSDictionary *)webPageDictionary;
--(Tab *)parseTabFromDictionary:(NSDictionary *)tabDictionary;
-
 - (void)updateServerGameSelected;
 - (void)fetchQRCode:(NSString*)QRcodeId;
 - (void)saveComment:(NSString*)comment game:(int)gameId starRating:(int)rating;
 - (void)parseSaveCommentResponseFromJSON: (JSONResult *)jsonResult;
-
-
 
 @end

@@ -7,15 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppModel.h"
-#import "Item.h"
+#import "AppModel.h";
+#import "Item.h";
 #import "ARISMoviePlayerViewController.h"
 #import "AsyncImageView.h"
 #import "itemDetailsMode.h"
-#import "TitleAndDecriptionFormViewController.h"
 
 
-@interface ItemDetailsViewController : UIViewController <UIWebViewDelegate,UITextViewDelegate> {
+
+@interface ItemDetailsViewController : UIViewController <UIWebViewDelegate> {
 	Item *item;
 	//ARISMoviePlayerViewController *mMoviePlayer; //only used if item is a video
 	MPMoviePlayerViewController *mMoviePlayer; //only used if item is a video
@@ -27,8 +27,7 @@
 	IBOutlet UIBarButtonItem *deleteButton;
 	IBOutlet UIBarButtonItem *pickupButton;
 	IBOutlet UIBarButtonItem *detailButton;
-    IBOutlet UITextView *textBox;
-    IBOutlet UIButton *saveButton;
+    
 	IBOutlet UIButton *backButton;
 	IBOutlet AsyncImageView *itemImageView;
 	IBOutlet UIWebView *itemDescriptionView;
@@ -49,8 +48,6 @@
 @property(nonatomic,retain) IBOutlet UIWebView *itemWebView;
 @property(nonatomic, retain) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property(nonatomic,retain)IBOutlet UIWebView *itemDescriptionView;;
-@property(nonatomic,retain) IBOutlet UITextView *textBox;
-@property(nonatomic, retain) IBOutlet UIButton *saveButton;
 
 - (IBAction)dropButtonTouchAction: (id) sender;
 - (IBAction)deleteButtonTouchAction: (id) sender;
@@ -61,11 +58,7 @@
 -(void)doActionWithMode: (ItemDetailsModeType) itemMode quantity: (int) quantity;
 - (void)updateQuantityDisplay;
 
-- (IBAction)saveButtonTouchAction;
-- (void) hideKeyboard;
--(void) editButtonPressed;
-- (void)titleAndDescriptionFormDidFinish:(TitleAndDecriptionFormViewController*)titleAndDescForm;
-- (void)displayTitleandDescriptionForm;
+
 - (void) showWaitingIndicator;
 - (void) dismissWaitingIndicator;
 @end

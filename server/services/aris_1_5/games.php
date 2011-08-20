@@ -99,46 +99,6 @@ class Games extends Module
 		
     }	
     
-    public function getTabBarItemsForGame($intGameId)
-    {
-        $query = "SELECT * FROM game_tab_data WHERE game_id = '{$intGameId}' ORDER BY tab_index ASC";
-        $result = mysql_query($query);
-        
-        if(mysql_num_rows($result) == 0){
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'QUESTS', '1')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'GPS', '2')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'INVENTORY', '3')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'QR', '4')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PLAYER', '5')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'CAMERA',  '6')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'MICROPHONE',  '7')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'NOTE',  '8')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PICKGAME',  '9')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'LOGOUT',  '10')";
-            @mysql_query($query);
-            $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'STARTOVER',  '11')";
-            @mysql_query($query);
-            $query = "SELECT * FROM game_tab_data WHERE game_id = '{$intGameId}' ORDER BY tab_index ASC";
-            $result = mysql_query($query);
-        }
-        return new returnData(0, $result, NULL);
-    }
-    
-    public function saveTab($intGameId, $stringTabType, $intIndex)
-    {
-        $query = "UPDATE game_tab_data SET tab_index = '{$intIndex}' WHERE game_id = '{$intGameId}' AND tab = '{$stringTabType}'";
-        mysql_query($query);
-        return new returnData(0);
-    }
     
 	
 	/**
@@ -343,7 +303,7 @@ class Games extends Module
   			origin_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
             weight INT UNSIGNED NOT NULL DEFAULT  '0',
             url TINYTEXT NOT NULL,
-            type ENUM(  'NORMAL',  'ATTRIB',  'URL', 'NOTE') CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  'NORMAL',
+            type ENUM(  'NORMAL',  'ATTRIB',  'URL' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  'NORMAL',
 			PRIMARY KEY  (item_id)
 			)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
 		NetDebug::trace($query);
@@ -374,7 +334,7 @@ class Games extends Module
 							'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE', 'PLAYER_HAS_NOT_VIEWED_NODE',
 							'PLAYER_VIEWED_NPC', 'PLAYER_HAS_NOT_VIEWED_NPC', 'PLAYER_VIEWED_WEBPAGE', 'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 
 							'PLAYER_VIEWED_AUGBUBBLE', 'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO', 
-                            'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_NOT_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK') NOT NULL,
+                            'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK') NOT NULL,
 			boolean_operator enum('AND','OR') NOT NULL DEFAULT 'AND',				
 			requirement_detail_1 VARCHAR(30) NULL,
 			requirement_detail_2 VARCHAR(30) NULL,
@@ -524,30 +484,6 @@ class Games extends Module
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folder contents table: ' . mysql_error());	
-        
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'QUESTS', '1')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'GPS', '2')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'INVENTORY', '3')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'QR', '4')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PLAYER', '5')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'CAMERA',  '6')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'MICROPHONE',  '7')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'NOTE',  '8')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PICKGAME',  '9')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'LOGOUT',  '10')";
-		@mysql_query($query);
-        $query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'STARTOVER',  '11')";
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(6, NULL, 'cannot create game_tab_data table- ' . mysql_error());	
 
 		$media = new Media();
 		$returnObject = $media->getMediaDirectory($newGameID);
@@ -773,14 +709,6 @@ class Games extends Module
         mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error()); 
         
-        $query = "CREATE TABLE `game_tab_data` (
-                                              `game_id` INT UNSIGNED NOT NULL ,
-                                              `tab` ENUM(  'STARTOVER',  'LOGOUT',  'PICKGAME',  'GPS',  'NEARBY',  'QUESTS',  'INVENTORY',  'PLAYER',  'QR',  'CAMERA',  'MICROPHONE',  'NOTE' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL ,
-                                              `tab_index` INT UNSIGNED NOT NULL COMMENT  '0 for disabled'
-                                              ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_unicode_ci";
-        mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error()); 
-        
         
 		return new returnData(0, FALSE);
 	}
@@ -868,7 +796,7 @@ class Games extends Module
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
-        $query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO', 'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_NOT_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
+		$query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO', 'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_NOT_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
@@ -908,10 +836,6 @@ class Games extends Module
 		NetDebug::trace("$query" . ":" . mysql_error());
         
         $query = "ALTER TABLE  `{$prefix}_quests` ADD  `sort_index` INT UNSIGNED NOT NULL DEFAULT  '0'";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error());
-        
-        $query = "ALTER TABLE  `{$prefix}_items` CHANGE  `type`  `type` ENUM(  'NORMAL',  'ATTRIB',  'URL',  'NOTE' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  'NORMAL'";
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
@@ -1020,12 +944,6 @@ class Games extends Module
         
         //Delete WebHooks
         $query = "DELETE FROM web_hooks WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
-        
-        //Delete Tab Bar information
-        $query = "DELETE FROM game_tab_data WHERE game_id = '{$intGameID}'";
         NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
@@ -1394,7 +1312,6 @@ class Games extends Module
                           $game->is_locational, $game->ready_for_public, 
                           $game->allow_player_created_locations, $game->delete_player_locations_on_reset,
                           $game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
-
         
         while($editors = mysql_fetch_object($rs)){
             Games::addEditorToGame($editors->editor_id, $newGameId->data);
@@ -1408,7 +1325,7 @@ class Games extends Module
         $query = "INSERT INTO {$newPrefix}_folder_contents (object_content_id, folder_id, content_type, content_id, previous_id) SELECT object_content_id, folder_id, content_type, content_id, previous_id FROM {$prefix}_folder_contents";
         mysql_query($query);
         
-        $query = "INSERT INTO {$newPrefix}_items (item_id, name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight, url, type) SELECT item_id, name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight, url, type FROM {$prefix}_items";
+        $query = "INSERT INTO {$newPrefix}_items (item_id, name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight) SELECT item_id, name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight FROM {$prefix}_items";
         mysql_query($query);
         
         $query = "INSERT INTO {$newPrefix}_locations (location_id, name, description, latitude, longitude, error, type, type_id, icon_media_id, item_qty, hidden, force_view, allow_quick_travel) SELECT location_id, name, description, latitude, longitude, error, type, type_id, icon_media_id, item_qty, hidden, force_view, allow_quick_travel FROM {$prefix}_locations";
@@ -1438,29 +1355,13 @@ class Games extends Module
         $query = "INSERT INTO {$newPrefix}_requirements (requirement_id, content_type, content_id, requirement, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3) SELECT requirement_id, content_type, content_id, requirement, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3 FROM {$prefix}_requirements";
         mysql_query($query);
         
-        $query = "SELECT * FROM game_tab_data WHERE game_id = {$prefix}";
-        $result = mysql_query($query);
-        while($row = mysql_fetch_object($result)){
-            $query = "INSERT INTO game_tab_data (game_id, tab, tab_index) VALUES ('{$newPrefix}', '{$row->tab}', '{$row->index}')";
-            mysql_query($query);
-        }
-        
-        $query = "SELECT * FROM aug_bubble_media WHERE game_id = {$prefix}";
-        $result = mysql_query($query);
-        while($row = mysql_fetch_object($result)){
-            $query = "INSERT INTO aug_bubble_media (game_id, aug_bubble_id, media_id, text, index) VALUES ('{$newPrefix}', '{$row->aug_bubble_id}', '{$row->media_id}', '{$row->text}', '{$row->index}')";
-            mysql_query($query);
-        }
-        
         $query = "SELECT * FROM aug_bubbles WHERE game_id = {$prefix}";
         $result = mysql_query($query);
         while($row = mysql_fetch_object($result)){
-            $query = "INSERT INTO aug_bubbles (game_id, name, description, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->icon_media_id}')";
-            mysql_query($query);
+            $query = "INSERT INTO aug_bubbles (game_id, name, description, icon_media_id, media_id, alignment_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->icon_media_id}', '{$row->media_id}', '{$row->alignment_media_id}')";
+            @mysql_query($query);
             $newID = mysql_insert_id();
             
-            $query = "UPDATE aug_bubble_media SET aug_bubble_id = {$newID} WHERE aug_bubble_id = {$row->aug_bubble_id}";
-            mysql_query($query);
             $query = "UPDATE {$newPrefix}_locations SET type_id = {$newID} WHERE type = 'AugBubble' AND type_id = {$row->aug_bubble_id}";
             mysql_query($query);
             $query = "UPDATE {$newPrefix}_folder_contents SET content_id = {$newID} WHERE content_type = 'AugBubble' AND content_id = {$row->aug_bubble_id}";
@@ -1488,7 +1389,7 @@ class Games extends Module
         $result = mysql_query($query);
         while($row = mysql_fetch_object($result)){
             $query = "INSERT INTO web_hooks (game_id, name, url, incoming) VALUES ('{$newPrefix}', '{$row->name}', '".addSlashes($row->url)."', '{$row->incoming}')";
-            mysql_query($query);
+            @mysql_query($query);
             $newID = mysql_insert_id();
             
             $query = "UPDATE {$newPrefix}_requirements SET content_id = {$newID} WHERE content_type = 'OutgoingWebHook' AND content_id = {$row->web_hook_id}";
@@ -1525,7 +1426,9 @@ class Games extends Module
             mysql_query($query);
             $query = "UPDATE aug_bubbles SET icon_media_id = {$newID} WHERE icon_media_id = $row->media_id AND game_id = {$newPrefix}";
             mysql_query($query);
-            $query = "UPDATE aug_bubble_media SET media_id = {$newID} WHERE media_id = $row->media_id AND game_id = {$newPrefix}";
+            $query = "UPDATE aug_bubbles SET media_id = {$newID} WHERE media_id = $row->media_id AND game_id = {$newPrefix}";
+            mysql_query($query);
+            $query = "UPDATE aug_bubbles SET alignment_media_id = {$newID} WHERE alignment_media_id = $row->media_id AND game_id = {$newPrefix}";
             mysql_query($query);
             $query = "UPDATE games SET icon_media_id = {$newID} WHERE icon_media_id = $row->media_id AND game_id = {$newPrefix}";
             mysql_query($query);
