@@ -403,14 +403,14 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 #pragma mark PickerViewDelegate selectors
 
 - (UITableViewCell *) getCellContentViewForQuest:(Quest *)quest inSection:(int)section {
-	CGRect cellFrame = CGRectMake(0, 0, 300, 100);
-	CGRect iconFrame = CGRectMake(5, 5, 50, 50);
+	CGRect cellFrame = CGRectMake(0, 0, 320, 100);
+	//CGRect iconFrame = CGRectMake(5, 5, 50, 50);
 	//CGRect nameFrame = CGRectMake(70, 10, 230, 25);
-	CGRect descriptionFrame = CGRectMake(70, 10, 230, 50);
+	CGRect descriptionFrame = CGRectMake(5, 10, 310, 50);
 	
 	//UILabel *nameView;
 	UIWebView *descriptionView;
-	AsyncImageView *iconView;
+	//AsyncImageView *iconView;
 	
 	UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:cellFrame] autorelease];
 	
@@ -432,11 +432,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 	[descriptionView release];
 	
 	//Init Icon
-	iconView = [[AsyncImageView alloc] initWithFrame:iconFrame];
+	//iconView = [[AsyncImageView alloc] initWithFrame:iconFrame];
 	//nameView.backgroundColor = [UIColor blackColor];
 	
 	//Set the icon
-	if (quest.iconMediaId > 0) {
+	/*if (quest.iconMediaId > 0) {
 		Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId:quest.iconMediaId];
 		[iconView loadImageFromMedia:iconMedia];
 	}
@@ -449,7 +449,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 	}
 	[cell.contentView addSubview:iconView];
 	[iconView release];
-	
+	*/
 	return cell;
 }
 
