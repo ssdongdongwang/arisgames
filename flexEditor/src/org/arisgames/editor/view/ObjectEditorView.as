@@ -246,12 +246,13 @@ public class ObjectEditorView extends Canvas
 		webPageEditor.includeInLayout = false;
 		augBubbleEditor.setVisible(false);
 		augBubbleEditor.includeInLayout = false;
-
+		this.width=470;
+		
         if (objectPaletteItem.isFolder())
         {
             trace("It's a folder, so display the Folder Editor.");
             folderEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = folderEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+folderEditor.objectPaletteItem.objectId+"";
             folderEditor.setVisible(true);
             folderEditor.includeInLayout = true;
         }
@@ -259,7 +260,7 @@ public class ObjectEditorView extends Canvas
         {
             trace("It's an Item, so display the Item Editor.")
             itemEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = itemEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+itemEditor.objectPaletteItem.objectId+"";
             itemEditor.setVisible(true);
             itemEditor.includeInLayout = true;
         }
@@ -267,16 +268,17 @@ public class ObjectEditorView extends Canvas
         {
             trace("It's a Character, so display the Character Editor.")
             characterEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = characterEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+characterEditor.objectPaletteItem.objectId+"";
             characterEditor.setVisible(true);
             characterEditor.includeInLayout = true;
 			characterEditor.reloadTheConversations();
+			this.width=800;
         }
         else if (objectPaletteItem.objectType == AppConstants.CONTENTTYPE_PAGE_DATABASE)
         {
             trace("It's an Page, so display the Page Editor.")
             plaqueEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = plaqueEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+plaqueEditor.objectPaletteItem.objectId+"";
             plaqueEditor.setVisible(true);
             plaqueEditor.includeInLayout = true;
         }
@@ -284,7 +286,7 @@ public class ObjectEditorView extends Canvas
 		{
 			trace("It's a WebPage, so display the WebPage Editor.")
 			webPageEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = webPageEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+webPageEditor.objectPaletteItem.objectId+"";
 			webPageEditor.setVisible(true);
 			webPageEditor.includeInLayout = true;
 		}
@@ -292,7 +294,7 @@ public class ObjectEditorView extends Canvas
 		{
 			trace("It's an AugBubble, so display the AugBubble Editor.")
 			augBubbleEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = augBubbleEditor.objectPaletteItem.objectId+"";
+			secretText.text = "id="+augBubbleEditor.objectPaletteItem.objectId+"";
 			augBubbleEditor.setVisible(true);
 			augBubbleEditor.includeInLayout = true;
 		}

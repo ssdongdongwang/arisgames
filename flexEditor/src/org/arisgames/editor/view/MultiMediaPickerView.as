@@ -178,6 +178,7 @@ package org.arisgames.editor.view
 		
 		public function pushDataIntoGUI():void {
 			if(selectedIndex == 0 && this.images.length == 0){
+				/*
 				mediaImageCanvas.setVisible(true);
 				mediaImageCanvas.includeInLayout = true;
 				mediaPreviewImage.setVisible(false);
@@ -188,6 +189,21 @@ package org.arisgames.editor.view
 				mediaRemoveButton.includeInLayout = false;
 				mediaPopupMediaPickerButton.setVisible(false);
 				mediaPopupMediaPickerButton.includeInLayout = false;
+				return;*/
+				mediaImageCanvas.setVisible(true);
+				mediaImageCanvas.includeInLayout = true;
+				mediaPreviewImage.setVisible(true);
+				mediaPreviewImage.includeInLayout = true;
+				mediaNoMediaLabel.setVisible(true);
+				mediaNoMediaLabel.includeInLayout = true;
+				mediaRemoveButton.setVisible(false);
+				mediaRemoveButton.includeInLayout = false;
+				mediaPopupMediaPickerButton.setVisible(false);
+				mediaPopupMediaPickerButton.includeInLayout = false;
+				
+				mediaurl = AppConstants.IMG_DEFAULT_PANO_SIZE_REFERENCE_URL;
+				mediaPreviewImage.source = mediaurl;
+				trace("Just set media image url = '" + mediaurl + "'");
 				return;
 			}
 			
@@ -232,7 +248,7 @@ package org.arisgames.editor.view
 				mediaRemoveButton.setVisible(false);
 				mediaRemoveButton.includeInLayout = false;
 				
-				mediaurl = AppConstants.IMG_DEFAULT_IMAGE_SIZE_REFERENCE_URL;
+				mediaurl = AppConstants.IMG_DEFAULT_PANO_SIZE_REFERENCE_URL;
 				mediaPreviewImage.source = mediaurl;
 				trace("Just set media image url = '" + mediaurl + "'");
 			}
@@ -250,6 +266,11 @@ package org.arisgames.editor.view
 			delegate.imageListWasUpdated(this.selectedIndex, images[selectedIndex], this.images);
 			images.refresh();
 			this.pushDataIntoGUI();
+		}
+		
+		public function didCloseWindow(picker:MultiMediaPickerPickerMX):void
+		{
+			this.handleMediaRemoveButtonClick(null);
 		}
 		
 		private function handleLoadMedia(obj:Object):void{

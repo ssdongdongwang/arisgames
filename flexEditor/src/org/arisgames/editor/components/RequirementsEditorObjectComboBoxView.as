@@ -137,7 +137,7 @@ public class RequirementsEditorObjectComboBoxView extends VBox implements IDropI
 			trace("going to load incoming web hooks - 8");
 			AppServices.getInstance().getWebHooksByGameId(GameModel.getInstance().game.gameId, new Responder(handleLoadWebHooks, handleFault));
 		}
-        else if (req == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE)
+        else if (req == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE || req == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_DATABASE || req == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_DATABASE || req == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_DATABASE)
         {
             trace("Upload Media option selected... editor will need to be reconfigured here to support different data model.");
         }
@@ -310,7 +310,8 @@ public class RequirementsEditorObjectComboBoxView extends VBox implements IDropI
                 var to:Object = new Object();
                 to.label = obj.result.data[j].title;
 				if(obj.result.data[j].title != "")
-					to.label += ": " + obj.result.data[j].text;
+					if(obj.result.data[j].npc_id != "0") to.label = obj.result.data[j].name + "::" + to.label + ": " + obj.result.data[j].text;
+					else to.label += ": " + obj.result.data[j].text;
                 to.data = obj.result.data[j].node_id;
                 possibleObjects.addItem(to);
             }

@@ -432,10 +432,9 @@ public class ItemEditorMediaDisplayView extends HBox
 			}*/
 			else
 			{
-				objectPaletteItem.augBubble.mediaId = m.mediaId;
 				objectPaletteItem.mediaId = m.mediaId;
 				objectPaletteItem.media = m;
-				trace("Just set Page with ID = '" + objectPaletteItem.augBubble.augBubbleId + "' Media Id = '" + objectPaletteItem.augBubble.mediaId + "'");
+				trace("Just set Page with ID = '" + objectPaletteItem.augBubble.augBubbleId);
 			}
 			//AppServices.getInstance().saveItem(GameModel.getInstance().game.gameId, objectPaletteItem.item, new Responder(handleSaveObject, handleFault));
 		}
@@ -544,7 +543,7 @@ public class ItemEditorMediaDisplayView extends HBox
         }
 		else if (objectPaletteItem.objectType == AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE)
 		{
-			objectPaletteItem.augBubble.mediaId = 0;            
+			//objectPaletteItem.augBubble.mediaId = 0;            
 			AppServices.getInstance().saveAugBubble(GameModel.getInstance().game.gameId, objectPaletteItem.augBubble, new Responder(handleSaveObjectAfterRemove, handleFault));
 		}
     }

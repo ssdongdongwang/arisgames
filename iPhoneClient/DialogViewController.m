@@ -486,19 +486,17 @@ NSString *const kDialogHtmlTemplate =
     pcActivityIndicator.frame = CGRectMake(130, 300,50 , 50);
     pcScrollView.hidden = YES;
     npcScrollView.hidden = YES;
-    lbl  = [[UILabel alloc] initWithFrame:pcScrollView.frame];
-    lbl.hidden = NO;
+    lbl.frame =  pcScrollView.frame;
     lbl.backgroundColor = [UIColor blackColor];
     lbl.alpha = .7;
     
     [self.view addSubview:lbl];
     [self.view addSubview:pcActivityIndicator];
-    [lbl release];
 	[pcActivityIndicator startAnimating];
 }
 - (void) dismissWaitingIndicatorForPlayerOptions{
 	pcTableViewController.view.hidden = NO;	
-    lbl.hidden = YES;
+    [lbl removeFromSuperview];
 	pcActivityIndicator.hidden = YES;
   
 	[pcActivityIndicator stopAnimating];
@@ -827,6 +825,7 @@ NSString *const kDialogHtmlTemplate =
 	if (indexPath.section == 0) {
 		NodeOption *option = [optionList objectAtIndex:indexPath.row];
 		cell.textLabel.text = option.text;
+        [cell.textLabel setLineBreakMode:UILineBreakModeWordWrap];
         if(option.hasViewed){ 
             cell.backgroundColor = [UIColor colorWithRed:233.0/255.0  
                                                                     green:233.0/255.0  

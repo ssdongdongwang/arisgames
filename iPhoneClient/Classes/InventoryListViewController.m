@@ -29,7 +29,7 @@
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self) {
         self.title = NSLocalizedString(@"InventoryViewTitleKey",@"");
-        self.tabBarItem.image = [UIImage imageNamed:@"inventory.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"inventoryicon.png"];
         self.iconCache = [[NSMutableArray alloc] initWithCapacity:[[AppModel sharedAppModel].inventory count]];
         self.mediaCache = [[NSMutableArray alloc] initWithCapacity:[[AppModel sharedAppModel].inventory count]];
         
@@ -116,17 +116,23 @@
 -(void)refreshViewFromModel {
 	NSLog(@"InventoryListViewController: Refresh View from Model");
     ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-
+    
+    //Calculate current Weight
+    self.currentWeight = 0;
+    for (Item *item in [[AppModel sharedAppModel].inventory allValues]){
+    self.currentWeight += item.weight*item.qty;
+    [AppModel sharedAppModel].currentGame.currentWeight = self.currentWeight;
+    }
+    capBar.progress = (float)((float)currentWeight/(float)weightCap);
+    capLabel.text = [NSString stringWithFormat: @"Weight Capacity: %d/%d", currentWeight, weightCap];
+    
 	if (silenceNextServerUpdateCount < 1) {		
 		NSArray *newInventory = [[AppModel sharedAppModel].inventory allValues];
 		//Check if anything is new since last time
 		int newItems = 0;
         UIViewController *topViewController =  [[self navigationController] topViewController];
-        self.currentWeight = 0;
 		for (Item *item in newInventory) {	
-            self.currentWeight += item.weight*item.qty;
-            capBar.progress = (float)((float)currentWeight/(float)weightCap);
-            capLabel.text = [NSString stringWithFormat: @"Weight Capacity: %d/%d", currentWeight, weightCap];
+
 
 			BOOL match = NO;
 			for (Item *existingItem in self.inventory) {
@@ -140,16 +146,8 @@
                     [appDelegate performSelector:@selector(displayNotificationTitle:) withObject:dict afterDelay:.1];
                  
                 }
-                /*if ((existingItem.itemId == item.itemId) && (existingItem.qty > item.qty)){
-                    if([topViewController respondsToSelector:@selector(updateQuantityDisplay)])
-                        [[[self navigationController] topViewController] respondsToSelector:@selector(updateQuantityDisplay)];
-
-                    [appDelegate displayNotificationTitle:@"Lost Item!" andPrompt:[NSString stringWithFormat:@"%d %@ removed from inventory",existingItem.qty - item.qty,item.name]];
-                    
-                }*/
-                
+                              
 			}
-            [AppModel sharedAppModel].currentGame.currentWeight = self.currentWeight;
 
 			if (match == NO) {
                 if([AppModel sharedAppModel].profilePic)
@@ -301,7 +299,9 @@
             media = [self.mediaCache objectAtIndex:indexPath.row];
         }
         else{
+            
             media = [[AppModel sharedAppModel] mediaForMediaId: item.mediaId];
+            if(media)
             [self.mediaCache  addObject:media];
         }
 	}
@@ -374,7 +374,7 @@
 	//Put the view on the screen
 	[[self navigationController] pushViewController:itemDetailsViewController animated:YES];
 	
-	[itemDetailsViewController release];
+	//[itemDetailsViewController release];
 	
 }
 

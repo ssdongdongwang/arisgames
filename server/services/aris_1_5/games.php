@@ -333,7 +333,7 @@ class Games extends Module
 			requirement enum( 'PLAYER_HAS_ITEM', 'PLAYER_DOES_NOT_HAVE_ITEM', 'PLAYER_VIEWED_ITEM',
 							'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE', 'PLAYER_HAS_NOT_VIEWED_NODE',
 							'PLAYER_VIEWED_NPC', 'PLAYER_HAS_NOT_VIEWED_NPC', 'PLAYER_VIEWED_WEBPAGE', 'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 
-							'PLAYER_VIEWED_AUGBUBBLE', 'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 
+							'PLAYER_VIEWED_AUGBUBBLE', 'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO', 
                             'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK') NOT NULL,
 			boolean_operator enum('AND','OR') NOT NULL DEFAULT 'AND',				
 			requirement_detail_1 VARCHAR(30) NULL,
@@ -372,6 +372,7 @@ class Games extends Module
 			 description text NOT NULL,
 			 text_when_complete tinytext NOT NULL COMMENT 'This is the txt that displays on the completed quests screen',
 			 icon_media_id int(10) unsigned NOT NULL default '0',
+             sort_index int(10) unsigned NOT NULL default '0',
 			 PRIMARY KEY  (quest_id)
 			)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
 		@mysql_query($query);
@@ -651,7 +652,7 @@ class Games extends Module
 		NetDebug::trace("$query" . ":" . mysql_error());
         
         
-        $query = "ALTER TABLE  `player_log` CHANGE  `event_type`  `event_type` ENUM(  'LOGIN',  'MOVE',  'PICKUP_ITEM',  'DROP_ITEM',  'DESTROY_ITEM',  'VIEW_ITEM',  'VIEW_NODE',  'VIEW_NPC',  'VIEW_WEBPAGE',  'VIEW_AUGBUBBLE',  'VIEW_MAP',  'VIEW_QUESTS', 'VIEW_INVENTORY',  'ENTER_QRCODE',  'UPLOAD_MEDIA_ITEM', 'RECEIVE_WEBHOOK', 'COMPLETE_QUEST' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
+        $query = "ALTER TABLE  `player_log` CHANGE  `event_type`  `event_type` ENUM(  'LOGIN',  'MOVE',  'PICKUP_ITEM',  'DROP_ITEM',  'DESTROY_ITEM',  'VIEW_ITEM',  'VIEW_NODE',  'VIEW_NPC',  'VIEW_WEBPAGE',  'VIEW_AUGBUBBLE',  'VIEW_MAP',  'VIEW_QUESTS', 'VIEW_INVENTORY',  'ENTER_QRCODE',  'UPLOAD_MEDIA_ITEM', 'UPLOAD_MEDIA_ITEM_IMAGE', 'UPLOAD_MEDIA_ITEM_AUDIO', 'UPLOAD_MEDIA_ITEM_VIDEO', 'RECEIVE_WEBHOOK', 'COMPLETE_QUEST' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
         mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
@@ -700,11 +701,14 @@ class Games extends Module
         mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
-        /*Dont do this until we get the aug_bubble editor stuff completed on the editor
-        $query = "alter table aug_bubbles drop column media_id";
+        $query = "ALTER TABLE `aug_bubbles` DROP `media_id`";
         mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());     
-        */
+        
+        $query = "ALTER TABLE `aug_bubbles` DROP `alignment_media_id`";
+        mysql_query($query);
+		NetDebug::trace("$query" . ":" . mysql_error()); 
+        
         
 		return new returnData(0, FALSE);
 	}
@@ -778,7 +782,7 @@ class Games extends Module
 		NetDebug::trace("$query" . ":" . mysql_error());
         
         
-        $query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM',  'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
+        $query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO',  'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_NOT_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
@@ -792,7 +796,7 @@ class Games extends Module
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
-        $query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM',  'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
+		$query = "ALTER TABLE  `{$prefix}_requirements` CHANGE  `requirement`  `requirement` ENUM(  'PLAYER_HAS_ITEM',  'PLAYER_DOES_NOT_HAVE_ITEM',  'PLAYER_VIEWED_ITEM',  'PLAYER_HAS_NOT_VIEWED_ITEM', 'PLAYER_VIEWED_NODE',  'PLAYER_HAS_NOT_VIEWED_NODE',  'PLAYER_VIEWED_NPC',  'PLAYER_HAS_NOT_VIEWED_NPC',  'PLAYER_VIEWED_WEBPAGE',  'PLAYER_HAS_NOT_VIEWED_WEBPAGE', 'PLAYER_VIEWED_AUGBUBBLE',  'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE',  'PLAYER_HAS_UPLOADED_MEDIA_ITEM', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO', 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO', 'PLAYER_HAS_COMPLETED_QUEST', 'PLAYER_HAS_NOT_COMPLETED_QUEST', 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK' ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
         
@@ -829,8 +833,11 @@ class Games extends Module
         
         $query = "ALTER TABLE  `{$prefix}_npc_conversations` ADD  `sort_index` INT UNSIGNED NOT NULL DEFAULT  '0'";
 		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error()); 
-
+		NetDebug::trace("$query" . ":" . mysql_error());
+        
+        $query = "ALTER TABLE  `{$prefix}_quests` ADD  `sort_index` INT UNSIGNED NOT NULL DEFAULT  '0'";
+		mysql_query($query);
+		NetDebug::trace("$query" . ":" . mysql_error());
         
 	}
 	
@@ -869,7 +876,7 @@ class Games extends Module
 	
 	
 	/**
-     * Create a new game
+     * Delete a new game
      * @returns returnCode = 0 on success
      */	
 	public function deleteGame($intGameID)
@@ -926,6 +933,11 @@ class Games extends Module
         
         //Delete Aug Bubbles
         $query = "DELETE FROM aug_bubbles WHERE game_id = '{$intGameID}'";
+        NetDebug::trace($query);
+		@mysql_query($query);
+		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+        //And AugBubble Media
+        $query = "DELETE FROM aug_bubble_media WHERE game_id = '{$intGameID}'";
         NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	

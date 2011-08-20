@@ -4,7 +4,7 @@ public class AppConstants
 {
 	//Server URL
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/stagingserver1"; //For other URL's to append to- Staging
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to- Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://atsosxdev.doit.wisc.edu/aris/server"; //For other URL's to append to- Dev
 	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
 
@@ -162,8 +162,14 @@ public class AppConstants
     public static const REQUIREMENT_PLAYER_VIEWED_NPC_HUMAN:String = "Player Greeted By Character";
     public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_NPC";
     public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_HUMAN:String = "Player Never Greeted By Character";
-    public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM";
-    public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN:String = "Player Has Uploaded Media Item";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN:String = "Player Has Uploaded Media Item";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_HUMAN:String = "Player Has Uploaded Image";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_HUMAN:String = "Player Has Uploaded Audio";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_HUMAN:String = "Player Has Uploaded Video";
 	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_DATABASE:String = "PLAYER_HAS_COMPLETED_QUEST";
 	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN:String = "Player Has Completed Quest";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE:String = "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK";
