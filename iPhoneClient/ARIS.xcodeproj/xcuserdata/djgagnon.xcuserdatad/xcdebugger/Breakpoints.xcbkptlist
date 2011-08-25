@@ -115,19 +115,5 @@
          landmarkName = "-parsePanoramicFromDictionary:"
          landmarkType = "5">
       </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         isPathRelative = "1"
-         filePath = "AppServices.m"
-         timestampString = "333435884.246357"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1127"
-         endingLineNumber = "1127"
-         landmarkName = "-parsePanoramicFromDictionary:"
-         landmarkType = "5">
-      </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>
