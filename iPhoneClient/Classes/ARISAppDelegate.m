@@ -560,10 +560,10 @@
 
 - (void) showNewWaitingIndicator:(NSString *)message displayProgressBar:(BOOL)displayProgressBar {
 	NSLog (@"AppDelegate: Showing Waiting Indicator");
-	if (self.waitingIndicatorView) [self.waitingIndicatorView release];
+    if (self.waitingIndicatorView) [self.waitingIndicatorView release];
 	
 	self.waitingIndicatorView = [[WaitingIndicatorView alloc] initWithWaitingMessage:message showProgressBar:NO];
-	[self.waitingIndicatorView show];
+    [self.waitingIndicatorView show];
 	
 	[[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the activity indicator show before returning	
 }
