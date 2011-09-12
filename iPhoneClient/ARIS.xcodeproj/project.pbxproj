@@ -236,6 +236,8 @@
 		ABDA40C210506AF400823A94 /* AnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = ABDA40B310506AF400823A94 /* AnnotationView.m */; };
 		ABDA40C310506AF400823A94 /* player.png in Resources */ = {isa = PBXBuildFile; fileRef = ABDA40B510506AF400823A94 /* player.png */; };
 		ABDA40DE10506CB300823A94 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABDA40DD10506CB300823A94 /* MapKit.framework */; };
+		ABDD18C7141BE1FE00525021 /* inventoryicon.png in Resources */ = {isa = PBXBuildFile; fileRef = ABDD18C5141BE1FE00525021 /* inventoryicon.png */; };
+		ABDD18C8141BE1FE00525021 /* playericon.png in Resources */ = {isa = PBXBuildFile; fileRef = ABDD18C6141BE1FE00525021 /* playericon.png */; };
 		ABEBF566123D916D00ECE66C /* WaitingIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = ABEBF565123D916D00ECE66C /* WaitingIndicatorView.m */; };
 		ABF4A38A116847640043EB1C /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = ABF4A37E116847640043EB1C /* ASIAuthenticationDialog.m */; };
 		ABF4A38B116847640043EB1C /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = ABF4A380116847640043EB1C /* ASIFormDataRequest.m */; };
@@ -634,6 +636,8 @@
 		ABDA40B310506AF400823A94 /* AnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AnnotationView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		ABDA40B510506AF400823A94 /* player.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = player.png; sourceTree = "<group>"; };
 		ABDA40DD10506CB300823A94 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		ABDD18C5141BE1FE00525021 /* inventoryicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inventoryicon.png; sourceTree = "<group>"; };
+		ABDD18C6141BE1FE00525021 /* playericon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playericon.png; sourceTree = "<group>"; };
 		ABEBF564123D916D00ECE66C /* WaitingIndicatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaitingIndicatorView.h; sourceTree = "<group>"; };
 		ABEBF565123D916D00ECE66C /* WaitingIndicatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaitingIndicatorView.m; sourceTree = "<group>"; };
 		ABF4A37D116847640043EB1C /* ASIAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIAuthenticationDialog.h; sourceTree = "<group>"; };
@@ -732,6 +736,7 @@
 		118669AF13BB8EC1004B4EC8 /* Player Profile / Attributes */ = {
 			isa = PBXGroup;
 			children = (
+				ABDD18C6141BE1FE00525021 /* playericon.png */,
 				118669A713BB8EAC004B4EC8 /* AttributesViewController.h */,
 				118669A813BB8EAC004B4EC8 /* AttributesViewController.m */,
 				118669A913BB8EAC004B4EC8 /* AttributesViewController.xib */,
@@ -1039,6 +1044,7 @@
 		A7986D660F8FEC2100A5469F /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
+				ABDD18C5141BE1FE00525021 /* inventoryicon.png */,
 				11A02D9E13CBA419007C084C /* ItemActionViewController.h */,
 				11A02D9F13CBA419007C084C /* ItemActionViewController.m */,
 				11A02DA013CBA419007C084C /* ItemActionViewController.xib */,
@@ -1570,6 +1576,8 @@
 				1129FA3613CD080500FE83B4 /* garden_frame3.jpg in Resources */,
 				1129FA3713CD080500FE83B4 /* garden_frame2.jpg in Resources */,
 				1129FA3813CD080500FE83B4 /* garden_frame1.jpg in Resources */,
+				ABDD18C7141BE1FE00525021 /* inventoryicon.png in Resources */,
+				ABDD18C8141BE1FE00525021 /* playericon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
