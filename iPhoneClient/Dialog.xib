@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1056</int>
-		<string key="IBDocument.SystemVersion">10K549</string>
+		<string key="IBDocument.SystemVersion">10J4139</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
-		<string key="IBDocument.AppKitVersion">1038.36</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -84,7 +84,7 @@
 							</object>
 							<object class="IBUIScrollView" id="644584544">
 								<reference key="NSNextResponder" ref="629273398"/>
-								<int key="NSvFlags">268</int>
+								<int key="NSvFlags">282</int>
 								<object class="NSMutableArray" key="NSSubviews">
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="IBUIWebView" id="411850233">
@@ -208,7 +208,7 @@
 									</object>
 									<object class="IBUITableView" id="1028266386">
 										<reference key="NSNextResponder" ref="644584544"/>
-										<int key="NSvFlags">301</int>
+										<int key="NSvFlags">282</int>
 										<string key="NSFrameSize">{320, 128}</string>
 										<reference key="NSSuperview" ref="644584544"/>
 										<reference key="NSWindow"/>
@@ -233,7 +233,7 @@
 									</object>
 									<object class="IBUIActivityIndicatorView" id="783367325">
 										<reference key="NSNextResponder" ref="644584544"/>
-										<int key="NSvFlags">293</int>
+										<int key="NSvFlags">288</int>
 										<string key="NSFrame">{{141, 42}, {37, 37}}</string>
 										<reference key="NSSuperview" ref="644584544"/>
 										<reference key="NSWindow"/>
@@ -790,6 +790,7 @@
 						<int key="objectID">50</int>
 						<reference key="object" ref="954674689"/>
 						<reference key="parent" ref="644584544"/>
+						<string key="objectName">Label - Nothing to Talk About</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">23</int>

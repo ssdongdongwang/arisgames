@@ -15,6 +15,7 @@
 #import "GamePickerMapViewController.h"
 #import "GamePickerSearchViewController.h"
 #import "GamePickerRecentViewController.h"
+#import "webpageViewController.h"
 
 
 @implementation ARISAppDelegate
@@ -247,11 +248,11 @@
     int x = 0;
     
     //Loop through every viewController and display the notification 
-    while (x < [self.tabBarController.customizableViewControllers count])
+    while (x < [self.tabBarController.viewControllers count] + 1)
         {
             //the 7th viewController is "bogusViewController which we want to ignore
             //but it is also then a good spot to check if a modal is on screen
-            if([[self.tabBarController.customizableViewControllers objectAtIndex:x] isKindOfClass:[BogusSelectGameViewController class]]) {
+            if(x == [self.tabBarController.viewControllers count]) {
                 if(self.tabBarController.modalViewController)
                 {
                     //set tempNC to the modalView if there is a modal up
@@ -263,7 +264,7 @@
                 
             }
             
-            else tempNC = (UINavigationController *)[self.tabBarController.customizableViewControllers objectAtIndex:x];
+            else tempNC = (UINavigationController *)[self.tabBarController.viewControllers objectAtIndex:x];
 
     NSString *title = [titleAndPrompt objectForKey:@"title"];
     NSString *prompt = [titleAndPrompt objectForKey:@"prompt"];
@@ -662,7 +663,9 @@
 	nearbyObjectNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
 		
 	//Display
-	[self.tabBarController presentModalViewController:nearbyObjectNavigationController animated:YES];
+    if([nearbyObjectViewController isKindOfClass:[webpageViewController class]])
+	[self.tabBarController presentModalViewController:nearbyObjectNavigationController animated:NO];
+    else 	[self.tabBarController presentModalViewController:nearbyObjectNavigationController animated:YES];
 	[nearbyObjectNavigationController release];
 }
 
@@ -756,12 +759,12 @@
     NSLog(@"AppDelegate: LOW MEMORY WARNING RECIEVED");
     
     [[AppServices sharedAppServices]fetchGameMediaListAsynchronously:YES];
-    
+   /* 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Low Memory Warning"
                                                     message:@"The device you are using does not currently have enough free memory to reliably run ARIS. Please close out of some of the other running programs and restart ARIS"
                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];	
-    [alert release];
+    [alert release];*/
 }
 
 
