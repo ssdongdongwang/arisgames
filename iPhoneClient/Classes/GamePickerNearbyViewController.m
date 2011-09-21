@@ -29,6 +29,11 @@
         self.title = @"Nearby";
         self.tabBarItem.image = [UIImage imageNamed:@"game.png"];
         self.gameIcons = [NSMutableArray arrayWithCapacity:[[AppModel sharedAppModel].gameList count]];
+        NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
+        [dispatcher addObserver:self selector:@selector(refresh) name:@"PlayerMoved" object:nil];
+        
+
+
     }
     return self;
 }
@@ -62,12 +67,7 @@
 -(void)refresh {
 	NSLog(@"GamePickerViewController: Refresh Requested");
     
-    if (![AppModel sharedAppModel].playerLocation) {
-		NSLog(@"NearbyBar: Waiting for the player location before continuing to refresh. Returning");
-        
-		[self performSelector:@selector(refresh) withObject:nil afterDelay:1];
-        return;
-	}
+
     
         //Calculate locational control value
     BOOL locational;
@@ -102,6 +102,7 @@
     NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
     [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewGameListReady" object:nil];
     [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"RecievedGameList" object:nil];
+        [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
     
     [[AppServices sharedAppServices] fetchGameListWithDistanceFilter:distanceFilter locational:locational];
         [self showLoadingIndicator];}

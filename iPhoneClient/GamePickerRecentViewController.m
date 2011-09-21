@@ -28,7 +28,11 @@
     if (self) {
         self.title = @"Recent Games";
 
-        self.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemRecents tag:0];		
+        self.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemRecents tag:0];	
+        NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
+        [dispatcher addObserver:self selector:@selector(refresh) name:@"PlayerMoved" object:nil];
+        [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
+
     }
     return self;
 }
@@ -71,13 +75,7 @@
 
 -(void)refresh {
 	NSLog(@"GamePickerRecentViewController: Refresh Requested");
-    if (![AppModel sharedAppModel].playerLocation) {
-		NSLog(@"NearbyBar: Waiting for the player location before continuing to refresh. Returning");
-        
-		[self performSelector:@selector(refresh) withObject:nil afterDelay:1];
-        return;
-	}
-
+    
     //register for notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel) name:@"NewRecentGameListReady" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLoadingIndicator) name:@"RecievedGameList" object:nil];
