@@ -66,7 +66,7 @@ NSString *const kDialogHtmlTemplate =
 @implementation DialogViewController
 @synthesize npcImage, pcImage, npcWebView, pcWebView, pcTableView,exitToTabVal;
 @synthesize npcScrollView, pcScrollView, npcImageScrollView, pcImageScrollView, pcActivityIndicator;
-@synthesize npcContinueButton, pcContinueButton, textSizeButton;
+@synthesize npcContinueButton, pcContinueButton, textSizeButton, specialBackButton;
 @synthesize pcAnswerView, mainView, npcView, pcView, nothingElseLabel,lbl,currentNpc,currentNode;
 
 
@@ -211,6 +211,7 @@ NSString *const kDialogHtmlTemplate =
 	// e.g. self.myOutlet = nil;
 }
 -(void)viewDidAppear:(BOOL)animated{
+    self.navigationItem.leftBarButtonItem = self.navigationItem.backBarButtonItem;
 }
 - (void) viewDidDisappear:(BOOL)animated {
 	NSLog(@"DialogViewController: View Did Disapear");
@@ -369,9 +370,9 @@ NSString *const kDialogHtmlTemplate =
         if (self.exitToTabVal != nil) {
             //TODO: Move this code into an app delegate method
             NSString *tab;
-            for(int i = 0;i < [appDelegate.tabBarController.customizableViewControllers count];i++)
+            for(int i = 0;i < [appDelegate.tabBarController.viewControllers count];i++)
             {
-                tab = [[appDelegate.tabBarController.customizableViewControllers objectAtIndex:i] title];
+                tab = [[appDelegate.tabBarController.viewControllers objectAtIndex:i] title];
                 tab = [tab lowercaseString];
                 self.exitToTabVal = [self.exitToTabVal lowercaseString];
                 if([self.exitToTabVal isEqualToString:tab])

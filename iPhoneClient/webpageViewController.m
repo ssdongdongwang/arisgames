@@ -85,6 +85,7 @@ NSURL *url = [NSURL URLWithString:urlAddress];
 	[[AppServices sharedAppServices] updateServerWebPageViewed:webPage.webPageId];
 	
 	
+    if([self.delegate isKindOfClass:[DialogViewController class]]) [self refreshConvos];
 	//[self.view removeFromSuperview];
 	if([self.delegate isKindOfClass:[DialogViewController class]] || [self.delegate isKindOfClass:[NodeViewController class]]
        || [self.delegate isKindOfClass:[QuestsViewController class]] || [self.delegate isKindOfClass:[ItemDetailsViewController class]])
@@ -127,6 +128,14 @@ NSURL *url = [NSURL URLWithString:urlAddress];
     self.webView.hidden = YES;
     self.blackView.hidden = NO;
 }
+- (void)refreshConvos {
+    [[AppServices sharedAppServices] fetchAllPlayerLists];
+    if([self.delegate isKindOfClass:[DialogViewController class]]){
+        DialogViewController *temp = (DialogViewController *)self.delegate;
+        [[AppServices sharedAppServices] fetchNpcConversations:temp.currentNpc.npcId afterViewingNode:temp.currentNode.nodeId];
+        [temp showWaitingIndicatorForPlayerOptions];
+    }
+}
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest: (NSURLRequest*)req navigationType:(UIWebViewNavigationType)navigationType { 
 
     if ([[[req URL] absoluteString] hasPrefix:@"aris://closeMe"]) {
@@ -134,15 +143,12 @@ NSURL *url = [NSURL URLWithString:urlAddress];
         return NO; 
     }  
     else if ([[[req URL] absoluteString] hasPrefix:@"aris://refreshStuff"]) {
-        [[AppServices sharedAppServices] fetchAllPlayerLists];
-        if([self.delegate isKindOfClass:[DialogViewController class]]){
-            DialogViewController *temp = (DialogViewController *)self.delegate;
-            [[AppServices sharedAppServices] fetchNpcConversations:temp.currentNpc.npcId afterViewingNode:temp.currentNode.nodeId];
-            [temp showWaitingIndicatorForPlayerOptions];
-        }
+        [self refreshConvos];
         return NO; 
     }   
     return YES;
 }
+
+
 
 @end
