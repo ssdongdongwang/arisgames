@@ -317,7 +317,10 @@ NSString *const kDialogHtmlTemplate =
 
 
 - (void) continueScript {
+    NSLog(@"DialogVC: continueScript");
+    
 	if (scriptIndex < [currentScript count]) { //Load up this scene of the script
+        NSLog(@"DialogVC: continueScript: Scenes still exist, load the next one");
 
 		Scene *currentScene = [currentScript objectAtIndex:scriptIndex];
         if (currentScene.videoId !=0) {
@@ -336,7 +339,7 @@ NSString *const kDialogHtmlTemplate =
         }
         else if(currentScene.panoId !=0) {
           Panoramic *pano = [[AppModel sharedAppModel] panoramicForPanoramicId:currentScene.panoId];
-	PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithNibName:@"PanoramicViewController" bundle: [NSBundle mainBundle]];    
+            PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithNibName:@"PanoramicViewController" bundle: [NSBundle mainBundle]];    
             panoramicViewController.panoramic = pano;
             
             [self.navigationController pushViewController:panoramicViewController animated:YES];
@@ -356,6 +359,7 @@ NSString *const kDialogHtmlTemplate =
 		++scriptIndex;
 	}
 	else { 	//End of Script. Display Player Options
+        NSLog(@"DialogVC: continueScript: No more scenes left, Load player Options");
 
         ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];        
       if(cachedScene.exitToTabWithTitle) self.exitToTabVal = cachedScene.exitToTabWithTitle;
@@ -387,8 +391,7 @@ NSString *const kDialogHtmlTemplate =
 }
 
 - (void) applyPlayerOptions{	
-	
-	
+	NSLog(@"DialogVC: Apply Player Options");
 	
 	++scriptIndex;
 	
@@ -411,6 +414,8 @@ NSString *const kDialogHtmlTemplate =
 	else {
 		if (currentNode.numberOfOptions > 0) {
 			//There are node options
+            NSLog(@"DialogVC: Apply Player Options: Node Options Exist");
+
             [self moveAllOutWithPostSelector:nil];
             [self movePcIn];
             
@@ -428,7 +433,9 @@ NSString *const kDialogHtmlTemplate =
 		}
 		else {
 			//No node options, load the conversations
-			[[AppServices sharedAppServices] fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
+            NSLog(@"DialogVC: Apply Player Options: Load Conversations");
+
+            [[AppServices sharedAppServices] fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
 			[self showWaitingIndicatorForPlayerOptions];
 		}
 	}
@@ -441,6 +448,9 @@ NSString *const kDialogHtmlTemplate =
 }
 
 - (void) finishApplyingPlayerOptions:(NSArray*)options{
+    
+    NSLog(@"DialogVC: finishApplyingPlayerOptions");
+
     currentNode = nil;
 	pcWebView.hidden = YES;
 	pcTableView.hidden = YES;
@@ -887,16 +897,11 @@ NSString *const kDialogHtmlTemplate =
 	currentNode = newNode;
 	[currentNode retain];
     if(newNode.text.length == 0){
-     [self continueScript];   
+        [self continueScript];
+        return;
     }
-	[parser parseText:newNode.text];
-    if(parser.exitToTabWithTitle != nil) {
-        self.exitToTabVal = (NSString*)parser.exitToTabWithTitle;
-    }
-    if(parser.currentText.length == 0 && !closingScriptPlaying) 
-    {
-      [self continueScript];  
-    }
+	
+    [parser parseText:newNode.text];
 }
 
 #pragma mark XML Parsing
@@ -911,7 +916,13 @@ NSString *const kDialogHtmlTemplate =
 	currentScript = parser.script;
 	scriptIndex = kStartingIndex;
 
-	[self continueScript];
+    if(parser.exitToTabWithTitle != nil) {
+        self.exitToTabVal = (NSString*)parser.exitToTabWithTitle;
+    }
+
+    [self continueScript];  
+
+    
 }
 
 #pragma mark Scroll View
