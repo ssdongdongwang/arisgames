@@ -260,7 +260,7 @@
 								<bool key="IBUIBouncesZoom">NO</bool>
 							</object>
 						</object>
-						<string key="NSFrameSize">{320, 416}</string>
+						<string key="NSFrame">{{400, 0}, {320, 416}}</string>
 						<reference key="NSSuperview" ref="774585933"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="205060251"/>
@@ -906,7 +906,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">78</int>
+			<int key="maxID">80</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -977,6 +977,7 @@
 							<string>pcTableViewController</string>
 							<string>pcView</string>
 							<string>pcWebView</string>
+							<string>specialBackButton</string>
 							<string>textSizeButton</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1000,6 +1001,7 @@
 							<string>UITableViewController</string>
 							<string>UIView</string>
 							<string>UIWebView</string>
+							<string>UIBarButtonItem</string>
 							<string>UIBarButtonItem</string>
 						</object>
 					</object>
@@ -1026,6 +1028,7 @@
 							<string>pcTableViewController</string>
 							<string>pcView</string>
 							<string>pcWebView</string>
+							<string>specialBackButton</string>
 							<string>textSizeButton</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1105,6 +1108,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">pcWebView</string>
 								<string key="candidateClassName">UIWebView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">specialBackButton</string>
+								<string key="candidateClassName">UIBarButtonItem</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">textSizeButton</string>
