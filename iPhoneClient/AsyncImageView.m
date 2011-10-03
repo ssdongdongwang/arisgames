@@ -14,12 +14,16 @@
 @synthesize connection;
 @synthesize data;
 @synthesize media;
-@synthesize delegate;
+@synthesize delegate,isLoading;
 
 
 - (void)loadImageFromMedia:(Media *) aMedia {
 	self.media = aMedia;
-	
+	if(self.isLoading){
+        NSLog(@"AsyncImageView: Already loading another request...returning");
+     return;   
+    }
+    else self.isLoading = YES;
 	//check if the media already as the image, if so, just grab it
 	if (self.media.image) {
 		[self updateViewWithNewImage:self.media.image];
@@ -81,7 +85,7 @@
 	
 	//Save the image in the media
 	self.media.image = image;
-	
+	self.isLoading= NO;
 	[self updateViewWithNewImage:image];
 }
 
@@ -108,10 +112,7 @@
 
 }
 
-- (UIImage*) getImage {
-    UIImageView* iv = [[self subviews] objectAtIndex:0];
-    return [iv image];
-}
+
 
 
 - (void)dealloc {
