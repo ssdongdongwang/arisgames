@@ -262,7 +262,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 
     if (indexPath.section == 0 && indexPath.row == 0) {
        if ([media.type isEqualToString: @"Image"] && media.url) {
-           if(self.mediaImageView.media.image == nil)
+           if(!self.mediaImageView.loaded)
         [self.mediaImageView loadImageFromMedia:media];
           
            

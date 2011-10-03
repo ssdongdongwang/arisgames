@@ -14,7 +14,7 @@
 @synthesize connection;
 @synthesize data;
 @synthesize media;
-@synthesize delegate,isLoading;
+@synthesize delegate,isLoading,loaded;
 
 
 - (void)loadImageFromMedia:(Media *) aMedia {
@@ -26,10 +26,11 @@
     else self.isLoading = YES;
 	//check if the media already as the image, if so, just grab it
 	if (self.media.image) {
+        self.loaded = YES;
 		[self updateViewWithNewImage:self.media.image];
 		return;
 	}
-    
+    else self.loaded = NO;
     if (!self.media.url) {
         NSLog(@"AsyncImageView: loadImageFromMedia with null url! ImageId:%@", self.media.uid);
         return;
@@ -85,6 +86,7 @@
 	
 	//Save the image in the media
 	self.media.image = image;
+    self.loaded = YES;
 	self.isLoading= NO;
 	[self updateViewWithNewImage:image];
 }
