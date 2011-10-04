@@ -15,14 +15,14 @@
 @implementation Item
 
 @synthesize name,url;
-@synthesize kind,creatorId;
+@synthesize kind;
 @synthesize forcedDisplay;
 
 @synthesize itemId;
 @synthesize mediaId;
 @synthesize iconMediaId;
 @synthesize locationId;
-@synthesize weight,type;
+@synthesize weight;
 @synthesize qty,maxQty;
 @synthesize description;
 

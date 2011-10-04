@@ -56,6 +56,8 @@
 	NSString *currentLanguage = [languages objectAtIndex:0];
 	NSLog(@"Current Locale: %@", [[NSLocale currentLocale] localeIdentifier]);
 	NSLog(@"Current language: %@", currentLanguage);
+	[languages release];
+	[currentLanguage release];
     
 	//register for notifications from views
 	NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
@@ -99,11 +101,6 @@
     AttributesViewController *attributesViewController = [[[AttributesViewController alloc] initWithNibName:@"AttributesViewController" bundle:nil] autorelease];
 	UINavigationController *attributesNavigationController = [[UINavigationController alloc] initWithRootViewController: attributesViewController];
 	attributesNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    
-    //Setup Notes View
-    NotebookViewController *notesViewController = [[[NotebookViewController alloc] initWithNibName:@"NotebookViewController" bundle:nil] autorelease];
-	UINavigationController *notesNavigationController = [[UINavigationController alloc] initWithRootViewController: notesViewController];
-	notesNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     
 	//Setup Camera View
 	CameraViewController *cameraViewController = [[[CameraViewController alloc] initWithNibName:@"Camera" bundle:nil] autorelease];
@@ -162,7 +159,6 @@
 										qrScannerNavigationController,
 										//arNavigationController,
                                         attributesNavigationController,
-                                        notesNavigationController,
 										cameraNavigationController,
 										audioRecorderNavigationController,
 										bogusSelectGameViewController,
@@ -173,7 +169,7 @@
     self.defaultViewControllerForMainTabBar = questsNavigationController;
     self.tabBarController.view.hidden = YES;
     [window addSubview:self.tabBarController.view];
-    [AppModel sharedAppModel].defaultGameTabList = self.tabBarController.customizableViewControllers;
+    
     
     //Setup the Game Selection Tab Bar
     
@@ -235,7 +231,7 @@
         self.tabBarController.view.hidden = YES;
         self.gameSelectionTabBarController.view.hidden = NO;
     }
-	//self.waitingIndicatorView = [[WaitingIndicatorView alloc] init];
+
 }
 
 - (void)displayNotificationTitle:(NSMutableDictionary *) titleAndPrompt{
@@ -471,7 +467,6 @@
 	[[AppModel sharedAppModel] saveUserDefaults];
 	
 	//Clear out the old game data
-    [[AppServices sharedAppServices] fetchTabBarItemsForGame: selectedGame.gameId];
 	[[AppServices sharedAppServices] resetAllPlayerLists];
     [[AppServices sharedAppServices] resetAllGameLists];
 	[tutorialViewController dismissAllTutorials];
@@ -501,58 +496,6 @@
     	
 }
 
--(void)changeTabBar{
-    UINavigationController *tempNav = [[UINavigationController alloc] init];
-    NSArray *newCustomVC = [[NSMutableArray alloc] initWithCapacity:10];
-    NSArray *newTabList = [[NSMutableArray alloc] initWithCapacity:10];
-    NSArray *tmpTabList = [[NSMutableArray alloc] initWithCapacity:11];
-
-    NSSortDescriptor *sortDescriptor;
-    sortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"tabIndex"
-                                                  ascending:YES] autorelease];
-    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-    
-    tmpTabList = [[AppModel sharedAppModel].gameTabList sortedArrayUsingDescriptors:sortDescriptors];
-    Tab *tmpTab = [[Tab alloc] init];
-    for(int y = 0; y < [tmpTabList count];y++){
-        tmpTab = [tmpTabList objectAtIndex:y];
-                if ([tmpTab.tabName isEqualToString:@"QUESTS"]) tmpTab.tabName = @"Quests";
-                else if([tmpTab.tabName isEqualToString:@"GPS"]) tmpTab.tabName = @"Map";
-                else if([tmpTab.tabName isEqualToString:@"INVENTORY"]) tmpTab.tabName = @"Inventory";
-                else if([tmpTab.tabName isEqualToString:@"QR"]) tmpTab.tabName = @"Decoder";
-                else if([tmpTab.tabName isEqualToString:@"PLAYER"]) tmpTab.tabName = @"Player";
-                else if([tmpTab.tabName isEqualToString:@"CAMERA"]) tmpTab.tabName = @"Camera";
-                else if([tmpTab.tabName isEqualToString:@"MICROPHONE"]) tmpTab.tabName = @"Recorder";
-                else if([tmpTab.tabName isEqualToString:@"NOTE"]) tmpTab.tabName = @"Notebook";
-                else if([tmpTab.tabName isEqualToString:@"LOGOUT"]) tmpTab.tabName = @"Logout";
-                else if([tmpTab.tabName isEqualToString:@"STARTOVER"]) tmpTab.tabName = @"Start Over";
-                else if([tmpTab.tabName isEqualToString:@"PICKGAME"]) tmpTab.tabName = @"Select Game";
-        if(tmpTab.tabIndex != 0) {
-            
-        newTabList = [newTabList arrayByAddingObject:tmpTab];
-        }
-    }
-    for(int y = 0; y < [newTabList count];y++){
-        tmpTab = [newTabList objectAtIndex:y];
-    for(int x = 0; x < [[AppModel sharedAppModel].defaultGameTabList count];x++){
-        
-        tempNav = (UINavigationController *)[[AppModel sharedAppModel].defaultGameTabList objectAtIndex:x];
-        if([tmpTab.tabName isEqualToString:@"Select Game"]){
-            BogusSelectGameViewController *bogusSelectGameViewController = [[BogusSelectGameViewController alloc] init];
-            newCustomVC = [newCustomVC arrayByAddingObject:bogusSelectGameViewController];
-            //[bogusSelectGameViewController release];
-            break;
-        }
-
-        if([tempNav.navigationItem.title isEqualToString:tmpTab.tabName]) newCustomVC = [newCustomVC arrayByAddingObject:tempNav];
-            }
-    }
-    self.tabBarController.viewControllers = [NSArray arrayWithArray: newCustomVC];
-    //[newCustomVC release];
-    [tempNav release];
-
-    
-}
 
 - (void)performLogout:(NSNotification *)notification {
     NSLog(@"Performing Logout: Clearing NSUserDefaults and Displaying Login Screen");
@@ -625,15 +568,11 @@
 
 
 - (void) showNewWaitingIndicator:(NSString *)message displayProgressBar:(BOOL)displayProgressBar {
-	NSLog (@"AppDelegate: Showing Waiting Indicator With Message:%@",message);
-	//if (self.waitingIndicatorView) [self.waitingIndicatorView dismiss];
-	
-    if (self.waitingIndicatorView){ 
-        [self removeNewWaitingIndicator];
-        [self.waitingIndicatorView release];}
+	NSLog (@"AppDelegate: Showing Waiting Indicator");
+    if (self.waitingIndicatorView) [self.waitingIndicatorView release];
 	
 	self.waitingIndicatorView = [[WaitingIndicatorView alloc] initWithWaitingMessage:message showProgressBar:NO];
-        [self.waitingIndicatorView show];
+    [self.waitingIndicatorView show];
 	
 	[[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the activity indicator show before returning	
 }

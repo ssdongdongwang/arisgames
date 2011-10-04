@@ -16,8 +16,7 @@
 #import "Media.h"
 #import "Annotation.h"
 #import <UIKit/UIActionSheet.h>
-#import "DataCollectionViewController.h"
-#import "NoteViewController.h"
+
 
 static float INITIAL_SPAN = 0.001;
 
@@ -28,7 +27,7 @@ static float INITIAL_SPAN = 0.001;
 @synthesize tracking;
 @synthesize mapTypeButton;
 @synthesize playerTrackingButton;
-@synthesize toolBar,addMediaButton;
+@synthesize toolBar;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -96,13 +95,7 @@ static float INITIAL_SPAN = 0.001;
 	[self refresh];
 
 }
-	
-- (IBAction)addMediaButtonAction: (id) sender{
-    NoteViewController *noteVC = [[NoteViewController alloc] initWithNibName:@"NoteViewController" bundle:nil];
-    noteVC.delegate = self;
-    [self.navigationController pushViewController:noteVC animated:YES];
-    [noteVC release];
-}
+		
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -123,8 +116,6 @@ static float INITIAL_SPAN = 0.001;
 	playerTrackingButton.action = @selector(refreshButtonAction:);
 	playerTrackingButton.style = UIBarButtonItemStyleDone;
 
-    addMediaButton.target = self;
-    addMediaButton.action = @selector(addMediaButtonAction:);
 	
 	//Force an update of the locations
 	[[AppServices sharedAppServices] forceUpdateOnNextLocationListFetch];

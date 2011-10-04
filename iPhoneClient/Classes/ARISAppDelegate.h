@@ -34,7 +34,6 @@
 #import "AudioToolbox/AudioToolbox.h"
 #import "Reachability.h"
 #import "TutorialViewController.h"
-#import "NotebookViewController.h"
 #import <MessageUI/MFMailComposeViewController.h>
 
 #import "GamePickerNearbyViewController.h"
@@ -111,6 +110,5 @@
 - (void) changeNavColor: (NSDictionary *) navBarAndColorDict;
 - (void) changeNavTitle: (NSDictionary *) navBarTitleAndPromptDict;
 - (void) decrementNotificationCount: (NSDictionary *) navBarDict; 
-- (void) changeTabBar;
 - (void) resetCurrentlyFetchingVars;
 @end

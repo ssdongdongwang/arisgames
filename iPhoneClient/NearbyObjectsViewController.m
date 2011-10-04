@@ -223,7 +223,6 @@
 	
 	Location<NearbyObjectProtocol> *l;
 	l = [self.oldNearbyLocationList objectAtIndex:indexPath.row];
-    l.delegate = self;
 	[l display];
 }
 

@@ -1,7 +1,6 @@
 package org.arisgames.editor.dao
 {
 import mx.rpc.remoting.RemoteObject;
-
 import org.arisgames.editor.util.AppConstants;
 
 public class AppDAO
@@ -19,7 +18,6 @@ public class AppDAO
 	private static var augBubbleServer:RemoteObject;
 	private static var conversationServer:RemoteObject;
 	private static var itemServer:RemoteObject;
-	private static var playerNoteServer:RemoteObject;
     private static var locationServer:RemoteObject;
     private static var contentServer:RemoteObject;
     private static var mediaServer:RemoteObject;
@@ -95,19 +93,6 @@ public class AppDAO
         }
         return nodeServer;
     }
-	
-	public function getPlayerNoteServer():RemoteObject
-	{
-		if(playerNoteServer == null)
-		{
-			playerNoteServer = new RemoteObject();
-			playerNoteServer.source = "aris_"+ AppConstants.APPLICATION_ENVIRONMENT_SERVER_VERSION + ".notes";
-			playerNoteServer.destination = "amfphp";
-			playerNoteServer.showBusyCursor = true;
-		}
-		return playerNoteServer;
-	}
-	
 	public function getConversationServer():RemoteObject
 	{
 		if (conversationServer == null)

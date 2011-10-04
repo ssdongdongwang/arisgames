@@ -4,9 +4,9 @@ public class AppConstants
 {
 	//Server URL
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/stagingserver1"; //For other URL's to append to- Staging
-	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to- Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://atsosxdev.doit.wisc.edu/aris/server"; //For other URL's to append to- Dev
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
+	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
 
 	
 	//Server Version
@@ -18,9 +18,9 @@ public class AppConstants
 	public static const APPLICATION_ENVIRONMENT_GATEWAY_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/gateway.php"; //services-config.xml
 
 	//Google API
-	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBRloMOfjiI7F4SM41AgXh_4cb6l9xTHRyPNO3mgDcJkTIE742EL8ZoQ_Q"; //arisgames.org
+	public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBRloMOfjiI7F4SM41AgXh_4cb6l9xTHRyPNO3mgDcJkTIE742EL8ZoQ_Q"; //arisgames.org
 	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAArdp0t4v0pcA_JogLZhjrjBTf4EykMftsP7dwAfDsLsFl_zB7rBTq5-3Hy0k3tU1tgyomozB1YmIfNg"; //davembp
-	public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAAo0AIYqWK4StlyQiw0FkCnhTFFMM2iSZ1Oq9cs2gegUR1k01AuBShe9g60gh2q1UpWRotcj3RpzpT2A"; //Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAAo0AIYqWK4StlyQiw0FkCnhTFFMM2iSZ1Oq9cs2gegUR1k01AuBShe9g60gh2q1UpWRotcj3RpzpT2A"; //Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_GOOGLEMAP_KEY:String = "ABQIAAAA-Z69V9McvCh02XYNV5UHBBQsvlSBtAWfm4N2P3iTGfWOp-UrmRRTU3pFPQwMJB92SZ3plLjvRpMIIw"; //atsosxdev
 
 
@@ -40,7 +40,6 @@ public class AppConstants
     public static const DYNAMICEVENT_PLACEMARKSELECTED:String = "DynamicEventPlaceMarkSelected";
     public static const DYNAMICEVENT_PLACEMARKREQUESTSDELETION:String = "DynamicEventPlaceMarkRequestsDeletion";
 	public static const DYNAMICEVENT_EDITOBJECTPALETTEITEM:String = "EditObjectPaletteItem";
-	public static const DYNAMICEVENT_OBJECTPALETTEITEMICONSET:String = "ObjectPaletteItemIconSetSoSetItsLocationsIcons";
 	public static const DYNAMICEVENT_HIGHLIGHTOBJECTPALETTEITEM:String = "HighlightObjectPaletteItem";
     public static const DYNAMICEVENT_CLOSEOBJECTPALETTEITEMEDITOR:String = "CloseObjectPaletteItemEditor";
     public static const DYNAMICEVENT_CLOSEMEDIAPICKER:String = "CloseMediaPicker";
@@ -68,7 +67,6 @@ public class AppConstants
     public static const CONTENTTYPE_ITEM:String = "Item";
 	public static const CONTENTTYPE_WEBPAGE:String = "WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE:String = "Panoramic";
-	public static const CONTENTTYPE_PLAYER_NOTE:String = "PlayerNote";
     public static const CONTENTTYPE_QRCODEGROUP:String = "QR Code Group";
     public static const CONTENTTYPE_PAGE_VAL:Number = 0;
     public static const CONTENTTYPE_CHARACTER_VAL:Number = 1;
@@ -76,13 +74,11 @@ public class AppConstants
     public static const CONTENTTYPE_QRCODEGROUP_VAL:Number = 3;
 	public static const CONTENTTYPE_WEBPAGE_VAL:Number = 4;
 	public static const CONTENTTYPE_AUGBUBBLE_VAL:Number = 5;
-	public static const CONTENTTYPE_PLAYER_NOTE_VAL:Number = 6;
     public static const CONTENTTYPE_PAGE_DATABASE:String = "Node";
     public static const CONTENTTYPE_CHARACTER_DATABASE:String = "Npc";
 	public static const CONTENTTYPE_ITEM_DATABASE:String = "Item";
 	public static const CONTENTTYPE_WEBPAGE_DATABASE:String = "WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE_DATABASE:String = "AugBubble";
-	public static const CONTENTTYPE_PLAYER_NOTE_DATABASE:String = "PlayerNote";
     public static const PLACEMARK_DEFAULT_ERROR_RANGE:Number = 30;
 	
 	// Default Names (Name of new objects as they are created)
@@ -91,7 +87,6 @@ public class AppConstants
 	public static const CONTENTTYPE_ITEM_DEFAULT_NAME:String = "Unnamed Item";
 	public static const CONTENTTYPE_WEBPAGE_DEFAULT_NAME:String = "Unnamed WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE_DEFAULT_NAME:String = "Unnamed Panoramic";
-	public static const CONTENTTYPE_PLAYER_NOTE_DEFAULT_NAME:String = "Unnamed Player Note";
 
     // Label Constants
     public static const BUTTON_LOGIN:String = "Login!";
@@ -120,14 +115,11 @@ public class AppConstants
 	public static const ITEM_TYPE_NORMAL:String = "NORMAL";
 	public static const ITEM_TYPE_ATTRIBUTE:String = "ATTRIB";
 	public static const ITEM_TYPE_URL:String = "URL";
-	public static const ITEM_TYPE_NOTE:String = "NOTE";
-
 	
 	//Player State Changes
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_ITEM:String = "VIEW_ITEM";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_WEBPAGE:String = "VIEW_WEBPAGE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_AUGBUBBLE:String = "VIEW_AUGBUBBLE";
-	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_PLAYER_NOTE:String = "VIEW_PLAYER_NOTE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_NODE:String = "VIEW_NODE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_NPC:String = "VIEW_NPC";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_RECEIVE_WEBHOOK:String = "RECEIVE_WEBHOOK";
@@ -158,13 +150,9 @@ public class AppConstants
 	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_WEBPAGE";
 	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_HUMAN:String = "Player Never Viewed Web Page";
 	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_DATABASE:String = "PLAYER_VIEWED_AUGBUBBLE";
-	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN:String = "Player Viewed Panoramic";
+	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN:String = "Player Viewed Aug Bubble";
 	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_AUGBUBBLE";
-	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_HUMAN:String = "Player Never Viewed Panoramic";
-	public static const REQUIREMENT_PLAYER_VIEWED_PLAYER_NOTE_DATABASE:String = "PLAYER_VIEWED_PLAYER_NOTE";
-	public static const REQUIREMENT_PLAYER_VIEWED_PLAYER_NOTE_HUMAN:String = "Player Viewed Player Note";
-	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_PLAYER_NOTE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_PLAYER_NOTE";
-	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_PLAYER_NOTE_HUMAN:String = "Player Never Viewed Player Note";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_HUMAN:String = "Player Never Viewed Aug Bubble";
     public static const REQUIREMENT_PLAYER_VIEWED_NODE_DATABASE:String = "PLAYER_VIEWED_NODE";
     public static const REQUIREMENT_PLAYER_VIEWED_NODE_HUMAN:String = "Player Viewed Plaque/Script";
     public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_NODE";
@@ -193,26 +181,12 @@ public class AppConstants
 	public static const REQUIREMENT_BOOLEAN_OR_DATABASE:String = "OR";
 	public static const REQUIREMENT_BOOLEAN_OR_HUMAN:String = "Only this one";
 	
-	// Tab Bar Server Type
-	public static const TAB_BAR_TYPE_QUESTS:String = "QUESTS";
-	public static const TAB_BAR_TYP_GPSE:String = "GPS";
-	public static const TAB_BAR_TYPE_INVENTORY:String = "INVENTORY";
-	public static const TAB_BAR_TYPE_QR:String = "QR";
-	public static const TAB_BAR_TYPE_PLAYER:String = "PLAYER";
-	public static const TAB_BAR_TYPE_CAMERA:String = "CAMERA";
-	public static const TAB_BAR_TYPE_MICROPHONE:String = "MICROPHONE";
-	public static const TAB_BAR_TYPE_NOTE:String = "NOTE";
-	public static const TAB_BAR_TYPE_PICKGAME:String = "PICKGAME";
-	public static const TAB_BAR_TYPE_LOGOUT:String = "LOGOUT";
-	public static const TAB_BAR_TYPE_STARTOVER:String = "STARTOVER";
-	
     // Defaults
     public static const DEFAULT_ICON_MEDIA_ID_NPC:Number = 1;
     public static const DEFAULT_ICON_MEDIA_ID_ITEM:Number = 2;
     public static const DEFAULT_ICON_MEDIA_ID_PLAQUE:Number = 3;
 	public static const DEFAULT_ICON_MEDIA_ID_WEBPAGE:Number = 4;
 	public static const DEFAULT_ICON_MEDIA_ID_AUGBUBBLE:Number = 5;
-	public static const DEFAULT_ICON_MEDIA_ID_PLAYER_NOTE:Number = 5;
 
 	// Palette Tree Stuff
 	public static const PALETTE_TREE_SELF_FOLDER_ID:Number = 0;

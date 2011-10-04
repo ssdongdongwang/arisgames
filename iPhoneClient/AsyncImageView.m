@@ -89,8 +89,6 @@
     self.loaded = YES;
 	self.isLoading= NO;
 	[self updateViewWithNewImage:image];
-    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ImageReady" object:nil]];
-
 }
 
 - (void) updateViewWithNewImage:(UIImage*)image {
@@ -99,7 +97,6 @@
 	[UIView setAnimationDuration:0.1];
 	self.alpha = 0;
 	[UIView commitAnimations];
-
 	self.image = image;
     self.contentMode = UIViewContentModeScaleAspectFit;
     [self setNeedsLayout];

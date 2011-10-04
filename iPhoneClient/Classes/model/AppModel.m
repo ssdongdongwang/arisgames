@@ -19,7 +19,7 @@
 @synthesize loggedIn, userName, password, playerId;
 @synthesize currentGame, gameList, locationList, playerList,recentGameList;
 @synthesize playerLocation, inventory, questList, networkAlert;
-@synthesize gameMediaList, gameItemList, gameNodeList, gameNpcList,gameWebPageList,gamePanoramicList,gameTabList, defaultGameTabList,gameNoteList,playerNoteList;
+@synthesize gameMediaList, gameItemList, gameNodeList, gameNpcList,gameWebPageList,gamePanoramicList;
 @synthesize locationListHash, questListHash, inventoryHash,profilePic,attributes;
 
 @synthesize nearbyLocationsList;
@@ -46,14 +46,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppModel);
 - (void)dealloc {
 	[gameMediaList release];
 	[gameList release];
-    [defaultGameTabList release];
     [recentGameList release];
 	[serverURL release];
 	[userName release];
 	[password release];
-    [gameTabList release];
-    [gameNoteList release];
-    [playerNoteList release];
     [super dealloc];
 }
 
@@ -298,12 +294,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppModel);
 	return node;
 }
 
-- (Note *)noteForNoteId:(int)mId{
-	Note *aNote = [[AppServices sharedAppServices]fetchNote:mId];
-	
-		return aNote;
-}
-
 - (WebPage *)webPageForWebPageID: (int)mId {
 	WebPage *page = [self.gameWebPageList objectForKey:[NSNumber numberWithInt:mId]];
 	
@@ -317,7 +307,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppModel);
 	}
 	return page;
 }
-
 
 - (Panoramic *)panoramicForPanoramicId:(int)mId {
     Panoramic *pan = [self.gamePanoramicList objectForKey:[NSNumber numberWithInt:mId]];

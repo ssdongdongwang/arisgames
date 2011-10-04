@@ -6,13 +6,11 @@ import mx.rpc.IResponder;
 import org.arisgames.editor.dao.AppDAO;
 import org.arisgames.editor.data.Game;
 import org.arisgames.editor.data.PlaceMark;
-import org.arisgames.editor.data.TabBarItem;
 import org.arisgames.editor.data.arisserver.AugBubble;
 import org.arisgames.editor.data.arisserver.Conversation;
 import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Location;
 import org.arisgames.editor.data.arisserver.NPC;
-import org.arisgames.editor.data.arisserver.PlayerNote;
 import org.arisgames.editor.data.arisserver.Node;
 import org.arisgames.editor.data.arisserver.PlayerStateChange;
 import org.arisgames.editor.data.arisserver.Quest;
@@ -112,13 +110,6 @@ public class AppServices
 
 	}
 
-	public function duplicateObject(game:Game, obId:int, resp:IResponder):void
-	{
-		trace("Appservices: duplicateItem");
-		var r:Object;
-		r = AppDAO.getInstance().getContentServer().duplicateObject(game.gameId, obId);
-		r.addResponder(resp);
-	}
 
     public function loadGamesByUserId(userId:Number, resp:IResponder):void
     {
@@ -169,34 +160,11 @@ public class AppServices
 		r = AppDAO.getInstance().getAugBubbleServer().getAugBubbles(gid);
 		r.addResponder(resp);
 	}
-	
-	public function getPlayerNoteById(gid:Number, pnid:Number, resp:IResponder):void
-	{
-		var r:Object;
-		r = AppDAO.getInstance().getPlayerNoteServer().getNoteById(pnid);
-		r.addResponder(resp);
-	}
 
 	public function getWebHookById(gid:Number, wid:Number, resp:IResponder):void
 	{
 		var r:Object;
 		r = AppDAO.getInstance().getWebHookServer().getWebHook(gid, wid);
-		r.addResponder(resp);
-	}
-	
-	public function savePlayerNote(gid:Number, playerNote:PlayerNote, resp:IResponder):void
-	{
-		var r:Object;
-		if (isNaN(playerNote.playerNoteId) || playerNote.playerNoteId == 0)
-		{
-			trace("This item doesn't have a player note Id, so call create Player Note");
-			r = AppDAO.getInstance().getPlayerNoteServer().createNewNote(gid, 0);
-		}
-		else
-		{
-			trace("This item has a playerNoteId (" + playerNote.playerNoteId + "), so call update PlayerNote.");
-			r = AppDAO.getInstance().getPlayerNoteServer().updateNote(playerNote.playerNoteId, playerNote.title, playerNote.shared);
-		}
 		r.addResponder(resp);
 	}
 	
@@ -410,23 +378,6 @@ public class AppServices
         l = AppDAO.getInstance().getContentServer().deleteContent(gid, opi.id);
         l.addResponder(resp);
     }
-	
-	public function getTabBarItemsForGame(gid:Number, resp:IResponder):void
-	{
-		var l:Object;
-		trace("GetTabBarItemsForGame: GameId = " + gid);
-		l = AppDAO.getInstance().getGameServer().getTabBarItemsForGame(gid);
-		l.addResponder(resp);
-	}
-	
-	public function saveTab(gid:Number, tab:TabBarItem, resp:IResponder):void
-	{
-		var l:Object;
-		trace("Saving tab...");
-		if(!tab.enabled) tab.index = 0;
-		l =  AppDAO.getInstance().getGameServer().saveTab(gid, tab.type, tab.index);
-		l.addResponder(resp);
-	}
 
     public function getFoldersAndContentByGameId(gid:Number, resp:IResponder):void
     {
@@ -566,24 +517,6 @@ public class AppServices
 	public function getAugBubbleMedia(gid:Number, augId:Number, resp:IResponder):void{
 		var l:Object;
 		l = AppDAO.getInstance().getAugBubbleServer().getAugBubbleMedia(gid, augId);
-		l.addResponder(resp);
-	}
-	
-	public function updatePlayerNoteMediaIndex(pnId:Number, mediaId:Number, game:Game, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().addContentToNote(pnId, game.gameId, 0, mediaId, "MEDIA", "");
-		l.addResponder(resp);
-	}
-	
-	public function removePlayerNoteMediaIndex(contentId:Number, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().deleteNoteContent(contentId);
-		l.addResponder(resp);
-	}
-	
-	public function getPlayerNoteMedia(gid:Number, augId:Number, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().getPlayerNoteMedia(gid, augId);
 		l.addResponder(resp);
 	}
 
