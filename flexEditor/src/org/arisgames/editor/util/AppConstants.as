@@ -4,17 +4,18 @@ public class AppConstants
 {
 	//Server URL
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/stagingserver1"; //For other URL's to append to- Staging
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Dave's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to- Phil's Machine
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://atsosxdev.doit.wisc.edu/aris/server"; //For other URL's to append to- Dev
-	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/qaserver"; //For other URL's to append to- QA
-
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/qaserver"; //For other URL's to append to- QA
+	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/devserver";
 	
 	//Server Version
 	public static const APPLICATION_ENVIRONMENT_SERVER_VERSION:String = "1_5";
 	
 	public static const APPLICATION_ENVIRONMENT_JSON_SERVICES_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/json.php/aris_" + APPLICATION_ENVIRONMENT_SERVER_VERSION + ".";
 	public static const APPLICATION_ENVIRONMENT_SERVICES_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/services/aris_" + APPLICATION_ENVIRONMENT_SERVER_VERSION + "/"; //staging		
-	public static const APPLICATION_ENVIRONMENT_UPLOAD_SERVER_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/services/aris_" + APPLICATION_ENVIRONMENT_SERVER_VERSION + "/uploadhandler.php";
+	public static const APPLICATION_ENVIRONMENT_UPLOAD_SERVER_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/services/aris_" + APPLICATION_ENVIRONMENT_SERVER_VERSION + "/uploadHandler.php";
 	public static const APPLICATION_ENVIRONMENT_GATEWAY_URL:String = APPLICATION_ENVIRONMENT_ROOT_URL+"/gateway.php"; //services-config.xml
 
 	//Google API
