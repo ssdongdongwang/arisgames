@@ -37,7 +37,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 
 
 @implementation NodeViewController
-@synthesize node, tableView, scrollView,aWebView,isLink,newHeight, hasMedia, mediaImageView,imageNewHeight;
+@synthesize node, tableView, scrollView,aWebView,isLink,newHeight, hasMedia,spinner, mediaImageView,imageNewHeight;
 @synthesize continueButton;
 
 // The designated initializer. Override to perform setup that is required before the view is loaded.
@@ -55,6 +55,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         self.isLink=NO;
         self.mediaImageView = [[AsyncImageView alloc]init];
         self.mediaImageView.delegate = self;
+        self.spinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     }
 
     return self;
@@ -70,7 +71,6 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 	ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.modalPresent = YES;
     self.aWebView.delegate = self;
-    self.aWebView.hidden = NO;
     
     NSString *htmlDescription = [NSString stringWithFormat:kPlaqueDescriptionHtmlTemplate, self.node.text];
 	[self.aWebView loadHTMLString:htmlDescription baseURL:nil];
@@ -79,6 +79,12 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     mediaImageView.contentMode = UIViewContentModeScaleAspectFit;
     mediaImageView.frame = CGRectMake(0, 0, 320, 200);
     self.imageNewHeight = mediaImageView.frame.size.height;
+    self.aWebView.hidden = YES;
+
+    
+}
+-(void)viewWillAppear:(BOOL)animated{
+    
     
 }
 -(void)viewDidDisappear:(BOOL)animated{
@@ -88,12 +94,16 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     //if (!self.isLink){
         float nHeight = [[self.aWebView stringByEvaluatingJavaScriptFromString:@"document.body.offsetHeight;"] floatValue];
         self.newHeight = nHeight;
-        
+    webView.hidden = NO;
         CGRect descriptionFrame = [self.aWebView frame];	
         descriptionFrame.size = CGSizeMake(descriptionFrame.size.width,newHeight+5);
         [self.aWebView setFrame:descriptionFrame];	
 
         [tableView reloadData];
+    for(int x = 0; x < [webView.subviews count]; x ++){
+        if([[webView.subviews objectAtIndex:x] isKindOfClass:[UIActivityIndicatorView class]])
+            [[webView.subviews objectAtIndex:x] removeFromSuperview];
+    }
    // }
 }
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
@@ -109,7 +119,11 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         return NO;
     }
     else{
-    self.isLink = YES;
+           self.isLink = YES;
+        [spinner startAnimating];
+        spinner.center = webView.center;
+        spinner.backgroundColor = [UIColor blackColor];
+        [webView addSubview:spinner];
         return YES;}
 }
 - (IBAction)backButtonTouchAction: (id) sender{
@@ -153,6 +167,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 }
 
 -(IBAction)playMovie:(id)sender {
+    [mMoviePlayer.moviePlayer play];
 	[self presentMoviePlayerViewControllerAnimated:mMoviePlayer];
 }
 -(void)imageFinishedLoading{
@@ -190,7 +205,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 	[scrollView release];
 	[mediaPlaybackButton release];
     [continueButton release];
-	
+	[aWebView release];
 	//remove listeners
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -211,7 +226,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 		NSLog(@"NodeViewController: Playable Load State");
         [mediaPlaybackButton setTitle:NSLocalizedString(@"TouchToPlayKey",@"") forState:UIControlStateNormal];
 		mediaPlaybackButton.enabled = YES;	
-		[self playMovie:nil];
+		//[self playMovie:nil];
 	} 
 	if( state & MPMovieLoadStatePlaythroughOK ) {
 		NSLog(@"NodeViewController: Playthrough OK Load State");
@@ -280,7 +295,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
            NSLog(@"NodeVC: cellForRowAtIndexPath: This is an A/V Plaque");
 
            //Setup the Button
-           mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 295)];
+           mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 240)];
            [mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
            [mediaPlaybackButton setBackgroundImage:[UIImage imageNamed:@"clickToPlay.png"] forState:UIControlStateNormal];
            [mediaPlaybackButton setTitle:NSLocalizedString(@"PreparingToPlayKey",@"") forState:UIControlStateNormal];
@@ -300,8 +315,8 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
            UIImage *videoThumb = [[mMoviePlayer.moviePlayer thumbnailImageAtTime:(NSTimeInterval)1.0 timeOption:MPMovieTimeOptionNearestKeyFrame] retain];
            //Resize thumb
            
-           UIGraphicsBeginImageContext(CGSizeMake(320.0f, 295.0f));
-           [videoThumb drawInRect:CGRectMake(0, 0, 320.0f, 295.0f)];
+           UIGraphicsBeginImageContext(CGSizeMake(320.0f, 240.0f));
+           [videoThumb drawInRect:CGRectMake(0, 0, 320.0f, 240.0f)];
            UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();    
            UIGraphicsEndImageContext();
            [mediaPlaybackButton setBackgroundImage:newImage forState:UIControlStateNormal];
@@ -320,7 +335,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
            descriptionFrame.origin.x = 15;
            descriptionFrame.origin.y = 15;
            [aWebView setFrame:descriptionFrame];
-           cell.backgroundView =aWebView;
+           cell.backgroundView = aWebView;
            cell.backgroundColor = [UIColor blackColor];
 
        }

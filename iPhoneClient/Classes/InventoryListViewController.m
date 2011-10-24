@@ -317,6 +317,7 @@
             iconMedia = [[AppModel sharedAppModel] mediaForMediaId: item.iconMediaId];
             [self.iconCache  addObject:iconMedia];
         }
+        if(!iconView.loaded)
 		[iconView loadImageFromMedia:iconMedia];
 	}
 	else {
