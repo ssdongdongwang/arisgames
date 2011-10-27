@@ -558,6 +558,10 @@
 		AB8A3CCD104936F500422773 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = ../../../../../../usr/lib/libiconv.2.dylib; sourceTree = SDKROOT; };
 		AB8A429E104C7F8C00422773 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
 		AB8A429F104C7F8C00422773 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = Node.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		AB8C6230145A093A00C8AFB2 /* Engineering Fountain.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Engineering Fountain.gpx"; sourceTree = "<group>"; };
+		AB8C6231145A096100C8AFB2 /* Bascom Hill.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Bascom Hill.gpx"; sourceTree = "<group>"; };
+		AB8C6232145A097E00C8AFB2 /* Engage Offices.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Engage Offices.gpx"; sourceTree = "<group>"; };
+		AB8C6233145A09A900C8AFB2 /* Institutes for Discovery.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Institutes for Discovery.gpx"; sourceTree = "<group>"; };
 		AB8E31F51228399B00C198C3 /* textFade.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = textFade.png; sourceTree = "<group>"; };
 		AB8FD009117BCF61004F8B9B /* GameDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameDetails.h; sourceTree = "<group>"; };
 		AB8FD00A117BCF61004F8B9B /* GameDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = GameDetails.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -867,6 +871,7 @@
 		29B97314FDCFA39411CA2CEA /* ARIS */ = {
 			isa = PBXGroup;
 			children = (
+				AB8C6234145A09AE00C8AFB2 /* GPX Locations */,
 				AB38DB3B13E4A1DE001EFF52 /* libiconv.dylib */,
 				AB1CA8AA13C7CC9000131F81 /* Frameworks and Dependancies */,
 				AB0A5BA3120365420065CE68 /* Localizable.strings */,
@@ -1269,6 +1274,17 @@
 				AB6B775410C9D64800275650 /* location.png */,
 			);
 			name = ARView;
+			sourceTree = "<group>";
+		};
+		AB8C6234145A09AE00C8AFB2 /* GPX Locations */ = {
+			isa = PBXGroup;
+			children = (
+				AB8C6233145A09A900C8AFB2 /* Institutes for Discovery.gpx */,
+				AB8C6232145A097E00C8AFB2 /* Engage Offices.gpx */,
+				AB8C6231145A096100C8AFB2 /* Bascom Hill.gpx */,
+				AB8C6230145A093A00C8AFB2 /* Engineering Fountain.gpx */,
+			);
+			name = "GPX Locations";
 			sourceTree = "<group>";
 		};
 		AB994443139EBD0C00C0878B /* RatingView */ = {
@@ -1761,7 +1777,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: David Gagnon (56YHU87885)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1781,7 +1797,7 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ARIS;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "95392608-6996-4F76-9735-018B7BB24CFD";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
