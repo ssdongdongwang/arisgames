@@ -38,7 +38,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 
 
 @implementation NodeViewController
-@synthesize node, tableView, isLink, hasMedia,spinner, mediaImageView, cellArray;
+@synthesize node, tableView, isLink, hasMedia,webViewSpinner, mediaImageView, cellArray;
 
 // The designated initializer. Override to perform setup that is required before the view is loaded.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -55,7 +55,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         self.isLink=NO;
         self.mediaImageView = [[AsyncImageView alloc]init];
         self.mediaImageView.delegate = self;
-        self.spinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        self.webViewSpinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     }
     
     return self;
@@ -96,6 +96,10 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         imageCell.backgroundView.layer.masksToBounds = YES;
         imageCell.backgroundView.layer.cornerRadius = 10.0;
         imageCell.userInteractionEnabled = NO;
+        
+        imageCell.frame = CGRectMake(0, 0, 320, 200);
+        self.mediaImageView.frame = CGRectMake(0, 0, 320, 200);
+
     }
     else if(([media.type isEqualToString: @"Video"] || [media.type isEqualToString: @"Audio"]) && media.url)
     {
@@ -135,21 +139,26 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     }
     
     //Setup the Description Webview and begin loading content
-    UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, 320, 60)];
+    UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, 300, 60)];
     webView.delegate = self;
     webView.backgroundColor =[UIColor clearColor];
     NSString *htmlDescription = [NSString stringWithFormat:kPlaqueDescriptionHtmlTemplate, self.node.text];
+    webView.alpha = 0.0; //The webView will resore alpha once it's loaded to avoid the ugly white blob
 	[webView loadHTMLString:htmlDescription baseURL:nil];
     
     //Create Description Web View Cell
     UITableViewCell *webCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"descriptionCell"];
     webCell.userInteractionEnabled = NO;
     CGRect descriptionFrame = [webView frame];	
-    descriptionFrame.origin.x = 10;
     [webView setFrame:descriptionFrame];
     webCell.backgroundView = webView;
     webCell.backgroundColor = [UIColor clearColor];
     
+    webViewSpinner.center = webCell.center;
+    [webViewSpinner startAnimating];
+    webViewSpinner.backgroundColor = [UIColor clearColor];
+    [webCell addSubview:webViewSpinner];
+
     //Create continue button cell
     UITableViewCell *buttonCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"continueButtonCell"];
     buttonCell.textLabel.text = @"Tap To Continue";
@@ -165,17 +174,16 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView{
     
+    webView.alpha = 1.00;
+    
     //Calculate the height of the web content
     float newHeight = [[webView stringByEvaluatingJavaScriptFromString:@"document.body.offsetHeight;"] floatValue];
     CGRect descriptionFrame = [webView frame];	
     descriptionFrame.size = CGSizeMake(descriptionFrame.size.width,newHeight+5);
     [webView setFrame:descriptionFrame];	
     
-    //Find the webView spinner and remove it
-    for(int x = 0; x < [webView.subviews count]; x ++){
-        if([[webView.subviews objectAtIndex:x] isKindOfClass:[UIActivityIndicatorView class]])
-            [[webView.subviews objectAtIndex:x] removeFromSuperview];
-    }
+    //Find the webCell spinner and remove it
+    [webViewSpinner removeFromSuperview];
     
     //Find the description cell and update it's frame with the new size
     for(int x = 0; x < 2; x++){
@@ -184,14 +192,12 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         }
     }
     
-    //Check to see if all the async loading is complete and we should reload the table with the new sizes
-    webLoaded = YES;
-    if((webLoaded && imageLoaded && hasMedia) ||(webLoaded && !hasMedia)) [self.tableView reloadData];
+    [tableView reloadData];
     
 }
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request 
 navigationType:(UIWebViewNavigationType)navigationType{
-    
+        
     if(self.isLink) {
         webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
         WebPage *temp = [[WebPage alloc]init];
@@ -203,13 +209,7 @@ navigationType:(UIWebViewNavigationType)navigationType{
         
         return NO;
     }
-    else{
-        [spinner startAnimating];
-        spinner.center = webView.center;
-        spinner.backgroundColor = [UIColor blackColor];
-        [webView addSubview:spinner];
-        return YES;
-    }
+    else return YES;
 }
 
 #pragma mark AsyncImageView Delegate Methods
@@ -223,10 +223,8 @@ navigationType:(UIWebViewNavigationType)navigationType{
         [(UITableViewCell *)[self.cellArray objectAtIndex:0] setFrame:mediaImageView.frame];
     }
     
-    //Check to see if all the async loading is complete and we should reload the table with the new sizes
-    imageLoaded = YES;
-    if((webLoaded && imageLoaded && hasMedia) || (webLoaded && !hasMedia))   [self.tableView reloadData];
-    
+    [tableView reloadData];
+        
 }
 
 

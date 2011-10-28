@@ -23,7 +23,7 @@
     BOOL imageLoaded, webLoaded;
     
     AsyncImageView *mediaImageView;
-    UIActivityIndicatorView *spinner;
+    UIActivityIndicatorView *webViewSpinner;
     NSArray *cellArray;
 }
 
@@ -31,12 +31,9 @@
 @property(readwrite, assign) BOOL isLink;
 @property(readwrite, assign) BOOL hasMedia;
 @property(nonatomic, retain) IBOutlet UITableView *tableView;
-@property(nonatomic, retain)UIActivityIndicatorView *spinner;
+@property(nonatomic, retain)UIActivityIndicatorView *webViewSpinner;
 @property(nonatomic,retain)AsyncImageView *mediaImageView;
 @property(nonatomic, retain)NSArray *cellArray;
-
-- (void)imageFinishedLoading;
-- (void) refreshView;
 
 @end
 
