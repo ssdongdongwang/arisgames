@@ -458,7 +458,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppServices);
     
 	//Update the server with the new Player Location
 	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].currentGame.gameId],
+						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
 						  nil];
