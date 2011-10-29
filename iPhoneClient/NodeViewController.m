@@ -16,6 +16,7 @@
 #import "webpageViewController.h"
 #import "WebPage.h"
 #import <AVFoundation/AVFoundation.h>
+#import "UIImage+Scale.h"
 
 static NSString * const OPTION_CELL = @"option";
 
@@ -40,6 +41,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 @implementation NodeViewController
 @synthesize node, tableView, isLink, hasMedia,webViewSpinner, mediaImageView, cellArray;
 
+
 // The designated initializer. Override to perform setup that is required before the view is loaded.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
@@ -55,7 +57,6 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         self.isLink=NO;
         self.mediaImageView = [[AsyncImageView alloc]init];
         self.mediaImageView.delegate = self;
-        self.webViewSpinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     }
     
     return self;
@@ -80,7 +81,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     else hasMedia = NO;
     
     //Create Image/AV Cell
-    UITableViewCell *imageCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"mediaCell"];
+    UITableViewCell *mediaCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"mediaCell"];
     
     if ([media.type isEqualToString: @"Image"] && media.url) {
         NSLog(@"NodeVC: cellForRowAtIndexPath: This is an Image Plaque");
@@ -92,56 +93,41 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
         }
         
         //Setup the cell as an image
-        imageCell.backgroundView = mediaImageView;
-        imageCell.backgroundView.layer.masksToBounds = YES;
-        imageCell.backgroundView.layer.cornerRadius = 5.0;
-        imageCell.userInteractionEnabled = NO;
+        mediaCell.backgroundView = mediaImageView;
+        mediaCell.backgroundView.layer.masksToBounds = YES;
+        mediaCell.backgroundView.layer.cornerRadius = 5.0;
+        mediaCell.userInteractionEnabled = NO;
         
         //By forcing these sizes now, the asyncimageview spinner displays in the correct location
-        imageCell.frame = CGRectMake(0, 0, 320, 200);
-        self.mediaImageView.frame = CGRectMake(0, 0, 320, 200);
+        mediaCell.frame = CGRectMake(0, 0, 300, 200);
+        self.mediaImageView.frame = CGRectMake(0, 0, 300, 200);
 
     }
     else if(([media.type isEqualToString: @"Video"] || [media.type isEqualToString: @"Audio"]) && media.url)
     {
         NSLog(@"NodeVC: This is an A/V Plaque");
-        //Setup the Button
-        mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 240)];
-        [mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
-        
                 
         //Create movie player object
         mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
         [mMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
         mMoviePlayer.moviePlayer.shouldAutoplay = NO;
         [mMoviePlayer.moviePlayer prepareToPlay];
+                
+        //Setup the Button
+        mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 300, 240)];
+        [mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
+        mediaPlaybackButton.backgroundColor = [UIColor blackColor];
         
-        //Syncronously Create a thumbnail for the button
-        UIImage *videoThumb = [[mMoviePlayer.moviePlayer thumbnailImageAtTime:(NSTimeInterval)1.0 timeOption:MPMovieTimeOptionExact] retain];
-        
-        imageLoaded = YES;
-        NSLog(@"NodeVC: videoThumb frame size is : %f, %f", videoThumb.size.width, videoThumb.size.height);
-        UIGraphicsBeginImageContext(CGSizeMake(320.0f, 240.0f));
-        [videoThumb drawInRect:CGRectMake(0, 0, 320.0f, 240.0f)];
-        UIImage *videoThumbSized = UIGraphicsGetImageFromCurrentImageContext();    
-        UIGraphicsEndImageContext();
-        [mediaPlaybackButton setBackgroundImage:videoThumbSized forState:UIControlStateNormal];
-        [videoThumb release];
-        [videoThumbSized release];
-        
+        //Add the overlay
         UIImageView *playButonOverlay = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"play_button.png"]];
         playButonOverlay.center = mediaPlaybackButton.center;
+        playButonOverlay.contentMode = UIViewContentModeScaleToFill;
         [mediaPlaybackButton addSubview:playButonOverlay]; 
-         
         
         //Setup the cell as the video preview button
-        imageCell.backgroundView = mediaPlaybackButton;
-        imageCell.backgroundView.layer.masksToBounds = YES;
-        imageCell.backgroundView.layer.cornerRadius = 10.0;
-        imageCell.userInteractionEnabled = YES;
-        imageCell.selectionStyle = UITableViewCellSelectionStyleNone;
-        imageCell.frame = mediaPlaybackButton.frame;
-        
+        mediaCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        mediaCell.frame = mediaPlaybackButton.frame;
+        mediaCell.backgroundView = mediaPlaybackButton;
 
     }
     
@@ -161,10 +147,11 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     webCell.backgroundView = webView;
     webCell.backgroundColor = [UIColor clearColor];
     
-    webViewSpinner.center = webCell.center;
-    [webViewSpinner startAnimating];
-    webViewSpinner.backgroundColor = [UIColor clearColor];
-    [webCell addSubview:webViewSpinner];
+    self.webViewSpinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    self.webViewSpinner.center = webCell.center;
+    [self.webViewSpinner startAnimating];
+    self.webViewSpinner.backgroundColor = [UIColor clearColor];
+    [webCell addSubview:self.webViewSpinner];
 
     //Create continue button cell
     UITableViewCell *buttonCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"continueButtonCell"];
@@ -172,7 +159,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     buttonCell.textLabel.textAlignment = UITextAlignmentCenter;
     
     //Setup the cellArray
-    if(hasMedia) self.cellArray = [[NSArray alloc] initWithObjects:imageCell,webCell,buttonCell, nil];
+    if(hasMedia) self.cellArray = [[NSArray alloc] initWithObjects:mediaCell,webCell,buttonCell, nil];
     else self.cellArray = [[NSArray alloc] initWithObjects:webCell,buttonCell, nil];
     
 }
@@ -225,7 +212,7 @@ navigationType:(UIWebViewNavigationType)navigationType{
     
     if(self.mediaImageView.image.size.width > 0){
         [self.mediaImageView setContentScaleFactor:(float)(320/self.mediaImageView.image.size.width)];
-        self.mediaImageView.frame = CGRectMake(0, 0, 320, self.mediaImageView.contentScaleFactor*self.mediaImageView.image.size.height);
+        self.mediaImageView.frame = CGRectMake(0, 0, 300, self.mediaImageView.contentScaleFactor*self.mediaImageView.image.size.height);
         NSLog(@"NodeVC: Image resized to: %f, %f",self.mediaImageView.frame.size.width,self.mediaImageView.frame.size.height);
         [(UITableViewCell *)[self.cellArray objectAtIndex:0] setFrame:mediaImageView.frame];
     }
@@ -274,7 +261,7 @@ navigationType:(UIWebViewNavigationType)navigationType{
                 appDelegate.tabBarController.selectedIndex = i;
         }
     }
-    
+        
 }
 
 -(IBAction)playMovie:(id)sender {
@@ -294,6 +281,14 @@ navigationType:(UIWebViewNavigationType)navigationType{
 	}
 	if( state & MPMovieLoadStatePlayable ) {
 		NSLog(@"NodeViewController: Playable Load State");
+        
+        //Create a thumbnail for the button
+        if (![mediaPlaybackButton backgroundImageForState:UIControlStateNormal]){
+            UIImage *videoThumb = [mMoviePlayer.moviePlayer thumbnailImageAtTime:(NSTimeInterval)1.0 timeOption:MPMovieTimeOptionExact];        
+            UIImage *videoThumbSized = [videoThumb scaleToSize:CGSizeMake(300, 240)];        
+            [mediaPlaybackButton setBackgroundImage:videoThumbSized forState:UIControlStateNormal];
+        }
+        
 	} 
 	if( state & MPMovieLoadStatePlaythroughOK ) {
 		NSLog(@"NodeViewController: Playthrough OK Load State");
@@ -352,13 +347,13 @@ navigationType:(UIWebViewNavigationType)navigationType{
 - (void)dealloc {
 	NSLog(@"NodeViewController: Dealloc");
     
-	[mMoviePlayer release];
-	[node release];
+    [node release];
 	[tableView release];
 	[mediaPlaybackButton release];
-	//remove listeners
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	if (mMoviePlayer) [mMoviePlayer release];
     
+    //remove listeners
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 

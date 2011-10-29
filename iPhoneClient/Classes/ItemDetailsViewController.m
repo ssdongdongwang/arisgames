@@ -14,6 +14,9 @@
 #import "ItemActionViewController.h"
 #import "WebPage.h"
 #import "webpageViewController.h"
+#import <AVFoundation/AVFoundation.h>
+#import "UIImage+Scale.h"
+
 
 NSString *const kItemDetailsDescriptionHtmlTemplate = 
 @"<html>"
@@ -35,7 +38,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 
 @implementation ItemDetailsViewController
-@synthesize item, inInventory,mode,itemImageView, itemWebView,activityIndicator,isLink,itemDescriptionView;
+@synthesize item, inInventory,mode,itemImageView, itemWebView,activityIndicator,isLink,itemDescriptionView,scrollView;
+
 
 // The designated initializer. Override to perform setup that is required before the view is loaded.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -55,17 +59,9 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
     return self;
 }
 
-- (int) calculateTextHeight:(NSString *)text {
-	CGRect frame = CGRectMake(0, 0, self.view.bounds.size.width, 200000);
-	CGSize calcSize = [text sizeWithFont:[UIFont systemFontOfSize:18.0]
-					   constrainedToSize:frame.size lineBreakMode:UILineBreakModeWordWrap];
-	frame.size = calcSize;
-	frame.size.height += 0;
-	NSLog(@"Found height of %f", frame.size.height);
-	return frame.size.height;
-}
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
+    [super viewDidLoad];
 	//Show waiting Indicator in own thread so it appears on time
 	//[NSThread detachNewThreadSelector: @selector(showWaitingIndicator:) toTarget: (ARISAppDelegate *)[[UIApplication sharedApplication] delegate] withObject: @"Loading..."];	
 	//[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate]showWaitingIndicator:NSLocalizedString(@"LoadingKey",@"") displayProgressBar:NO];
@@ -121,26 +117,28 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 		NSLog(@"ItemDetailsViewController: Image Layout Selected");
         if(!itemImageView.loaded)
 		[itemImageView loadImageFromMedia:media];
+        itemImageView.contentMode = UIViewContentModeScaleAspectFill;
 	}
 	else if (([media.type isEqualToString: @"Video"] || [media.type isEqualToString: @"Audio"]) && media.url) {
 		NSLog(@"ItemDetailsViewController:  AV Layout Selected");
 
 		//Setup the Button
-		mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 295)];
-		[mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
-		[mediaPlaybackButton setBackgroundImage:[UIImage imageNamed:@"clickToPlay.png"] forState:UIControlStateNormal];
-		[mediaPlaybackButton setTitle:NSLocalizedString(@"PreparingToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = NO;
-		mediaPlaybackButton.titleLabel.font = [UIFont boldSystemFontOfSize:24];
-		[mediaPlaybackButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
+        mediaPlaybackButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 320, 240)];
+        [mediaPlaybackButton addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
+        [mediaPlaybackButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
 		[mediaPlaybackButton setContentVerticalAlignment:UIControlContentVerticalAlignmentBottom];
-		[scrollView addSubview:mediaPlaybackButton];	
-				
-		//Create movie player object
-		mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
-		[mMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
-		mMoviePlayer.moviePlayer.shouldAutoplay = NO;
-		[mMoviePlayer.moviePlayer prepareToPlay];		
+        
+        //Create movie player object
+        mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
+        [mMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
+        mMoviePlayer.moviePlayer.shouldAutoplay = NO;
+        [mMoviePlayer.moviePlayer prepareToPlay];
+        
+        //Setup the overlay
+        UIImageView *playButonOverlay = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"play_button.png"]];
+        playButonOverlay.center = mediaPlaybackButton.center;
+        [mediaPlaybackButton addSubview:playButonOverlay];
+        [self.scrollView addSubview:mediaPlaybackButton];
 	}
 	
 	else {
@@ -170,7 +168,6 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
     }
     else itemWebView.hidden = YES;
-	[super viewDidLoad];
 }
 
 - (void)updateQuantityDisplay {
@@ -381,8 +378,13 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	}
 	if( state & MPMovieLoadStatePlayable ) {
 		NSLog(@"ItemDetailsViewController: Playable Load State");
-        [mediaPlaybackButton setTitle:NSLocalizedString(@"TouchToPlayKey",@"") forState:UIControlStateNormal];
-		mediaPlaybackButton.enabled = YES;	
+        
+        //Create a thumbnail for the button
+        if (![mediaPlaybackButton backgroundImageForState:UIControlStateNormal]) {
+            UIImage *videoThumb = [mMoviePlayer.moviePlayer thumbnailImageAtTime:(NSTimeInterval)1.0 timeOption:MPMovieTimeOptionExact];            
+            UIImage *videoThumbSized = [videoThumb scaleToSize:CGSizeMake(320, 240)];        
+            [mediaPlaybackButton setBackgroundImage:videoThumbSized forState:UIControlStateNormal];
+        }
 	} 
 	if( state & MPMovieLoadStatePlaythroughOK ) {
 		NSLog(@"ItemDetailsViewController: Playthrough OK Load State");
@@ -524,11 +526,10 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 }
 
 - (void)dealloc {
-    NSLog(@"Item Details View: Deallocating");
+    NSLog(@"Item Details View: Dealloc");
 	
 	// free our movie player
-    [mMoviePlayer release];
-	
+    if (mMoviePlayer) [mMoviePlayer release];
 	[mediaPlaybackButton release];
 	
 	//remove listeners

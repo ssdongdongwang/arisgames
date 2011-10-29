@@ -377,7 +377,7 @@
 	//Put the view on the screen
 	[[self navigationController] pushViewController:itemDetailsViewController animated:YES];
 	
-	//[itemDetailsViewController release];
+	[itemDetailsViewController release];
 	
 }
 

@@ -48,6 +48,7 @@
 @property(nonatomic,retain) IBOutlet UIWebView *itemWebView;
 @property(nonatomic, retain) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property(nonatomic,retain)IBOutlet UIWebView *itemDescriptionView;;
+@property(nonatomic,retain)UIScrollView *scrollView;
 
 - (IBAction)dropButtonTouchAction: (id) sender;
 - (IBAction)deleteButtonTouchAction: (id) sender;
