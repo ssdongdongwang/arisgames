@@ -10,7 +10,6 @@ abstract class Module
 	const kLOG_MOVE = 'MOVE';
 	const kLOG_PICKUP_ITEM = 'PICKUP_ITEM';
 	const kLOG_DROP_ITEM = 'DROP_ITEM';
-	const kLOG_DROP_NOTE = 'DROP_NOTE';
 	const kLOG_DESTROY_ITEM = 'DESTROY_ITEM';
 	const kLOG_VIEW_ITEM = 'VIEW_ITEM';
 	const kLOG_VIEW_NODE = 'VIEW_NODE';
@@ -31,16 +30,23 @@ abstract class Module
 	
 	//constants for gameID_requirements table enums
 	const kREQ_PLAYER_HAS_ITEM = 'PLAYER_HAS_ITEM';
+	const kREQ_PLAYER_DOES_NOT_HAVE_ITEM = 'PLAYER_DOES_NOT_HAVE_ITEM';
 	const kREQ_PLAYER_VIEWED_ITEM = 'PLAYER_VIEWED_ITEM';
+	const kREQ_PLAYER_HAS_NOT_VIEWED_ITEM = 'PLAYER_HAS_NOT_VIEWED_ITEM';
 	const kREQ_PLAYER_VIEWED_NODE = 'PLAYER_VIEWED_NODE';
+	const kREQ_PLAYER_HAS_NOT_VIEWED_NODE = 'PLAYER_HAS_NOT_VIEWED_NODE';
 	const kREQ_PLAYER_VIEWED_NPC = 'PLAYER_VIEWED_NPC';
+	const kREQ_PLAYER_HAS_NOT_VIEWED_NPC = 'PLAYER_HAS_NOT_VIEWED_NPC';
     const kREQ_PLAYER_VIEWED_WEBPAGE = 'PLAYER_VIEWED_WEBPAGE';
+	const kREQ_PLAYER_HAS_NOT_VIEWED_WEBPAGE = 'PLAYER_HAS_NOT_VIEWED_WEBPAGE';
     const kREQ_PLAYER_VIEWED_AUGBUBBLE = 'PLAYER_VIEWED_AUGBUBBLE';
+	const kREQ_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE = 'PLAYER_HAS_NOT_VIEWED_AUGBUBBLE';
 	const kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM = 'PLAYER_HAS_UPLOADED_MEDIA_ITEM';
     const kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE = 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE';
 	const kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO = 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO';
     const kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO = 'PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO';
     const kREQ_PLAYER_HAS_COMPLETED_QUEST = 'PLAYER_HAS_COMPLETED_QUEST';
+	const kREQ_PLAYER_HAS_NOT_COMPLETED_QUEST = 'PLAYER_HAS_NOT_COMPLETED_QUEST';
     const kREQ_PLAYER_HAS_RECEIVED_INCOMING_WEBHOOK = 'PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK';
 	
 	const kRESULT_DISPLAY_NODE = 'Node';
@@ -262,47 +268,6 @@ abstract class Module
     	}
     }
 	
-	
-	/**
-     * Adds a note to Locations at the specified latitude, longitude
-     */ 
-    protected function giveNoteToWorld($strGamePrefix, $noteId, $floatLat, $floatLong) {
-		
-		$query = "SELECT * FROM {$strGamePrefix}_locations 
-				WHERE type = 'PlayerNote' AND type_id = '{$noteId}'";	
-    	$result = @mysql_query($query);
-    	NetDebug::trace($query . ' ' . mysql_error());  
-    	
-    	if ($existingNote = @mysql_fetch_object($result)) {
-    		//We have a match
-    		NetDebug::trace("This note has already been placed");   	
-
-    		$query = "UPDATE {$strGamePrefix}_locations
-    				SET latitude = '{$floatLat}', longitude = '{$floatLong}'
-    				WHERE location_id = {$existingNote->location_id}";
-    		NetDebug::trace($query . ' ' . mysql_error());  
-    		@mysql_query($query);
-    	}
-		else {
-			NetDebug::trace("Note has not yet been placed");   	
-
-			$error = 100; //Use 100 meters
-			$query = "SELECT title FROM notes WHERE note_id = '{$noteId}'";
-			$result = @mysql_query($query);
-        	$obj = @mysql_fetch_object($result);
-			$title = $obj->title;
-			
-			$query = "INSERT INTO {$strGamePrefix}_locations (name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
-											  VALUES ('{$title}','PlayerNote','{$noteId}', '71', '{$floatLat}','{$floatLong}', '{$error}','1')";
-    		NetDebug::trace($query . ' ' . mysql_error());  
-    		@mysql_query($query);
-    		
-    		$newId = mysql_insert_id();
-    		//Create a coresponding QR Code
-			QRCodes::createQRCode($strGamePrefix, "Location", $newId, '');
-    	}
-    }
-	
 	protected function metersBetweenLatLngs($lat1, $lon1, $lat2, $lon2) { 
 
 		$theta = $lon1 - $lon2; 
@@ -429,8 +394,8 @@ abstract class Module
      * @return boolean
      */
     
-    //Spelled 'distAnce' wrong in function name and variable name... afraid to change it... the repurcussions could be ASTRONOMICAL.
-    protected function playerHasUploadedMediaItemWithinDistence($intGameID, $intPlayerID, $dblLatitude, $dblLongitude, $dblDistenceInMeters, $qty, $mediaType) {
+    //Spelled 'distAnce' wrong in function name and variable name... afraid to change it...
+    protected function playerHasUploadedMediaItemWithinDistence($intGameID, $intPlayerID, $dblLatitude, $dblLongitude, $dblDistenceInMeters, $mediaType) {
     	$prefix = Module::getPrefix($intGameID);
 		if (!$prefix) return FALSE;
 
@@ -449,7 +414,7 @@ abstract class Module
 						
 		NetDebug::trace($query);
 		$rsResult = @mysql_query($query);
-		if (@mysql_num_rows($rsResult) >= $qty) return true;
+		if (@mysql_num_rows($rsResult) > 0) return true;
 		else return false;
 
     }	    
@@ -466,7 +431,7 @@ abstract class Module
 		//Fetch the requirements
 		$query = "SELECT requirement,
 						requirement_detail_1,requirement_detail_2,requirement_detail_3,
-						boolean_operator, not_operator
+						boolean_operator 
 					FROM {$strPrefix}_requirements 
 					WHERE content_type = '{$strObjectType}' AND content_id = '{$intObjectID}'";
 		$rsRequirments = @mysql_query($query);
@@ -485,21 +450,41 @@ abstract class Module
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
 						$requirement['requirement_detail_1']);
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_ITEM:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
+						$requirement['requirement_detail_1']);
+					break;
 				case Module::kREQ_PLAYER_VIEWED_NODE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
+						$requirement['requirement_detail_1']);
+					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NODE:
+					$requirementMet =  !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
 						$requirement['requirement_detail_1']);
 					break;
 				case Module::kREQ_PLAYER_VIEWED_NPC:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
                                                            $requirement['requirement_detail_1']);
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NPC:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
+                                                            $requirement['requirement_detail_1']);
+					break;	
                 case Module::kREQ_PLAYER_VIEWED_WEBPAGE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_WEBPAGE, 
                                                            $requirement['requirement_detail_1']);
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_WEBPAGE:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_WEBPAGE, 
+                                                            $requirement['requirement_detail_1']);
+					break;
                 case Module::kREQ_PLAYER_VIEWED_AUGBUBBLE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_AUGBUBBLE, 
                                                            $requirement['requirement_detail_1']);
+					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_AUGBUBBLE, 
+                                                            $requirement['requirement_detail_1']);
 					break;
                 case Module::kREQ_PLAYER_HAS_RECEIVED_INCOMING_WEBHOOK:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_RECEIVE_WEBHOOK, 
@@ -510,38 +495,42 @@ abstract class Module
 					$requirementMet = Module::playerHasItem($strPrefix, $intPlayerID, 
 						$requirement['requirement_detail_1'], $requirement['requirement_detail_2']);
 					break;
+				case Module::kREQ_PLAYER_DOES_NOT_HAVE_ITEM:
+					$requirementMet = !Module::playerHasItem($strPrefix, $intPlayerID, 
+						$requirement['requirement_detail_1'], $requirement['requirement_detail_2']);
+					break;
 				//Data Collection
 				case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-						$requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM);
+						$requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM);
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO:
                     NetDebug::trace("isAudio");
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO);
                     NetDebug::trace($requirementMet);
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO);
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE);
 					break;
 				case Module::kREQ_PLAYER_HAS_COMPLETED_QUEST:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_COMPLETE_QUEST, 
                                                            $requirement['requirement_detail_1']);
 					break;	
+                case Module::kREQ_PLAYER_HAS_NOT_COMPLETED_QUEST:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_COMPLETE_QUEST, 
+                                                           $requirement['requirement_detail_1']);
+					break;
 			}//switch
-            
-            //Account for the 'NOT's
-            if($requirement['not_operator'] == "NOT") $requirementMet = !$requirementMet;
-
 			if ($requirement['boolean_operator'] == "AND" && $requirementMet == FALSE) {
 				//NetDebug::trace("An AND requirement was not met. Requirements Failed.");
 				return FALSE;
@@ -561,8 +550,9 @@ abstract class Module
                 $requirementsMet = FALSE;
             }
 
-		}
-        
+		}//while
+		//NetDebug::trace("At the end of all the requirements for this object and any AND were passed, no ORs were passed.");
+		//So no ORs were met, and possibly all ands were met
 		if (!$requirementsExist) {
 			//NetDebug::trace("No requirements exist. Requirements Passed.");
 			return TRUE;
@@ -687,8 +677,8 @@ abstract class Module
         
 		else return true;
 	}	
-
-	    //PHIL_REQ_CODE:
+	
+    //PHIL_REQ_CODE:
     // Takes as input an event, and checks to see if that event is sufficient to complete ANY quests for a certain user. Returns
     // an array of 'Quest Objects', or "NO" if no quests are to be completed.
     // NOTE: this function is called 'appendCompletedQuestsIfReady'.
@@ -1004,25 +994,50 @@ abstract class Module
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_VIEW_ITEM;
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_ITEM:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_ITEM, 
+                                                            $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_VIEW_THE_THING";//Module::kLOG_VIEW_ITEM;
+					break;
 				case Module::kREQ_PLAYER_VIEWED_NODE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_VIEW_NODE;
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NODE:
+					$requirementMet =  !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NODE, 
+                                                             $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_VIEW_THE_NODE";//Module::kLOG_VIEW_NODE;
+					break;
 				case Module::kREQ_PLAYER_VIEWED_NPC:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_VIEW_NPC;
+					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_NPC:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_NPC, 
+                                                            $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_VIEW_THE_DUDE";//Module::kLOG_VIEW_NPC;
 					break;	
                 case Module::kREQ_PLAYER_VIEWED_WEBPAGE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_WEBPAGE, 
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_VIEW_WEBPAGE;
 					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_WEBPAGE:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_WEBPAGE, 
+                                                            $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_VIEW_THE_WEB";//Module::kLOG_VIEW_WEBPAGE;
+					break;
                 case Module::kREQ_PLAYER_VIEWED_AUGBUBBLE:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_AUGBUBBLE, 
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_VIEW_AUGBUBBLE;
+					break;
+				case Module::kREQ_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_VIEW_AUGBUBBLE, 
+                                                            $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_VIEW_THE_BUBBLE";//Module::kLOG_VIEW_AUGBUBBLE;
 					break;
                 case Module::kREQ_PLAYER_HAS_RECEIVED_INCOMING_WEBHOOK:
 					$requirementMet = Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_RECEIVE_WEBHOOK, 
@@ -1035,29 +1050,34 @@ abstract class Module
                                                             $requirement['requirement_detail_1'], $requirement['requirement_detail_2']);
                     $requirement['event'] = Module::kLOG_PICKUP_ITEM;
 					break;
+				case Module::kREQ_PLAYER_DOES_NOT_HAVE_ITEM:
+					$requirementMet = !Module::playerHasItem($strPrefix, $intPlayerID, 
+                                                             $requirement['requirement_detail_1'], $requirement['requirement_detail_2']);
+                    $requirement['event'] = Module::kLOG_DROP_ITEM;
+					break;
                     //Data Collection
 				case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM);
                     $requirement['event'] = Module::kLOG_UPLOAD_MEDIA_ITEM;
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE);
                     $requirement['event'] = Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE;
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO);
                     $requirement['event'] = Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO;
 					break;
                 case Module::kREQ_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO:
 					$requirementMet = Module::playerHasUploadedMediaItemWithinDistence($strPrefix, $intPlayerID, 
-                                                                                       $requirement['requirement_detail_3'], $requirement['requirement_detail_4'], 
-                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO);
+                                                                                       $requirement['requirement_detail_1'], $requirement['requirement_detail_2'], 
+                                                                                       $requirement['requirement_detail_3'], Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO);
                     $requirement['event'] = Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO;
 					break;
 				case Module::kREQ_PLAYER_HAS_COMPLETED_QUEST:
@@ -1065,10 +1085,12 @@ abstract class Module
                                                            $requirement['requirement_detail_1']);
                     $requirement['event'] = Module::kLOG_COMPLETE_QUEST;
 					break;	
+                case Module::kREQ_PLAYER_HAS_NOT_COMPLETED_QUEST:
+					$requirementMet = !Module::playerHasLog($strPrefix, $intPlayerID, Module::kLOG_COMPLETE_QUEST, 
+                                                           $requirement['requirement_detail_1']);
+                    $requirement['event'] = "DONT_COMPLETE_THE_QUEST";//Module::kLOG_COMPLETE_QUEST;
+					break;	
 			}//switch
-            
-            //Account for the 'NOT's
-            if($requirement['not_operator'] == "NOT") $requirementMet = !$requirementMet;
             
 			if ($requirement['boolean_operator'] == "AND" && $requirementMet == FALSE) {
 				//NetDebug::trace("An AND requirement was not met. Requirements Failed.");

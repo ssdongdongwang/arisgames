@@ -12,7 +12,6 @@
 #import "Item.h"
 #import "Node.h"
 #import "Npc.h"
-#import "Note.h"
 
 
 @implementation Location
@@ -28,7 +27,7 @@
 @synthesize hidden;
 @synthesize forcedDisplay;
 @synthesize allowsQuickTravel;
-@synthesize qty,delegate;
+@synthesize qty;
 
 -(nearbyObjectKind) kind {
 	nearbyObjectKind returnValue = NearbyObjectNil;
@@ -37,7 +36,6 @@
 	if ([self.objectType isEqualToString:@"Item"]) returnValue = NearbyObjectItem;
 	if ([self.objectType isEqualToString:@"Player"]) returnValue = NearbyObjectPlayer;
     if ([self.objectType isEqualToString:@"WebPage"]) returnValue = NearbyObjectWebPage;
-    if ([self.objectType isEqualToString:@"PlayerNote"]) returnValue = NearbyObjectNote;
     if ([self.objectType isEqualToString:@"AugBubble"]) returnValue = NearbyObjectPanoramic;
 	return returnValue;
 }
@@ -64,18 +62,11 @@
     if (self.kind == NearbyObjectWebPage) {
 		return [[AppModel sharedAppModel] webPageForWebPageID: objectId]; 
 	}
-    if (self.kind == NearbyObjectNote) {
-        Note *aNote = [[Note alloc]init];
-        aNote = [[AppModel sharedAppModel] noteForNoteId: objectId]; 
-        aNote.delegate=self.delegate;
-		return aNote;
-	}
+	
     if (self.kind == NearbyObjectPanoramic) {
 		return [[AppModel sharedAppModel] panoramicForPanoramicId: objectId]; 
 	}
-    if (self.kind == NearbyObjectNote) {
-        return  [[AppModel sharedAppModel] noteForNoteId:objectId];
-    }
+    
 	if (self.kind == NearbyObjectNPC) {
 		return [[AppModel sharedAppModel] npcForNpcId: objectId]; 
 	}

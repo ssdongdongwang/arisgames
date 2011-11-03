@@ -11,7 +11,7 @@
 #import "Media.h"
 #import "AsyncImageView.h"
 #import "AppModel.h"
-#import "DataCollectionViewController.h"
+
 
 @implementation InventoryListViewController
 
@@ -276,26 +276,8 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	static NSString *CellIdentifier = @"Cell";
 	
-    
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];	
 	if(cell == nil) cell = [self getCellContentView:CellIdentifier];
-    
-    cell.textLabel.backgroundColor = [UIColor clearColor]; 
-    cell.detailTextLabel.backgroundColor = [UIColor clearColor]; 
-    
-    if (indexPath.row % 2 == 0){  
-        cell.contentView.backgroundColor = [UIColor colorWithRed:233.0/255.0  
-                                                           green:233.0/255.0  
-                                                            blue:233.0/255.0  
-                                                           alpha:1.0];  
-    } else {  
-        cell.contentView.backgroundColor = [UIColor colorWithRed:200.0/255.0  
-                                                           green:200.0/255.0  
-                                                            blue:200.0/255.0  
-                                                           alpha:1.0];  
-    } 
-
-    
 	
 	Item *item = [inventory objectAtIndex: [indexPath row]];
 	
@@ -316,9 +298,9 @@
         lblTemp3.text = [NSString stringWithFormat:@"Quantity: %d",item.qty];
     else
         lblTemp3.text = nil;
-        iconView.hidden = NO;
+
     Media *media;
-    if (item.mediaId != 0 && ![item.type isEqualToString:@"NOTE"]) {
+    if (item.mediaId != 0) {
         if([self.mediaCache count] > indexPath.row){
             media = [self.mediaCache objectAtIndex:indexPath.row];
         }
@@ -345,8 +327,25 @@
 		//Load the Default
 		if ([media.type isEqualToString: @"Image"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultImageIcon.png"]];
 		if ([media.type isEqualToString: @"Audio"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultAudioIcon.png"]];
-		if ([media.type isEqualToString: @"Video"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultVideoIcon.png"]];	}
-    	
+		if ([media.type isEqualToString: @"Video"]) [iconView updateViewWithNewImage:[UIImage imageNamed:@"defaultVideoIcon.png"]];
+	}
+    
+    
+    cell.textLabel.backgroundColor = [UIColor clearColor]; 
+    cell.detailTextLabel.backgroundColor = [UIColor clearColor]; 
+    
+    if (indexPath.row % 2 == 0){  
+        cell.contentView.backgroundColor = [UIColor colorWithRed:233.0/255.0  
+                                                           green:233.0/255.0  
+                                                            blue:233.0/255.0  
+                                                           alpha:1.0];  
+    } else {  
+        cell.contentView.backgroundColor = [UIColor colorWithRed:200.0/255.0  
+                                                           green:200.0/255.0  
+                                                            blue:200.0/255.0  
+                                                           alpha:1.0];  
+    } 
+	
 	return cell;
 }
 
@@ -364,10 +363,9 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {	
-    
 	Item *selectedItem = [inventory objectAtIndex:[indexPath row]];
 	NSLog(@"Displaying Detail View: %@", selectedItem.name);
-
+	
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
 	

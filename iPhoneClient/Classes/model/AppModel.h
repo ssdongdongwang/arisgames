@@ -16,7 +16,6 @@
 #import "Media.h"
 #import "WebPage.h"
 #import "Panoramic.h"
-#import "Note.h"
 
 extern NSDictionary *InventoryElements;
 
@@ -51,20 +50,13 @@ extern NSDictionary *InventoryElements;
 	NSMutableDictionary *gameNpcList;
     NSMutableDictionary *gameWebPageList;
     NSMutableDictionary *gamePanoramicList;
-    NSMutableArray *gameNoteList;
-    NSMutableArray *playerNoteList;
-
-    NSArray *gameTabList;
-    NSArray *defaultGameTabList;
-
-
 
 	//Training Flags
 	BOOL hasSeenNearbyTabTutorial;
 	BOOL hasSeenQuestsTabTutorial;
 	BOOL hasSeenMapTabTutorial;
 	BOOL hasSeenInventoryTabTutorial;
-    BOOL profilePic,tabsReady;
+    BOOL profilePic;
 }
 
 
@@ -93,20 +85,13 @@ extern NSDictionary *InventoryElements;
 @property(nonatomic, retain) NSString *inventoryHash;
 @property(nonatomic, retain) NSMutableDictionary *inventory;
 @property(nonatomic, retain) NSMutableDictionary *attributes;
-@property(nonatomic, retain) NSMutableArray *gameNoteList;
-@property(nonatomic, retain) NSMutableArray *playerNoteList;
 
 
 @property(nonatomic, retain) NSMutableDictionary *gameMediaList;
 @property(nonatomic, retain) NSMutableDictionary *gameItemList;
 @property(nonatomic, retain) NSMutableDictionary *gameNodeList;
-@property(nonatomic, retain) NSArray *gameTabList;
-@property(nonatomic, retain) NSArray *defaultGameTabList;
-
-
 @property(nonatomic, retain) NSMutableDictionary *gameNpcList;
 @property(nonatomic, retain) NSMutableDictionary *gameWebPageList;
-
 @property(nonatomic, retain) NSMutableDictionary *gamePanoramicList;
 
 
@@ -118,8 +103,6 @@ extern NSDictionary *InventoryElements;
 @property(readwrite) BOOL hasSeenQuestsTabTutorial;
 @property(readwrite) BOOL hasSeenMapTabTutorial;
 @property(readwrite) BOOL hasSeenInventoryTabTutorial;
-@property(readwrite) BOOL tabsReady;
-
 
 
 + (AppModel *)sharedAppModel;
@@ -140,7 +123,5 @@ extern NSDictionary *InventoryElements;
 - (Npc *)npcForNpcId: (int)mId;
 - (WebPage *)webPageForWebPageID: (int)mId;
 - (Panoramic *)panoramicForPanoramicId: (int)mId;
-- (Note *)noteForNoteId: (int)mId;
-
 
 @end

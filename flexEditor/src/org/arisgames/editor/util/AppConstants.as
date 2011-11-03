@@ -4,9 +4,11 @@ public class AppConstants
 {
 	//Server URL
 	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://arisgames.org/stagingserver1"; //For other URL's to append to- Staging
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to-         Phil's Machine
-	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/qaserver"; //For other URL's to append to-       QA
-	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/devserver"; //For other URL's to append to- Dev
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://davebmp.local/server"; //For other URL's to append to- Dave's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://Phildos.local/server"; //For other URL's to append to- Phil's Machine
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://atsosxdev.doit.wisc.edu/aris/server"; //For other URL's to append to- Dev
+	//public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/qaserver"; //For other URL's to append to- QA
+	public static const APPLICATION_ENVIRONMENT_ROOT_URL:String = "http://warhol.arisgames.org/devserver";
 	
 	//Server Version
 	public static const APPLICATION_ENVIRONMENT_SERVER_VERSION:String = "1_5";
@@ -39,7 +41,6 @@ public class AppConstants
     public static const DYNAMICEVENT_PLACEMARKSELECTED:String = "DynamicEventPlaceMarkSelected";
     public static const DYNAMICEVENT_PLACEMARKREQUESTSDELETION:String = "DynamicEventPlaceMarkRequestsDeletion";
 	public static const DYNAMICEVENT_EDITOBJECTPALETTEITEM:String = "EditObjectPaletteItem";
-	public static const DYNAMICEVENT_OBJECTPALETTEITEMICONSET:String = "ObjectPaletteItemIconSetSoSetItsLocationsIcons";
 	public static const DYNAMICEVENT_HIGHLIGHTOBJECTPALETTEITEM:String = "HighlightObjectPaletteItem";
     public static const DYNAMICEVENT_CLOSEOBJECTPALETTEITEMEDITOR:String = "CloseObjectPaletteItemEditor";
     public static const DYNAMICEVENT_CLOSEMEDIAPICKER:String = "CloseMediaPicker";
@@ -67,7 +68,6 @@ public class AppConstants
     public static const CONTENTTYPE_ITEM:String = "Item";
 	public static const CONTENTTYPE_WEBPAGE:String = "WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE:String = "Panoramic";
-	public static const CONTENTTYPE_PLAYER_NOTE:String = "PlayerNote";
     public static const CONTENTTYPE_QRCODEGROUP:String = "QR Code Group";
     public static const CONTENTTYPE_PAGE_VAL:Number = 0;
     public static const CONTENTTYPE_CHARACTER_VAL:Number = 1;
@@ -75,13 +75,11 @@ public class AppConstants
     public static const CONTENTTYPE_QRCODEGROUP_VAL:Number = 3;
 	public static const CONTENTTYPE_WEBPAGE_VAL:Number = 4;
 	public static const CONTENTTYPE_AUGBUBBLE_VAL:Number = 5;
-	public static const CONTENTTYPE_PLAYER_NOTE_VAL:Number = 6;
     public static const CONTENTTYPE_PAGE_DATABASE:String = "Node";
     public static const CONTENTTYPE_CHARACTER_DATABASE:String = "Npc";
 	public static const CONTENTTYPE_ITEM_DATABASE:String = "Item";
 	public static const CONTENTTYPE_WEBPAGE_DATABASE:String = "WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE_DATABASE:String = "AugBubble";
-	public static const CONTENTTYPE_PLAYER_NOTE_DATABASE:String = "PlayerNote";
     public static const PLACEMARK_DEFAULT_ERROR_RANGE:Number = 30;
 	
 	// Default Names (Name of new objects as they are created)
@@ -90,7 +88,6 @@ public class AppConstants
 	public static const CONTENTTYPE_ITEM_DEFAULT_NAME:String = "Unnamed Item";
 	public static const CONTENTTYPE_WEBPAGE_DEFAULT_NAME:String = "Unnamed WebPage";
 	public static const CONTENTTYPE_AUGBUBBLE_DEFAULT_NAME:String = "Unnamed Panoramic";
-	public static const CONTENTTYPE_PLAYER_NOTE_DEFAULT_NAME:String = "Unnamed Player Note";
 
     // Label Constants
     public static const BUTTON_LOGIN:String = "Login!";
@@ -119,14 +116,11 @@ public class AppConstants
 	public static const ITEM_TYPE_NORMAL:String = "NORMAL";
 	public static const ITEM_TYPE_ATTRIBUTE:String = "ATTRIB";
 	public static const ITEM_TYPE_URL:String = "URL";
-	public static const ITEM_TYPE_NOTE:String = "NOTE";
-
 	
 	//Player State Changes
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_ITEM:String = "VIEW_ITEM";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_WEBPAGE:String = "VIEW_WEBPAGE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_AUGBUBBLE:String = "VIEW_AUGBUBBLE";
-	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_PLAYER_NOTE:String = "VIEW_PLAYER_NOTE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_NODE:String = "VIEW_NODE";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_VIEW_NPC:String = "VIEW_NPC";
 	public static const PLAYERSTATECHANGE_EVENTTYPE_RECEIVE_WEBHOOK:String = "RECEIVE_WEBHOOK";
@@ -144,54 +138,49 @@ public class AppConstants
 	public static const REQUIREMENTTYPE_WEBHOOK:String = "OutgoingWebHook";
 
     // Requirement Options
-	public static const REQUIREMENT_NOT_OP_TRUE_DATABASE:String = "Player Has";
-	public static const REQUIREMENT_NOT_OP_TRUE_HUMAN:String = "DO";
-	public static const REQUIREMENT_NOT_OP_FALSE_DATABASE:String = "Player Has Not";
-	public static const REQUIREMENT_NOT_OP_FALSE_HUMAN:String = "NOT";
     public static const REQUIREMENT_PLAYER_HAS_ITEM_DATABASE:String = "PLAYER_HAS_ITEM";
-    public static const REQUIREMENT_PLAYER_HAS_ITEM_HUMAN:String = "At Least Qty of an Item";
+    public static const REQUIREMENT_PLAYER_HAS_ITEM_HUMAN:String = "Player Has At Least Qty of an Item";
+    public static const REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_DATABASE:String = "PLAYER_DOES_NOT_HAVE_ITEM";
+    public static const REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_HUMAN:String = "Player Has Less Than Qty of an Item";
 	public static const REQUIREMENT_PLAYER_VIEWED_ITEM_DATABASE:String = "PLAYER_VIEWED_ITEM";
-	public static const REQUIREMENT_PLAYER_VIEWED_ITEM_HUMAN:String = "Viewed Item";
+	public static const REQUIREMENT_PLAYER_VIEWED_ITEM_HUMAN:String = "Player Viewed Item";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_ITEM";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_HUMAN:String = "Player Never Viewed Item";
 	public static const REQUIREMENT_PLAYER_VIEWED_WEBPAGE_DATABASE:String = "PLAYER_VIEWED_WEBPAGE";
-	public static const REQUIREMENT_PLAYER_VIEWED_WEBPAGE_HUMAN:String = "Viewed Web Page";
+	public static const REQUIREMENT_PLAYER_VIEWED_WEBPAGE_HUMAN:String = "Player Viewed Web Page";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_WEBPAGE";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_HUMAN:String = "Player Never Viewed Web Page";
 	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_DATABASE:String = "PLAYER_VIEWED_AUGBUBBLE";
-	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN:String = "Viewed Panoramic";
-	public static const REQUIREMENT_PLAYER_VIEWED_PLAYER_NOTE_DATABASE:String = "PLAYER_VIEWED_PLAYER_NOTE";
-	public static const REQUIREMENT_PLAYER_VIEWED_PLAYER_NOTE_HUMAN:String = "Viewed Player Note";
+	public static const REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN:String = "Player Viewed Aug Bubble";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_AUGBUBBLE";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_HUMAN:String = "Player Never Viewed Aug Bubble";
     public static const REQUIREMENT_PLAYER_VIEWED_NODE_DATABASE:String = "PLAYER_VIEWED_NODE";
-    public static const REQUIREMENT_PLAYER_VIEWED_NODE_HUMAN:String = "Viewed Plaque/Script";
+    public static const REQUIREMENT_PLAYER_VIEWED_NODE_HUMAN:String = "Player Viewed Plaque/Script";
+    public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_NODE";
+    public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_HUMAN:String = "Player Never Viewed Plaque/Script";
     public static const REQUIREMENT_PLAYER_VIEWED_NPC_DATABASE:String = "PLAYER_VIEWED_NPC";
-    public static const REQUIREMENT_PLAYER_VIEWED_NPC_HUMAN:String = "Greeted Character";
+    public static const REQUIREMENT_PLAYER_VIEWED_NPC_HUMAN:String = "Player Greeted By Character";
+    public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_DATABASE:String = "PLAYER_HAS_NOT_VIEWED_NPC";
+    public static const REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_HUMAN:String = "Player Never Greeted By Character";
 	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM";
-	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN:String = "Uploaded Media Item";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN:String = "Player Has Uploaded Media Item";
 	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE";
-	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_HUMAN:String = "Uploaded Image";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_HUMAN:String = "Player Has Uploaded Image";
 	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO";
-	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_HUMAN:String = "Uploaded Audio";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO_HUMAN:String = "Player Has Uploaded Audio";
 	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_DATABASE:String = "PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO";
-	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_HUMAN:String = "Uploaded Video";
+	public static const REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_HUMAN:String = "Player Has Uploaded Video";
 	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_DATABASE:String = "PLAYER_HAS_COMPLETED_QUEST";
-	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN:String = "Completed Quest";
+	public static const REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN:String = "Player Has Completed Quest";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_DATABASE:String = "PLAYER_HAS_NOT_COMPLETED_QUEST";
+	public static const REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_HUMAN:String = "Player Has Not Completed Quest";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE:String = "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK";
-	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN:String = "Received Incoming Web Hook";
+	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN:String = "Player Has Received Incoming Web Hook";
 
 	public static const REQUIREMENT_BOOLEAN_AND_DATABASE:String = "AND";
 	public static const REQUIREMENT_BOOLEAN_AND_HUMAN:String = "All";
 	public static const REQUIREMENT_BOOLEAN_OR_DATABASE:String = "OR";
 	public static const REQUIREMENT_BOOLEAN_OR_HUMAN:String = "Only this one";
-	
-	// Tab Bar Server Type
-	public static const TAB_BAR_TYPE_QUESTS:String = "QUESTS";
-	public static const TAB_BAR_TYP_GPSE:String = "GPS";
-	public static const TAB_BAR_TYPE_INVENTORY:String = "INVENTORY";
-	public static const TAB_BAR_TYPE_QR:String = "QR";
-	public static const TAB_BAR_TYPE_PLAYER:String = "PLAYER";
-	public static const TAB_BAR_TYPE_CAMERA:String = "CAMERA";
-	public static const TAB_BAR_TYPE_MICROPHONE:String = "MICROPHONE";
-	public static const TAB_BAR_TYPE_NOTE:String = "NOTE";
-	public static const TAB_BAR_TYPE_PICKGAME:String = "PICKGAME";
-	public static const TAB_BAR_TYPE_LOGOUT:String = "LOGOUT";
-	public static const TAB_BAR_TYPE_STARTOVER:String = "STARTOVER";
 	
     // Defaults
     public static const DEFAULT_ICON_MEDIA_ID_NPC:Number = 1;
@@ -199,7 +188,6 @@ public class AppConstants
     public static const DEFAULT_ICON_MEDIA_ID_PLAQUE:Number = 3;
 	public static const DEFAULT_ICON_MEDIA_ID_WEBPAGE:Number = 4;
 	public static const DEFAULT_ICON_MEDIA_ID_AUGBUBBLE:Number = 5;
-	public static const DEFAULT_ICON_MEDIA_ID_PLAYER_NOTE:Number = 5;
 
 	// Palette Tree Stuff
 	public static const PALETTE_TREE_SELF_FOLDER_ID:Number = 0;

@@ -6,13 +6,11 @@ import mx.rpc.IResponder;
 import org.arisgames.editor.dao.AppDAO;
 import org.arisgames.editor.data.Game;
 import org.arisgames.editor.data.PlaceMark;
-import org.arisgames.editor.data.TabBarItem;
 import org.arisgames.editor.data.arisserver.AugBubble;
 import org.arisgames.editor.data.arisserver.Conversation;
 import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Location;
 import org.arisgames.editor.data.arisserver.NPC;
-import org.arisgames.editor.data.arisserver.PlayerNote;
 import org.arisgames.editor.data.arisserver.Node;
 import org.arisgames.editor.data.arisserver.PlayerStateChange;
 import org.arisgames.editor.data.arisserver.Quest;
@@ -112,13 +110,6 @@ public class AppServices
 
 	}
 
-	public function duplicateObject(game:Game, obId:int, resp:IResponder):void
-	{
-		trace("Appservices: duplicateItem");
-		var r:Object;
-		r = AppDAO.getInstance().getContentServer().duplicateObject(game.gameId, obId);
-		r.addResponder(resp);
-	}
 
     public function loadGamesByUserId(userId:Number, resp:IResponder):void
     {
@@ -169,34 +160,11 @@ public class AppServices
 		r = AppDAO.getInstance().getAugBubbleServer().getAugBubbles(gid);
 		r.addResponder(resp);
 	}
-	
-	public function getPlayerNoteById(gid:Number, pnid:Number, resp:IResponder):void
-	{
-		var r:Object;
-		r = AppDAO.getInstance().getPlayerNoteServer().getNoteById(pnid);
-		r.addResponder(resp);
-	}
 
 	public function getWebHookById(gid:Number, wid:Number, resp:IResponder):void
 	{
 		var r:Object;
 		r = AppDAO.getInstance().getWebHookServer().getWebHook(gid, wid);
-		r.addResponder(resp);
-	}
-	
-	public function savePlayerNote(gid:Number, playerNote:PlayerNote, resp:IResponder):void
-	{
-		var r:Object;
-		if (isNaN(playerNote.playerNoteId) || playerNote.playerNoteId == 0)
-		{
-			trace("This item doesn't have a player note Id, so call create Player Note");
-			r = AppDAO.getInstance().getPlayerNoteServer().createNewNote(gid, 0);
-		}
-		else
-		{
-			trace("This item has a playerNoteId (" + playerNote.playerNoteId + "), so call update PlayerNote.");
-			r = AppDAO.getInstance().getPlayerNoteServer().updateNote(playerNote.playerNoteId, playerNote.title, playerNote.shared);
-		}
 		r.addResponder(resp);
 	}
 	
@@ -410,23 +378,6 @@ public class AppServices
         l = AppDAO.getInstance().getContentServer().deleteContent(gid, opi.id);
         l.addResponder(resp);
     }
-	
-	public function getTabBarItemsForGame(gid:Number, resp:IResponder):void
-	{
-		var l:Object;
-		trace("GetTabBarItemsForGame: GameId = " + gid);
-		l = AppDAO.getInstance().getGameServer().getTabBarItemsForGame(gid);
-		l.addResponder(resp);
-	}
-	
-	public function saveTab(gid:Number, tab:TabBarItem, resp:IResponder):void
-	{
-		var l:Object;
-		trace("Saving tab...");
-		if(!tab.enabled) tab.index = 0;
-		l =  AppDAO.getInstance().getGameServer().saveTab(gid, tab.type, tab.index);
-		l.addResponder(resp);
-	}
 
     public function getFoldersAndContentByGameId(gid:Number, resp:IResponder):void
     {
@@ -568,24 +519,6 @@ public class AppServices
 		l = AppDAO.getInstance().getAugBubbleServer().getAugBubbleMedia(gid, augId);
 		l.addResponder(resp);
 	}
-	
-	public function updatePlayerNoteMediaIndex(pnId:Number, mediaId:Number, game:Game, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().addContentToNote(pnId, game.gameId, 0, mediaId, "MEDIA", "");
-		l.addResponder(resp);
-	}
-	
-	public function removePlayerNoteMediaIndex(contentId:Number, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().deleteNoteContent(contentId);
-		l.addResponder(resp);
-	}
-	
-	public function getPlayerNoteMedia(gid:Number, augId:Number, resp:IResponder):void{
-		var l:Object;
-		l = AppDAO.getInstance().getPlayerNoteServer().getPlayerNoteMedia(gid, augId);
-		l.addResponder(resp);
-	}
 
     public function getRequirementsForObject(gid:Number, objectType:String, objectId:Number, resp:IResponder):void
     {
@@ -606,20 +539,18 @@ public class AppServices
     public function saveRequirement(gid:Number, req:Requirement, resp:IResponder):void
     {
         var l:Object;
-		if(req.notOpHuman == "Player Has") req.notOp = "DO";
-		else if(req.notOpHuman == "Player Has Not") req.notOp = "NOT";
         if (isNaN(req.requirementId))
         {
             trace("This Requirement doesn't have an Id, so call Create Requirement function On Remote Server..");
 			trace("Requirement ID:" + req.requirementId + " Requirement:" + req.requirement + " Detail1:" + req.requirementDetail1 + " Detail2:" + req.requirementDetail2 );
-			l = AppDAO.getInstance().getRequirementsServer().createRequirement(gid, req.contentType, req.contentId, req.requirement, req.requirementDetail1, req.requirementDetail2, req.requirementDetail3, req.requirementDetail4, req.boolean, req.notOp);
+			l = AppDAO.getInstance().getRequirementsServer().createRequirement(gid, req.contentType, req.contentId, req.requirement, req.requirementDetail1, req.requirementDetail2, req.requirementDetail3, req.boolean);
         }
         else
         {
             trace("This Requirement has an Id (" + req.requirementId + "), so call Update Requirement function on Remote Server.");
 			trace("Requirement ID:" + req.requirementId + " Requirement:" + req.requirement + " Detail1:" + req.requirementDetail1 + " Detail2:" + req.requirementDetail2 );
 
-			l = AppDAO.getInstance().getRequirementsServer().updateRequirement(gid, req.requirementId, req.contentType, req.contentId, req.requirement, req.requirementDetail1, req.requirementDetail2, req.requirementDetail3, req.requirementDetail4, req.boolean, req.notOp);
+			l = AppDAO.getInstance().getRequirementsServer().updateRequirement(gid, req.requirementId, req.contentType, req.contentId, req.requirement, req.requirementDetail1, req.requirementDetail2, req.requirementDetail3, req.boolean);
         }
         l.addResponder(resp);
     }

@@ -274,7 +274,6 @@ public class PlaceMarkerEditorView extends Canvas
 			placeMarker.setOptions(options);
 			placeMarker.icon = options.icon as PlaceMarkerIcon;
 			placeMarker.icon.select();
-			placeMarker.icon.setNewIcon(placeMark.iconURL);
 			
 			
             //Alert.show("This placemark was succesfully updated.", "Successfully Updated Placemark");

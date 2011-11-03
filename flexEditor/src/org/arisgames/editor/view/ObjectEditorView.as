@@ -1,11 +1,8 @@
 package org.arisgames.editor.view
 {
-import flash.events.Event;
-
 import mx.containers.Canvas;
 import mx.controls.Alert;
 import mx.controls.Label;
-import mx.events.DynamicEvent;
 import mx.events.FlexEvent;
 import mx.rpc.Responder;
 import mx.rpc.events.ResultEvent;
@@ -15,13 +12,11 @@ import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Media;
 import org.arisgames.editor.data.arisserver.NPC;
 import org.arisgames.editor.data.arisserver.Node;
-import org.arisgames.editor.data.arisserver.PlayerNote;
 import org.arisgames.editor.data.arisserver.WebPage;
 import org.arisgames.editor.data.businessobjects.ObjectPaletteItemBO;
 import org.arisgames.editor.models.GameModel;
 import org.arisgames.editor.services.AppServices;
 import org.arisgames.editor.util.AppConstants;
-import org.arisgames.editor.util.AppDynamicEventManager;
 import org.arisgames.editor.util.AppUtils;
 
 public class ObjectEditorView extends Canvas
@@ -38,7 +33,6 @@ public class ObjectEditorView extends Canvas
     [Bindable] public var characterEditor:ObjectEditorCharacterView;
     [Bindable] public var plaqueEditor:ObjectEditorPlaqueView;
 	[Bindable] public var augBubbleEditor:ObjectEditorAugBubbleView;
-	[Bindable] public var playerNoteEditor:ObjectEditorPlayerNoteView;
 	public var stdHeight:Number;
 
     
@@ -80,10 +74,6 @@ public class ObjectEditorView extends Canvas
         }
     }
 
-	public function duplicateObject(evt:Event):void {
-		AppServices.getInstance().duplicateObject(GameModel.getInstance().game, objectPaletteItem.id, new Responder(handleDupedObject, handleFault));
-	}
-	
     private function handleGetContent(obj:Object):void
     {
         trace("In handleGetContent() Result called with obj = " + obj + "; Result = " + obj.result);
@@ -116,12 +106,6 @@ public class ObjectEditorView extends Canvas
                 m.isDefault = obj.result.data.icon_media.is_default;
 
                 op.iconMedia = m;
-				
-				trace("ObjectEditorView: sending notification that new media was set");
-				var de:DynamicEvent = new DynamicEvent(AppConstants.DYNAMICEVENT_OBJECTPALETTEITEMICONSET);
-				de.objectPaletteItem = op;
-				de.iconURL = m.urlPath + m.fileName;
-				AppDynamicEventManager.getInstance().dispatchEvent(de);		
             }
 
             op.mediaId = obj.result.data.media_id;
@@ -183,11 +167,6 @@ public class ObjectEditorView extends Canvas
 				//trace("Load underlying augBubble data...");
 				AppServices.getInstance().getAugBubbleById(GameModel.getInstance().game.gameId, op.objectId, new Responder(handleLoadSpecificData, handleFault));
 			}
-			else if (op.objectType == AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE)
-			{
-				//trace("Load underlying augBubble data...");
-				AppServices.getInstance().getPlayerNoteById(GameModel.getInstance().game.gameId, op.objectId, new Responder(handleLoadSpecificData, handleFault));
-			}
 			
             this.objectPaletteItem = op;
         }
@@ -201,7 +180,6 @@ public class ObjectEditorView extends Canvas
         var node:Node = null;
 		var webPage:WebPage = null;
 		var augBubble:AugBubble = null;
-		var playerNote:PlayerNote = null;
 
         var data:Object = retObj.result.data;
         var objType:String = "";
@@ -241,13 +219,6 @@ public class ObjectEditorView extends Canvas
 			
 			objType = AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE;
 		}
-		else if (data.hasOwnProperty("player_note_id"))
-		{
-			trace("retObj has an player_note_id!  It's value = '" + data.player_note_id + "'.");
-			playerNote = AppUtils.parseResultDataIntoPlayerNote(data);
-			
-			objType = AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE;
-		}
         else
         {
             trace("retObj data type couldn't be found, returning.");
@@ -255,7 +226,7 @@ public class ObjectEditorView extends Canvas
         }
 
         trace("Time to look for it's matching Game Object.");
-        AppUtils.matchDataWithGameObject(this.objectPaletteItem, objType, npc, item, node, webPage, augBubble, playerNote);
+        AppUtils.matchDataWithGameObject(this.objectPaletteItem, objType, npc, item, node, webPage, augBubble);
 
         // Update the Editor
         this.updateTheEditorUI();
@@ -277,8 +248,6 @@ public class ObjectEditorView extends Canvas
 		webPageEditor.includeInLayout = false;
 		augBubbleEditor.setVisible(false);
 		augBubbleEditor.includeInLayout = false;
-		playerNoteEditor.setVisible(false);
-		playerNoteEditor.includeInLayout = false;
 		this.width=470;
 		this.height = this.stdHeight;
 		
@@ -334,32 +303,7 @@ public class ObjectEditorView extends Canvas
 			augBubbleEditor.setVisible(true);
 			augBubbleEditor.includeInLayout = true;
 		}
-		else if (objectPaletteItem.objectType == AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE)
-		{
-			trace("It's a PlayerNote, so display the PlayerNote Editor.")
-			playerNoteEditor.setObjectPaletteItem(objectPaletteItem);
-			secretText.text = "id="+playerNoteEditor.objectPaletteItem.objectId+"";
-			playerNoteEditor.setVisible(true);
-			playerNoteEditor.includeInLayout = true;
-		}
     }
-	
-	public function handleDupedObject(obj:Object):void
-	{
-		trace("In handleDupedObject() Result called with obj = " + obj + "; Result = " + obj.result);
-		if (obj.result.returnCode != 0)
-		{
-			trace("Bad dub object attempt... let's see what happened.  Error = '" + obj.result.returnCodeDescription + "'");
-			var msg:String = obj.result.returnCodeDescription;
-			Alert.show("Error Was: " + msg, "Error While Getting Content For Editor");
-		}
-		else
-		{
-			trace("refresh the sideBar");
-			var de:DynamicEvent = new DynamicEvent(AppConstants.APPLICATIONDYNAMICEVENT_REDRAWOBJECTPALETTE);
-			AppDynamicEventManager.getInstance().dispatchEvent(de);	
-		}
-	}
 
     public function handleFault(obj:Object):void
     {

@@ -127,8 +127,6 @@ public class RequirementsEditorView extends Panel
         r.requirement = AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_DATABASE;
 		r.contentType = this.requirementObjectType;
         r.contentId = this.requirementObjectId;
-		r.notOp = "DO";
-		r.notOpHuman = "Player Has";
         
         requirements.addItem(r);
         AppServices.getInstance().saveRequirement(GameModel.getInstance().game.gameId, r, new Responder(handleAddRequirementSave, handleFault));
@@ -139,7 +137,7 @@ public class RequirementsEditorView extends Panel
         trace("RequirementEditorView: handleDataEditBeginning()....");
         var r:Requirement = reqs.selectedItem as Requirement;
 
-        if (AppUtils.isUploadMediaItemRequirementType(r) && evt.columnIndex != 4)
+        if (AppUtils.isUploadMediaItemRequirementType(r))
         {
             trace("RequirementEditorView: This requirement is an Uploaded Media Item, so stop the itemEditor from being setup.");
             evt.preventDefault();
@@ -193,7 +191,8 @@ public class RequirementsEditorView extends Panel
             }
 			
 			//Check if Qty should be used
-			if (r.requirement == AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_DATABASE || r.requirement == AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE)
+			if (r.requirement == AppConstants.REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_DATABASE || 
+				r.requirement == AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_DATABASE)
 			{
 				trace("RequirementEditorView: This requirement uses QTY");
 				r.requirementDetail2 = "1";
@@ -353,15 +352,11 @@ public class RequirementsEditorView extends Panel
                 r.requirementId = obj.result.data.list.getItemAt(j).requirement_id;
                 r.requirement = obj.result.data.list.getItemAt(j).requirement;
 				r.boolean = obj.result.data.list.getItemAt(j).boolean_operator;
-				r.notOp = obj.result.data.list.getItemAt(j).not_operator;
-				if(r.notOp == "DO") r.notOpHuman = "Player Has";
-				else if(r.notOp == "NOT") r.notOpHuman = "Player Has Not";
 				trace ("loading requirement - boolean was:" + r.boolean);
 		
                 r.requirementDetail1 = obj.result.data.list.getItemAt(j).requirement_detail_1;
                 r.requirementDetail2 = obj.result.data.list.getItemAt(j).requirement_detail_2;
-				r.requirementDetail3 = obj.result.data.list.getItemAt(j).requirement_detail_3;
-				r.requirementDetail4 = obj.result.data.list.getItemAt(j).requirement_detail_4;
+                r.requirementDetail3 = obj.result.data.list.getItemAt(j).requirement_detail_3;
                 r.contentId = obj.result.data.list.getItemAt(j).content_id;
                 r.contentType = obj.result.data.list.getItemAt(j).content_type;
                 requirements.addItem(r);
@@ -396,11 +391,11 @@ public class RequirementsEditorView extends Panel
         requirementsEditorMap.requirement = r;
         if (r.requirementDetail1 != null && r.requirementDetail2 != null)
         {
-            requirementsEditorMap.setPlacemarkLocation(parseFloat(r.requirementDetail3), parseFloat(r.requirementDetail4), 0);
+            requirementsEditorMap.setPlacemarkLocation(parseFloat(r.requirementDetail1), parseFloat(r.requirementDetail2), 0);
 		}
         else
         {
-			var pm:PlaceMark = new PlaceMark();// = GameModel.getInstance().game.placeMarks.getItemAt(0) as PlaceMark;
+			var pm:PlaceMark = GameModel.getInstance().game.placeMarks.getItemAt(0) as PlaceMark;
 			
 			//Set zoom to inital placemark
 			//requirementsEditorMap.setPlacemarkLocation(pm.latitude, pm.longitude, 0);

@@ -9,10 +9,8 @@
 #import "AudioRecorderViewController.h"
 #import "ARISAppDelegate.h"
 #import "AppServices.h"
-#import "GPSViewController.h"
-#import "DataCollectionViewController.h"
-#import "NoteCommentViewController.h"
-#import "NoteViewController.h"
+#import "TitleAndDecriptionFormViewController.h"
+
 
 @implementation AudioRecorderViewController
 @synthesize soundFileURL;
@@ -20,7 +18,7 @@
 @synthesize soundPlayer;
 @synthesize meter;
 @synthesize meterUpdateTimer;
-@synthesize audioData, delegate, noteId,previewMode;
+@synthesize audioData;
 
 
 // The designated initializer. Override to perform setup that is required before the view is loaded.
@@ -54,18 +52,14 @@
 	NSString *tempDir = NSTemporaryDirectory ();
     NSString *soundFilePath =[tempDir stringByAppendingString: @"sound.caf"];
 	
-    if(!previewMode){
     NSURL *newURL = [[NSURL alloc] initFileURLWithPath: soundFilePath];
     self.soundFileURL = newURL;
     [newURL release];
-    mode = kAudioRecorderStarting; 
-       
-    [[AVAudioSession sharedInstance] setDelegate: self];
-	}
-    else mode = kAudioRecorderNoteMode;
 	
-	 [self updateButtonsForCurrentMode];
-
+	[[AVAudioSession sharedInstance] setDelegate: self];
+	
+	mode = kAudioRecorderStarting; 
+	[self updateButtonsForCurrentMode];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -119,19 +113,10 @@
 			uploadButton.hidden = YES;
 			discardButton.hidden = YES;
 			break;
-        case kAudioRecorderNoteMode:
-            [recordStopOrPlayButton setTitle: NSLocalizedString(@"PlayKey", @"") forState: UIControlStateNormal];
-            [recordStopOrPlayButton setTitle: NSLocalizedString(@"PlayKey", @"") forState: UIControlStateHighlighted];			
-            uploadButton.hidden = YES;
-            discardButton.hidden = YES;
-            mode = kAudioRecorderRecordingComplete;
-
-            break;
 		default:
-
 			break;
 	}
-    }
+}
 
 - (IBAction) recordStopOrPlayButtonAction: (id) sender{
 	
@@ -188,11 +173,7 @@
 			
 		case kAudioRecorderPlaying:
 			[self.soundPlayer stop];
-            if(!self.previewMode)
-                mode = kAudioRecorderRecordingComplete;
-            else
-                mode = kAudioRecorderNoteMode;
-                
+			mode = kAudioRecorderRecordingComplete;
 			[self updateButtonsForCurrentMode];
 			break;	
 			
@@ -236,19 +217,39 @@
 	self.audioData = [NSData dataWithContentsOfURL:soundFileURL];
 	self.soundRecorder = nil;
 	
-	//Do server call here
-    [[AppServices sharedAppServices] addContentToNoteFromFileData:self.audioData fileName:@"audio.caf" name:nil noteId:self.noteId type:@"AUDIO"];
-    if([self.delegate isKindOfClass:[NoteCommentViewController class]]) [self.delegate addedAudio];
-    if([self.delegate isKindOfClass:[NoteViewController class]]) [self.delegate setNoteValid:YES];
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:.5];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
-                           forView:self.navigationController.view cache:YES];
-    [self.navigationController popViewControllerAnimated:NO];
-    
-    [UIView commitAnimations]; 
+	TitleAndDecriptionFormViewController *titleAndDescForm = [[TitleAndDecriptionFormViewController alloc] 
+															  initWithNibName:@"TitleAndDecriptionFormViewController" bundle:nil];
+	titleAndDescForm.delegate = self;
+	[self.view addSubview:titleAndDescForm.view];
 }	
+
+- (void)titleAndDescriptionFormDidFinish:(TitleAndDecriptionFormViewController*)titleAndDescForm{
+	NSLog(@"CameraVC: Back from form");
+	[titleAndDescForm.view removeFromSuperview];
+		
+	[[AppServices sharedAppServices] createItemAndGiveToPlayerFromFileData:self.audioData 
+										   fileName:@"audio.caf" 
+											  title:titleAndDescForm.titleField.text 
+										description:titleAndDescForm.descriptionField.text];
+    [titleAndDescForm release];
+
+	
+	[[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryAmbient error: nil];
+    NSString *tab;
+    ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];        
+
+    for(int i = 0;i < [appDelegate.tabBarController.customizableViewControllers count];i++)
+    {
+        tab = [[appDelegate.tabBarController.customizableViewControllers objectAtIndex:i] title];
+        tab = [tab lowercaseString];
+        if([tab isEqualToString:@"inventory"])
+        {
+            appDelegate.tabBarController.selectedIndex = i;
+        }
+    }
+
+	
+}
 
 - (IBAction) discardButtonAction: (id) sender{
 	soundPlayer = nil;

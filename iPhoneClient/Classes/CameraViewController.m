@@ -11,9 +11,7 @@
 #import "AppModel.h"
 #import "AppServices.h"
 #import <MobileCoreServices/UTCoreTypes.h>
-#import "GPSViewController.h"
-#import "NoteCommentViewController.h"
-#import "NoteViewController.h"
+#import "TitleAndDecriptionFormViewController.h"
 
 @implementation CameraViewController
 
@@ -22,7 +20,7 @@
 @synthesize libraryButton;
 @synthesize mediaData;
 @synthesize mediaFilename;
-@synthesize profileButton, delegate,showVid, noteId;
+@synthesize profileButton;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle {
@@ -65,35 +63,17 @@
 	NSLog(@"Camera Loaded");
 }
 
--(void)viewWillAppear:(BOOL)animated{
-    if(showVid) [self cameraButtonTouchAction];
-    else [self libraryButtonTouchAction];
-}
 
 - (IBAction)cameraButtonTouchAction {
 	NSLog(@"Camera Button Pressed");
-self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:self.imagePickerController.sourceType];
-    
-        self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-    
-		self.imagePickerController.allowsEditing = YES;
+	
+	self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+	self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:self.imagePickerController.sourceType];
+	self.imagePickerController.allowsEditing = YES;
 	self.imagePickerController.showsCameraControls = YES;
 	[self presentModalViewController:self.imagePickerController animated:YES];
 }
 
-        
-- (BOOL) isVideoCameraAvailable{
-        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        NSArray *sourceTypes = [UIImagePickerController availableMediaTypesForSourceType:picker.sourceType];
-        [picker release];
-        
-        if (![sourceTypes containsObject:(NSString *)kUTTypeMovie ]){
-            
-            return NO;
-        }
-        
-        return YES;
-    }
 
 - (IBAction)libraryButtonTouchAction {
 	NSLog(@"Library Button Pressed");
@@ -135,28 +115,14 @@ self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaT
                                        self, 
                                        @selector(image:didFinishSavingWithError:contextInfo:), 
                                        nil );
-        [[AppServices sharedAppServices] addContentToNoteFromFileData:self.mediaData fileName:self.mediaFilename name:nil noteId:self.noteId type:@"PHOTO"];
-        if([self.delegate isKindOfClass:[NoteCommentViewController class]]) [self.delegate addedPhoto];
-        if([self.delegate isKindOfClass:[NoteViewController class]]) [self.delegate setNoteValid:YES];
 	}	
 	else if ([mediaType isEqualToString:@"public.movie"]){
 		NSLog(@"CameraViewController: Found a Movie");
 		NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
 		self.mediaData = [NSData dataWithContentsOfURL:videoURL];
 		self.mediaFilename = @"video.mp4";
-        [[AppServices sharedAppServices] addContentToNoteFromFileData:self.mediaData fileName:self.mediaFilename name:nil noteId:self.noteId type:@"VIDEO"];
-        if([self.delegate isKindOfClass:[NoteCommentViewController class]]) [self.delegate addedVideo];
-        if([self.delegate isKindOfClass:[NoteViewController class]]) [self.delegate setNoteValid:YES];
 	}	
-    
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:.5];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
-                           forView:self.navigationController.view cache:YES];
-    [self.navigationController popViewControllerAnimated:NO];
-    
-    [UIView commitAnimations]; 
+	[self displayTitleandDescriptionForm];
 
 }
 
@@ -164,21 +130,44 @@ self.imagePickerController.mediaTypes = [UIImagePickerController availableMediaT
     NSLog(@"Finished saving image with error: %@", error);
 }
 
--(void) uploadMedia {
+- (void)displayTitleandDescriptionForm {
+    TitleAndDecriptionFormViewController *titleAndDescForm = [[TitleAndDecriptionFormViewController alloc] 
+                                                              initWithNibName:@"TitleAndDecriptionFormViewController" bundle:nil];
+	
+	titleAndDescForm.delegate = self;
+	[self.view addSubview:titleAndDescForm.view];
+}
+
+- (void)titleAndDescriptionFormDidFinish:(TitleAndDecriptionFormViewController*)titleAndDescForm{
+	NSLog(@"CameraVC: Back from form");
+	[titleAndDescForm.view removeFromSuperview];
+
+	[[AppServices sharedAppServices] createItemAndGiveToPlayerFromFileData:self.mediaData 
+										   fileName:self.mediaFilename 
+											  title:titleAndDescForm.titleField.text 
+										description:titleAndDescForm.descriptionField.text];
+    
+    [titleAndDescForm release];	
+    NSString *tab;
+    ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];        
+
+    for(int i = 0;i < [appDelegate.tabBarController.customizableViewControllers count];i++)
+    {
+        tab = [[appDelegate.tabBarController.customizableViewControllers objectAtIndex:i] title];
+        tab = [tab lowercaseString];
+        if([tab isEqualToString:@"inventory"])
+        {
+            appDelegate.tabBarController.selectedIndex = i;
+        }
     }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-	[UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:.5];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
-                           forView:self.navigationController.view cache:YES];
-    [[picker parentViewController] dismissModalViewControllerAnimated:NO];
-    [self.navigationController popViewControllerAnimated:NO];
-    
-    [UIView commitAnimations]; 
+}
 
-		
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+	
+	[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+	
 }
 
 #pragma mark UINavigationControllerDelegate Protocol Methods

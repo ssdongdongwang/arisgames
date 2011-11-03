@@ -7,6 +7,7 @@
 	
 	<mx:Binding destination="value" source="cbo.value"/>
 	
+	
 	<mx:ComboBox id="cbo" editable="true" width="100%">
 		<mx:dataProvider>
 			<mx:String>AND</mx:String>

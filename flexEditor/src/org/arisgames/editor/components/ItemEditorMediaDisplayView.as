@@ -52,7 +52,7 @@ public class ItemEditorMediaDisplayView extends HBox
 	[Bindable] public var alignNoMediaLabel:Label;
 	[Bindable] public var alignPopupMediaPickerButton:Button;
 	*/
-	public var mediaPickerHidden:Boolean;
+	
     private var mediaPicker:ItemEditorMediaPickerMX;
 
     /**
@@ -61,7 +61,6 @@ public class ItemEditorMediaDisplayView extends HBox
     public function ItemEditorMediaDisplayView()
     {
         super();
-		mediaPickerHidden = false;
         this.addEventListener(FlexEvent.CREATION_COMPLETE, handleInit)
     }
 
@@ -82,23 +81,6 @@ public class ItemEditorMediaDisplayView extends HBox
 
     }
 
-	public function hideMediaPicker(hide:Boolean):void
-	{
-		if(hide){
-			mediaPickerHidden = true;
-			mediaImageCanvas.setVisible(false);
-			mediaPreviewImage.setVisible(false);
-			mediaAVLinkButton.setVisible(false);
-			mediaRemoveButton.setVisible(false);
-			mediaNoMediaLabel.setVisible(false);
-			mediaPopupMediaPickerButton.setVisible(false);
-		}
-		else {
-			mediaPickerHidden = false;
-			pushDataIntoGUI();
-		}
-	}
-	
     public function setObjectPaletteItem(opi:ObjectPaletteItemBO):void
     {
         trace("ItemEditorMediaDisplayView: setting objectPaletteItem with name = '" + opi.name + "' in ItemEditorPlaqueView");
@@ -109,7 +91,7 @@ public class ItemEditorMediaDisplayView extends HBox
     private function pushDataIntoGUI():void
     {
         //trace("ItemEditorMediaDisplayView: pushDataIntoGUI called with Icon Media Id = '" + objectPaletteItem.iconMediaId + "'; Media Id = '" + objectPaletteItem.mediaId + "'; Align Media Id = '" + objectPaletteItem.alignMediaId + "'; Icon Media Object = '" + objectPaletteItem.iconMedia + "'; Media Object = '" + objectPaletteItem.media + "'");
-		if(objectPaletteItem == null) return;
+
         // Load The Icon Media
         if (objectPaletteItem.iconMedia != null && (objectPaletteItem.iconMedia.type == AppConstants.MEDIATYPE_AUDIO || objectPaletteItem.iconMedia.type == AppConstants.MEDIATYPE_VIDEO))
         {
@@ -182,15 +164,6 @@ public class ItemEditorMediaDisplayView extends HBox
 			trace("ItemEditorMediaDisplayView: Just set icon image url = '" + iconurl + "'");
         }
 
-		if(mediaPickerHidden){
-			mediaImageCanvas.setVisible(true);
-			mediaPreviewImage.setVisible(true);
-			mediaAVLinkButton.setVisible(true);
-			mediaRemoveButton.setVisible(true);
-			mediaNoMediaLabel.setVisible(true);
-			mediaPopupMediaPickerButton.setVisible(true);
-			return;
-		}
         // Load The Media GUI
 		if(objectPaletteItem.objectType != AppConstants.CONTENTTYPE_WEBPAGE_DATABASE && objectPaletteItem.objectType != AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE){
 			mediaPopupMediaPickerButton.setVisible(true);
@@ -461,25 +434,7 @@ public class ItemEditorMediaDisplayView extends HBox
 			{
 				objectPaletteItem.mediaId = m.mediaId;
 				objectPaletteItem.media = m;
-				trace("Just set Page with ID = '" + objectPaletteItem.augBubble.augBubbleId );
-			}
-			//AppServices.getInstance().saveItem(GameModel.getInstance().game.gameId, objectPaletteItem.item, new Responder(handleSaveObject, handleFault));
-		}
-		else if (objectPaletteItem.objectType == AppConstants.CONTENTTYPE_ITEM_DATABASE)
-		{
-			if (picker.isInIconPickerMode())
-			{
-				objectPaletteItem.item.iconMediaId = m.mediaId;
-				objectPaletteItem.iconMediaId = m.mediaId;
-				objectPaletteItem.iconMedia = m;
-				trace("Just set Item with ID = '" + objectPaletteItem.item.itemId + "' Icon Media Id = '" + objectPaletteItem.item.iconMediaId + "'");
-			}
-			else
-			{
-				objectPaletteItem.item.mediaId = m.mediaId;
-				objectPaletteItem.mediaId = m.mediaId;
-				objectPaletteItem.media = m;
-				trace("Just set Item with ID = '" + objectPaletteItem.item.itemId + "' Media Id = '" + objectPaletteItem.item.mediaId + "'");
+				trace("Just set Page with ID = '" + objectPaletteItem.augBubble.augBubbleId);
 			}
 			//AppServices.getInstance().saveItem(GameModel.getInstance().game.gameId, objectPaletteItem.item, new Responder(handleSaveObject, handleFault));
 		}

@@ -6,19 +6,17 @@ import mx.utils.ArrayUtil;
 import org.arisgames.editor.MainView;
 import org.arisgames.editor.data.PlaceMark;
 import org.arisgames.editor.data.arisserver.AugBubble;
-import org.arisgames.editor.data.arisserver.AugBubbleMedia;
 import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Location;
 import org.arisgames.editor.data.arisserver.NPC;
 import org.arisgames.editor.data.arisserver.Node;
-import org.arisgames.editor.data.arisserver.PlayerNote;
-import org.arisgames.editor.data.arisserver.PlayerNoteMedia;
 import org.arisgames.editor.data.arisserver.PlayerStateChange;
 import org.arisgames.editor.data.arisserver.Quest;
 import org.arisgames.editor.data.arisserver.Requirement;
 import org.arisgames.editor.data.arisserver.WebPage;
 import org.arisgames.editor.data.businessobjects.ObjectPaletteItemBO;
 import org.arisgames.editor.models.GameModel;
+import org.arisgames.editor.data.arisserver.AugBubbleMedia;
 
 /**
  * A singleton object that provides parsers, converters and other general utilities
@@ -66,9 +64,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE;
-			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
-				return AppConstants.CONTENTTYPE_PLAYER_NOTE;
-				
             /*
              case AppConstants.CONTENTTYPE_QRCODEGROUP_VAL:
              return AppConstants.CONTENTTYPE_QRCODEGROUP;
@@ -92,8 +87,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE_DATABASE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE;
-			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
-				return AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE;
             /*
              case AppConstants.CONTENTTYPE_QRCODEGROUP_VAL:
              return AppConstants.CONTENTTYPE_QRCODEGROUP;
@@ -127,10 +120,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
-			case AppConstants.CONTENTTYPE_PLAYER_NOTE:
-				return AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL;
-			case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
-				return AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL;
             /*
              case AppConstants.CONTENTTYPE_QRCODEGROUP:
              return AppConstants.CONTENTTYPE_QRCODEGROUP_VAL;
@@ -268,7 +257,7 @@ public class AppUtils
         }
     }
 
-    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble, playerNote:PlayerNote):void
+    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble):void
     {
         //trace("matchDataWithGameObject() called: Looking at Game Object Id '" + obj.id + ".  It's Object Type = '" + obj.objectType + "', while it's Content Id = '" + obj.objectId + "'; Is Folder? " + obj.isFolder() + "");
 
@@ -313,13 +302,6 @@ public class AppUtils
 						obj.augBubble = augBubble;
 					}
 					break;
-				case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
-					if (obj.objectId == playerNote.playerNoteId)
-					{
-						//trace("Just matched Game Object Id " + obj.id + " with augBubble of ID = " + augBubble.augBubbleId);
-						obj.playerNote = playerNote;
-					}
-					break;
             }
         }
         else if (obj.isFolder())
@@ -328,7 +310,7 @@ public class AppUtils
             for (var lc:Number = 0; lc < obj.children.length; lc++)
             {
                 var childObj:ObjectPaletteItemBO = obj.children.getItemAt(lc) as ObjectPaletteItemBO;
-                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble, playerNote);
+                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble);
             }
         }
     }
@@ -431,42 +413,12 @@ public class AppUtils
 			augBubble.name = data.name;
 			augBubble.desc = data.description;
 			augBubble.iconMediaId = data.icon_media_id;
-			
+	
 			return augBubble;
 		}
 		else
 		{
 			trace("Data passed in was not an Aug Bubble Result set, returning NULL.");
-			return null;
-		}
-	}
-	
-	public static function parseResultDataIntoPlayerNote(data:Object):PlayerNote
-	{
-		if (data.hasOwnProperty("note_id"))
-		{
-			trace("retObj has a note_id!  It's value = '" + data.note_id + "'.");
-			var playerNote:PlayerNote= new PlayerNote();
-			
-			playerNote.media = new ArrayCollection();
-			playerNote.textBlob = "";
-			for(var x:Number = 0; x < data.contents.length; x++){
-				if(data.contents[x].type == "TEXT") playerNote.textBlob = playerNote.textBlob + data.contents[x].text + "; ";
-				else playerNote.media.addItem(new PlayerNoteMedia(data.contents[x].media_id, data.contents[x].text, data.contents[x].sort_index, data.contents[x].content_id));
-			}
-			
-			playerNote.playerNoteId = data.note_id;
-			playerNote.ownerId = data.owner_id;
-			playerNote.title = data.title;
-			playerNote.aveRating = data.ave_rating;
-			playerNote.numRatings = data.num_ratings;
-			playerNote.shared = data.shared;
-			
-			return playerNote;
-		}
-		else
-		{
-			trace("Data passed in was not a Player Note Result set, returning NULL.");
 			return null;
 		}
 	}
@@ -589,16 +541,28 @@ public class AppUtils
         {
             case AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_HUMAN:
                 return AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_DATABASE;
+            case AppConstants.REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_HUMAN:
+                return AppConstants.REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_DATABASE;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_ITEM_HUMAN:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_ITEM_DATABASE;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_HUMAN:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_VIEWED_WEBPAGE_HUMAN:
 				return AppConstants.REQUIREMENT_PLAYER_VIEWED_WEBPAGE_DATABASE;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_HUMAN:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN:
 				return AppConstants.REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_DATABASE;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_HUMAN:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_DATABASE;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_NODE_HUMAN:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_NODE_DATABASE;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_HUMAN:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_DATABASE;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_NPC_HUMAN:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_NPC_DATABASE;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_HUMAN:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_HUMAN:
@@ -609,6 +573,8 @@ public class AppUtils
 				return AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_DATABASE;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_HUMAN:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_DATABASE;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE;
             default:
@@ -623,16 +589,28 @@ public class AppUtils
         {
             case AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_DATABASE:
                 return AppConstants.REQUIREMENT_PLAYER_HAS_ITEM_HUMAN;
+            case AppConstants.REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_DATABASE:
+                return AppConstants.REQUIREMENT_PLAYER_DOES_NOT_HAVE_ITEM_HUMAN;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_ITEM_DATABASE:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_ITEM_HUMAN;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_DATABASE:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_ITEM_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_VIEWED_WEBPAGE_DATABASE:
 				return AppConstants.REQUIREMENT_PLAYER_VIEWED_WEBPAGE_HUMAN;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_DATABASE:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_WEBPAGE_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_DATABASE:
 				return AppConstants.REQUIREMENT_PLAYER_VIEWED_AUGBUBBLE_HUMAN;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_DATABASE:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_AUGBUBBLE_HUMAN;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_NODE_DATABASE:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_NODE_HUMAN;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_DATABASE:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NODE_HUMAN;
             case AppConstants.REQUIREMENT_PLAYER_VIEWED_NPC_DATABASE:
                 return AppConstants.REQUIREMENT_PLAYER_VIEWED_NPC_HUMAN;
+            case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_DATABASE:
+                return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_VIEWED_NPC_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_DATABASE:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE_DATABASE:
@@ -643,6 +621,8 @@ public class AppUtils
 				return AppConstants.REQUIREMENT_PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_DATABASE:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_COMPLETED_QUEST_HUMAN;
+			case AppConstants.REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_DATABASE:
+				return AppConstants.REQUIREMENT_PLAYER_HAS_NOT_COMPLETED_QUEST_HUMAN;
 			case AppConstants.REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE:
 				return AppConstants.REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN;
             default:
