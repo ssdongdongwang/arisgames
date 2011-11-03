@@ -113,7 +113,7 @@ extern NSDictionary *InventoryElements;
 - (void)clearUserDefaults;
 - (void)saveUserDefaults;
 - (void)initUserDefaults;
-
+- (void)clearGameLists;
 - (void)modifyQuantity: (int)quantityModifier forLocationId: (int)locationId;
 - (void)removeItemFromInventory: (Item*)item qtyToRemove:(int)qty;
 

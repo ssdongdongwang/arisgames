@@ -13,6 +13,7 @@
 #import "GameDetails.h"
 #import "GamePickerCell.h"
 #include <QuartzCore/QuartzCore.h>
+#include "AsyncImageView.h"
 
 @implementation GamePickerNearbyViewController
 
@@ -193,7 +194,6 @@
 		// Release the temporary UIViewController.
 		[temporaryController release];
     }
-	
 	Game *currentGame = [self.gameList objectAtIndex:indexPath.row];
 
 	cell.titleLabel.text = currentGame.name;
@@ -217,23 +217,36 @@
     [cell.starView setStarImage:[UIImage imageNamed:@"small-star-hot.png"]
                                forState:kSCRatingViewUserSelected];
     
+  
     //Set up the Icon
-	if ([currentGame.iconMediaUrl length] > 0) {
+    //Create a new iconView for each cell instead of reusing the same one
+    AsyncImageView *iconView = [[AsyncImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+
+        
 		Media *iconMedia = [[Media alloc] initWithId:1 andUrlString:currentGame.iconMediaUrl ofType:@"Icon"];
-        currentGame.iconMedia = iconMedia;
-        [cell.iconView loadImageFromMedia:iconMedia];
-        currentGame.iconMediaUrl = nil; //Clear out the URL so it will load from the iconMediaNextTime
-	}
-	else
-    {
-        if(currentGame.iconMedia)
-            cell.iconView.image = currentGame.iconMedia.image;
-        else
-            cell.iconView.image = [UIImage imageNamed:@"Icon.png"];
+    if(currentGame.iconMedia.image){
+        iconView.image = currentGame.iconMedia.image;
     }
-    cell.iconView.layer.masksToBounds = YES;
-    cell.iconView.layer.cornerRadius = 10.0;
+    else {
+        if([currentGame.iconMediaUrl length] == 0) iconView.image = [UIImage imageNamed:@"Icon.png"];
+        else{
+        currentGame.iconMedia = iconMedia;
+        [iconView loadImageFromMedia:iconMedia];
+        [iconMedia release];
+        }
+    }
+
+    iconView.layer.masksToBounds = YES;
+    iconView.layer.cornerRadius = 10.0;
     
+    //clear out icon view
+    if([cell.iconView.subviews count]>0)
+    [[cell.iconView.subviews objectAtIndex:0] removeFromSuperview];
+    
+    
+    [cell.iconView addSubview: iconView];
+   
+    [iconView release];
     return cell;
 }
 
@@ -323,7 +336,8 @@
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
+    [gameIcons release];
+    [gameTable release];
     [gameList release];
     [refreshButton release];
     [super dealloc];

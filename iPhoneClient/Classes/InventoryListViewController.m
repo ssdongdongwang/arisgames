@@ -41,7 +41,6 @@
         [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
 
 		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
-
     }
     return self;
 }
@@ -198,6 +197,11 @@
 	[inventoryTable reloadData];
 	
 	if (silenceNextServerUpdateCount>0) silenceNextServerUpdateCount--;
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"hasViewed"
+                                                  ascending:YES] autorelease];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    self.inventory = [self.inventory sortedArrayUsingDescriptors:sortDescriptors];
 
 	
 }
@@ -317,7 +321,6 @@
             iconMedia = [[AppModel sharedAppModel] mediaForMediaId: item.iconMediaId];
             [self.iconCache  addObject:iconMedia];
         }
-        if(!iconView.loaded)
 		[iconView loadImageFromMedia:iconMedia];
 	}
 	else {
@@ -346,7 +349,6 @@
 	return cell;
 }
 
-					 
  - (unsigned int) indexOf:(char) searchChar inString:(NSString *)searchString {
 	NSRange searchRange;
 	searchRange.location = (unsigned int) searchChar;

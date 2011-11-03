@@ -38,12 +38,16 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppModel);
 		//Init USerDefaults
 		defaults = [NSUserDefaults standardUserDefaults];
 		gameMediaList = [[NSMutableDictionary alloc] initWithCapacity:10];
+        NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
+        [dispatcher addObserver:self selector:@selector(clearGameLists) name:@"NewGameSelected" object:nil];
 	}
 			 
     return self;
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	[gameMediaList release];
 	[gameList release];
     [recentGameList release];
@@ -122,6 +126,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppModel);
 
 }
 
+-(void)clearGameLists{
+    NSLog(@"Clearing Game Lists");
+    [gameMediaList removeAllObjects];
+    [gameItemList removeAllObjects];
+    [gameNodeList removeAllObjects];
+    [gameNpcList removeAllObjects];
+    [gameWebPageList removeAllObjects];
+    [gamePanoramicList removeAllObjects];
+}
 
 -(void)clearUserDefaults {
 	NSLog(@"Model: Clearing User Defaults");	
