@@ -1,0 +1,167 @@
+html
+{
+}
+
+body
+{
+  background: #222;
+  font-family: calibri,tahoma,arial,sans-serif;
+  font-size: 1em;
+  height: 100%;
+  color: #fff;
+  margin: 2% 15% 2% 15%;
+}
+
+#header
+{
+  height: 80px;
+}
+
+img
+{
+  float: left;
+}
+
+#logotext
+{
+  font-family: arial,sans-serif;
+  color: #fff;
+  font-size: 3em;
+  font-weight: bold;
+  padding-top: 30px;
+}
+
+#mapContainer 
+{
+  margin-top: 2%;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+  height: 300px;
+  text-align: center;
+}
+
+#mainStatsContainer
+{
+  margin-top: 1%;
+  height: 120px;
+  font-family: calibri, arial, sans-serif;
+  font-weight: bold;
+  text-align: center;
+}
+
+#totalPlayers
+{
+  margin-left: auto;
+  padding: 1%;
+  width: 25%;
+  margin-right: 1%;
+  float: left;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+#totalGames
+{
+  padding: 1%;
+  width: 25%;
+  margin-right: 1%;
+  float: left;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+#totalEditors
+{
+  padding: 1%;
+  width: 25%;
+  margin-right: 1%;
+  float: left;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+.bigNum
+{
+  margin: 0;
+  font-size: 4em;
+}
+
+.bigText
+{
+  margin: 0;
+  font-size: 2em;
+}
+
+#topTenGames
+{
+  margin-top: 1%;
+  margin-right: 3%;
+  float: left;
+  width: 90%;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+#liveFeedContainer
+{
+  margin-top: 1%;
+  float: left;
+  width: 40%;
+  height: 500px;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+h1
+{
+  text-align: center;
+}
+
+.topTenElement
+{
+  margin-left: 2px;
+  margin-right: 2px;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+  padding: 1%;
+  height: 75px;
+}
+
+.topTenNum
+{
+  font-family: arial,sans-serif;
+  color: #336699;
+  font-size: 3em;
+  font-weight: bold;
+  float: left;
+}
+
+.topTenGameName
+{
+  font-weight: bold;
+  float: left;
+}
+
+.topTenGameCount
+{
+  font-family: arial,sans-serif;
+  color: #FF9900;
+  font-size: 3em;
+  font-weight: bold;
+  float: right;
+  padding: 2px;
+  border: solid white 2px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+button {
+ margin: 10px auto;
+}
