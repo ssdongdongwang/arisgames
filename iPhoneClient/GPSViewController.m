@@ -42,7 +42,10 @@
 		[dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"ReceivedLocationList" object:nil];
 		[dispatcher addObserver:self selector:@selector(processNearbyLocationsList:) name:@"ReceivedNearbyLocationList" object:nil];
 		[dispatcher addObserver:self selector:@selector(silenceNextUpdate) name:@"SilentNextUpdate" object:nil];
-		[dispatcher addObserver:self selector:@selector(movieFinishedPreloading:) name:MPMoviePlayerContentPreloadDidFinishNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+												 selector:@selector(movieLoadStateChanged:) 
+													 name:MPMoviePlayerLoadStateDidChangeNotification 
+												   object:nil];
 		[dispatcher addObserver:self selector:@selector(movieFinishedPlayback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
 		
 		//create a time for automatic map refresh
@@ -331,7 +334,7 @@
 				NSLog(@"GPSViewController: Just added an annotation to a null mapview!");
 			}
 			
-			[annotation release];
+			[annotation retain]; //TRY RETAIN
 		}
 		
 		//Add the freshly loaded players from the notification
@@ -360,18 +363,37 @@
     [super dealloc];
 }
 
--(void)movieFinishedPreloading:(NSNotification*)notification
-{
-	NSLog(@"Preloading Complete");
-	[mainButton setTitle: @"Play" forState: UIControlStateNormal];
-	[mainButton setTitle: @"Play" forState: UIControlStateHighlighted];
-	[spinner stopAnimating];
-	[spinner removeFromSuperview];
-	mainButton.enabled = YES;
-	
-	
 
+- (void)movieLoadStateChanged:(NSNotification*) aNotification{
+	
+    NSLog(@"GPSVC: movieLoadStateChanged");
+
+    MPMovieLoadState state = [(MPMoviePlayerController *) aNotification.object loadState];
+    
+	if( state & MPMovieLoadStateUnknown ) {
+		NSLog(@"GPSVC: Unknown Load State");
+	}
+	if( state & MPMovieLoadStatePlayable ) {
+		NSLog(@"GPSVC: Playable Load State");
+        [mainButton setTitle: @"Play" forState: UIControlStateNormal];
+        [mainButton setTitle: @"Play" forState: UIControlStateHighlighted];
+        [spinner stopAnimating];
+        [spinner removeFromSuperview];
+        mainButton.enabled = YES;
+        
+	} 
+	if( state & MPMovieLoadStatePlaythroughOK ) {
+		NSLog(@"GPSVC: Playthrough OK Load State");
+        
+	} 
+	if( state & MPMovieLoadStateStalled ) {
+		NSLog(@"GPSVC: Stalled Load State");
+	} 
+    
 }
+
+
+
 
 -(void)movieFinishedPlayback:(NSNotification*)notification
 {
@@ -486,7 +508,7 @@
 		return playerAnnotationView;	
 	} 
 
-	MKAnnotationView *annotationView=[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"marker"];
+	MKAnnotationView *annotationView=[[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"marker"]autorelease];
 	annotationView.image = [UIImage imageNamed:@"item.png"];
 	annotationView.canShowCallout = YES;
 	return annotationView;

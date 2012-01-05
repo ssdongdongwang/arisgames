@@ -69,12 +69,40 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "GPSViewController.m"
-         timestampString = "301615831.571492"
+         timestampString = "347481479.462522"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "339"
-         endingLineNumber = "339"
+         startingLineNumber = "342"
+         endingLineNumber = "342"
          landmarkName = "-refreshViewFromModel"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "GPSViewController.m"
+         timestampString = "347481656.316651"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "166"
+         endingLineNumber = "166"
+         landmarkName = "-processNearbyLocationsList:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "GPSViewController.m"
+         timestampString = "347482878.34954"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "143"
+         endingLineNumber = "143"
+         landmarkName = "-processNearbyLocationsList:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

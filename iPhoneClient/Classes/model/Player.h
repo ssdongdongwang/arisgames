@@ -15,8 +15,8 @@
 	BOOL hidden;
 }
 
-@property(copy, readwrite) NSString *name;
-@property(copy, readwrite) CLLocation *location;
+@property(nonatomic, retain) NSString *name;
+@property(nonatomic, retain) CLLocation *location;
 @property(readwrite) BOOL hidden;
 
 @end

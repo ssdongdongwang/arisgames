@@ -8,6 +8,8 @@
 
 #import "ARISAppDelegate.h"
 #import "Node.h"
+#import "NearbyObjectProtocol.h"
+
 
 @implementation ARISAppDelegate
 
@@ -158,15 +160,16 @@
 
 //Play a sound
 - (void) playAudio:(NSString*)wavFileName {
-	AVAudioPlayer *player;
+	/*
+    AVAudioPlayer *player;
 	NSString *soundPath = [[NSBundle mainBundle] pathForResource:wavFileName ofType:@"wav"];
-	player =[[[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath: soundPath] error:nil]autorelease];
+	player =[[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath: soundPath] error:nil];
 	[soundPath release];
 	player.volume = 1.0;
 	player.numberOfLoops = 0;
 	[player prepareToPlay];
 	[player play];
-    
+    */
 }
 
 //Vibrate

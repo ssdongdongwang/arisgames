@@ -25,12 +25,12 @@
 }
 
 @property(readwrite, assign) int locationId;
-@property(copy, readwrite) NSString *name;
+@property(nonatomic, retain) NSString *name;
 @property(readwrite, assign) int iconMediaId;
 
-@property(copy, readwrite) CLLocation *location;
+@property(nonatomic, retain) CLLocation *location;
 @property(readwrite) double error;
-@property(copy, readwrite) NSString *objectType;
+@property(nonatomic, retain) NSString *objectType;
 @property(readonly) nearbyObjectKind kind;
 - (nearbyObjectKind) kind;
 @property(readwrite) int objectId;

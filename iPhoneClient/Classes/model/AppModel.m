@@ -14,6 +14,8 @@
 #import "JSONResult.h"
 #import "JSON.h"
 #import "ASIFormDataRequest.h"
+#import "NearbyObjectProtocol.h"
+
 
 static NSString *const nearbyLock = @"nearbyLock";
 static NSString *const locationsLock = @"locationsLock";
@@ -788,6 +790,7 @@ static const int kEmptyValue = -1;
 		}
 		if ([type length] < 1) {
 			NSLog(@"AppModel fetchMediaList: Empty type for media #%d", uid);
+            type = NearbyObjectItem;
 			continue;
 		}
 		
