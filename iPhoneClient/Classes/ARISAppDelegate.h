@@ -7,10 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "model/AppModel.h";
+#import "model/AppModel.h"
 
-#import "LoginViewController.h";
-#import "GenericWebViewController.h";
+#import "LoginViewController.h"
 #import "MyCLController.h"
 
 #import "model/Game.h"
@@ -18,13 +17,9 @@
 #import "Item.h"
 #import "ItemDetailsViewController.h"
 
-#import "QuestsViewController.h"
 #import "GPSViewController.h"
 #import "InventoryListViewController.h"
-#import "CameraViewController.h"
 #import "AudioRecorderViewController.h"
-#import "ARViewViewControler.h"
-#import "QRScannerViewController.h"
 #import "GamePickerViewController.h"
 #import "LogoutViewController.h"
 #import "StartOverViewController.h"

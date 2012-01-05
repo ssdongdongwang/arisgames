@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "model/AppModel.h";
-#import "Item.h";
+#import "model/AppModel.h"
+#import "Item.h"
 #import "ARISMoviePlayerViewController.h"
 #import "AsyncImageView.h"
 

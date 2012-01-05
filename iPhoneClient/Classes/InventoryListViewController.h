@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "model/AppModel.h";
-#import "ARISAppDelegate.h";
-#import "Item.h";
-#import "ItemDetailsViewController.h";
+#import "model/AppModel.h"
+#import "ARISAppDelegate.h"
+#import "Item.h"
+#import "ItemDetailsViewController.h"
 
 @interface InventoryListViewController : UIViewController {
 	AppModel *appModel;	

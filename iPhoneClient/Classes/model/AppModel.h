@@ -11,7 +11,6 @@
 #import "Game.h"
 #import "Item.h"
 #import "Node.h"
-#import "Npc.h"
 #import "Media.h"
 
 extern NSDictionary *InventoryElements;
@@ -87,7 +86,6 @@ extern NSDictionary *InventoryElements;
 - (void)fetchQuestList;
 - (Item *)fetchItem:(int)itemId;
 - (Node *)fetchNode:(int)nodeId;
-- (Npc *)fetchNpc:(int)npcId;
 - (Media *)mediaForMediaId:(int)mId;
 
 	
@@ -110,7 +108,6 @@ extern NSDictionary *InventoryElements;
 
 - (Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary;
 - (Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary;
-- (Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary;
 - (void)updateServerGameSelected;
 -(NSObject<QRCodeProtocol> *)fetchQRCode:(NSString*)QRcodeId;
 

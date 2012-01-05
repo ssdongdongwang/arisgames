@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "model/AppModel.h";
-#import "Location.h";
+#import "model/AppModel.h"
+#import "Location.h"
 
 @interface DeveloperViewController : UIViewController {
 	AppModel *appModel;	

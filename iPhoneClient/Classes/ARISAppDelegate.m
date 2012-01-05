@@ -30,14 +30,13 @@
 	
 	//init app model
 	appModel = [[AppModel alloc] init];
-	//appModel.baseAppURL = @"http://davembp.local/server/";
-	appModel.baseAppURL = @"http://arisgames.org/stagingserver1/";
+	appModel.baseAppURL = @"http://arisgames.org/server/";
 
 	NSURL *url = [NSURL URLWithString:appModel.baseAppURL];
 	appModel.serverName = [NSString stringWithFormat:@"http://%@:%d", [url host], 
 					   ([url port] ? [[url port] intValue] : 80)];
 	appModel.jsonServerBaseURL = [NSString stringWithFormat:@"%@%@",
-							  appModel.baseAppURL, @"json.php/aris"];	
+							  appModel.baseAppURL, @"json.php/aris_1_5"];	
 	appModel.gameId = 200;
 	[appModel retain];
 	

@@ -8,7 +8,7 @@
 
 #import "AudioRecorderViewController.h"
 #import "ARISAppDelegate.h"
-#import "TitleAndDecriptionFormViewController.h";
+#import "TitleAndDecriptionFormViewController.h"
 
 
 @implementation AudioRecorderViewController

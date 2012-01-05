@@ -10,7 +10,6 @@
 #import "ARISAppDelegate.h"
 #import "Media.h"
 #import "NodeOption.h"
-#import "Quest.h"
 #import "JSONConnection.h"
 #import "JSONResult.h"
 #import "JSON.h"
@@ -490,15 +489,6 @@ static const int kEmptyValue = -1;
 					  usingParser:@selector(parseNodeFromDictionary:)];
 }
 
--(Npc *)fetchNpc:(int)npcId{
-	NSLog(@"Model: Fetch Requested for Npc %d", npcId);
-	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",self.gameId],
-						  [NSString stringWithFormat:@"%d",npcId],
-						  [NSString stringWithFormat:@"%d",self.playerId],
-						  nil];
-	return [self fetchFromService:@"npcs" usingMethod:@"getNpcWithConversationsForPlayer"
-						 withArgs:arguments usingParser:@selector(parseNpcFromDictionary:)];
-}
 
 - (void)fetchGameList {
 	NSLog(@"AppModel: Fetching Game List.");
@@ -691,28 +681,6 @@ static const int kEmptyValue = -1;
 	}
 	
 	return node;	
-}
-
--(Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary {
-	Npc *npc = [[[Npc alloc] init] autorelease];
-	npc.npcId = [[npcDictionary valueForKey:@"npc_id"] intValue];
-	npc.name = [npcDictionary valueForKey:@"name"];
-	npc.greeting = [npcDictionary valueForKey:@"text"];
-	npc.description = [npcDictionary valueForKey:@"description"];
-	npc.mediaId = [[npcDictionary valueForKey:@"media_id"] intValue];
-	
-	NSArray *conversationOptions = [npcDictionary objectForKey:@"conversationOptions"];
-	NSEnumerator *conversationOptionsEnumerator = [conversationOptions objectEnumerator];
-	NSDictionary *conversationDictionary;
-	while (conversationDictionary = [conversationOptionsEnumerator nextObject]) {	
-		//Make the Node Option and add it to the Npc
-		int optionNodeId = [[conversationDictionary valueForKey:@"node_id"] intValue];
-		NSString *text = [conversationDictionary valueForKey:@"text"]; 
-		NodeOption *option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId];
-		[npc addOption:option];
-		[option release];
-	}
-	return npc;	
 }
 
 -(NSArray *)parseGameListFromArray: (NSArray *)gameListArray{
@@ -920,7 +888,6 @@ static const int kEmptyValue = -1;
 
 	if ([type isEqualToString:@"Node"]) return [self parseNodeFromDictionary:qrCodeObjectDictionary];
 	if ([type isEqualToString:@"Item"]) return [self parseItemFromDictionary:qrCodeObjectDictionary];
-	if ([type isEqualToString:@"Npc"]) return [self parseNpcFromDictionary:qrCodeObjectDictionary];
 
 	return nil;
 }
@@ -933,71 +900,6 @@ static const int kEmptyValue = -1;
 	[self fetchLocationList];
 }
 
--(void)parseQuestListFromJSON: (JSONResult *)jsonResult{
 
-	NSLog(@"AppModel: Parsing Quests");
-	
-	//Check for an error
-	
-	//Compare this hash to the last one. If the same, stop here
-	if (jsonResult.hash == questListHash) {
-		NSLog(@"AppModel: Hash is same as last quest list update, continue");
-		return;
-	}
-	
-	//Save this hash for later comparisions
-	questListHash = jsonResult.hash;
-	
-	//Continue parsing
-	NSDictionary *questListDictionary = (NSDictionary *)jsonResult.data;	
-	
-	
-	//parse out the active quests into quest objects
-	NSMutableArray *activeQuestObjects = [[NSMutableArray alloc] init];
-	NSArray *activeQuests = [questListDictionary objectForKey:@"active"];
-	NSEnumerator *activeQuestsEnumerator = [activeQuests objectEnumerator];
-	NSDictionary *activeQuest;
-	while (activeQuest = [activeQuestsEnumerator nextObject]) {
-		//We have a quest, parse it into a quest abject and add it to the activeQuestObjects array
-		Quest *quest = [[Quest alloc] init];
-		quest.questId = [[activeQuest objectForKey:@"quest_id"] intValue];
-		quest.name = [activeQuest objectForKey:@"name"];
-		quest.description = [activeQuest objectForKey:@"description"];
-		quest.iconMediaId = [[activeQuest objectForKey:@"icon_media_id"] intValue];
-		[activeQuestObjects addObject:quest];
-		[quest release];
-	}
-
-	//parse out the completed quests into quest objects	
-	NSMutableArray *completedQuestObjects = [[NSMutableArray alloc] init];
-	NSArray *completedQuests = [questListDictionary objectForKey:@"completed"];
-	NSEnumerator *completedQuestsEnumerator = [completedQuests objectEnumerator];
-	NSDictionary *completedQuest;
-	while (completedQuest = [completedQuestsEnumerator nextObject]) {
-		//We have a quest, parse it into a quest abject and add it to the completedQuestObjects array
-		Quest *quest = [[Quest alloc] init];
-		quest.questId = [[completedQuest objectForKey:@"quest_id"] intValue];
-		quest.name = [completedQuest objectForKey:@"name"];
-		quest.description = [completedQuest objectForKey:@"text_when_complete"];
-		quest.iconMediaId = [[completedQuest objectForKey:@"icon_media_id"] intValue];
-		[completedQuestObjects addObject:quest];
-		[quest release];
-	}
-
-	//Package the two object arrays in a Dictionary
-	NSMutableDictionary *tmpQuestList = [[NSMutableDictionary alloc] init];
-	[tmpQuestList setObject:activeQuestObjects forKey:@"active"];
-	[tmpQuestList setObject:completedQuestObjects forKey:@"completed"];
-	[activeQuestObjects release];
-	[completedQuestObjects release];
-	
-	self.questList = tmpQuestList;
-	
-	//Sound the alarm
-	NSLog(@"AppModel: Finished fetching quests from server, model updated");
-	NSNotification *notification = [NSNotification notificationWithName:@"ReceivedQuestList" object:nil];
-	[[NSNotificationCenter defaultCenter] postNotification:notification];
-	
-}
 
 @end
