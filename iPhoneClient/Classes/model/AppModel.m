@@ -547,7 +547,6 @@ static const int kEmptyValue = -1;
 
 - (void)fetchAllLists{
 	[self fetchLocationList];
-	[self fetchQuestList];
 	[self fetchInventory];	
 }
 
@@ -593,24 +592,6 @@ static const int kEmptyValue = -1;
 
 }
 
-
--(void)fetchQuestList {
-	NSLog(@"Model: Fetch Requested for Quests");
-	
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",self.gameId],
-						  [NSString stringWithFormat:@"%d",playerId],
-						  nil];
-	
-	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithArisJSONServer:self.jsonServerBaseURL 
-																	andServiceName:@"quests"
-																	 andMethodName:@"getQuestsForPlayer"
-																	  andArguments:arguments];
-	
-	[jsonConnection performAsynchronousRequestWithParser:@selector(parseQuestListFromJSON:)]; 	
-	[jsonConnection release];
-
-}
 
 
 #pragma mark Parsers
@@ -896,7 +877,6 @@ static const int kEmptyValue = -1;
 -(void)parseStartOverFromJSON:(JSONResult *)jsonResult{
 	NSLog(@"AppModel: Parsing start over result and firing off fetches");
 	[self fetchInventory];
-	[self fetchQuestList];
 	[self fetchLocationList];
 }
 
