@@ -10,8 +10,10 @@
 
 <?php
 
-$CURDIR = __DIR__ . DIRECTORY_SEPARATOR;
+// CONSTANTS
 
+$numTopGames = 100; // number of top games to show in list
+$CURDIR = __DIR__ . DIRECTORY_SEPARATOR;
 $db = 'server';
 
 require($CURDIR . 'config.class.php');
@@ -35,6 +37,112 @@ function initialize()
 
   <?php generatePlayerLocations(); ?>
   <?php generateGameLocations(); ?>
+  
+  ShowDiv('topTenElementForDay');
+  currentTopTenElement = 'topTenElementForDay';
+
+  populateGraphs();
+}
+
+function populateGraphs()
+{
+  <?php generateGraphData() ?>
+
+  var playersGraph = document.getElementById("playersGraph");      
+  var cwidth = playersGraph.width;
+  var cheight = playersGraph.height;
+  var barwidth = cwidth/range;
+  var ctx=playersGraph.getContext("2d");
+  ctx.fillStyle="#FF9900";
+  for(var i = 0; i < range; i++)
+  {
+    ctx.fillRect(cwidth-(i*barwidth),cheight,-1*barwidth,-1*gdata.players.countarray[i]/gdata.players.max*cheight);
+  }
+
+  var gamesGraph = document.getElementById("gamesGraph");      
+  var cwidth = gamesGraph.width;
+  var cheight = gamesGraph.height;
+  var barwidth = cwidth/range;
+  var ctx=gamesGraph.getContext("2d");
+  ctx.fillStyle="#336699";
+  for(var i = 0; i < range; i++)
+  {
+    ctx.fillRect(cwidth-(i*barwidth),cheight,-1*barwidth,-1*gdata.games.countarray[i]/gdata.games.max*cheight);
+  }
+
+  var editorsGraph = document.getElementById("editorsGraph");      
+  var cwidth = editorsGraph.width;
+  var cheight = editorsGraph.height;
+  var barwidth = cwidth/range;
+  var ctx=editorsGraph.getContext("2d");
+  ctx.fillStyle="#7BB31A";
+  for(var i = 0; i < range; i++)
+  {
+    ctx.fillRect(cwidth-(i*barwidth),cheight,-1*barwidth,-1*gdata.editors.countarray[i]/gdata.editors.max*cheight);
+  }
+}
+
+// topTenArray and topTenButtons must be parallel arrays
+
+var topTenArray = ['topTenElementForDay', 'topTenElementForWeek', 'topTenElementForMonth'];
+var topTenButtons = ['topTenDayButton', 'topTenWeekButton', 'topTenMonthButton'];
+
+function enableTopTenItem(divId)
+{
+  for (var i = 0; i < topTenArray.length; i++)
+  {
+    if (divId == topTenArray[i])
+    {
+      document.getElementById(divId).style.display= 'block';
+      document.getElementById(topTenButtons[i]).style.backgroundColor = "#336699";
+    }
+    else
+    {
+      document.getElementById(topTenArray[i]).style.display= 'none';
+      document.getElementById(topTenButtons[i]).style.backgroundColor = "#555";
+    }
+  }
+  currentTopTenElement = divId;
+}
+
+function ShowDiv(divId)
+{
+  document.getElementById(divId).style.display= 'block';
+}
+
+function ShowHide(divId)
+{
+  if (document.getElementById(divId).style.display == 'none')
+  {
+    document.getElementById(divId).style.display= 'block';
+  }
+  else
+  {
+    document.getElementById(divId).style.display = 'none';
+  }
+}
+
+// API allows only 20 reverse geocoding lookups in a short amount of time (not feasible)
+function reverseLatLng(lat, lng)
+{
+  var latlng = new google.maps.LatLng(lat, lng);
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({'latLng': latlng}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK)
+    {
+      if (results[1])
+      {
+        return results[1].formatted_address;
+      } 
+      else
+      {
+        alert("No results found");
+      }
+    } 
+    else
+    {
+      alert("Geocoder failed due to: " + status);
+    }});
 }
 
 </script>
@@ -43,42 +151,84 @@ function initialize()
 
 <body onload="initialize()">
 
+<div id="topPlate" class="backgroundPlate"> </div>
+
+<div id="main">
 <div id="header" >
-  <a href="http://arisgames.org"><img src="http://arisgames.org/wp-content/uploads/2010/08/ARISLogo1.png" border="0" class="png" alt="ARIS - Mobile Learning Experiences" /></a>   
+  <a href="http://arisgames.org">
+    <img src="http://arisgames.org/wp-content/uploads/2010/08/ARISLogo1.png" border="0" class="png" alt="ARIS - Mobile Learning Experiences" />
+  </a>   
   <span id="logotext">stats</span>
 </div>
 
 <div id="mapContainer"></div>
+<img src="shadow.png" style="width:100%"/>
+<br />
 
 <div id="mainStatsContainer">
 
-  <div id="totalPlayers">
+  <div id="totalPlayers" class="statsContainer">
     <p class="bigNum"><span style="color: #FF9900"><?php generatePlayersTotal(); ?></span></p>
     <p class="bigText">players</p>
-  </div>
-    
-  <div id="totalGames">
-    <p class="bigNum"><span style="color: #336699"><?php generateGamesTotal(); ?></span></p>
-    <p class="bigText">games</p>  
+    <canvas id="playersGraph" class="graph">
+    </canvas>
+    <div class="graphText">new players/time</div>
   </div>
   
-  <div id="totalEditors">
+  <div id="totalEditors" class="statsContainer">
     <p class="bigNum"><span style="color: #7BB31A"><?php generateEditorsTotal(); ?></span></p>
     <p class="bigText">editors</p>
+    <canvas id="editorsGraph" class="graph">
+    </canvas>
+    <div class="graphText">new editors/time</div>
   </div>
   
+  <div id="totalGames" class="statsContainer">
+    <p class="bigNum"><span style="color: #336699"><?php generateGamesTotal(); ?></span></p>
+    <p class="bigText">games</p>  
+    <canvas id="gamesGraph" class="graph">
+    </canvas>
+    <div class="graphText">new games/time</div>
+  </div>
 </div>
 
 <div id="topTenGames">
-  <h1>Top 10 games</h1>
+  <h1 style="margin-bottom: 5px">top <?php echo $GLOBALS['numTopGames']; ?> games of the</h1>
   
-  <button>day</button>
-  <button>week</button>
-  <button>month</button>
-  <button>all time</button>
+  <div id="topTenButtonBox">
+    <button id="topTenDayButton" onclick="javascript:enableTopTenItem('topTenElementForDay')">day</button>
+   
+    <script type="text/javascript">
+      document.getElementById("topTenDayButton").style.backgroundColor = '#336699';
+    </script> 
+    
+    <button id="topTenWeekButton" onclick="javascript:enableTopTenItem('topTenElementForWeek')">week</button>
+    <button id="topTenMonthButton" onclick="javascript:enableTopTenItem('topTenElementForMonth')">month</button>
+  </div>  
   
-  <?php generateTopGames(); ?>
+  <?php generateTopGames(day); ?>
+  <?php generateTopGames(week); ?>
+  <?php generateTopGames(month); ?>
   
+</div>
+
+</div>
+<div id="bottomPlate" class="backgroundPlate"> 
+  <div id="bottomBar">
+    <div id="feed" style="float:left;">
+      Stay Connected
+      <a href="http://www.arisgames.org/feed">(css image)<img src="" /></a>
+      <a href="http://www.flickr.com/photos/academictech/sets/72157623910424967/">(flickr image)<img src="" /></a>
+    </div>
+    <div id="links" style="float:right;">
+      <a href="http://www.arisgames.org/press">Press</a> &nbsp;
+      <a href="http://www.arisgames.org/design-jam-recap">Design Jam Recap</a> &nbsp;
+      <a href="http://www.arisgames.org/demo">Demo</a> &nbsp;
+      <a href="http://www.arisgames.org/blog">Community Blog</a> &nbsp;
+      <a href="http://www.arisgames.org/projects-and-papers">Projects</a> &nbsp;
+      <a href="http://www.arisgames.org/design-team">Design Team</a> &nbsp;
+    </div>
+  </div>
 </div>
 
 <!--
@@ -90,7 +240,6 @@ function initialize()
 </html>
 
 <?php
-
 
 function generatePlayerLocations()
 {
@@ -107,7 +256,7 @@ function generatePlayerLocations()
 
   while ($row = mysql_fetch_object($result))
   {
-    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/stats/smiley_happy.png\' });' . "\n";
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/smiley_happy.png\' });' . "\n";
   }
 }
 
@@ -166,14 +315,29 @@ function generateEditorsTotal()
   echo $numEditors;
 }
 
-function generateTopGames()
+function generateTopGames($timeframe)
 {
+  if ($timeframe == 'day')
+  {
+    $topTenDivName = 'topTenElementForDay';
+    $queryInterval = '1 DAY';
+  }
+  else if ($timeframe == 'week')
+  {
+    $topTenDivName = 'topTenElementForWeek';
+    $queryInterval = '7 DAY';
+  }
+  else if ($timeframe == 'month')
+  {
+    $topTenDivName = 'topTenElementForMonth';
+    $queryInterval = '1 MONTH';
+  }
+
   $query = '
-	  SELECT games.name AS name, COUNT(DISTINCT player_id) AS count
+	  SELECT games.game_id as id, games.name AS name, COUNT(DISTINCT player_id) AS count, games.description AS description
 	  FROM   player_log, games
 	  WHERE player_log.game_id = games.game_id 
-	  AND date_sub(curdate(), INTERVAL 1 WEEK) <= timestamp
-	  AND NOW() >= timestamp
+	  AND timestamp BETWEEN DATE_SUB(NOW(), INTERVAL ' . $queryInterval . ') AND NOW()
 	  GROUP BY player_log.game_id
 	  HAVING count > 1
 	  ORDER BY count DESC';
@@ -182,20 +346,94 @@ function generateTopGames()
 
   $counter = 0;
 
+	echo "<div id=\"" . $topTenDivName . "\">\n";
+	
   while ($game = mysql_fetch_object($result))
   {
 	  $counter++;
+	  
+    if ($counter > $GLOBALS['numTopGames'])
+    {
+      break;
+    }
+    
 	  $name = $game->name;
 	  $count = $game->count;
+	  $description = $game->description;     
+    	  
 	  echo "<div class=\"topTenElement\">\n";
 	  echo '<div class="topTenNum">' . $counter . "</div>\n";
 	  echo '<div class="topTenGameName">' . $name . "</div>\n";
 	  echo '<div class="topTenGameCount">' . $count ."</div>\n";
-	  echo "</div>\n";
+	  echo '<div class="topTenGameDesc">' . $description . "</div>\n";
+	  
+	  /*
+	  // get the location (use the google maps api to get a name for the long/lat)
+
+    $query2 = 'SELECT longitude, latitude FROM ' . $game->id . '_locations LIMIT 1';
+    $result2 = mysql_query($query2);
+    
+    if (mysql_num_rows($result2) == 1)
+    {
+      $row = mysql_fetch_object($result2);
+      
+      if ($row->latitude != 0 && $row->longitude != 0)
+      {      
+        $toplat = $row->latitude;
+        $toplong = $row->longitude;
+      }
+    }   
+    
+	  echo '<div class="topTenLocation">';
+	  //echo '<script type="text/javascript">';
+	  //echo 'document.write(reverseLatLng(' . $toplat . ', ' . $toplong . '));</script>';
+    //echo "</div>\n"; */
+     
+    echo "</div>\n"; 
   }
+  echo "</div>\n";
 }
 
+function monthsago($i)
+{
+	return "DATE_SUB(NOW(), INTERVAL $i MONTH)";
+}
+
+function getCountsForTable($t, $range)
+{
+	$query = "SELECT SUM(created BETWEEN ".monthsago(1)." AND ".monthsago(0).") AS '_1_months_ago'";
+	for($i = 1; $i < $range; $i++)
+	{
+		$query = $query . ", SUM(created BETWEEN ".monthsago($i+1)." AND ".monthsago($i).") AS '_".($i+1)."_months_ago'";
+	}
+	$query = $query." FROM $t;";
+	$result = mysql_query($query);
+	$counts = mysql_fetch_array($result);
+	//var_dump($counts);
+
+	$countarray = array();
+	$max = 0;
+	for($i = 0; $i < $range; $i++)
+	{
+		$countarray[] = $counts[$i];	
+		if($counts[$i] > $max)
+			$max = $counts[$i];
+	}
+	$graph->countarray = $countarray;
+	$graph->max = $max;
+	return $graph;
+}
+
+function generateGraphData()
+{
+  $range = 24;
+  $graphData->players = getCountsForTable("players", $range);
+  $graphData->games = getCountsForTable("games", $range);
+  $graphData->editors = getCountsForTable("editors", $range);
+  
+  $graphData = json_encode($graphData);
+  echo "var gdata = $graphData;";
+  echo "var range = $range;";
+}
 
 ?>
-
-
