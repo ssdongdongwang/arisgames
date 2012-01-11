@@ -9,54 +9,60 @@ body
   font-size: 1em;
   height: 100%;
   width: 100%;
-  margin-top:30px;
+  margin-top: 1.875em;
 }
 
 #main
 {
-  width: 1000px;
+  width: 62.5em;
   margin: 0 auto;
 }
 
-a:link {color:#AAAAAA; text-decoration:none;}
-a:visited {color:#AAAAAA; text-decoration:none;}
-a:hover {color:#336699; text-decoration:underline;}
-
-/*
-div
+a:link
 {
-  border-width:2px;
-  border-style:dotted;
+  color: #AAAAAA;
+  text-decoration: none;
 }
-*/
+
+a:visited
+{
+  color: #AAAAAA;
+  text-decoration: none;
+}
+
+a:hover
+{
+  color: #336699;
+  text-decoration: underline;
+}
 
 .backgroundPlate
 {
   width: 100%;
-  position:absolute;
-  left:0px;
-  background-color:#222;
-  z-index:-10;
+  position: absolute;
+  left: 0;
+  background-color: #222;
+  z-index: -10;
 }
 
 #topPlate
 {
-  height: 470px;
-  top:0px;
+  height: 29.375em;
+  top: 0;
 }
 
 #bottomPlate
 {
-  height: 50px;
+  height: 3.125em;
   position: relative;
-  top:50px;
+  top: 3.125em;
 }
 
 #bottomBar
 {
-  width:1000px;
-  margin:0 auto;
-  color:#AAAAAA;
+  width: 62.5em;
+  margin: 0 auto;
+  color: #AAAAAA;
 }
  
 #header
@@ -83,8 +89,8 @@ img
 {
   margin:0 auto;
   margin-top: 2%;
-  border: solid white 10px;
-  height: 400px;
+  border: 0.625em solid white;
+  height: 25em;
   text-align: center;
 }
 
@@ -95,22 +101,22 @@ img
   font-family: calibri, arial, sans-serif;
   font-weight: bold;
   text-align: center;
-  border-top:1px solid #AAAAAA;
+  border-top: 0.0625em solid #AAAAAA;
 }
 
 .statsContainer
 {
-  margin:0 1%;
-  width:29%;
+  margin: 0 1%;
+  width: 29%;
 }
 
 .graph
 {
-width:80%; 
-height:60px;
-border-top:1px solid #AAAAAA;
-border-bottom:1px solid #AAAAAA;
-margin:0 auto;
+width: 80%; 
+height: 3.75em;
+border-top: 0.0625em solid #AAAAAA;
+border-bottom: 0.0625em solid #AAAAAA;
+margin: 0 auto;
 }
 
 #totalPlayers
@@ -145,20 +151,20 @@ margin:0 auto;
   margin: 0;
   padding: 0;
   font-size: 1em;
-  color:#AAAAAA;
-  position:relative;
-  bottom:2px;
+  color: #AAAAAA;
+  position: relative;
+  bottom: 0.125em;
 }
 
 #topTenGames
 {
-  margin:0 auto;
+  margin: 0 auto;
   width: 100%;
-  border: solid #AAAAAA 2px;
-  border-radius: 15px;
-  -moz-border-radius: 15px;
-  position:relative;
-  top:20px;
+  border: 0.125em solid #AAAAAA;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
+  position: relative;
+  top: 1.25em;
 }
 
 #liveFeedContainer
@@ -166,10 +172,10 @@ margin:0 auto;
   margin-top: 1%;
   float: left;
   width: 40%;
-  height: 500px;
-  border: solid white 2px;
-  border-radius: 15px;
-  -moz-border-radius: 15px;
+  height: 31.25em;
+  border: 0.125em solid white;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
 }
 
 h1
@@ -185,8 +191,8 @@ h1
 .topTenElement
 {
   position:relative;
-  border-top: solid #AAAAAA 2px;
-  height: 85px;
+  border-top: 0.125em solid #AAAAAA;
+  height: 5.3125em;
 }
 
 .topTenNumBox
@@ -229,7 +235,7 @@ h1
 
 #topTenName, #topTenAuthor, #topTenDescription, #topTenPlayerText
 {
-  margin: 2px;
+  margin: 0.125em;
   padding: 0;
 }
 
@@ -255,14 +261,14 @@ h1
 
 #topTenImg
 {
-  margin: 10px 0px 10px 20px;
+  margin: 0.2em 0 0 0.4em;
 }
 
 button {
   background-color: #555;
   color: white;
-  margin: 10px auto;
-  border: solid white 2px;
-  border-radius: 15px;
-  -moz-border-radius: 15px;
+  margin: 0.625em auto;
+  border: solid white 0.125em;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
 }
