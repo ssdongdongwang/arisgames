@@ -61,7 +61,7 @@ div
  
 #header
 {
-  height: 80px;
+  height: 5em;
 }
 
 img
@@ -75,7 +75,8 @@ img
   color: #fff;
   font-size: 3em;
   font-weight: bold;
-  padding-top: 30px;
+  position: relative;
+  top: 0.3em;
 }
 
 #mapContainer 
@@ -183,42 +184,66 @@ h1
 
 .topTenElement
 {
+  position:relative;
   border-top: solid #AAAAAA 2px;
-  padding: 1%;
-  height: 75px;
+  height: 85px;
 }
 
-.topTenNum
+.topTenNumBox
 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 10%;
   font-family: arial,sans-serif;
   color: #336699;
   font-size: 3em;
   font-weight: bold;
-  float: left;
 }
 
-.topTenGameName
+.topTenNum
 {
-  font-weight: bold;
-  float: left;
+  text-align: center;
+  line-height: 1.5em;
 }
 
-.topTenGameDesc
+.topTenGameNameAndDesc
+{
+  position: absolute;
+  top: 0;
+  left: 10%;
+  height: 100%;
+  width: 80%;
+}
+
+.topTenGameCount
+{
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 90%;
+  height: 100%;
+  width: 10%;
+}
+
+#topTenName, #topTenAuthor, #topTenDescription, #topTenPlayerText
+{
+  margin: 2px;
+  padding: 0;
+}
+
+#topTenDescription
 {
   font-style: italic;
 }
 
-.topTenGameCount
+#topTenPlayerCount
 {
   font-family: arial,sans-serif;
   color: #FF9900;
   font-size: 3em;
   font-weight: bold;
-  float: right;
-  padding: 2px;
-  border: solid white 2px;
-  border-radius: 15px;
-  -moz-border-radius: 15px;
 }
 
 #topTenButtonBox
@@ -226,6 +251,11 @@ h1
   width: 11.5em;
   margin-left: auto;
   margin-right: auto;
+}
+
+#topTenImg
+{
+  margin: 10px 0px 10px 20px;
 }
 
 button {

@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1.0, user-scalable=yes" />
+<meta name = "viewport" content = "width = device-width">
 
 <link rel="stylesheet" href="./stats.css">
 
@@ -12,7 +12,7 @@
 
 // CONSTANTS
 
-$numTopGames = 100; // number of top games to show in list
+$numTopGames = 10; // number of top games to show in list
 $CURDIR = __DIR__ . DIRECTORY_SEPARATOR;
 $db = 'server';
 
@@ -38,8 +38,8 @@ function initialize()
   <?php generatePlayerLocations(); ?>
   <?php generateGameLocations(); ?>
   
-  ShowDiv('topTenElementForDay');
-  currentTopTenElement = 'topTenElementForDay';
+  ShowDiv('topTenElementForWeek');
+  currentTopTenElement = 'topTenElementForWeek';
 
   populateGraphs();
 }
@@ -177,10 +177,10 @@ function reverseLatLng(lat, lng)
   
   <div id="totalEditors" class="statsContainer">
     <p class="bigNum"><span style="color: #7BB31A"><?php generateEditorsTotal(); ?></span></p>
-    <p class="bigText">editors</p>
+    <p class="bigText">creators</p>
     <canvas id="editorsGraph" class="graph">
     </canvas>
-    <div class="graphText">new editors/time</div>
+    <div class="graphText">new creators/time</div>
   </div>
   
   <div id="totalGames" class="statsContainer">
@@ -197,13 +197,11 @@ function reverseLatLng(lat, lng)
   
   <div id="topTenButtonBox">
     <button id="topTenDayButton" onclick="javascript:enableTopTenItem('topTenElementForDay')">day</button>
-   
-    <script type="text/javascript">
-      document.getElementById("topTenDayButton").style.backgroundColor = '#336699';
-    </script> 
-    
     <button id="topTenWeekButton" onclick="javascript:enableTopTenItem('topTenElementForWeek')">week</button>
     <button id="topTenMonthButton" onclick="javascript:enableTopTenItem('topTenElementForMonth')">month</button>
+    <script type="text/javascript">
+      document.getElementById("topTenWeekButton").style.backgroundColor = '#336699';
+    </script> 
   </div>  
   
   <?php generateTopGames(day); ?>
@@ -243,46 +241,51 @@ function reverseLatLng(lat, lng)
 
 function generatePlayerLocations()
 {
-  $longitudeArrayName = 'longitudeArray';
-  $latitudeArrayName = 'latitudeArray';
-
   // do not include locations that are test locations (0,0)
   $query = 'SELECT latitude, longitude
             FROM players
             WHERE latitude <> 0
             AND longitude <> 0';
 
-  $result = mysql_query($query);
-
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()';
+  $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
-  {
-    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/smiley_happy.png\' });' . "\n";
-  }
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_100.png\' });' . "\n";
+
+
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 WEEK) AND NOW()';
+  $result = mysql_query($query.$interval);
+  while ($row = mysql_fetch_object($result))
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_66.png\' });' . "\n";
+
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()';
+  $result = mysql_query($query.$interval);
+  while ($row = mysql_fetch_object($result))
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_33.png\' });' . "\n";
+
 }
 
 function generateGameLocations()
 {
-  $query1 = 'SELECT game_id FROM games';
-  $result1 = mysql_query($query1);
-  
-  while ($game = mysql_fetch_object($result1))
-  {      
-    $query2 = 'SELECT longitude, latitude FROM ' . $game->game_id . '_locations LIMIT 1';
-    $result2 = mysql_query($query2);
-    
-    if (mysql_num_rows($result2) == 1)
-    {
-      $row = mysql_fetch_object($result2);
-      
-      if ($row->latitude != 0 && $row->longitude != 0)
-      {      
-        echo 'new google.maps.Marker({
-              position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), 
-              map: map,
-              icon: \'http://arisgames.com/stats/videogames.png\' });' . "\n";
-      }
-    }
-  }
+  // do not include locations that are test locations (0,0)
+  $query = "SELECT DISTINCT games.game_id, games.created, players.latitude, players.longitude FROM games LEFT JOIN player_log ON games.game_id = player_log.game_id LEFT JOIN players ON player_log.player_id = players.player_id WHERE players.latitude IS NOT NULL";
+
+  $interval = ' AND games.created BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW() GROUP BY games.game_id';
+  $result = mysql_query($query.$interval);
+  while ($row = mysql_fetch_object($result))
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/game_alpha_100.png\' });' . "\n";
+
+
+  $interval = ' AND games.created BETWEEN DATE_SUB(NOW(), INTERVAL 1 WEEK) AND NOW() GROUP BY games.game_id';
+  $result = mysql_query($query.$interval);
+  while ($row = mysql_fetch_object($result))
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/game_alpha_66.png\' });' . "\n";
+
+  $interval = ' AND games.created BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW() GROUP BY games.game_id';
+  $result = mysql_query($query.$interval);
+  while ($row = mysql_fetch_object($result))
+    echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/game_alpha_33.png\' });' . "\n";
+
 }
 
 function generateGamesTotal()
@@ -334,13 +337,20 @@ function generateTopGames($timeframe)
   }
 
   $query = '
-	  SELECT games.game_id as id, games.name AS name, COUNT(DISTINCT player_id) AS count, games.description AS description
-	  FROM   player_log, games
-	  WHERE player_log.game_id = games.game_id 
-	  AND timestamp BETWEEN DATE_SUB(NOW(), INTERVAL ' . $queryInterval . ') AND NOW()
-	  GROUP BY player_log.game_id
-	  HAVING count > 1
-	  ORDER BY count DESC';
+SELECT media.file_name as file_name, editors.name as author, temp.game_id, temp.name, temp.description, temp.count FROM
+(SELECT games.game_id, games.name, games.description, games.icon_media_id, COUNT(DISTINCT player_id) AS count
+FROM games
+INNER JOIN player_log ON games.game_id = player_log.game_id
+WHERE player_log.timestamp BETWEEN DATE_SUB(NOW(), INTERVAL '.$queryInterval.') AND NOW()
+GROUP BY games.game_id 
+HAVING count > 1) as temp 
+INNER JOIN game_editors ON temp.game_id = game_editors.game_id
+INNER JOIN editors ON game_editors.editor_id = editors.editor_id
+LEFT JOIN media ON temp.icon_media_id = media.media_id 
+GROUP BY game_id
+HAVING count > 1
+ORDER BY count DESC
+';
 
   $result = mysql_query($query);
 
@@ -358,14 +368,27 @@ function generateTopGames($timeframe)
     }
     
 	  $name = $game->name;
+	  $gameid = $game->game_id;
 	  $count = $game->count;
-	  $description = $game->description;     
-    	  
+	  $author = $game->author;
+	  $iconFileURL = $game->file_name;
+	  $description = $game->description;   
+    
 	  echo "<div class=\"topTenElement\">\n";
-	  echo '<div class="topTenNum">' . $counter . "</div>\n";
-	  echo '<div class="topTenGameName">' . $name . "</div>\n";
-	  echo '<div class="topTenGameCount">' . $count ."</div>\n";
-	  echo '<div class="topTenGameDesc">' . $description . "</div>\n";
+	  
+	  if ($iconFileURL)
+	  {
+	    $iconURL = 'http://www.arisgames.com/server/gamedata/' . $gameid . '/' . $iconFileURL;
+	  }
+    else
+    {      
+      $iconURL = 'http://www.arisgames.com/server/ARISDefaultLogo.png';
+    }
+    echo '<div class="topTenNumBox"><div class="topTenNum"><img id="topTenImg" width="64" height="64" src="' . $iconURL . "\" /></div></div>\n";
+	  echo '<div class="topTenGameNameAndDesc"><p id="topTenName"><strong>' . $name . "</strong></p>\n";
+	  echo '<p id="topTenAuthor">' . $author . "</p>";
+	  echo '<p id="topTenDescription">' . $description . "</p></div>\n";
+	  echo '<div class="topTenGameCount"><span id="topTenPlayerCount">' . $count .'</span><p id="topTenPlayerText">players</p></div>';
 	  
 	  /*
 	  // get the location (use the google maps api to get a name for the long/lat)
@@ -407,9 +430,9 @@ function getCountsForTable($t, $range)
 		$query = $query . ", SUM(created BETWEEN ".monthsago($i+1)." AND ".monthsago($i).") AS '_".($i+1)."_months_ago'";
 	}
 	$query = $query." FROM $t;";
+	//echo "/*".$query."*/\n";
 	$result = mysql_query($query);
 	$counts = mysql_fetch_array($result);
-	//var_dump($counts);
 
 	$countarray = array();
 	$max = 0;
