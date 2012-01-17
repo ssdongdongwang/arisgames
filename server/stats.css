@@ -70,7 +70,7 @@ a:hover
   height: 5em;
 }
 
-img
+img#title
 {
   float: left;
 }
@@ -101,7 +101,6 @@ img
   font-family: calibri, arial, sans-serif;
   font-weight: bold;
   text-align: center;
-  border-top: 0.0625em solid #AAAAAA;
 }
 
 .statsContainer
@@ -114,9 +113,9 @@ img
 {
 width: 80%; 
 height: 3.75em;
-border-top: 0.0625em solid #AAAAAA;
-border-bottom: 0.0625em solid #AAAAAA;
 margin: 0 auto;
+border-top: 1px solid #AAAAAA;
+border-bottom: 1px solid #AAAAAA;
 }
 
 #totalPlayers
@@ -192,7 +191,7 @@ h1
 {
   position:relative;
   border-top: 0.125em solid #AAAAAA;
-  height: 5.3125em;
+  height: 5.6em;
 }
 
 .topTenNumBox
@@ -204,7 +203,7 @@ h1
   width: 10%;
   font-family: arial,sans-serif;
   color: #336699;
-  font-size: 3em;
+  font-size: 0.5em;
   font-weight: bold;
 }
 
@@ -233,18 +232,18 @@ h1
   width: 10%;
 }
 
-#topTenName, #topTenAuthor, #topTenDescription, #topTenPlayerText
+.topTenName, .topTenAuthor, .topTenDescription, .topTenPlayerText
 {
   margin: 0.125em;
   padding: 0;
 }
 
-#topTenDescription
+.topTenDescription
 {
   font-style: italic;
 }
 
-#topTenPlayerCount
+.topTenPlayerCount
 {
   font-family: arial,sans-serif;
   color: #FF9900;
@@ -254,14 +253,14 @@ h1
 
 #topTenButtonBox
 {
-  width: 11.5em;
+  width: 11em;
   margin-left: auto;
   margin-right: auto;
 }
 
-#topTenImg
+.topTenImg
 {
-  margin: 0.2em 0 0 0.4em;
+  margin: 1.5em 0 0 0.4em;
 }
 
 button {
@@ -272,3 +271,4 @@ button {
   border-radius: 1em;
   -moz-border-radius: 1em;
 }
+
