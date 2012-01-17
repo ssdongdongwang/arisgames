@@ -147,6 +147,22 @@ function reverseLatLng(lat, lng)
 
 </script>
 
+
+<script type="text/javascript">
+//Google Analytics
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10031673-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<title>ARIS live stats</title>
 </head>
 
 <body onload="initialize()">
@@ -156,13 +172,13 @@ function reverseLatLng(lat, lng)
 <div id="main">
 <div id="header" >
   <a href="http://arisgames.org">
-    <img src="http://arisgames.org/wp-content/uploads/2010/08/ARISLogo1.png" border="0" class="png" alt="ARIS - Mobile Learning Experiences" />
+    <img src="http://arisgames.org/wp-content/uploads/2010/08/ARISLogo1.png" id="title" class="png" alt="ARIS - Mobile Learning Experiences" />
   </a>   
-  <span id="logotext">stats</span>
+  <span id="logotext">LIVE STATS</span>
 </div>
 
 <div id="mapContainer"></div>
-<img src="shadow.png" style="width:100%"/>
+<img src="shadow.png" alt="shadow" style="width:100%"/>
 <br />
 
 <div id="mainStatsContainer">
@@ -172,7 +188,7 @@ function reverseLatLng(lat, lng)
     <p class="bigText">players</p>
     <canvas id="playersGraph" class="graph">
     </canvas>
-    <div class="graphText">new players/time</div>
+    <div class="graphText">new players/month</div>
   </div>
   
   <div id="totalEditors" class="statsContainer">
@@ -180,7 +196,7 @@ function reverseLatLng(lat, lng)
     <p class="bigText">creators</p>
     <canvas id="editorsGraph" class="graph">
     </canvas>
-    <div class="graphText">new creators/time</div>
+    <div class="graphText">new creators/month</div>
   </div>
   
   <div id="totalGames" class="statsContainer">
@@ -188,7 +204,7 @@ function reverseLatLng(lat, lng)
     <p class="bigText">games</p>  
     <canvas id="gamesGraph" class="graph">
     </canvas>
-    <div class="graphText">new games/time</div>
+    <div class="graphText">new games/month</div>
   </div>
 </div>
 
@@ -211,12 +227,13 @@ function reverseLatLng(lat, lng)
 </div>
 
 </div>
+
 <div id="bottomPlate" class="backgroundPlate"> 
   <div id="bottomBar">
     <div id="feed" style="float:left;">
       Stay Connected
-      <a href="http://www.arisgames.org/feed">(css image)<img src="" /></a>
-      <a href="http://www.flickr.com/photos/academictech/sets/72157623910424967/">(flickr image)<img src="" /></a>
+      <a href="http://www.arisgames.org/feed"></a>
+      <a href="http://www.flickr.com/photos/academictech/sets/72157623910424967/"><img alt="flickr icon" src="http://arisgames.org/wp-content/themes/Play/images/profiles/rss_16.png" /></a>
     </div>
     <div id="links" style="float:right;">
       <a href="http://www.arisgames.org/press">Press</a> &nbsp;
@@ -229,15 +246,20 @@ function reverseLatLng(lat, lng)
   </div>
 </div>
 
-<!--
-<div id="liveFeedContainer">
-  <h1>Live feed</h1>
-</div>
- -->
 </body>
 </html>
 
 <?php
+
+function truncate_text($text, $nbrChar, $append='...')
+{
+  if(strlen($text) > $nbrChar)
+  {
+    $text = substr($text, 0, $nbrChar);
+    $text .= $append;
+  }
+  return $text;
+}
 
 function generatePlayerLocations()
 {
@@ -247,22 +269,23 @@ function generatePlayerLocations()
             WHERE latitude <> 0
             AND longitude <> 0';
 
-  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()';
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 10 MINUTE) AND NOW()';
   $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
     echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_100.png\' });' . "\n";
 
 
-  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 WEEK) AND NOW()';
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()';
   $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
     echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_66.png\' });' . "\n";
 
-  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()';
+/*
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 WEEK) AND NOW()';
   $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
     echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.com/server/map_icons/player_alpha_33.png\' });' . "\n";
-
+*/
 }
 
 function generateGameLocations()
@@ -372,7 +395,7 @@ ORDER BY count DESC
 	  $count = $game->count;
 	  $author = $game->author;
 	  $iconFileURL = $game->file_name;
-	  $description = $game->description;   
+	  $description = truncate_text($game->description, 215);   
     
 	  echo "<div class=\"topTenElement\">\n";
 	  
@@ -384,11 +407,11 @@ ORDER BY count DESC
     {      
       $iconURL = 'http://www.arisgames.com/server/ARISDefaultLogo.png';
     }
-    echo '<div class="topTenNumBox"><div class="topTenNum"><img id="topTenImg" width="64" height="64" src="' . $iconURL . "\" /></div></div>\n";
-	  echo '<div class="topTenGameNameAndDesc"><p id="topTenName"><strong>' . $name . "</strong></p>\n";
-	  echo '<p id="topTenAuthor">' . $author . "</p>";
-	  echo '<p id="topTenDescription">' . $description . "</p></div>\n";
-	  echo '<div class="topTenGameCount"><span id="topTenPlayerCount">' . $count .'</span><p id="topTenPlayerText">players</p></div>';
+    echo '<div class="topTenNumBox"><div class="topTenNum"><img class="topTenImg" alt="img" width="64" height="64" src="' . $iconURL . "\" /></div></div>\n";
+	  echo '<div class="topTenGameNameAndDesc"><p class="topTenName"><strong>' . $name . "</strong></p>\n";
+	  echo '<p class="topTenAuthor">' . $author . "</p>";
+	  echo '<p class="topTenDescription">' . $description . "</p></div>\n";
+	  echo '<div class="topTenGameCount"><span class="topTenPlayerCount">' . $count .'</span><p class="topTenPlayerText">players</p></div>';
 	  
 	  /*
 	  // get the location (use the google maps api to get a name for the long/lat)
