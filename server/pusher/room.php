@@ -8,47 +8,54 @@
 
 		//RECEIVE
 		var pusher = new Pusher('<?php echo $key; ?>');
-		Pusher.channel_auth_endpoint = '<?php echo $private_auth; ?>';
 
+		//Public
 		var pub_channel = pusher.subscribe('<?php echo $public_channel; ?>');
 		pub_channel.bind('<?php echo $public_event; ?>', function(data) {
 			document.getElementById('public_messages').innerHTML = document.getElementById('public_messages').innerHTML + "<br />\nMessage Received (public): "+data;
 		});
-		pub_channel.bind('<?php echo "client-".$public_event; ?>', function(data) {
-			document.getElementById('public_messages').innerHTML = document.getElementById('public_messages').innerHTML + "<br />\nMessage Received (public- client): "+data;
-		});
 
+		//Private
+		Pusher.channel_auth_endpoint = '<?php echo $private_auth; ?>';
 		var priv_channel = pusher.subscribe('<?php echo $private_channel; ?>');
 		priv_channel.bind('<?php echo $private_event; ?>', function(data) {
 			document.getElementById('private_messages').innerHTML = document.getElementById('private_messages').innerHTML + "<br />\nMessage Received (private): "+data;
 		});
-		priv_channel.bind('<?php echo "client-".$private_event; ?>', function(data) {
-			document.getElementById('private_messages').innerHTML = document.getElementById('private_messages').innerHTML + "<br />\nMessage Received (private- client): "+data;
+
+		//Presence
+		Pusher.channel_auth_endpoint = '<?php echo $presence_auth; ?>';
+		var pres_channel = pusher.subscribe('<?php echo $presence_channel; ?>');
+		pres_channel.bind('<?php echo $presence_event; ?>', function(data) {
+			document.getElementById('presence_messages').innerHTML = document.getElementById('presence_messages').innerHTML + "<br />\nMessage Received (presence): "+data;
 		});
 
+		//Arduino
 		var arduino_channel = pusher.subscribe('<?php echo $arduino_channel; ?>');
-		arduino_test_channel.bind('arduino_event_register', function(data) {
+		arduino_channel.bind('<?php echo $arduino_event; ?>', function(data) {
+			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino): "+data;
+		});
+		arduino_channel.bind('arduino_event_register', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_register): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_1', function(data) {
+		arduino_channel.bind('arduino_event_1', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_1): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_2', function(data) {
+		arduino_channel.bind('arduino_event_2', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_2): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_3', function(data) {
+		arduino_channel.bind('arduino_event_3', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_3): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_4', function(data) {
+		arduino_channel.bind('arduino_event_4', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_4): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_5', function(data) {
+		arduino_channel.bind('arduino_event_5', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_5): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_6', function(data) {
+		arduino_channel.bind('arduino_event_6', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_6): "+data;
 		});
-		arduino_test_channel.bind('arduino_event_7', function(data) {
+		arduino_channel.bind('arduino_event_7', function(data) {
 			document.getElementById('arduino_messages').innerHTML = document.getElementById('arduino_messages').innerHTML + "<br />\nMessage Received (arduino_event_7): "+data;
 		});
 		
@@ -58,7 +65,7 @@
         	{
                 	var xmlhttp;
                 	xmlhttp=new XMLHttpRequest();
-                	xmlhttp.open("POST","http://arisgames.org/devserver/pusher/"+room+"_send.php",false);
+                	xmlhttp.open("POST","http://dev.arisgames.org/server/pusher/"+room+"_send.php",false);
                 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 	xmlhttp.send(room+'_data='+data); //Synchronous call
 	
@@ -79,6 +86,9 @@
 		</td>
 		<td width="300px">
 			PRIVATE
+		</td>
+		<td width="300px">
+			PRESENCE
 		</td>
 		<td width="300px">
 			ARDUINO
@@ -105,6 +115,15 @@
 		</td>
 		<td valign="top">
 
+			<input type="text" id="presence_sendtext"></input>
+			<input type="button" value="Send" onClick="message('presence');"></input>
+			<div id="presence_messages">
+			Waiting...
+			</div>
+
+		</td>
+		<td valign="top">
+
 			<input type="text" id="arduino_sendtext"></input>
 			<input type="button" value="Send" onClick="message('arduino');"></input>
 			<div id="arduino_messages">
@@ -117,3 +136,4 @@
 	
 </body>
 </html>
+

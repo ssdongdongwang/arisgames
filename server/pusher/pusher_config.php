@@ -14,17 +14,52 @@ else if($account == "PHIL")
 	$app_id = '15816';
 }
 
+$public_send = 'public_send.php';
 $private_auth = 'private_auth.php';
+$private_send = 'private_send.php';
+$presence_auth = 'presence_auth.php';
+$presence_send = 'presence_send.php';
+$arduino_send = 'arduino_send.php';
 
-$public_channel = 'public-pusher_room_channel';
-$public_event = 'public-pusher_room_event';
-$public_data = '';
+$default_channel = 'default-channel';
+$default_event = 'default-event';
+$default_data = '';
 
-$private_channel = 'private-pusher_room_channel';
-$private_event = 'private-pusher_room_event';
-$private_data = '';
+$public_default_channel = 'public-default-channel';
+$public_default_event = 'default-event';
+$public_default_data = '';
 
-$arduino_channel = 'arduino-pusher_room_channel';
-$arduino_event = 'arduino-pusher_room_event';
-$adruino_data = '';
+$private_default_channel = 'private-default-channel';
+$private_default_event = 'default-event';
+$private_default_data = '';
+
+$presence_default_channel = 'presence-default-channel';
+$presence_default_event = 'default-event';
+$presence_default_data = '';
+
+$arduino_default_channel = 'arduino-default-channel';
+$arduino_default_event = 'default-event';
+$adruino_default_data = '';
+
+function setDefaults($room)
+{
+	if($room == 'public')
+	{
+		$default_channel = $public_default_channel;
+		$default_event = $public_default_event;
+		$default_data = $public_default_data;
+	}
+	else if($room == 'private')
+	{
+		$default_channel = $private_default_channel;
+		$default_event = $private_default_event;
+		$default_data = $private_default_data;
+	}
+	else if($room == 'presence')
+	{
+		$default_channel = $presence_default_channel;
+		$default_event = $presence_default_event;
+		$default_data = $presence_default_data;
+	}
+}
 ?>

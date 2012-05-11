@@ -477,6 +477,7 @@ NSString *const kARISServerServicePackage = @"v1";
 	
 	return [(NSDecimalNumber*)jsonResult.data intValue];
 }
+
 -(int)createNote{
     NSLog(@"AppModel: Creating New Note");
 	
@@ -484,6 +485,8 @@ NSString *const kARISServerServicePackage = @"v1";
 	NSArray *arguments = [NSArray arrayWithObjects:
 						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
 						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
+						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
+						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
                           nil];
 	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL 
                                                             andServiceName:@"notes" 
@@ -491,7 +494,6 @@ NSString *const kARISServerServicePackage = @"v1";
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
 	JSONResult *jsonResult = [jsonConnection performSynchronousRequest]; 
-	
 	
 	if (!jsonResult) {
 		NSLog(@"\tFailed.");
@@ -2451,7 +2453,7 @@ NSString *const kARISServerServicePackage = @"v1";
     ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate removeNewWaitingIndicator];
     
-	NSObject<QRCodeProtocol> *qrCodeObject = nil;
+	NSObject<QRCodeProtocol> *qrCodeObject;
     
 	if ((NSNull*)jsonResult.data != [NSNull null]) {
 		NSDictionary *qrCodeDictionary = (NSDictionary *)jsonResult.data;
@@ -2460,6 +2462,7 @@ NSString *const kARISServerServicePackage = @"v1";
             NSDictionary *objectDictionary = [qrCodeDictionary valueForKey:@"object"];
             if ([type isEqualToString:@"Location"]) qrCodeObject = [self parseLocationFromDictionary:objectDictionary];
         }
+        else qrCodeObject = qrCodeDictionary;
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotification: [NSNotification notificationWithName:@"QRCodeObjectReady" object:qrCodeObject]];
