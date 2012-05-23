@@ -1,4 +1,4 @@
-//
+﻿//
 //  ARISAppDelegate.m
 //  ARIS
 //
@@ -491,8 +491,8 @@ BOOL isShowingNotification;
     
 	if (!self.serverAlert){
 		self.serverAlert = [[UIAlertView alloc] initWithTitle:title
-                                                      message:@"You may need to login to your Wifi connection from Safari. \nYou also may need to verify ARIS server settings in system preferences. \nIf the problem persists, please send us some debugging information"
-                                                     delegate:self cancelButtonTitle:@"Ignore" otherButtonTitles: @"Report",nil];
+                                                      message:NSLocalizedString(@"ARISAppDelegateWIFIErrorMessageKey", @"")
+                                                     delegate:self cancelButtonTitle:NSLocalizedString(@"IgnoreKey", @"") otherButtonTitles:NSLocalizedString(@"ReportKey", @""),nil];
 		[self.serverAlert show];	
  	}
 	else {
@@ -511,7 +511,7 @@ BOOL isShowingNotification;
 	if (!self.networkAlert) {
 		networkAlert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"PoorConnectionTitleKey", @"") 
                                                   message: NSLocalizedString(@"PoorConnectionMessageKey", @"")
-												 delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+												 delegate:self cancelButtonTitle:NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
 	}
 	if (self.networkAlert.visible == NO) [networkAlert show];
     
@@ -718,7 +718,7 @@ BOOL isShowingNotification;
 		else {
 			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"LoginErrorTitleKey",@"")
 															message:NSLocalizedString(@"LoginErrorMessageKey",@"")
-														   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+														   delegate:self cancelButtonTitle:NSLocalizedString(@"OkKey", @"")otherButtonTitles: nil];
 			[alert show];	
 		}
 	}
@@ -784,7 +784,7 @@ BOOL isShowingNotification;
 
     
    loadingVC = [[LoadingViewController alloc]initWithNibName:@"LoadingViewController" bundle:nil];
-    loadingVC.progressLabel.text = @"Fetching Game Lists...";
+    loadingVC.progressLabel.text = NSLocalizedString(@"ARISAppDelegateFectchingGameListsKey", @"");
     [self.tabBarController presentModalViewController:self.loadingVC animated:NO];
     	
 }

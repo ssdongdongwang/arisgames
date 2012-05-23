@@ -13,7 +13,7 @@
         	xmlhttp.send(params); //Synchronous call
 
         	var response=JSON.parse(xmlhttp.responseText);
-		alert(xmlhttp.responseText);
+		//alert(xmlhttp.responseText);
 		if(response.returnCode == 1) //Error
 		{
 			document.getElementById('playerBackPacks').innerHTML = response.data;	
@@ -53,6 +53,9 @@
 		{
 			var bpRequestObject = new Object();
 			bpRequestObject.gameId = gameId;
+                        if(playerId = parseInt(parseURLParams(document.URL).playerId))
+                          bpRequestObject.playerArray = playerId;
+                        //alert(JSON.stringify(bpRequestObject));
 			sendRequest("players.getPlayerBackpacksFromArray", JSON.stringify(bpRequestObject));
 		}
 		else
@@ -69,7 +72,7 @@
 			sendRequest("players.getPlayerBackpacksFromArray", JSON.stringify(bpRequestObject));
 		}
 		else
-			alert("Please Enter a Valid Game ID");
+			//alert("Please Enter a Valid Game ID");
 	}
 
 </script>

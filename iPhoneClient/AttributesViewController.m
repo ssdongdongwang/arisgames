@@ -45,8 +45,8 @@
 - (void)viewDidAppear:(BOOL)animated {
 	
 	[self refresh];		
-	self.nameLabel.text = [NSString stringWithFormat:@"Name: %@",[AppModel sharedAppModel].userName];
-    self.groupLabel.text = @"Group: N/A";
+	self.nameLabel.text = [NSString stringWithFormat:@"%@: %@",NSLocalizedString(@"AttributesViewNameKey", @""), [AppModel sharedAppModel].userName];
+    self.groupLabel.text = NSLocalizedString(@"AttributesViewGroupKey", @"");
 	silenceNextServerUpdateCount = 0;
     if ([AppModel sharedAppModel].currentGame.pcMediaId != 0) {
 		//Load the image from the media Table
@@ -171,7 +171,7 @@
         cell.imageView.image = iconView.image;
     }
     else{
-        cell.textLabel.text = @"No Attributes Currently Available";
+        cell.textLabel.text = NSLocalizedString(@"AttributesNoCurrentlyKey", @"");
     }
         cell.userInteractionEnabled = NO;
         
@@ -189,7 +189,7 @@
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     //if(section==0)return  @"Group";
        // else 
-            return  @"Attributes";
+            return NSLocalizedString(@"AttributesAttributesTitleKey", @"");
 }
 
 // Customize the height of each row

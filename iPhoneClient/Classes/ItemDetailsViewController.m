@@ -333,19 +333,19 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
                     quantity--;
                 }
                 }
-				errorMessage = [NSString stringWithFormat:@"You can't carry that much. Only %d picked up",quantity];
+				errorMessage = [NSString stringWithFormat:@"%@ %d %@",NSLocalizedString(@"ItemAcionCarryThatMuchKey", @""),quantity,NSLocalizedString(@"PickedUpKey", @"")];
 
 			}
 			else if (item.maxQty == 0) {
-				errorMessage = @"This item cannot be picked up.";
+				errorMessage = NSLocalizedString(@"ItemAcionCannotPickUpKey", @"");
 				quantity = 0;
 			}
             else {
-				errorMessage = @"You cannot carry any more of this item.";
+				errorMessage = NSLocalizedString(@"ItemAcionCannotCarryMoreKey", @"");
 				quantity = 0;
 			}
             
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Inventory over Limit"
+			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:  NSLocalizedString(@"ItemAcionInventoryOverLimitKey", @"")
 															message: errorMessage
 														   delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
 			[alert show];
@@ -356,8 +356,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
             while ((quantity*item.weight + [AppModel sharedAppModel].currentGame.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryWeightCap) {
                 quantity--;
             }
-            errorMessage = [NSString stringWithFormat:@"Too Heavy! Only %d picked up",quantity];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Inventory over Limit"
+            errorMessage = [NSString stringWithFormat:@"%@ %d %@",NSLocalizedString(@"ItemAcionTooHeavyKey", @""),quantity,NSLocalizedString(@"PickedUpKey", @"")];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:  NSLocalizedString(@"ItemAcionInventoryOverLimitKey", @"")
 															message: errorMessage
 														   delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
 			[alert show];

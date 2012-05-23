@@ -43,16 +43,16 @@
         [self.alert release];
     }
     else*/ if(self.ratingView.userRating == 0){
-        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Error", @"")
-                                                message: NSLocalizedString(@"Please give this game a rating of one through five stars", @"")
-                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ErrorKey", @"")
+                                                message: NSLocalizedString(@"CommentsFormNumberOfStarsRatingKey", @"")
+                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
         [self.alert show];
         self.alert;
     }
     else{
-        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Success!", @"a")
-                                                message: NSLocalizedString(@"Comment Successfully Posted", @"")
-                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"CommentsFormSuccessKey", @"a")
+                                                message: NSLocalizedString(@"CommentsFormSuccessMessageKey", @"")
+                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
         [self.alert show];
         self.alert;
         [[AppServices sharedAppServices] saveComment:self.textField.text game:self.game.gameId starRating:self.ratingView.userRating];
