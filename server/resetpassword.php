@@ -14,7 +14,7 @@
 
 <div class="logo">
 <?php
-    require_once('./server/config.class.php');
+    require_once('config.class.php');
 echo "<a href='".Config::serverWWWPath."'><img src='".Config::serverWWWPath."/wp-content/uploads/2010/08/ARISLogo1.png' border='0' class='png' alt='ARIS - Mobile Learning Experiences' /></a>";
 ?>
 </div>

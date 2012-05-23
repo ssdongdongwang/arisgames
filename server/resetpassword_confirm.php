@@ -1,5 +1,5 @@
 <?php
-    require_once('./server/config.class.php');
+    require_once('config.class.php');
     // Function to display form
     function showForm($errorName=false,$errorOldPassword=false,$errorNewPassword=false, $errorVerifyPassword=false){
         if ($errorName)  $errorTextName  = " Username is not found.  Please enter a valid username.";
