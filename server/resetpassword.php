@@ -15,7 +15,7 @@
 <div class="logo">
 <?php
     require_once('config.class.php');
-echo "<a href='".Config::serverWWWPath."'><img src='".Config::serverWWWPath."/wp-content/uploads/2010/08/ARISLogo1.png' border='0' class='png' alt='ARIS - Mobile Learning Experiences' /></a>";
+echo "<a href='http://arisgames.org'><img src='http://arisgames.org/wp-content/uploads/2010/08/ARISLogo1.png' border='0' class='png' alt='ARIS - Mobile Learning Experiences' /></a>";
 ?>
 </div>
 <br><span id="logotext"><br>Change Your Password</span>
@@ -26,7 +26,7 @@ echo "<a href='".Config::serverWWWPath."'><img src='".Config::serverWWWPath."/wp
 <form method="POST" action="resetpassword_confirm.php" name="ResetPassword"><br>
 <div class="tab">
 <?php
-    require_once('./server/config.class.php'); 
+    require_once('config.class.php'); 
     // setup database connection
     $conn = @mysql_connect(Config::dbHost, Config::dbUser, Config::dbPass);
     mysql_select_db (Config::dbSchema);
