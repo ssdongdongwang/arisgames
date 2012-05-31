@@ -139,17 +139,9 @@ class Games extends Module
 					@mysql_query($query);
 					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PLAYER', '5')";
 					@mysql_query($query);
-					//$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'CAMERA',  '6')";
-					//@mysql_query($query);
-					//$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'MICROPHONE',  '7')";
-					//@mysql_query($query);
 					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'NOTE',  '6')";
 					@mysql_query($query);
-					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PICKGAME', '7')";
-					@mysql_query($query);
-					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'LOGOUT', '8')";
-					@mysql_query($query);
-					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'STARTOVER', '9')";
+					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PICKGAME', '9999')";
 					@mysql_query($query);
 					$query = "SELECT * FROM game_tab_data WHERE game_id = '{$intGameId}' ORDER BY tab_index ASC";
 					$result = mysql_query($query);
@@ -184,6 +176,16 @@ class Games extends Module
 				$query = "SELECT * FROM games WHERE game_id = '{$intGameId}'";
 				$result = mysql_query($query);
 				$gameObj = mysql_fetch_object($result);
+                
+                //Check if Game Has Been Played
+                $query = "SELECT * FROM player_log WHERE game_id = '{$intGameId}' AND player_id = '{$intPlayerId}' AND deleted = 0 LIMIT 1";
+				$result = mysql_query($query);
+                if(mysql_num_rows($result) > 0){
+                    $gameObj->has_been_played = true;
+                }
+                else{
+                $gameObj->has_been_played = false;
+                }
 
 				//Get Locational Stuff
 				if($boolGetLocationalInfo){
@@ -557,17 +559,9 @@ class Games extends Module
 				@mysql_query($query);
 				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PLAYER', '5')";
 				@mysql_query($query);
-				//$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'CAMERA',  '6')";
-				//@mysql_query($query);
-				//$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'MICROPHONE',  '7')";
-				//@mysql_query($query);
 				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'NOTE', '6')";
 				@mysql_query($query);
-				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PICKGAME', '7')";
-				@mysql_query($query);
-				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'LOGOUT', '8')";
-				@mysql_query($query);
-				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'STARTOVER', '9')";
+				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PICKGAME', '9999')";
 				@mysql_query($query);
 				if (mysql_error()) return new returnData(6, NULL, 'cannot create game_tab_data table- ' . mysql_error());	
 
@@ -659,6 +653,33 @@ class Games extends Module
 				$query = "ALTER TABLE game_tab_data ADD id MEDIUMINT NOT NULL AUTO_INCREMENT KEY FIRST";
 				mysql_query($query);
 				NetDebug::trace("$query" . ":" . mysql_error());
+                
+                                //delete individually
+                                $query = "DELETE FROM game_tab_data WHERE tab='STARTOVER'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());
+                
+                                $query = "DELETE FROM game_tab_data WHERE tab='LOGOUT'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());
+                
+                                $query = "DELETE FROM game_tab_data WHERE tab='CAMERA'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());
+                
+                                $query = "DELETE FROM game_tab_data WHERE tab='MICROPHONE'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());                
+                
+                                //restructure table
+                                $query = "ALTER TABLE game_tab_data CHANGE tab tab ENUM('PICKGAME','GPS','NEARBY','QUESTS','INVENTORY','PLAYER','QR','NOTE')";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());
+                
+                                //make PICKGAME last tab
+                                $query = "UPDATE game_tab_data SET tab_index ='9999' WHERE tab='PICKGAME'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());  
 
 				return new returnData(0, FALSE);
 			}
@@ -936,7 +957,7 @@ class Games extends Module
                                 $gameObj = mysql_fetch_object($result);
                                 $game = $gameObj->name;
 
-                                $body = "An owner of ARIS Game \"".$game."\" has promoted you to editor. Go to ".Config::serverWWWPath."/editor and log in to begin collaborating!";
+                                $body = "An owner of ARIS Game \"".$game."\" has promoted you to editor. Go to ".Config::WWWPath."/editor and log in to begin collaborating!";
                                 Module::sendEmail($email, "You are now an editor of ARIS Game \"$game\"", $body);
 
 				return new returnData(0);	
@@ -1164,11 +1185,24 @@ class Games extends Module
 				$game = @mysql_fetch_object($rs);
 				if (!$game) return new returnData(2, NULL, "invalid game id");
 
+                                $compatibleName = false;
+                                $appendNo = 1;
+                                while(!$compatibleName)
+                                {
+                                  $query = "SELECT * FROM games WHERE name = '".$game->name."_copy".$appendNo."'";
+                                  $result = mysql_query($query);
+                                  if(mysql_fetch_object($result))
+                                    $appendNo++;
+                                  else
+                                    $compatibleName = true;
+                                }
+                                $game->name = $game->name."_copy".$appendNo;
+
 				$query = "SELECT editor_id FROM game_editors WHERE game_id = {$intGameID}";
 				$rs = mysql_query($query);
 				$editors = mysql_fetch_object($rs);
 
-				$newGameId = Games::createGame($editors->editor_id, $game->name . "_copy", $game->description, 
+				$newGameId = Games::createGame($editors->editor_id, $game->name, $game->description, 
 						$game->pc_media_id, $game->icon_media_id, $game->media_id,
 						$game->is_locational, $game->ready_for_public, 
 						$game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments,
@@ -1217,8 +1251,8 @@ class Games extends Module
 				$query = "INSERT INTO {$newPrefix}_requirements (requirement_id, content_type, content_id, requirement, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3, requirement_detail_4) SELECT requirement_id, content_type, content_id, requirement, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3, requirement_detail_4 FROM {$prefix}_requirements";
 				mysql_query($query);
 
-                //Remove the tabs created by createGame
-                $query = "DELETE FROM game_tab_data WHERE game_id = {$newPrefix}";
+                                //Remove the tabs created by createGame
+                                $query = "DELETE FROM game_tab_data WHERE game_id = {$newPrefix}";
 				$result = mysql_query($query);
                 
 				$query = "SELECT * FROM game_tab_data WHERE game_id = {$prefix}";
@@ -1286,7 +1320,7 @@ class Games extends Module
 					mysql_query($query);
 					$newID = mysql_insert_id();
 
-					copy(("../../gamedata/" . $prefix . "/" . $row->file_name),("../../gamedata/" . $newPrefix . "/" . $row->file_name));
+					if($row->file_name != "") copy(("../../gamedata/" . $prefix . "/" . $row->file_name),("../../gamedata/" . $newPrefix . "/" . $row->file_name));
 
 					$query = "UPDATE {$newPrefix}_items SET icon_media_id = {$newID} WHERE icon_media_id = $row->media_id";
 					mysql_query($query);

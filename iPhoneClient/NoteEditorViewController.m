@@ -1,5 +1,5 @@
 //
-//  NoteViewController.m
+//  NoteEditorViewController.m
 //  ARIS
 //
 //  Created by Brian Thiel on 8/9/11.
@@ -35,6 +35,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        
         viewControllers = [[NSMutableArray alloc] initWithCapacity:10];
         NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
         /*  [dispatcher addObserver:self selector:@selector(updateTable) name:@"ImageReady" object:nil];*/
@@ -349,7 +350,7 @@ if(([note.title length] == 0)) note.title = NSLocalizedString(@"NodeEditorNewNot
             self.sharingLabel.text = NSLocalizedString(@"NoteEditorListOnlyKey", @""); 
               }
             else{
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"NoteEditorNotAllowedKey", @"") message: NSLocalizedString(@"NoteEditorNotAllowedSharingToListsMessageKey", @"") delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"NoteEditorNotAllowedKey", @"") message: NSLocalizedString(@"NoteEditorNotAllowedSharingToListsMessageKey", @"") delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
                 
                 [alert show];
             }

@@ -1,5 +1,5 @@
 //
-//  DataCollectionViewController.m
+//  NoteDetailsViewController.m
 //  ARIS
 //
 //  Created by Brian Thiel on 8/12/11.
@@ -77,11 +77,11 @@
     self.pageControl.numberOfPages = 1;
     self.pageControl.hidesForSinglePage = YES;
     if (self.note.creatorId == [AppModel sharedAppModel].playerId) {
-        UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editButtonTouched)];
+        UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"EditKey", @"") style:UIBarButtonItemStyleDone target:self action:@selector(editButtonTouched)];
         [self.navigationItem setRightBarButtonItem:editButton];
     }
     if([self.delegate isKindOfClass:[Note class]]){
-        UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(backButtonTouch)];
+        UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"BackButtonKey", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(backButtonTouch)];
         [self.navigationItem setLeftBarButtonItem:backButton];
     }
     
@@ -221,7 +221,7 @@
         else if([content.getType isEqualToString:kNoteContentTypePhoto]){
             
             AsyncMediaImageView *controller = [[AsyncMediaImageView alloc] initWithFrame:frame andMedia:content.getMedia];
-            controller.contentMode = UIViewContentModeScaleAspectFill;
+            controller.contentMode = UIViewContentModeScaleAspectFit; //CHANGED FROM FILL TO FIT
             [scrollView addSubview:controller];
             
         }

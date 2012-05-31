@@ -268,10 +268,33 @@ NSString *const kARISServerServicePackage = @"v1";
                                       andArguments:arguments 
                                       andUserInfo:nil];
 	[jsonConnection performAsynchronousRequestWithHandler:
-     @selector(parseStartOverFromJSON:)]; 
+     @selector(parseStartOverFromJSONTemp:)]; 
     
     [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] returnToHomeView];
     
+}
+
+- (void)startOverGame:(int)gameId{
+	NSLog(@"Model: Start Over");
+    NSLog(@"%d", gameId);
+    
+    [self resetAllPlayerLists];
+    
+    [self resetAllGameLists];
+    
+	//Call server service
+	NSArray *arguments = [NSArray arrayWithObjects:
+						  [NSString stringWithFormat:@"%d", gameId],
+						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
+						  nil];
+	JSONConnection *jsonConnection = [[JSONConnection alloc]
+                                      initWithServer:[AppModel sharedAppModel].serverURL
+                                      andServiceName:@"players"
+                                      andMethodName:@"startOverGameForPlayer"
+                                      andArguments:arguments 
+                                      andUserInfo:nil];
+	[jsonConnection performAsynchronousRequestWithHandler:
+     @selector(parseStartOverFromJSON:)]; 
 }
 
 
@@ -1758,6 +1781,7 @@ NSString *const kARISServerServicePackage = @"v1";
 	[AppModel sharedAppModel].gameNoteList = tempNoteList;
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNoteListReady" object:nil]];
     NSLog(@"DONE Parsing Game Note List");
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"GameNoteListRefreshed" object:nil]];
     self.currentlyFetchingGameNoteList = NO;
 	//[tempNoteList release];
 }
@@ -1872,6 +1896,10 @@ NSString *const kARISServerServicePackage = @"v1";
     
     game.gameId = [[gameSource valueForKey:@"game_id"] intValue];
     //NSLog(@"AppModel: Parsing Game: %d", game.gameId);		
+    
+    NSString *hasBeenPlayed = [gameSource valueForKey:@"has_been_played"];
+    if ((NSNull *)hasBeenPlayed != [NSNull null]) game.hasBeenPlayed = [hasBeenPlayed boolValue];
+    else game.hasBeenPlayed = NO;
     
     game.name = [gameSource valueForKey:@"name"];
     if ((NSNull *)game.name == [NSNull null]) game.name = @"";
@@ -2474,7 +2502,12 @@ NSString *const kARISServerServicePackage = @"v1";
 -(void)parseStartOverFromJSON:(JSONResult *)jsonResult{
 	NSLog(@"AppModel: Parsing start over result and firing off fetches");
 	[self silenceNextServerUpdate];
-	[self fetchAllPlayerLists];
+}
+
+-(void)parseStartOverFromJSONTemp:(JSONResult *)jsonResult{
+	NSLog(@"AppModel: Parsing start over result and firing off fetches");
+	[self silenceNextServerUpdate];
+    [self fetchAllPlayerLists];
 }
 
 
