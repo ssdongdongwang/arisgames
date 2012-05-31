@@ -26,8 +26,11 @@ static float INITIAL_SPAN = 0.001;
 @synthesize mapView;
 @synthesize tracking,mapTrace;
 @synthesize mapTypeButton;
+@synthesize mapOverlayButton;
 @synthesize playerTrackingButton;
 @synthesize toolBar,addMediaButton;
+@synthesize overlay;
+@synthesize overlayArray;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -66,14 +69,47 @@ static float INITIAL_SPAN = 0.001;
 	switch (mapView.mapType) {
 		case MKMapTypeStandard:
 			mapView.mapType=MKMapTypeSatellite;
+            [mapView removeOverlay:overlay];
 			break;
 		case MKMapTypeSatellite:
 			mapView.mapType=MKMapTypeHybrid;
 			break;
 		case MKMapTypeHybrid:
 			mapView.mapType=MKMapTypeStandard;
+            if (overlay != NULL)
+                [mapView addOverlay:overlay];
 			break;
 	}
+}
+
+- (IBAction)changeMapOverlay: (id) sender {
+	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
+	[appDelegate playAudioAlert:@"ticktick" shouldVibrate:NO];
+	
+    if ([[mapView overlays] containsObject: overlay]) {
+        [mapView removeOverlay:overlay];
+	} else {
+        [mapView addOverlay:overlay];
+    }
+
+    
+    /*if ([[mapView overlays] containsObject: [overlayArray objectAtIndex: 2]]) {
+        [mapView removeOverlay:[overlayArray objectAtIndex: 2]];
+	}
+    if ([[mapView overlays] containsObject: [overlayArray objectAtIndex: 1]]) {
+        [mapView removeOverlay:[overlayArray objectAtIndex: 1]];
+        if ([overlayArray objectAtIndex: 2] != NULL) 
+            [mapView addOverlay:[overlayArray objectAtIndex: 2]];
+	}
+	if ([[mapView overlays] containsObject: [overlayArray objectAtIndex: 0]]) {
+        [mapView removeOverlay:[overlayArray objectAtIndex: 0]];
+        if ([overlayArray objectAtIndex: 1] != NULL) 
+            [mapView addOverlay:[overlayArray objectAtIndex: 1]];
+	}
+    if ([[mapView overlays] count] == 0) {
+        if ([overlayArray objectAtIndex: 0] != NULL) 
+            [mapView addOverlay:[overlayArray objectAtIndex: 0]];
+    }*/
 }
 
 - (IBAction)refreshButtonAction{
@@ -127,7 +163,22 @@ static float INITIAL_SPAN = 0.001;
     [super viewDidLoad];
 	
 	NSLog(@"Begin Loading GPS View");
-	mapView.showsUserLocation = YES;
+    
+
+    // create array of overlays
+    for (int iOverlay = 0; iOverlay < 3; iOverlay++) {
+        NSString *tileFolderTitle = [NSString stringWithFormat:@"OverlayTiles%i",iOverlay];
+        NSString *tileDirectory = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:tileFolderTitle];
+        NSLog(@"tileDirectory: %@", tileDirectory);
+        overlay = [[TileOverlay alloc] initWithTileDirectory:tileDirectory];
+    
+        if (overlay != NULL) {
+            [overlayArray addObject:overlay];
+        }
+    }
+    
+        
+        mapView.showsUserLocation = YES;
 	[mapView setDelegate:self];
 	[self.view addSubview:mapView];
 	NSLog(@"GPSViewController: Mapview inited and added to view");
@@ -137,6 +188,10 @@ static float INITIAL_SPAN = 0.001;
 	mapTypeButton.target = self; 
 	mapTypeButton.action = @selector(changeMapType:);
 	mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
+    
+    mapOverlayButton.target = self; 
+	mapOverlayButton.action = @selector(changeMapOverlay:);
+	//mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
 	
 	playerTrackingButton.target = self; 
 	playerTrackingButton.action = @selector(refreshButtonAction);
@@ -154,6 +209,15 @@ static float INITIAL_SPAN = 0.001;
 
 	NSLog(@"GPSViewController: View Loaded");
 }
+
+
+- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id )overlay
+{
+    TileOverlayView *view = [[TileOverlayView alloc] initWithOverlay:overlay];
+    view.tileAlpha = 0.6;
+    return view;
+}
+
 
 - (void)viewDidAppear:(BOOL)animated {
     NSLog(@"GPSViewController: view did appear");

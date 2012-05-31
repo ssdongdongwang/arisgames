@@ -11,7 +11,8 @@
 #import "Location.h"
 #import <MapKit/MapKit.h>
 #import "Annotation.h"
-
+#import "TileOverlay.h"
+#import "TileOverlayView.h"
 
 
 @interface GPSViewController : UIViewController <MKMapViewDelegate, UIActionSheetDelegate> {
@@ -21,6 +22,7 @@
 	BOOL tracking,mapTrace;
 	BOOL appSetNextRegionChange;
 	IBOutlet UIBarButtonItem *mapTypeButton;
+    IBOutlet UIBarButtonItem *mapOverlayButton;
 	IBOutlet UIBarButtonItem *playerTrackingButton;
 	IBOutlet UIToolbar *toolBar;
 	int silenceNextServerUpdateCount;
@@ -45,9 +47,12 @@
 @property BOOL tracking;
 @property BOOL mapTrace;
 
+@property TileOverlay *overlay;
+@property NSMutableArray *overlayArray;
 
 
 @property (nonatomic) IBOutlet UIBarButtonItem *mapTypeButton;
+@property (nonatomic) IBOutlet UIBarButtonItem *mapOverlayButton;
 @property (nonatomic) IBOutlet UIBarButtonItem *playerButton;
 
 @property (nonatomic) IBOutlet UIBarButtonItem *addMediaButton;
