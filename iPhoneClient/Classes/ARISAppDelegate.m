@@ -22,6 +22,7 @@
 NSString *errorMessage, *errorDetail;
 
 BOOL isShowingNotification;
+
 @implementation ARISAppDelegate
 
 @synthesize window;
@@ -38,6 +39,7 @@ BOOL isShowingNotification;
 @synthesize titleLabel,descLabel,notifArray,tabShowY;
 @synthesize pubClient;
 @synthesize privClient,loadingVC;
+@synthesize player;
 
 
 //@synthesize toolbarViewController;
@@ -153,21 +155,14 @@ BOOL isShowingNotification;
 	LogoutViewController *logoutViewController = [[LogoutViewController alloc] initWithNibName:@"Logout" bundle:nil];
 	UINavigationController *logoutNavigationController = [[UINavigationController alloc] initWithRootViewController: logoutViewController];
 	logoutNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-
-	//Start Over View
-	StartOverViewController *startOverViewController = [[StartOverViewController alloc] initWithNibName:@"StartOverViewController" bundle:nil];
-	UINavigationController *startOverNavigationController = [[UINavigationController alloc] initWithRootViewController: startOverViewController];
-	startOverNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
 	
 	//Developer View
 	DeveloperViewController *developerViewController = [[DeveloperViewController alloc] initWithNibName:@"Developer" bundle:nil];
 	UINavigationController *developerNavigationController = [[UINavigationController alloc] initWithRootViewController: developerViewController];
 	developerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-	
-	
+		
 	//Bogus Game Picker View
     BogusSelectGameViewController *bogusSelectGameViewController = [[BogusSelectGameViewController alloc] init];
-
 
 	//Login View
 	loginViewController = [[LoginViewController alloc] initWithNibName:@"Login" bundle:nil];
@@ -194,7 +189,6 @@ BOOL isShowingNotification;
                                         notesNavigationController,
 										bogusSelectGameViewController,
 										logoutNavigationController,
-										startOverNavigationController,
 										//developerNavigationController,
 										nil];
     self.defaultViewControllerForMainTabBar = questsNavigationController;
@@ -615,18 +609,25 @@ BOOL isShowingNotification;
 
 //Play a sound
 - (void) playAudio:(NSString*)wavFileName {
-    
 	NSURL* url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:wavFileName ofType:@"wav"]];
     NSLog(@"Appdelegate: Playing Audio: %@", url);
+    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];	
+    [[AVAudioSession sharedInstance] setActive: YES error: nil];
     NSError* err;
-    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL: url error:&err];
-    
+    self.player = [[AVAudioPlayer alloc] initWithContentsOfURL: url error:&err];
+    [self.player setDelegate: self];
     if( err ){
         NSLog(@"Appdelegate: Playing Audio: Failed with reason: %@", [err localizedDescription]);
     }
     else{
-        [player play];
+        [self.player play];
     }
+}
+
+- (void) audioPlayerDidFinishPlaying: (AVAudioPlayer *) player
+                        successfully: (BOOL) flag {
+    NSLog(@"Appdelegate: Audio is done playing");
+    [[AVAudioSession sharedInstance] setActive: NO error: nil];
 }
 
 //Vibrate
@@ -763,8 +764,6 @@ BOOL isShowingNotification;
                 else if([tmpTab.tabName isEqualToString:@"QR"]) tmpTab.tabName = NSLocalizedString(@"QRScannerTitleKey",@"");
                 else if([tmpTab.tabName isEqualToString:@"PLAYER"]) tmpTab.tabName = NSLocalizedString(@"PlayerTitleKey",@"");
                 else if([tmpTab.tabName isEqualToString:@"NOTE"]) tmpTab.tabName = NSLocalizedString(@"NotebookTitleKey",@"");
-                else if([tmpTab.tabName isEqualToString:@"LOGOUT"]) tmpTab.tabName = NSLocalizedString(@"LogoutTitleKey",@"");
-                else if([tmpTab.tabName isEqualToString:@"STARTOVER"]) tmpTab.tabName = NSLocalizedString(@"StartOverTitleKey",@"");
                 else if([tmpTab.tabName isEqualToString:@"PICKGAME"]) tmpTab.tabName = NSLocalizedString(@"GamePickerTitleKey",@"");
         if(tmpTab.tabIndex != 0) {
             

@@ -174,7 +174,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"updatePlayerLastGame" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil]; 
+		[jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
     
 }
 
@@ -191,7 +191,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"mapViewed" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil];
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
     
 }
 
@@ -208,7 +208,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"questsViewed" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil]; 
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
     
 }
 
@@ -225,7 +225,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"inventoryViewed" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil]; 
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
     
 }
 -(void)resetAndEmailNewPassword:(NSString *)email{
@@ -241,36 +241,6 @@ NSString *const kARISServerServicePackage = @"v1";
                                       andUserInfo:nil];
 	[jsonConnection performAsynchronousRequestWithHandler:
      nil]; 
-    
-}
-- (void)startOverGame{
-	NSLog(@"Model: Start Over");
-    ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-	
-    [appDelegate displayIntroNode];
-    
-    [self resetAllPlayerLists];
-    
-    [self resetAllGameLists];
-    
-    [appDelegate.tutorialViewController dismissAllTutorials];
-    
-    
-	//Call server service
-	NSArray *arguments = [NSArray arrayWithObjects:
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-						  nil];
-	JSONConnection *jsonConnection = [[JSONConnection alloc]
-                                      initWithServer:[AppModel sharedAppModel].serverURL
-                                      andServiceName:@"players"
-                                      andMethodName:@"startOverGameForPlayer"
-                                      andArguments:arguments 
-                                      andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:
-     @selector(parseStartOverFromJSONTemp:)]; 
-    
-    [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] returnToHomeView];
     
 }
 
@@ -457,7 +427,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"likeNote" 
                                                               andArguments:arguments
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil]; 
+	[jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
     
 }
 -(void)unLikeNote:(int)noteId{
@@ -472,7 +442,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"unlikeNote" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-	[jsonConnection performAsynchronousRequestWithHandler:nil]; 
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
 }
 
 -(int)addCommentToNoteWithId:(int)noteId andTitle:(NSString *)title{
@@ -491,7 +461,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
 	JSONResult *jsonResult = [jsonConnection performSynchronousRequest]; 
-	
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
 	
 	if (!jsonResult) {
 		NSLog(@"\tFailed.");
@@ -517,7 +487,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
 	JSONResult *jsonResult = [jsonConnection performSynchronousRequest]; 
-	
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
 	if (!jsonResult) {
 		NSLog(@"\tFailed.");
 		return 0;
@@ -590,7 +560,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                              andMethodName:@"deleteLocationsForObject" 
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
-    [jsonConnection performAsynchronousRequestWithHandler:nil]; 
+    [jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; //This is a cheat to make sure that the fetch Happens After 
 	
 }
 
@@ -619,11 +589,13 @@ NSString *const kARISServerServicePackage = @"v1";
 
 -(void)sendNotificationToNoteViewer{
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewContentListReady" object:nil]];
+    [self fetchPlayerNoteListAsync];
 }
 
 
 -(void)sendNotificationToNotebookViewer{
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NoteDeleted" object:nil]];
+    [self fetchPlayerNoteListAsync];
 }
 
 
@@ -647,6 +619,8 @@ NSString *const kARISServerServicePackage = @"v1";
 	//[request setUploadProgressDelegate:appDelegate.waitingIndicator.progressView];
     
 	[uploader upload];
+    
+    [self fetchAllPlayerLists];
     
 }
 -(void)fetchPlayerNoteListAsync{
@@ -695,7 +669,7 @@ NSString *const kARISServerServicePackage = @"v1";
                                                               andArguments:arguments 
                                                                andUserInfo:nil];
     //[AppModel sharedAppModel].isGameNoteList = NO;
-	[jsonConnection performAsynchronousRequestWithHandler:@selector(fetchPlayerNoteListAsync)]; 
+	[jsonConnection performAsynchronousRequestWithHandler:@selector(fetchAllPlayerLists)]; 
 }
 
 - (void)uploadNoteContentDidFail:(ARISUploader *)uploader {
@@ -1271,6 +1245,7 @@ NSString *const kARISServerServicePackage = @"v1";
 	[AppModel sharedAppModel].gameTagList = tempTagsList;
     
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNoteListReady" object:nil]];	
+    
     
     
 }
@@ -2502,12 +2477,6 @@ NSString *const kARISServerServicePackage = @"v1";
 -(void)parseStartOverFromJSON:(JSONResult *)jsonResult{
 	NSLog(@"AppModel: Parsing start over result and firing off fetches");
 	[self silenceNextServerUpdate];
-}
-
--(void)parseStartOverFromJSONTemp:(JSONResult *)jsonResult{
-	NSLog(@"AppModel: Parsing start over result and firing off fetches");
-	[self silenceNextServerUpdate];
-    [self fetchAllPlayerLists];
 }
 
 

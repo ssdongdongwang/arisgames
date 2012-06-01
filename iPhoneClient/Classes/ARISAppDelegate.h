@@ -16,6 +16,9 @@
 
 #import "NearbyObjectsViewController.h"
 
+#import <Foundation/Foundation.h>
+#import <AVFoundation/AVAudioPlayer.h>
+
 #import "Item.h"
 #import "ItemDetailsViewController.h"
 #import "QuestsViewController.h"
@@ -27,7 +30,6 @@
 #import "ARViewViewControler.h"
 #import "QRScannerViewController.h"
 #import "LogoutViewController.h"
-#import "StartOverViewController.h"
 #import "DeveloperViewController.h"
 #import "WaitingIndicatorViewController.h"
 #import "WaitingIndicatorView.h"
@@ -43,7 +45,7 @@
 #import "LoadingViewController.h"
 
 
-@interface ARISAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate,PTPusherDelegate> {
+@interface ARISAppDelegate : NSObject <AVAudioPlayerDelegate,UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate,PTPusherDelegate> {
 	UIWindow *window;
     UITabBarController *tabBarController;
     UIViewController *defaultViewControllerForMainTabBar;
@@ -99,6 +101,7 @@ NSMutableArray *notifArray;
 @property(nonatomic) IBOutlet UILabel *titleLabel;
 @property(nonatomic) IBOutlet UILabel *descLabel;
 
+@property (nonatomic, strong) AVAudioPlayer *player;
 
 - (void)attemptLoginWithUserName:(NSString *)userName andPassword:(NSString *)password;
 - (void) displayNearbyObjectView:(UIViewController *)nearbyObjectsNavigationController;
