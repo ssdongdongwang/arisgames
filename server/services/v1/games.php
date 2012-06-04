@@ -141,6 +141,8 @@ class Games extends Module
 					@mysql_query($query);
 					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'NOTE',  '6')";
 					@mysql_query($query);
+					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'STARTOVER', '998')";
+					@mysql_query($query);
 					$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$intGameId}', 'PICKGAME', '9999')";
 					@mysql_query($query);
 					$query = "SELECT * FROM game_tab_data WHERE game_id = '{$intGameId}' ORDER BY tab_index ASC";
@@ -561,6 +563,8 @@ class Games extends Module
 				@mysql_query($query);
 				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'NOTE', '6')";
 				@mysql_query($query);
+				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'STARTOVER', '998')";
+				@mysql_query($query);
 				$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'PICKGAME', '9999')";
 				@mysql_query($query);
 				if (mysql_error()) return new returnData(6, NULL, 'cannot create game_tab_data table- ' . mysql_error());	
@@ -635,51 +639,36 @@ class Games extends Module
 			/**
 			 * Updates all game databases using upgradeGameDatabase
 			 */	
-			public function upgradeGameDatabases($startingGameIndex) 
+			public function upgradeGameDatabases($startingGameIndex = 0) 
 			{		
-
 				NetDebug::trace("Upgrading Game Databases:\n");
 
+                                //restructure table
+                                $query = "ALTER TABLE game_tab_data CHANGE tab tab ENUM('GPS','NEARBY','QUESTS','INVENTORY','PLAYER','QR','NOTE','STARTOVER','PICKGAME') NOT NULL;";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());
+
+                                //make PICKGAME last tab
+                                $query = "UPDATE game_tab_data SET tab_index ='9999' WHERE tab='PICKGAME'";
+				mysql_query($query);
+				NetDebug::trace("$query" . ":" . mysql_error());  
+
+                                $query = "SELECT game_id FROM game_tab_data WHERE game_id > $startingGameIndex GROUP BY game_id";
+                                $result = mysql_query($query);
+                                while($gid = mysql_fetch_object($result))
+                                {
+                                  $query = "INSERT INTO game_tab_data (game_id, tab, tab_index) VALUES ($gid->game_id, 'STARTOVER', 998);";
+                                  $res = mysql_query($query);
+                                }
+
 				$query = "SELECT * FROM games WHERE game_id > $startingGameIndex ORDER BY game_id";
-				$rs = @mysql_query($query);
+				$rs = mysql_query($query);
 				if (mysql_error())  return new returnData(3, NULL, 'SQL error');
 
 				while ($game = mysql_fetch_object($rs)) {
 					NetDebug::trace("Upgrade Game: {$game->game_id}");
 					$upgradeResult = Games::upgradeGameDatabase($game->game_id);
 				}
-
-				//System wide changes below
-				$query = "ALTER TABLE game_tab_data ADD id MEDIUMINT NOT NULL AUTO_INCREMENT KEY FIRST";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());
-                
-                                //delete individually
-                                $query = "DELETE FROM game_tab_data WHERE tab='STARTOVER'";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());
-                
-                                $query = "DELETE FROM game_tab_data WHERE tab='LOGOUT'";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());
-                
-                                $query = "DELETE FROM game_tab_data WHERE tab='CAMERA'";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());
-                
-                                $query = "DELETE FROM game_tab_data WHERE tab='MICROPHONE'";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());                
-                
-                                //restructure table
-                                $query = "ALTER TABLE game_tab_data CHANGE tab tab ENUM('PICKGAME','GPS','NEARBY','QUESTS','INVENTORY','PLAYER','QR','NOTE')";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());
-                
-                                //make PICKGAME last tab
-                                $query = "UPDATE game_tab_data SET tab_index ='9999' WHERE tab='PICKGAME'";
-				mysql_query($query);
-				NetDebug::trace("$query" . ":" . mysql_error());  
 
 				return new returnData(0, FALSE);
 			}
@@ -696,8 +685,6 @@ class Games extends Module
 				Module::serverErrorLog("Upgrade Game $intGameID");
 
 				$prefix = Module::getPrefix($intGameID);                
-                
-                
 			}
 
 
@@ -1174,8 +1161,9 @@ class Games extends Module
 			 * @param The game Id to be duplicated
 			 *
 			 */
-			public function duplicateGame($intGameID){
+			public function duplicateGame($intGameID, $intEditorID = 0){
 
+                                Module::serverErrorLog("Duplicating Game ID:".$intGameID);
 				$prefix = Module::getPrefix($intGameID);
 
 				$query = "SELECT * FROM games WHERE game_id = {$intGameID} LIMIT 1";
@@ -1189,7 +1177,7 @@ class Games extends Module
                                 $appendNo = 1;
                                 while(!$compatibleName)
                                 {
-                                  $query = "SELECT * FROM games WHERE name = '".$game->name."_copy".$appendNo."'";
+                                  $query = "SELECT * FROM games WHERE name = '".addslashes($game->name)."_copy".$appendNo."'";
                                   $result = mysql_query($query);
                                   if(mysql_fetch_object($result))
                                     $appendNo++;
@@ -1198,22 +1186,35 @@ class Games extends Module
                                 }
                                 $game->name = $game->name."_copy".$appendNo;
 
-				$query = "SELECT editor_id FROM game_editors WHERE game_id = {$intGameID}";
-				$rs = mysql_query($query);
-				$editors = mysql_fetch_object($rs);
-
-				$newGameId = Games::createGame($editors->editor_id, $game->name, $game->description, 
-						$game->pc_media_id, $game->icon_media_id, $game->media_id,
-						$game->is_locational, $game->ready_for_public, 
-						$game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments,
-						$game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
-
-
-				while($editors = mysql_fetch_object($rs)){
-					Games::addEditorToGame($editors->editor_id, $newGameId->data);
-				}
+                                $newGameID = new stdClass();
+                                $newGameID->data = 0;
+                                if($intEditorID != 0)
+                                {
+				  $newGameId = Games::createGame($intEditorID, $game->name, $game->description, 
+						  $game->pc_media_id, $game->icon_media_id, $game->media_id,
+						  $game->is_locational, $game->ready_for_public, 
+						  $game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments,
+						  $game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
+                                }
+                                else
+                                {
+				  $query = "SELECT editor_id FROM game_editors WHERE game_id = {$intGameID}";
+				  $rs = mysql_query($query);
+				  $editors = mysql_fetch_object($rs);
+  
+				  $newGameId = Games::createGame($editors->editor_id, $game->name, $game->description, 
+						  $game->pc_media_id, $game->icon_media_id, $game->media_id,
+						  $game->is_locational, $game->ready_for_public, 
+						  $game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments,
+						  $game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
+  
+				  while($editors = mysql_fetch_object($rs)){
+					  Games::addEditorToGame($editors->editor_id, $newGameId->data);
+				  }
+                                }
 
 				$newPrefix = Module::getPrefix($newGameId->data);
+                                if(!$newPrefix || $newPrefix == 0) return new returnData(2, NULL, "Error Duplicating Game");
 
 				$query = "INSERT INTO {$newPrefix}_folders (folder_id, name, parent_id, previous_id, is_open) SELECT folder_id, name, parent_id, previous_id, is_open FROM {$prefix}_folders";
 				mysql_query($query);
