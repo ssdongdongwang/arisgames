@@ -88,9 +88,10 @@ BOOL isShowingNotification;
 	[dispatcher addObserver:self selector:@selector(checkForDisplayCompleteNode) name:@"NewQuestListReady" object:nil];
     [dispatcher addObserver:self selector:@selector(receivedMediaList) name:@"ReceivedMediaList" object:nil];
 
-    
-    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 20)];
-    self.descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 15)];
+    UILabel *titleLabelAlloc = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 20)];
+    self.titleLabel = titleLabelAlloc;
+    UILabel *descLabelAlloc = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 15)];
+    self.descLabel = descLabelAlloc;
     titleLabel.textColor = [UIColor whiteColor];
     titleLabel.font = [UIFont boldSystemFontOfSize:16];
     titleLabel.textAlignment = UITextAlignmentCenter;
@@ -103,7 +104,8 @@ BOOL isShowingNotification;
     [self.window addSubview:descLabel];
 	//Setup NearbyObjects View
 	NearbyObjectsViewController *nearbyObjectsViewController = [[NearbyObjectsViewController alloc]initWithNibName:@"NearbyObjectsViewController" bundle:nil];
-	self.nearbyObjectsNavigationController = [[UINavigationController alloc] initWithRootViewController: nearbyObjectsViewController];
+    UINavigationController *nearbyObjectsNavigationControllerAlloc = [[UINavigationController alloc] initWithRootViewController: nearbyObjectsViewController];
+	self.nearbyObjectsNavigationController = nearbyObjectsNavigationControllerAlloc;
 	self.nearbyObjectsNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
 	
 	//Setup ARView
@@ -174,7 +176,8 @@ BOOL isShowingNotification;
     
     
 	//Setup the Main Tab Bar
-	self.tabBarController = [[UITabBarController alloc] init];
+    UITabBarController *tabBarControllerAlloc = [[UITabBarController alloc] init];
+	self.tabBarController = tabBarControllerAlloc;
 	self.tabBarController.delegate = self;
 	UINavigationController *moreNavController = self.tabBarController.moreNavigationController;
 	moreNavController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -198,7 +201,8 @@ BOOL isShowingNotification;
     
     //Setup the Game Selection Tab Bar
     
-    self.gameSelectionTabBarController = [[UITabBarController alloc] init];
+    UITabBarController *gameSelectionTabBarControllerAlloc = [[UITabBarController alloc] init];
+    self.gameSelectionTabBarController = gameSelectionTabBarControllerAlloc;
     self.gameSelectionTabBarController.delegate = self;
     
     GamePickerNearbyViewController *gamePickerNearbyViewController = [[GamePickerNearbyViewController alloc] initWithNibName:@"GamePickerNearbyViewController" bundle:nil];
@@ -233,7 +237,8 @@ BOOL isShowingNotification;
     
     
     //Setup The Tutorial View Controller
-	self.tutorialViewController = [[TutorialViewController alloc]init];
+    TutorialViewController *tutorialViewControllerAlloc = [[TutorialViewController alloc]init];
+	self.tutorialViewController = tutorialViewControllerAlloc ;
 	self.tutorialViewController.view.frame = self.tabBarController.view.frame;
 	self.tutorialViewController.view.hidden = YES;
 	self.tutorialViewController.view.userInteractionEnabled = NO;
@@ -420,13 +425,12 @@ BOOL isShowingNotification;
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:window cache:YES];
+    self.tabBarController.selectedIndex = 0;
+    [self hideNotifications];
     self.tabBarController.view.hidden = YES;
     self.gameSelectionTabBarController.view.hidden = NO;
     self.loginViewNavigationController.view.hidden = YES;
     [UIView commitAnimations];
-    
-    
-    [self returnToHomeView];
 
 }
 
@@ -437,9 +441,10 @@ BOOL isShowingNotification;
     errorDetail = detail;
     
 	if (!self.serverAlert){
-		self.serverAlert = [[UIAlertView alloc] initWithTitle:title
-                                                      message:NSLocalizedString(@"ARISAppDelegateWIFIErrorMessageKey", @"")
-                                                     delegate:self cancelButtonTitle:NSLocalizedString(@"IgnoreKey", @"") otherButtonTitles:NSLocalizedString(@"ReportKey", @""),nil];
+        UIAlertView *serverAlertAlloc = [[UIAlertView alloc] initWithTitle:title
+                                                                   message:NSLocalizedString(@"ARISAppDelegateWIFIErrorMessageKey", @"")
+                                                                  delegate:self cancelButtonTitle:NSLocalizedString(@"IgnoreKey", @"") otherButtonTitles:NSLocalizedString(@"ReportKey", @""),nil];
+		self.serverAlert = serverAlertAlloc;
 		[self.serverAlert show];	
  	}
 	else {
@@ -480,9 +485,9 @@ BOOL isShowingNotification;
 	if(!self.loadingVC){
         if (self.waitingIndicatorView){ 
             [self removeNewWaitingIndicator];
-            self.waitingIndicatorView;}
-        
-        self.waitingIndicatorView = [[WaitingIndicatorView alloc] initWithWaitingMessage:message showProgressBar:displayProgressBar];
+        }
+        WaitingIndicatorView *waitingIndicatorViewAlloc = [[WaitingIndicatorView alloc] initWithWaitingMessage:message showProgressBar:displayProgressBar];
+        self.waitingIndicatorView = waitingIndicatorViewAlloc;
         [self.waitingIndicatorView show];
         
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the activity indicator show before returning	
@@ -499,7 +504,8 @@ BOOL isShowingNotification;
 - (void) showWaitingIndicator:(NSString *)message displayProgressBar:(BOOL)displayProgressBar {
 	NSLog (@"AppDelegate: Showing Waiting Indicator");
 	if (!self.waitingIndicator) {
-		self.waitingIndicator = [[WaitingIndicatorViewController alloc] initWithNibName:@"WaitingIndicator" bundle:nil];
+        WaitingIndicatorViewController *waitingIndicatorAlloc = [[WaitingIndicatorViewController alloc] initWithNibName:@"WaitingIndicator" bundle:nil];
+		self.waitingIndicator = waitingIndicatorAlloc;
 	}
 	self.waitingIndicator.message = message;
 	self.waitingIndicator.progressView.hidden = !displayProgressBar;
@@ -516,8 +522,8 @@ BOOL isShowingNotification;
 
 
 - (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController {
-	
-	self.nearbyObjectNavigationController = [[UINavigationController alloc] initWithRootViewController:nearbyObjectViewController];
+	UINavigationController *nearbyObjectNavigationControllerAlloc = [[UINavigationController alloc] initWithRootViewController:nearbyObjectViewController];
+	self.nearbyObjectNavigationController = nearbyObjectNavigationControllerAlloc;
 	self.nearbyObjectNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     
 	//Display
@@ -765,6 +771,9 @@ BOOL isShowingNotification;
                 else if([tmpTab.tabName isEqualToString:@"PLAYER"]) tmpTab.tabName = NSLocalizedString(@"PlayerTitleKey",@"");
                 else if([tmpTab.tabName isEqualToString:@"NOTE"]) tmpTab.tabName = NSLocalizedString(@"NotebookTitleKey",@"");
                 else if([tmpTab.tabName isEqualToString:@"PICKGAME"]) tmpTab.tabName = NSLocalizedString(@"GamePickerTitleKey",@"");
+                else{
+                    tmpTab.tabIndex = 0;
+                }
         if(tmpTab.tabIndex != 0) {
             
         newTabList = [newTabList arrayByAddingObject:tmpTab];
@@ -775,14 +784,7 @@ BOOL isShowingNotification;
     for(int x = 0; x < [[AppModel sharedAppModel].defaultGameTabList count];x++){
         
         tempNav = (UINavigationController *)[[AppModel sharedAppModel].defaultGameTabList objectAtIndex:x];
-        if([tmpTab.tabName isEqualToString:NSLocalizedString(@"GamePickerTitleKey",@"")]){
-            BogusSelectGameViewController *bogusSelectGameViewController = [[BogusSelectGameViewController alloc] init];
-            newCustomVC = [newCustomVC arrayByAddingObject:bogusSelectGameViewController];
-            //[bogusSelectGameViewController release];
-            break;
-        }
-
-        if([tempNav.navigationItem.title isEqualToString:tmpTab.tabName]) newCustomVC = [newCustomVC arrayByAddingObject:tempNav];
+        if([tempNav.navigationItem.title isEqualToString:tmpTab.tabName])newCustomVC = [newCustomVC arrayByAddingObject:tempNav];
             }
     }
 
@@ -915,10 +917,8 @@ BOOL isShowingNotification;
 		if (controller) [self.tabBarController presentModalViewController:controller animated:YES];
 	}
 	
-	self.serverAlert;
 	self.serverAlert = nil;
-	
-	
+    
 }
 
 #pragma mark MFMailComposeViewController Delegate
@@ -961,5 +961,6 @@ BOOL isShowingNotification;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
 @end
 

@@ -43,18 +43,18 @@
         [self.alert release];
     }
     else*/ if(self.ratingView.userRating == 0){
-        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ErrorKey", @"")
-                                                message: NSLocalizedString(@"CommentsFormNumberOfStarsRatingKey", @"")
-                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
+        UIAlertView *alertAlloc = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"ErrorKey", @"")
+                                                             message: NSLocalizedString(@"CommentsFormNumberOfStarsRatingKey", @"")
+                                                            delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
+        self.alert = alertAlloc;
         [self.alert show];
-        self.alert;
     }
     else{
-        self.alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"CommentsFormSuccessKey", @"a")
-                                                message: NSLocalizedString(@"CommentsFormSuccessMessageKey", @"")
-                                               delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
+        UIAlertView *alertAlloc = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"CommentsFormSuccessKey", @"a")
+                                                             message: NSLocalizedString(@"CommentsFormSuccessMessageKey", @"")
+                                                            delegate: self cancelButtonTitle: NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
+        self.alert = alertAlloc;
         [self.alert show];
-        self.alert;
         [[AppServices sharedAppServices] saveComment:self.textField.text game:self.game.gameId starRating:self.ratingView.userRating];
         
         self.commentsVC.defaultRating = self.ratingView.userRating;
@@ -64,6 +64,7 @@
         if([self.textField.text isEqualToString:@"Comment"]) comment.text = @"";
         else comment.text = self.textField.text;
         comment.rating = self.ratingView.userRating;
+        self.game.rating = self.ratingView.userRating;
         comment.playerName = @"You";
         [self.commentsVC addComment:comment];
         [self.commentsVC.tableView reloadData];

@@ -57,9 +57,11 @@ NSString *const kGameDetailsHtmlTemplate =
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
         // Custom initialization
-        self.mediaImageView = [[AsyncMediaImageView alloc]initWithFrame:CGRectMake(0, 0, 320, 200)];
+        AsyncMediaImageView *mediaImageViewAlloc = [[AsyncMediaImageView alloc]initWithFrame:CGRectMake(0, 0, 320, 200)];
+        self.mediaImageView = mediaImageViewAlloc;
         //self.splashMedia = [[Media alloc] init];
-        self.descriptionIndexPath = [[NSIndexPath alloc] init];
+        NSIndexPath *descriptionIndexPathAlloc = [[NSIndexPath alloc] init];
+        self.descriptionIndexPath = descriptionIndexPathAlloc;
     }
     return self;
 }
@@ -92,6 +94,7 @@ NSString *const kGameDetailsHtmlTemplate =
     descriptionWebView.hidden = NO;
 	[descriptionWebView loadHTMLString:htmlDescription baseURL:nil];
     
+    [tableView reloadData];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)descriptionView {
