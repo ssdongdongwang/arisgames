@@ -129,7 +129,7 @@
     numPages = 0;
     //self.scrollView.contentSize = CGSizeMake(scrollView.frame.size.width * numPages, scrollView.frame.size.height);
     
-    NoteContent *noteContent;
+    NoteContent<NoteContentProtocol> *noteContent;
     if([self.note.contents count] == 0){
         
     }
@@ -139,6 +139,8 @@
             [self loadNewPageWithContent:noteContent];
         }
     }
+    
+    
 }
 
 -(void)addUploadsToNote{
@@ -149,16 +151,16 @@
             [self.note.contents removeObjectAtIndex:x];
     }
     
-    NSMutableDictionary *uploads = [AppModel sharedAppModel].uploadManager.uploadContentsForNotes;
+    NSMutableDictionary *uploads = [AppModel sharedAppModel].uploadManager.uploadContents;
     NSArray *uploadContentForNote = [[uploads objectForKey:[NSNumber numberWithInt:self.note.noteId]]allValues];
     [self.note.contents addObjectsFromArray:uploadContentForNote];
     NSLog(@"NoteEditorVC: Added %d upload content(s) to note",[uploadContentForNote count]);
+    
 }
 
 -(void)commentButtonTouch{
     [self showComments];
 }
-
 -(void)likeButtonTouch{
     self.note.userLiked = !self.note.userLiked;
     if(self.note.userLiked){
@@ -174,11 +176,9 @@
     self.likeLabel.text = [NSString stringWithFormat:@"%d",self.note.numRatings];
     
 }
-
 -(void)shareButtonTouch{
     
 }
-
 -(void)showComments{
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;  
 
@@ -205,7 +205,7 @@
 -(void)saveButtonTouchAction{
     //[self displayTitleandDescriptionForm];
 }
-- (void)loadNewPageWithContent:(NoteContent *)content{
+- (void)loadNewPageWithContent:(NoteContent<NoteContentProtocol> *)content{
     
     if(![content.getType isEqualToString:@"UPLOAD"]){
         numPages++;

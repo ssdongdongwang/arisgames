@@ -53,11 +53,6 @@
     return [self contentId];
 }
 
-- (id) managedObjectContext
-{
-    return @"I'm Not nil!";
-}
-
 - (void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }

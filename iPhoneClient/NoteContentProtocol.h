@@ -13,10 +13,9 @@
 @required
 - (NSString *) getTitle;
 - (NSString *) getText;
+- (Media *) getMedia;
 - (NSString *) getType;
 - (NSString *) getUploadState; //uploadStateDONE, uploadStateUPLOADING, uploadStateQUEUED, uploadStateFAILED
-- (Media *) getMedia;
 - (int) getNoteId;
 - (int) getContentId;
-- (id) managedObjectContext;
 @end

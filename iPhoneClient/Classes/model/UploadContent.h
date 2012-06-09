@@ -21,12 +21,13 @@
 @property (nonatomic) NSURL *fileURL;
 @property int noteId;
 
+- (id) initForNoteId:(int)noteId withTitle:(NSString *)title withText:(NSString *)text withType:(NSString *)type withFileURL:(NSURL *)url inState:(NSString *)state andContext:(NSManagedObjectContext *)context;
+
 @end
 
-@interface UploadContent (CoreDataGeneratedPrimitiveAccessors)
 
-- (NSString *) primitiveState;
-- (void) setPrimitiveState:(NSString *)value;
+@interface UploadContent (PrimitiveAccessors)
+
 
 - (NSString *) primitiveFileURL;
 - (void) setPrimitiveFileURL:(NSString *)value;

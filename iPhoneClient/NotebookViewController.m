@@ -208,7 +208,7 @@ BOOL tagFilter;
                                                       ascending:YES];
         NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
         
-        tagList = [[tagList sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+        self.tagList = [[self.tagList sortedArrayUsingDescriptors:sortDescriptors] copy];
         [tagGameNoteList removeAllObjects];
         [headerTitleGameList removeAllObjects];
         

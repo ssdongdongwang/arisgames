@@ -197,7 +197,7 @@
                         ALAssetRepresentation *rep = [asset defaultRepresentation];
                         CGImageRef iref = [rep fullResolutionImage];
                         UIImage *image = [UIImage imageWithCGImage:iref];
-                        NSData *imageData = UIImageJPEGRepresentation(image, 0.4);
+                        NSData *imageData = UIImagePNGRepresentation(image);
                         
                         NSString *newFilePath =[NSTemporaryDirectory() stringByAppendingString: [NSString stringWithFormat:@"%@image.jpg",[NSDate date]]];
                         

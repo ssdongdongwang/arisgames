@@ -10,13 +10,13 @@
 #import "Media.h"
 
 @interface UploadMan : NSObject {    
-    NSMutableDictionary *uploadContentsForNotes;
+    NSMutableDictionary *uploadContents;
     NSManagedObjectContext *context;   
     int currentUploadCount;
     int maxUploadCount;
 }
 
-@property (nonatomic) NSMutableDictionary *uploadContentsForNotes;
+@property (nonatomic) NSMutableDictionary *uploadContents;
 @property (nonatomic) NSManagedObjectContext *context;
 @property (nonatomic) int currentUploadCount;
 @property (nonatomic) int maxUploadCount;
