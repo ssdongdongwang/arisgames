@@ -47,10 +47,12 @@
 
 #import "TileOverlayView.h"
 #import "TileOverlay.h"
+#import "AppModel.h"
 
 @implementation TileOverlayView
 
 @synthesize tileAlpha;
+@synthesize overlayID;
 
 - (id)initWithOverlay:(id <MKOverlay>)overlay
 {
@@ -65,7 +67,8 @@
 {
     // Return YES only if there are some tiles in this mapRect and at this zoomScale.
     TileOverlay *tileOverlay = (TileOverlay *)self.overlay;
-    NSArray *tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale];
+    NSArray *tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale withOverlayID:0];  // just zero now to get something to work.  need to change it later to have it be index of overlay object
+    //NSArray *tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale];
     return [tilesInRect count] > 0;    
 }
 
@@ -78,14 +81,24 @@
     // Get the list of tile images from the model object for this mapRect.  The
     // list may be 1 or more images (but not 0 because canDrawMapRect would have
     // returned NO in that case).
-    NSArray *tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale];
+    NSArray *tilesInRect;
+    int iOverlays = [[AppModel sharedAppModel].overlayList count];
+    for (int i = 0; i < iOverlays; i++) {
+        //NSString *tileFolderTitle = [NSString stringWithFormat:@"OverlayTiles%i",0];
+        //NSString *tileDirectory = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:tileFolderTitle];
+        //overlay = [[TileOverlay alloc] initWithTileDirectory:tileDirectory];
+        tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale withOverlayID:i];
+        //NSArray *tilesInRect = [tileOverlay tilesInMapRect:mapRect zoomScale:zoomScale];
+
+    }
     
+        
     CGContextSetAlpha(context, tileAlpha);
         
     for (ImageTile *tile in tilesInRect) {
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.frame];
-        UIImage *image = [[UIImage alloc] initWithContentsOfFile:tile.imagePath];
+        UIImage *image = tile.image;
         CGContextSaveGState(context);
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
         CGContextScaleCTM(context, 1/zoomScale, 1/zoomScale);

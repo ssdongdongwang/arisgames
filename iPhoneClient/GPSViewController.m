@@ -69,15 +69,15 @@ static float INITIAL_SPAN = 0.001;
 	switch (mapView.mapType) {
 		case MKMapTypeStandard:
 			mapView.mapType=MKMapTypeSatellite;
-            [mapView removeOverlay:overlay];
+            //[mapView removeOverlay:overlay];
 			break;
 		case MKMapTypeSatellite:
 			mapView.mapType=MKMapTypeHybrid;
 			break;
 		case MKMapTypeHybrid:
 			mapView.mapType=MKMapTypeStandard;
-            if (overlay != NULL)
-                [mapView addOverlay:overlay];
+            //if (overlay != NULL)
+            //    [mapView addOverlay:overlay];
 			break;
 	}
 }
@@ -165,20 +165,21 @@ static float INITIAL_SPAN = 0.001;
 	NSLog(@"Begin Loading GPS View");
     
 
-    // create array of overlays
-    for (int iOverlay = 0; iOverlay < 3; iOverlay++) {
-        NSString *tileFolderTitle = [NSString stringWithFormat:@"OverlayTiles%i",iOverlay];
-        NSString *tileDirectory = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:tileFolderTitle];
-        NSLog(@"tileDirectory: %@", tileDirectory);
-        overlay = [[TileOverlay alloc] initWithTileDirectory:tileDirectory];
-    
+    // step through all overlays and add them
+    int iOverlays = [[AppModel sharedAppModel].overlayList count];
+    for (int i = 0; i < iOverlays; i++) {  // one of two places where dealing with multiple overlays will be handled
+        overlay = [[TileOverlay alloc] initWithOverlayID:i];
+        //NSString *tileFolderTitle = [NSString stringWithFormat:@"OverlayTiles%i",0];
+        //NSString *tileDirectory = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:tileFolderTitle];
+        //overlay = [[TileOverlay alloc] initWithTileDirectory:tileDirectory];
         if (overlay != NULL) {
             [overlayArray addObject:overlay];
+            [mapView addOverlay:overlay];
         }
     }
     
         
-        mapView.showsUserLocation = YES;
+    mapView.showsUserLocation = YES;
 	[mapView setDelegate:self];
 	[self.view addSubview:mapView];
 	NSLog(@"GPSViewController: Mapview inited and added to view");
@@ -189,8 +190,8 @@ static float INITIAL_SPAN = 0.001;
 	mapTypeButton.action = @selector(changeMapType:);
 	mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
     
-    mapOverlayButton.target = self; 
-	mapOverlayButton.action = @selector(changeMapOverlay:);
+    //mapOverlayButton.target = self; 
+	//mapOverlayButton.action = @selector(changeMapOverlay:);
 	//mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
 	
 	playerTrackingButton.target = self; 
@@ -211,10 +212,13 @@ static float INITIAL_SPAN = 0.001;
 }
 
 
-- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id )overlay
+- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id)ovrlay
 {
-    TileOverlayView *view = [[TileOverlayView alloc] initWithOverlay:overlay];
-    view.tileAlpha = 0.6;
+    
+    TileOverlayView *view = [[TileOverlayView alloc] initWithOverlay:ovrlay];
+    Overlay *ovrly =  [[AppModel sharedAppModel].overlayList objectAtIndex:0];
+    view.tileAlpha =  ovrly.alpha;
+    
     return view;
 }
 

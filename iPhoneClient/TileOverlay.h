@@ -47,14 +47,18 @@
 
 
 #import <MapKit/MapKit.h>
+#import "Overlay.h"
 
 @interface ImageTile : NSObject {
-    NSString *imagePath;
     MKMapRect frame;
+    UIImage *image;
+    
 }
 
+
 @property (nonatomic, readonly) MKMapRect frame;
-@property (nonatomic, readonly) NSString *imagePath;
+@property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, readonly) Overlay *currentOverlay;
 
 @end
 
@@ -66,9 +70,11 @@
 
 // Initialize the TileOverlay with a directory structure containing map tile images.
 // The directory structure must conform to the output of the gdal2tiles.py utility.
+- (id)initWithOverlayID:(int) overlayID;
 - (id)initWithTileDirectory:(NSString *)tileDirectory;
 
 // Return an array of ImageTile objects for the given MKMapRect and MKZoomScale
+- (NSArray *)tilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)scale withOverlayID:(int)overlayID;
 - (NSArray *)tilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)scale;
 
 @end

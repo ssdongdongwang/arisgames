@@ -66,12 +66,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [imagePath release];
-    [super dealloc];
-}
-
 @end
 
 // Convert an MKZoomScale to a zoom level where level 0 contains 4 256px square tiles,
@@ -106,7 +100,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
                     NSString *tileKey = [[NSString alloc] initWithFormat:@"%d/%d/%d", z, x, y];
                     
                     [pathSet addObject:tileKey];
-                    [tileKey release];
                     
                     if (z < minZ)
                         minZ = z;
@@ -174,12 +167,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
     return boundingMapRect;
 }
 
-- (void)dealloc
-{
-    [tileBase release];
-    [tilePaths release];
-    [super dealloc];
-}
 
 - (NSArray *)tilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)scale
 {

@@ -54,5 +54,6 @@
 }
 
 @property (nonatomic, assign) CGFloat tileAlpha;
+@property (nonatomic, assign) int overlayID;
 
 @end

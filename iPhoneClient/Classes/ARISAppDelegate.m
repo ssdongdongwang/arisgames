@@ -19,7 +19,9 @@
 #import "NoteDetailsViewController.h"
 #import "LoadingViewController.h"
 
+
 NSString *errorMessage, *errorDetail;
+
 
 BOOL isShowingNotification;
 @implementation ARISAppDelegate

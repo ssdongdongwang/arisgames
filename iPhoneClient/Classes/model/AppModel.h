@@ -19,6 +19,7 @@
 #import "Note.h"
 #import "MediaCache.h"
 #import "UploadMan.h"
+#import "Overlay.h"
 
 extern NSDictionary *InventoryElements;
 
@@ -58,6 +59,7 @@ extern NSDictionary *InventoryElements;
     NSMutableDictionary *playerNoteList;
     NSMutableArray *gameTagList;
 
+    NSMutableArray *overlayList;
 
     NSArray *gameTabList;
     NSArray *defaultGameTabList;
@@ -120,6 +122,7 @@ extern NSDictionary *InventoryElements;
 @property(nonatomic) NSMutableDictionary *playerNoteList;
 @property(nonatomic) NSMutableArray *gameTagList;
 
+@property(nonatomic) NSMutableArray *overlayList;	
 
 
 @property(nonatomic) NSMutableDictionary *gameMediaList;
