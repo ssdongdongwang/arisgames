@@ -45,5 +45,4 @@
 - (IBAction)profileButtonTouchAction;
 //- (BOOL) isVideoCameraAvailable;
 -(void) uploadMedia;
-- (NSMutableData*)dataWithEXIFUsingData:(NSData*)originalJPEGData;
 @end
