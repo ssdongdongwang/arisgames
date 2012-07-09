@@ -20,7 +20,7 @@
 @implementation GamePickerNearbyViewController
 
 @synthesize gameTable;
-@synthesize gameList, gameIcons;
+@synthesize gameList;
 @synthesize refreshButton,count;
 
 
@@ -32,7 +32,6 @@
         self.title = NSLocalizedString(@"NearbyObjectsTabKey", @"");
 		self.navigationItem.title = [NSString stringWithFormat: @"%@", NSLocalizedString(@"GamePickerNearbyGamesKey", @"")];
         self.tabBarItem.image = [UIImage imageNamed:@"193-location-arrow"];
-        self.gameIcons = [NSMutableArray arrayWithCapacity:[[AppModel sharedAppModel].gameList count]];
         NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
         [dispatcher addObserver:self selector:@selector(refresh) name:@"PlayerMoved" object:nil];
         
@@ -118,7 +117,6 @@
         //register for notifications
         NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
         [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewGameListReady" object:nil];
-        [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"RecievedGameList" object:nil];
         [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
         
         if ([[AppModel sharedAppModel] loggedIn]) [[AppServices sharedAppServices] fetchGameListWithDistanceFilter:distanceFilter locational:locational];
@@ -138,8 +136,6 @@
 	UIBarButtonItem * barButton = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
 	[[self navigationItem] setRightBarButtonItem:barButton];
 	[activityIndicator startAnimating];
-    
-    
 }
 
 -(void) viewWillAppear:(BOOL)animated{
@@ -148,7 +144,6 @@
 
 -(void)removeLoadingIndicator{
 	[[self navigationItem] setRightBarButtonItem:self.refreshButton];
-    [gameTable reloadData];
 }
 
 - (void)refreshViewFromModel {
@@ -159,6 +154,8 @@
     
 	self.gameList = [[AppModel sharedAppModel].gameList sortedArrayUsingSelector:@selector(compareCalculatedScore:)];
     [gameTable reloadData];
+    
+    [self removeLoadingIndicator];
 }
 
 #pragma mark Control Callbacks
