@@ -122,7 +122,7 @@ abstract class Module
   protected function mToDeg($meters)
   {
     //Ridiculous approximation, but fine for most cases
-    return $meters/500000;
+    return $meters*6/500000;
   }
 
   /*
@@ -859,6 +859,7 @@ abstract class Module
     }
     if($shouldCheckSpawnablesForDeletion)
     {
+        Module::serverErrorLog("Checking ".$type." ".$eventDetail2);
       $query = "SELECT * FROM spawnables WHERE game_id = $gameId AND type = '$type' AND type_id = $eventDetail1 LIMIT 1";
       $result = mysql_query($query);
       if(($obj = mysql_fetch_object($result)) && $obj->delete_when_viewed == 1) 
