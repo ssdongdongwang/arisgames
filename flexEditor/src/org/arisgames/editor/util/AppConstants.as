@@ -53,6 +53,7 @@ public class AppConstants
 	public static const DYNAMICEVENT_OPENQUESTSEDITOR:String = "OpenQuestsEditor";
 	public static const DYNAMICEVENT_CLOSEQUESTSEDITOR:String = "CloseQuestsEditor";
 	public static const DYNAMICEVENT_CLOSESPAWNABLESEDITOR:String = "CloseSpawnablesEditor";
+	public static const DYNAMICEVENT_CLOSEFOUNTAINEDITOR:String = "CloseFountainEditor";
 	public static const DYNAMICEVENT_OPENWEBHOOKSEDITOR:String = "OpenWebHooksEditor";
 	public static const DYNAMICEVENT_CLOSEWEBHOOKSEDITOR:String = "CloseWebHooksEditor";
 	public static const DYNAMICEVENT_OPENNOTETAGSEDITOR:String = "OpenNoteTagsEditor";
@@ -181,7 +182,9 @@ public class AppConstants
 	public static const REQUIREMENT_PLAYER_HAS_NOTE_WITH_COMMENTS_DATABASE:String = "PLAYER_HAS_NOTE_WITH_COMMENTS";
 	public static const REQUIREMENT_PLAYER_HAS_NOTE_WITH_COMMENTS_HUMAN:String = "Created A Note With (qty) Comments";
 	public static const REQUIREMENT_PLAYER_HAS_GIVEN_NOTE_COMMENTS_DATABASE:String = "PLAYER_HAS_GIVEN_NOTE_COMMENTS";
+	public static const REQUIREMENT_PLAYER_HAS_GIVEN_NOTE_LIKES_DATABASE:String = "PLAYER_HAS_GIVEN_NOTE_LIKES";
 	public static const REQUIREMENT_PLAYER_HAS_GIVEN_NOTE_COMMENTS_HUMAN:String = "Given (qty) Comments On Notes";
+	public static const REQUIREMENT_PLAYER_HAS_GIVEN_NOTE_LIKES_HUMAN:String = "Given (qty) Likes On Notes";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_DATABASE:String = "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK";
 	public static const REQUIREMENT_PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK_HUMAN:String = "Received Incoming Web Hook";
 
