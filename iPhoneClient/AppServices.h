@@ -7,7 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RootViewController.h"
 #import "AppModel.h"
+#import "MyCLController.h"
+#import "Location.h"
 #import "Game.h"
 #import "Tab.h"
 #import "Item.h"
@@ -35,7 +38,11 @@
     BOOL currentlyFetchingLocationList,currentlyFetchingGameNoteList,currentlyFetchingPlayerNoteList;
     BOOL currentlyFetchingInventory;
     BOOL currentlyFetchingQuestList;
-    BOOL currentlyFetchingGamesList;
+    BOOL currentlyFetchingOneGame;
+    BOOL currentlyFetchingNearbyGamesList;
+    BOOL currentlyFetchingPopularGamesList;
+    BOOL currentlyFetchingSearchGamesList;
+    BOOL currentlyFetchingRecentGamesList;
     BOOL currentlyUpdatingServerWithPlayerLocation;
     BOOL currentlyUpdatingServerWithMapViewed;
     BOOL currentlyUpdatingServerWithQuestsViewed;
@@ -50,7 +57,11 @@ extern NSString *const kARISServerServicePackage;
 @property(readwrite) BOOL currentlyFetchingGameNoteList;
 @property(readwrite) BOOL currentlyFetchingPlayerNoteList;
 @property(readwrite) BOOL currentlyFetchingQuestList;
-@property(readwrite) BOOL currentlyFetchingGamesList;
+@property(readwrite) BOOL currentlyFetchingOneGame;
+@property(readwrite) BOOL currentlyFetchingNearbyGamesList;
+@property(readwrite) BOOL currentlyFetchingPopularGamesList;
+@property(readwrite) BOOL currentlyFetchingSearchGamesList;
+@property(readwrite) BOOL currentlyFetchingRecentGamesList;
 @property(readwrite) BOOL currentlyUpdatingServerWithPlayerLocation;
 @property(readwrite) BOOL currentlyUpdatingServerWithMapViewed;
 @property(readwrite) BOOL currentlyUpdatingServerWithQuestsViewed;
@@ -138,7 +149,7 @@ extern NSString *const kARISServerServicePackage;
 
 - (void)registerNewUser:(NSString*)userName password:(NSString*)pass 
 			  firstName:(NSString*)firstName lastName:(NSString*)lastName email:(NSString*)email;
-- (void)parseGameListFromJSON: (JSONResult *)jsonResult;
+- (NSMutableArray *)parseGameListFromJSON: (JSONResult *)jsonResult;
 - (Game *)parseGame:(NSDictionary *)gameSource;
 - (void)parseGameMediaListFromJSON: (JSONResult *)jsonResult;
 - (void)parseGameNpcListFromJSON: (JSONResult *)jsonResult;
@@ -153,8 +164,8 @@ extern NSString *const kARISServerServicePackage;
 - (void)parseRecentGameListFromJSON: (JSONResult *)jsonResult;
 - (void)parseGameTagsListFromJSON: (JSONResult *)jsonResult;
 
-- (Location*)parseLocationFromDictionary: (NSDictionary *)locationDictionary;
-- (Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary;
+- (Location *)parseLocationFromDictionary:(NSDictionary *)locationDictionary;
+- (Item *)parseItemFromDictionary:(NSDictionary *)itemDictionary;
 - (Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary;
 - (Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary;
 - (WebPage *)parseWebPageFromDictionary: (NSDictionary *)webPageDictionary;

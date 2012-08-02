@@ -14,7 +14,7 @@
 #import "Scene.h"
 #import "SceneParser.h"
 
-@interface DialogViewController : UIViewController<AVAudioPlayerDelegate, SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate> {
+@interface DialogViewController : UIViewController<SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, AVAudioPlayerDelegate> {
 	IBOutlet	AsyncMediaImageView	*npcImage;
 	IBOutlet	AsyncMediaImageView	*pcImage;
 	IBOutlet	UIWebView	*npcWebView;
@@ -55,20 +55,13 @@
 
     UILabel         *lbl;
 	BOOL			closingScriptPlaying;
-	BOOL			inFullScreenTextMode;
-    BOOL			areNotifications;
-    BOOL            movedForNotifications;
-    BOOL            isPC;
-    
-    CGRect          tempNpcFrame;
-    CGRect          tempPcFrame;
+	int			    textboxSize;
+    BOOL            hideLeaveConversationButton;
     
     AVAudioPlayer *player;
     ARISMoviePlayerViewController *ARISMoviePlayer;
     
     UIActivityIndicatorView *waiting;
-    
-    int             notificationBarHeight;
 }
 
 
@@ -86,15 +79,10 @@
 @property(nonatomic) IBOutlet UIBarButtonItem *specialBackButton;
 @property (nonatomic, strong) AVAudioPlayer *player;
 @property (nonatomic, strong) ARISMoviePlayerViewController *ARISMoviePlayer;
-@property (nonatomic)         CGRect tempNpcFrame;
-@property (nonatomic)         CGRect tempPcFrame;
 @property (nonatomic)         UIActivityIndicatorView *waiting;
 @property                     BOOL closingScriptPlaying;
-@property                     BOOL inFullScreenTextMode;
-@property                     BOOL areNotifications;
-@property                     BOOL movedForNotifications;
-@property                     BOOL isPC;
-@property (readwrite,assign)  int notificationBarHeight;
+@property                     int textboxSize;
+@property                     BOOL            hideLeaveConversationButton;
 
 @property(nonatomic) IBOutlet NSString *exitToTabVal;
 

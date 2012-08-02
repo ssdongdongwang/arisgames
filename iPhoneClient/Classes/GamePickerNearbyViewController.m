@@ -65,7 +65,7 @@
  //PUSHER STUFF
  -(void)sendPusherEvent{
  //Do send event things
- ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
+ ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
  PTPusherPrivateChannel *pChannel = (PTPusherPrivateChannel *)[appDelegate.privClient channelNamed:@"private-pusher_room_channel"];
  [pChannel triggerEventNamed:@"private-pusher_room_event" data:@"from the iPhone"];
  }
@@ -116,7 +116,7 @@
     if([AppModel sharedAppModel].playerLocation){
         //register for notifications
         NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-        [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewGameListReady" object:nil];
+        [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewNearbyGameListReady" object:nil];
         [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
         
         if ([[AppModel sharedAppModel] loggedIn]) [[AppServices sharedAppServices] fetchGameListWithDistanceFilter:distanceFilter locational:locational];
@@ -157,7 +157,7 @@
     //unregister for notifications
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-	self.gameList = [[AppModel sharedAppModel].gameList sortedArrayUsingSelector:@selector(compareCalculatedScore:)];
+	self.gameList = [[AppModel sharedAppModel].nearbyGameList sortedArrayUsingSelector:@selector(compareCalculatedScore:)];
     [gameTable reloadData];
     
     [self removeLoadingIndicator];

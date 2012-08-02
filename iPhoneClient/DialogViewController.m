@@ -69,14 +69,12 @@ NSString *const kDialogHtmlTemplate =
 @synthesize npcContinueButton, pcContinueButton, textSizeButton, specialBackButton;
 @synthesize pcAnswerView, mainView, npcView, pcView, nothingElseLabel,lbl,currentNpc,currentNode, npcVideoView;
 @synthesize player, ARISMoviePlayer;
-@synthesize closingScriptPlaying, inFullScreenTextMode;;
-@synthesize waiting, notificationBarHeight, areNotifications, movedForNotifications;
-@synthesize tempNpcFrame, tempPcFrame, isPC;
+@synthesize closingScriptPlaying, textboxSize;
+@synthesize waiting;
 
 // The designated initializer. Override to perform setup that is required before the view is loaded.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-		
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(optionsRecievedFromNotification:)
 													 name:@"ConversationNodeOptionsReady"
@@ -93,16 +91,13 @@ NSString *const kDialogHtmlTemplate =
 - (void)viewDidLoad {
 	[super viewDidLoad];
 		
-    ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-    appDelegate.modalPresent = YES;
+    [RootViewController sharedRootViewController].modalPresent = YES;
 	//General Setup
 	lastPcId = 0;
 	currentNode = nil;
 	self.closingScriptPlaying = NO;
-	self.inFullScreenTextMode = NO;
-    self.areNotifications = NO;
-    self.movedForNotifications = NO;
-    self.isPC = YES;
+	self.textboxSize = 1;
+    self.hideLeaveConversationButton = NO;
     self.exitToTabVal = nil;
 	
     //View Setup
@@ -153,7 +148,6 @@ NSString *const kDialogHtmlTemplate =
 	}
     
     NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
-	[dispatcher addObserver:self selector:@selector(showNotifications:) name:@"showNotifications" object:nil];
     [dispatcher addObserver:self selector:@selector(hideNotifications:) name:@"hideNotifications" object:nil];
     
 /*  SAMPLE DIALOG FORMAT
@@ -175,24 +169,27 @@ NSString *const kDialogHtmlTemplate =
 
 -(void)toggleFullScreenTextMode{
 	NSLog(@"DialogViewController: toggleTextSize");
-
+    
     CGRect newTextFrame;
-    if (self.inFullScreenTextMode) {
-        //switch to part of screen mode
-        int yValue = 332;
-        if(self.areNotifications){
-            yValue -= self.notificationBarHeight;
-        } 
-        newTextFrame = CGRectMake(0, yValue, 320, 128);
-	}
-	else {
-		//switch to full screen mode
-        int yValue = 44;
-        if(self.areNotifications){
-            yValue += self.notificationBarHeight;
-        } 
-		newTextFrame = CGRectMake(0, yValue, 320, 416);
-	}
+    
+    switch(textboxSize){
+        case 0:
+           //text is off screen, move it on screen
+           newTextFrame = CGRectMake(0, 332, 320, 128);
+            break;
+        case 1:
+            //textbox is normal size, make it full screen
+            newTextFrame = CGRectMake(0, 44, 320, 416);
+            break;
+        case 2:
+            //text is full screen, move it off screen
+            newTextFrame = CGRectMake(0, 480, 320, 128);
+            break;
+        default:
+            //should never reach here
+            newTextFrame = CGRectMake(0, 332, 320, 128);
+            break;
+    }
 	[UIView beginAnimations:@"toggleTextSize" context:nil];
 	[UIView setAnimationDuration:0.5];
 	self.pcScrollView.frame = newTextFrame;
@@ -201,70 +198,22 @@ NSString *const kDialogHtmlTemplate =
 	self.npcScrollView.frame = newTextFrame;
 	[UIView commitAnimations];
 	
-	self.inFullScreenTextMode = !self.inFullScreenTextMode;
-	
-}
-
--(void)showNotifications:(NSNotification*) notification {
-    if(!self.movedForNotifications){
-    self.areNotifications = YES;
-  //  self.tempNpcFrame = self.npcImageScrollView.frame;
-    self.tempPcFrame =  self.pcImageScrollView.frame;
-    ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-    self.notificationBarHeight = appDelegate.notificationBarHeight;
-    CGRect newTextFrame;
-    newTextFrame = CGRectMake(0, 44+self.notificationBarHeight, 320, 416);
-    [UIView beginAnimations:@"toggleTextSize" context:nil];
-    [UIView setAnimationDuration:0.5];
-    if (self.inFullScreenTextMode) {
-	self.pcScrollView.frame = newTextFrame;
-	self.pcTableView.frame = self.pcScrollView.bounds;
-    self.pcScrollView.contentSize = self.pcTableView.frame.size;
-	self.npcScrollView.frame = newTextFrame;
-    }
-    self.pcImageScrollView.frame =  CGRectMake(0, 44, 320, 416);
-   // self.npcImageScrollView.frame =  CGRectMake(0, 44, 320, 416);
-	[UIView commitAnimations];
-  /*  else{
-        newTextFrame = CGRectMake(0, 332-self.notificationBarHeight, 320, 416);
-        [UIView beginAnimations:@"toggleTextSize" context:nil];
-        [UIView setAnimationDuration:0.5];
-        self.pcScrollView.frame = newTextFrame;
-        self.pcTableView.frame = self.pcScrollView.bounds;
-        self.pcScrollView.contentSize = self.pcTableView.frame.size;
-        self.npcScrollView.frame = newTextFrame;
-        [UIView commitAnimations];   
-    }  */
-        self.movedForNotifications = YES;
-    } 
+	if(self.textboxSize < 2) self.textboxSize++;
+    else self.textboxSize = 0;
 }
 
 -(void)hideNotifications:(NSNotification*) notification {
-    self.areNotifications = NO;
-    self.movedForNotifications = NO;
     CGRect newTextFrame;
     newTextFrame = CGRectMake(0, 44, 320, 416);
     [UIView beginAnimations:@"toggleTextSize" context:nil];
-    [UIView setAnimationDuration:0.5];
-    self.pcImageScrollView.frame =  self.tempPcFrame;
-  //  self.npcImageScrollView.frame =  self.tempNpcFrame;
-    if (self.inFullScreenTextMode) {
+    [UIView setAnimationDuration:0.0];
+    if (self.textboxSize == 2) {
         self.pcScrollView.frame = newTextFrame;
         self.pcTableView.frame = self.pcScrollView.bounds;
         self.pcScrollView.contentSize = self.pcTableView.frame.size;
         self.npcScrollView.frame = newTextFrame;
     }
     [UIView commitAnimations];
-  /*  else{
-        newTextFrame = CGRectMake(0, 332-self.notificationBarHeight, 320, 416);
-        [UIView beginAnimations:@"toggleTextSize" context:nil];
-        [UIView setAnimationDuration:0.5];
-        self.pcScrollView.frame = newTextFrame;
-        self.pcTableView.frame = self.pcScrollView.bounds;
-        self.pcScrollView.contentSize = self.pcTableView.frame.size;
-        self.npcScrollView.frame = newTextFrame;
-        [UIView commitAnimations]; 
-    } */
     
 }
 
@@ -290,10 +239,8 @@ NSString *const kDialogHtmlTemplate =
 - (IBAction)backButtonTouchAction: (id) sender{
 	NSLog(@"DialogViewController: Notify server of NPC view and Dismiss view");
 	
-	ARISAppDelegate *appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
-    appDelegate.modalPresent = NO;
-	[appDelegate dismissNearbyObjectView:self];
-
+    [RootViewController sharedRootViewController].modalPresent = NO;
+	[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
 }
 
 - (IBAction)continueButtonTouchAction{
@@ -365,9 +312,7 @@ NSString *const kDialogHtmlTemplate =
 - (void) beginWithNPC:(Npc *)aNpc {
 	currentNpc = aNpc;
 		
-	parser = [[SceneParser alloc] initWithDefaultNpcId];
-	parser.delegate = self;
-
+	parser = [[SceneParser alloc] initWithDefaultNpcIdWithDelegate: self];
 }
 
 - (void) loadNPCImage:(NSInteger)mediaId {
@@ -445,14 +390,13 @@ NSString *const kDialogHtmlTemplate =
 	}
 	else { 	//End of Script. Display Player Options
         NSLog(@"DialogVC: continueScript: No more scenes left. Checking for exitTo tags before loading options");
-
-        ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];        
+  
         if(cachedScene.exitToTabWithTitle) self.exitToTabVal = cachedScene.exitToTabWithTitle;
         
         //Check if this is a closing script or we are shutting down
         if(self.closingScriptPlaying==YES || (self.exitToTabVal != nil)) {
-            appDelegate.modalPresent = NO;
-            [appDelegate dismissNearbyObjectView:self];
+            [RootViewController sharedRootViewController].modalPresent = NO;
+            [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
             [[AppServices sharedAppServices] updateServerNodeViewed:self.currentNode.nodeId fromLocation:self.currentNode.locationId];
         }
         
@@ -461,43 +405,43 @@ NSString *const kDialogHtmlTemplate =
             //TODO: Move this code into an app delegate method
             if([cachedScene.exitToType isEqualToString:@"tab"]){
                 NSString *tab;
-                for(int i = 0;i < [appDelegate.tabBarController.viewControllers count];i++){
-                    tab = [[appDelegate.tabBarController.viewControllers objectAtIndex:i] title];
+                for(int i = 0;i < [[RootViewController sharedRootViewController].tabBarController.viewControllers count];i++){
+                    tab = [[[RootViewController sharedRootViewController].tabBarController.viewControllers objectAtIndex:i] title];
                     tab = [tab lowercaseString];
                     self.exitToTabVal = [self.exitToTabVal lowercaseString];
                     if([self.exitToTabVal isEqualToString:tab]) {
-                        appDelegate.tabBarController.selectedIndex = i;
+                        [RootViewController sharedRootViewController].tabBarController.selectedIndex = i;
                     }
                 }
             }
             else if([cachedScene.exitToType isEqualToString:@"plaque"]){
                 NodeViewController *nodeVC = [[NodeViewController alloc]initWithNibName:@"Node" bundle:[NSBundle mainBundle]];
                 nodeVC.node = [[AppModel sharedAppModel] nodeForNodeId:[cachedScene.exitToTabWithTitle intValue]];
-                [appDelegate displayNearbyObjectView:nodeVC];
+                [[RootViewController sharedRootViewController]displayNearbyObjectView:nodeVC];
      
             }
             else if([cachedScene.exitToType isEqualToString:@"webpage"]){
                 webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
                 webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:[cachedScene.exitToTabWithTitle intValue]];
                 webPageViewController.delegate = self;
-                [appDelegate displayNearbyObjectView:webPageViewController];
+                [[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
                 
             }
             else if([cachedScene.exitToType isEqualToString:@"item"]){
                 ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
                 itemVC.item = [[AppModel sharedAppModel] itemForItemId:[cachedScene.exitToTabWithTitle intValue]];                
-                [appDelegate displayNearbyObjectView:itemVC];
+                [[RootViewController sharedRootViewController] displayNearbyObjectView:itemVC];
             }
             else if([cachedScene.exitToType isEqualToString:@"character"]){
                 DialogViewController *dialogVC = [[DialogViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle]];
                 [dialogVC beginWithNPC:[[AppModel sharedAppModel] npcForNpcId:[cachedScene.exitToTabWithTitle intValue]]];
-                [appDelegate displayNearbyObjectView:dialogVC];
+                [[RootViewController sharedRootViewController] displayNearbyObjectView:dialogVC];
             }
             else if([cachedScene.exitToType isEqualToString:@"panoramic"]){
                 Panoramic *pano = [[AppModel sharedAppModel] panoramicForPanoramicId:[cachedScene.exitToTabWithTitle intValue]];
                 PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithNibName:@"PanoramicViewController" bundle: [NSBundle mainBundle]];    
                 panoramicViewController.panoramic = pano;
-                [appDelegate displayNearbyObjectView:panoramicViewController];
+                [[RootViewController sharedRootViewController] displayNearbyObjectView:panoramicViewController];
             }
         }
         else{
@@ -508,7 +452,6 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) applyPlayerOptions{	
 	NSLog(@"DialogVC: Apply Player Options");
-	self.isPC = YES;
 	++scriptIndex;
 	
 	// Display the appropriate question for the PC
@@ -554,7 +497,6 @@ NSString *const kDialogHtmlTemplate =
 			[self showWaitingIndicatorForPlayerOptions];
 		}
 	}
-		
 }
 
 - (void) optionsRecievedFromNotification:(NSNotification*) notification{
@@ -697,7 +639,6 @@ NSString *const kDialogHtmlTemplate =
 	BOOL isCurrentlyDisplayed;
 		 
 	if (cachedScene.isPc) {
-        self.isPC = YES;
         NSLog(@"Dialog VC: finishScene: This is the PC");
 		self.title = NSLocalizedString(@"DialogPlayerName",@"");
 		characterView = pcView;
@@ -714,12 +655,11 @@ NSString *const kDialogHtmlTemplate =
 		if (scriptIndex == [currentScript count] && self.closingScriptPlaying ) {
 			//We are at the end of the script and no conversations exist, the next tap on the button is going to end the dialog
 			[pcContinueButton setTitle: NSLocalizedString(@"DialogEnd",@"") forState: UIControlStateNormal];
-			[pcContinueButton setTitle: NSLocalizedString(@"DialogEnd",@"") forState: UIControlStateHighlighted];	
+			[pcContinueButton setTitle: NSLocalizedString(@"DialogEnd",@"") forState: UIControlStateHighlighted];
+
 		}
-		
 	}
 	else {
-        self.isPC = NO;
         NSLog(@"Dialog VC: finishScene: This is the NPC");
 		self.title = currentNpc.name;
 		characterView = npcView;
@@ -980,7 +920,8 @@ NSString *const kDialogHtmlTemplate =
 
 #pragma mark PC options table view
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 2;
+    if(self.hideLeaveConversationButton) return 1;
+       return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
@@ -1079,10 +1020,17 @@ NSString *const kDialogHtmlTemplate =
         self.exitToTabVal = (NSString*)parser.exitToTabWithTitle;
     }
 
-    [self continueScript];  
-    
-    
+    [self continueScript]; 
 }
+
+- (void) setHideLeaveConversationButton:(BOOL)hide{
+    hideLeaveConversationButton = hide;
+}
+
+- (BOOL) hideLeaveConversationButton {
+    return hideLeaveConversationButton;
+}
+
 #pragma mark Scroll View
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
 	return cachedScrollView;

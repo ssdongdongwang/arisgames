@@ -98,12 +98,12 @@
     //unregister for notifications
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    if(self.currentPage == 0) self.gameList = [AppModel sharedAppModel].gameList;
-    else self.gameList = [self.gameList arrayByAddingObjectsFromArray:[AppModel sharedAppModel].gameList];
+    if(self.currentPage == 0) self.gameList = [AppModel sharedAppModel].searchGameList;
+    else self.gameList = [self.gameList arrayByAddingObjectsFromArray:[AppModel sharedAppModel].searchGameList];
     
     self.currentlyFetchingNextPage = NO;
     self.currentPage++;
-    if([AppModel sharedAppModel].gameList.count == 0) self.allResultsFound = YES;
+    if([AppModel sharedAppModel].searchGameList.count == 0) self.allResultsFound = YES;
 	[gameTable reloadData];
 }
 
@@ -309,7 +309,7 @@
     //register for notifications
     NSNotificationCenter *dispatcher = [NSNotificationCenter defaultCenter];
     [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"RecievedGameList" object:nil];
-    [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewGameListReady" object:nil];
+    [dispatcher addObserver:self selector:@selector(refreshViewFromModel) name:@"NewSearchGameListReady" object:nil];
     [dispatcher addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost" object:nil];
     
 	[self showLoadingIndicator];
