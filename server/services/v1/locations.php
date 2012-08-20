@@ -463,7 +463,7 @@ class Locations extends Module
             //Destroy spawnables
             if($spawnable->time_to_live != -1)
             {
-                $query = "DELETE FROM ".$intGameID."_locations WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND";
+                $query = "DELETE  ".$intGameID."_locations, ".$intGameID."_qrcodes FROM ".$intGameID."_locations LEFT_JOIN ".$intGameID."_qrcodes ON ".$intGameID."_locations.location_id = ".$intGameID."_qrcodes.link_id WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND";
                 mysql_query($query);
             }
 
@@ -474,7 +474,8 @@ class Locations extends Module
                 //If location's icon is not defined, use the object's icon
                 if (!$locobj->icon_media_id) 
                     $locobj->icon_media_id = $object->icon_media_id;
-                $locobj->delete_when_viewed = $spawnable->delete_when_viewed;
+                $locobj->delete_when_viewed = $spawnable->delete_when_viewed && $spawnable->active;
+                //Module::serverErrorLog($locobj->delete_when_viewed."<- final  ".$spawnable->delete_when_viewed." ".$spawnable->active);
 
                 //Add it
                 $arrayLocations[] = $locobj;
