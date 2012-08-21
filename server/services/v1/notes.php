@@ -33,7 +33,7 @@ class Notes extends Module
     $result = mysql_query($query);
     $noteobj = mysql_fetch_object($result);
 
-    $query = "UPDATE ".$noteobj->game_id."_locations SET name = '{$title}' WHERE type='PlayerNote' AND type_id = '{$noteId}'";
+    $query = "UPDATE locations SET name = '{$title}' WHERE game_id = {$noteobj->game_id} AND type='PlayerNote' AND type_id = '{$noteId}'";
     @mysql_query($query);
     if (mysql_error()) return new returnData(1, NULL, mysql_error());
 
@@ -271,7 +271,7 @@ class Notes extends Module
 
   function noteDropped($noteId, $gameId)
   {
-    $query = "SELECT * FROM ".$gameId."_locations WHERE type='PlayerNote' AND type_id='{$noteId}' LIMIT 1";
+    $query = "SELECT * FROM locations WHERE game_id = {$gameId} AND type='PlayerNote' AND type_id='{$noteId}' LIMIT 1";
     $result = mysql_query($query);
 
     if(mysql_num_rows($result) > 0)
@@ -282,7 +282,7 @@ class Notes extends Module
 
   function getNoteLocation($noteId, $gameId)
   {
-    $query = "SELECT * FROM ".$gameId."_locations WHERE type='PlayerNote' AND type_id='{$noteId}' LIMIT 1";
+    $query = "SELECT * FROM locations WHERE game_id = {$gameId} AND type='PlayerNote' AND type_id='{$noteId}' LIMIT 1";
     $result = mysql_query($query);
     $locObj = mysql_fetch_object($result);
     $retLoc = new stdClass();
@@ -301,6 +301,12 @@ class Notes extends Module
 
     $result = @mysql_query($query);
     $noteObj = mysql_fetch_object($result);
+      
+    $query = "DELETE FROM note_tags WHERE note_id = '{$noteId}'";
+    mysql_query($query);
+      
+    $query = "DELETE FROM note_likes WHERE note_id = '{$noteId}'";
+    mysql_query($query);
 
     $query = "SELECT note_id FROM notes WHERE parent_note_id = '{$noteId}'";
     $result = @mysql_query($query);
@@ -315,7 +321,7 @@ class Notes extends Module
 
     //Delete the folder record
     //EditorFolderContents::deleteContent($noteObj->game_id, "PlayerNote", $noteId); //This would cause an infinite loop becasue it deletes the note
-    $query = "DELETE FROM {$noteObj->game_id}_folder_contents WHERE content_type = 'PlayerNote' AND content_id = '{$noteId}'";
+    $query = "DELETE FROM folder_contents WHERE game_id = {$noteObj->game_id} AND content_type = 'PlayerNote' AND content_id = '{$noteId}'";
     mysql_query($query);
     if (mysql_error()) return new returnData(1, NULL, mysql_error());
 

@@ -24,7 +24,7 @@ class Items extends Module
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
 
-        $query = "SELECT * FROM {$prefix}_items";
+        $query = "SELECT * FROM items WHERE game_id = '{$prefix}'";
         NetDebug::trace($query);
 
 
@@ -49,12 +49,7 @@ class Items extends Module
         $prefix = Module::getPrefix($gameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-
-        $query = "SELECT {$prefix}_items.*, {$prefix}_player_items.qty 
-            FROM {$prefix}_items
-            JOIN {$prefix}_player_items 
-            ON {$prefix}_items.item_id = {$prefix}_player_items.item_id
-            WHERE player_id = $playerId";
+        $query = "SELECT game_items.*, game_player_items.qty FROM (SELECT * FROM items WHERE game_id = {$gameId}) AS game_items JOIN (SELECT * FROM player_items WHERE game_id = {$gameId} AND player_id = $playerId) AS game_player_items ON game_items.item_id = game_player_items.item_id";
         NetDebug::trace($query);
 
         $rsResult = @mysql_query($query);
@@ -80,7 +75,7 @@ class Items extends Module
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
 
-        $query = "SELECT qty FROM {$prefix}_player_items WHERE player_id = $playerId AND item_id = $itemId";
+        $query = "SELECT qty FROM player_items WHERE player_id = $playerId AND item_id = $itemId AND game_id = '{$prefix}'";
 
         $rsResult = @mysql_query($query);
         if (!$rsResult) return new returnData(0, NULL);
@@ -105,12 +100,7 @@ class Items extends Module
         $prefix = Module::getPrefix($gameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-
-        $query = "SELECT {$prefix}_items.*, {$prefix}_player_items.qty 
-            FROM {$prefix}_items
-            JOIN {$prefix}_player_items 
-            ON {$prefix}_items.item_id = {$prefix}_player_items.item_id
-            WHERE {$prefix}_items.is_attribute = '1' AND player_id = $playerId";
+        $query = "SELECT game_items.*, game_player_items.qty FROM (SELECT * FROM items WHERE game_id = {$gameId} AND is_attribute = '1') AS game_items JOIN (SELECT * FROM player_items WHERE game_id = {$gameId} AND player_id = $playerId) AS game_player_items ON game_items.item_id = game_player_items.item_id";
         NetDebug::trace($query);
 
         $rsResult = @mysql_query($query);
@@ -135,7 +125,7 @@ class Items extends Module
         $prefix = Module::getPrefix($gameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-        $query = "SELECT * FROM {$prefix}_items WHERE item_id = {$itemId} LIMIT 1";
+        $query = "SELECT * FROM items WHERE item_id = {$itemId} AND game_id = '{$prefix}' LIMIT 1";
 
         $rsResult = @mysql_query($query);
         if (mysql_error()) return new returnData(3, NULL, "SQL Error");
@@ -170,9 +160,10 @@ class Items extends Module
         $prefix = Module::getPrefix($gameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-        $query = "INSERT INTO {$prefix}_items 
-            (name, description, icon_media_id, media_id, dropable, destroyable, is_attribute, max_qty_in_inventory, weight, url, type)
-            VALUES ('{$name}', 
+        $query = "INSERT INTO items 
+            (game_id, name, description, icon_media_id, media_id, dropable, destroyable, is_attribute, max_qty_in_inventory, weight, url, type)
+            VALUES ('{$gameId}',
+                    '{$name}', 
                     '{$description}',
                     '{$iconMediaId}', 
                     '{$mediaId}', 
@@ -218,8 +209,8 @@ class Items extends Module
 
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-        $query = "UPDATE {$prefix}_items 
-            SET name = '{$name}', 
+        $query = "UPDATE items 
+                SET name = '{$name}', 
                 description = '{$description}', 
                 icon_media_id = '{$iconMediaId}',
                 media_id = '{$mediaId}', 
@@ -230,7 +221,7 @@ class Items extends Module
                 weight = '{$weight}',
                 url = '{$url}',
                 type = '{$type}'
-                    WHERE item_id = '{$itemId}'";
+                WHERE item_id = '{$itemId}' AND game_id = '{$prefix}'";
 
         NetDebug::trace("updateNpc: Running a query = $query");	
 
@@ -266,7 +257,7 @@ class Items extends Module
         PlayerStateChanges::deletePlayerStateChangesThatRefrenceObject($gameId, 'Item', $itemId);
         Module::removeItemFromAllPlayerInventories($prefix, $itemId );
 
-        $query = "DELETE FROM {$prefix}_items WHERE item_id = {$itemId}";
+        $query = "DELETE FROM items WHERE item_id = {$itemId} AND game_id = '{$prefix}'";
 
         $rsResult = @mysql_query($query);
         if (mysql_error()) return new returnData(3, NULL, "SQL Error");
@@ -315,7 +306,7 @@ class Items extends Module
     public static function getDetailedPlayerAttributes($playerId, $gameId)
     {
         /* ATTRIBUTES */
-        $query = "SELECT DISTINCT i.item_id, i.name, i.description, i.max_qty_in_inventory, i.weight, i.type, i.url, pi.qty, m.file_name as media_url, m.game_id as media_game_id, im.file_name as icon_url, im.game_id as icon_game_id FROM {$gameId}_player_items as pi LEFT JOIN {$gameId}_items as i ON pi.item_id = i.item_id LEFT JOIN media as m ON i.media_id = m.media_id LEFT JOIN media as im ON i.icon_media_id = im.media_id WHERE pi.player_id = {$playerId} AND pi.item_id = i.item_id AND i.type = 'ATTRIB' GROUP BY i.item_id";
+        $query = "SELECT DISTINCT i.item_id, i.name, i.description, i.max_qty_in_inventory, i.weight, i.type, i.url, pi.qty, m.file_name as media_url, m.game_id as media_game_id, im.file_name as icon_url, im.game_id as icon_game_id FROM (SELECT * FROM player_items WHERE game_id = {$gameId}) as pi LEFT JOIN (SELCT * FROM items WHERE game_id = {$gameId}) as i ON pi.item_id = i.item_id LEFT JOIN media as m ON i.media_id = m.media_id LEFT JOIN media as im ON i.icon_media_id = im.media_id WHERE pi.player_id = {$playerId} AND pi.item_id = i.item_id AND i.type = 'ATTRIB' GROUP BY i.item_id";
 
         $result = mysql_query($query);
         $contents = array();
@@ -330,7 +321,7 @@ class Items extends Module
     public static function getDetailedPlayerItems($playerId, $gameId)
     {
         /* OTHER ITEMS */
-        $query = "SELECT DISTINCT i.item_id, i.name, i.description, i.max_qty_in_inventory, i.weight, i.type, i.url, pi.qty, m.file_name as media_url, m.game_id as media_game_id, im.file_name as icon_url, im.game_id as icon_game_id FROM {$gameId}_player_items as pi LEFT JOIN {$gameId}_items as i ON pi.item_id = i.item_id LEFT JOIN media as m ON i.media_id = m.media_id LEFT JOIN media as im ON i.icon_media_id = im.media_id WHERE pi.player_id = {$playerId} AND pi.item_id = i.item_id AND i.type != 'ATTRIB' GROUP BY i.item_id";
+        $query = "SELECT DISTINCT i.item_id, i.name, i.description, i.max_qty_in_inventory, i.weight, i.type, i.url, pi.qty, m.file_name as media_url, m.game_id as media_game_id, im.file_name as icon_url, im.game_id as icon_game_id FROM (SELECT * FROM player_items WHERE game_id={$gameId}) as pi LEFT JOIN (SELECT * FROM items WHERE game_id = {$gameId}) as i ON pi.item_id = i.item_id LEFT JOIN media as m ON i.media_id = m.media_id LEFT JOIN media as im ON i.icon_media_id = im.media_id WHERE pi.player_id = {$playerId} AND pi.item_id = i.item_id AND i.type != 'ATTRIB' GROUP BY i.item_id";
 
         $result = mysql_query($query);
         $contents = array();

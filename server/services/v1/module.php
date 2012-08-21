@@ -195,8 +195,8 @@ abstract class Module
    * Removes the specified item from the user.
    */ 
   protected function removeItemFromAllPlayerInventories($strGamePrefix, $intItemID ) {
-    $query = "DELETE FROM {$strGamePrefix}_player_items 
-      WHERE item_id = $intItemID";
+    $query = "DELETE FROM player_items 
+      WHERE item_id = {$intItemID} AND game_id = '{$strGamePrefix}'";
     $result = @mysql_query($query);
     NetDebug::trace($query . mysql_error());    
   }
@@ -206,8 +206,8 @@ abstract class Module
    */ 
   protected function adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $amountOfAdjustment) {
     //Get any existing record
-    $query = "SELECT * FROM {$strGamePrefix}_player_items 
-      WHERE player_id = $intPlayerID AND item_id = $intItemID LIMIT 1";
+    $query = "SELECT * FROM player_items 
+      WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}' LIMIT 1";
     $result = @mysql_query($query);
     NetDebug::trace($query . mysql_error());
 
@@ -216,17 +216,17 @@ abstract class Module
       $newQty = $existingPlayerItem->qty + $amountOfAdjustment;
       if ($newQty < 1) {
         NetDebug::trace("Adjustment would result in a qty of $newQty so delete the record");
-        $query = "DELETE FROM {$strGamePrefix}_player_items 
-          WHERE player_id = $intPlayerID AND item_id = $intItemID";
+        $query = "DELETE FROM player_items 
+          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}'";
         NetDebug::trace($query);
         @mysql_query($query);
       }
       else {
         //Update the qty
         NetDebug::trace("Updating Qty to $newQty");
-        $query = "UPDATE {$strGamePrefix}_player_items 
+        $query = "UPDATE player_items 
           SET qty = $newQty
-          WHERE player_id = $intPlayerID AND item_id = $intItemID";
+          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}'";
         NetDebug::trace($query);
         @mysql_query($query);
       }
@@ -235,8 +235,8 @@ abstract class Module
       //Create a record
       NetDebug::trace("Creating a new player_item record");
 
-      $query = "INSERT INTO {$strGamePrefix}_player_items 
-        (player_id, item_id, qty) VALUES ($intPlayerID, $intItemID, $amountOfAdjustment)
+      $query = "INSERT INTO player_items 
+        (game_id,player_id, item_id, qty) VALUES ({$strGamePrefix},$intPlayerID, $intItemID, $amountOfAdjustment)
         ON duplicate KEY UPDATE item_id = $intItemID";
       NetDebug::trace($query);
       @mysql_query($query);
@@ -259,9 +259,9 @@ abstract class Module
    */ 
   protected function decrementItemQtyAtLocation($strGamePrefix, $intLocationID, $intQty = 1) {
     //If this location has a null item_qty, decrementing it will still be a null
-    $query = "UPDATE {$strGamePrefix}_locations 
+    $query = "UPDATE locations 
       SET item_qty = item_qty-{$intQty}
-    WHERE location_id = '{$intLocationID}' AND item_qty > 0";
+    WHERE location_id = '{$intLocationID}' AND item_qty > 0 AND game_id = '{$strGamePrefix}'";
     NetDebug::trace($query);	
     @mysql_query($query);    	
   }
@@ -278,8 +278,8 @@ abstract class Module
       COS($floatLat * PI() / 180) * COS(latitude * PI() / 180) * 
       COS(($floatLong - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1609.344
       AS `distance`, location_id 
-      FROM {$strGamePrefix}_locations 
-      WHERE type = 'item' AND type_id = '{$intItemID}'
+      FROM locations 
+      WHERE type = 'item' AND type_id = '{$intItemID}' AND game_id = '{$strGamePrefix}'
       HAVING distance<= {$clumpingRangeInMeters}
     ORDER BY distance ASC"; 	
       $result = @mysql_query($query);
@@ -289,9 +289,9 @@ abstract class Module
       //We have a match
       NetDebug::trace("An item exists nearby, adding to that location");   	
 
-      $query = "UPDATE {$strGamePrefix}_locations
+      $query = "UPDATE locations
         SET item_qty = item_qty + {$intQty}
-      WHERE location_id = {$closestLocationWithinClumpingRange->location_id}";
+      WHERE location_id = {$closestLocationWithinClumpingRange->location_id} AND game_id = '{$strGamePrefix}'";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
     }
@@ -302,8 +302,8 @@ abstract class Module
       $error = 100; //Use 100 meters
       $icon_media_id = $this->getItemIconMediaId($strGamePrefix, $intItemID); //Set the map icon = the item's icon
 
-      $query = "INSERT INTO {$strGamePrefix}_locations (name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
-        VALUES ('{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
+      $query = "INSERT INTO locations (game_id, name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
+        VALUES ('{$strGamePrefix}', '{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
 
@@ -319,7 +319,7 @@ abstract class Module
    */ 
   protected function giveNoteToWorld($strGamePrefix, $noteId, $floatLat, $floatLong) {
 
-    $query = "SELECT * FROM {$strGamePrefix}_locations WHERE type = 'PlayerNote' AND type_id = '{$noteId}'";	
+    $query = "SELECT * FROM locations WHERE type = 'PlayerNote' AND type_id = '{$noteId}' AND game_id = '{$strGamePrefix}'";	
     $result = @mysql_query($query);
     NetDebug::trace($query . ' ' . mysql_error());  
 
@@ -327,9 +327,9 @@ abstract class Module
       //We have a match
       NetDebug::trace("This note has already been placed");   	
 
-      $query = "UPDATE {$strGamePrefix}_locations
+      $query = "UPDATE locations
         SET latitude = '{$floatLat}', longitude = '{$floatLong}'
-        WHERE location_id = {$existingNote->location_id}";
+        WHERE location_id = {$existingNote->location_id} AND game_id = '{$strGamePrefix}'";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
     }
@@ -342,8 +342,8 @@ abstract class Module
       $obj = @mysql_fetch_object($result);
       $title = $obj->title;
 
-      $query = "INSERT INTO {$strGamePrefix}_locations (name, type, type_id, icon_media_id, latitude, longitude, error, item_qty, hidden, force_view, allow_quick_travel)
-        VALUES ('{$title}','PlayerNote','{$noteId}', ".Module::kPLAYER_NOTE_DEFAULT_ICON.", '{$floatLat}','{$floatLong}', '{$error}','1',0,0,0)";
+      $query = "INSERT INTO locations (game_id, name, type, type_id, icon_media_id, latitude, longitude, error, item_qty, hidden, force_view, allow_quick_travel)
+        VALUES ('{$strGamePrefix}', '{$title}','PlayerNote','{$noteId}', ".Module::kPLAYER_NOTE_DEFAULT_ICON.", '{$floatLat}','{$floatLong}', '{$error}','1',0,0,0)";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
 
@@ -386,7 +386,7 @@ abstract class Module
    **/
   protected function recordExists($strPrefix, $strTable, $intRecordID){
     $key = substr($strTable, 0, strlen($strTable)-1);
-    $query = "SELECT * FROM {$strPrefix}_{$strTable} WHERE {$key} = $intRecordID";
+    $query = "SELECT * FROM {$strTable} WHERE {$key} = $intRecordID AND game_id = '{$stPrefix}'";
     $rsResult = @mysql_query($query);
     if (mysql_error()) return FALSE;
     if (mysql_num_rows($rsResult) < 1) return FALSE;
@@ -397,7 +397,7 @@ abstract class Module
    * Looks up an item name
    **/
   protected function getItemName($strPrefix, $intItemID){
-    $query = "SELECT name FROM {$strPrefix}_items WHERE item_id = $intItemID";
+    $query = "SELECT name FROM items WHERE item_id = $intItemID AND game_id = '{$strPrefix}'";
     $rsResult = @mysql_query($query);		
     $row = @mysql_fetch_array($rsResult);	
     return $row['name'];
@@ -407,7 +407,7 @@ abstract class Module
    * Looks up an item icon media id
    **/
   protected function getItemIconMediaId($strPrefix, $intItemID){
-    $query = "SELECT name FROM {$strPrefix}_items WHERE item_id = $intItemID";
+    $query = "SELECT name FROM items WHERE item_id = $intItemID AND game_id = '{$strPrefix}'";
     $rsResult = @mysql_query($query);		
     $row = @mysql_fetch_array($rsResult);	
     return $row['icon_media_id'];
@@ -470,9 +470,9 @@ abstract class Module
     $prefix = Module::getPrefix($gameId);
     if (!$prefix) return FALSE;
 
-    $query = "SELECT qty FROM {$prefix}_player_items 
+    $query = "SELECT qty FROM player_items 
       WHERE player_id = '{$playerId}' 
-      AND item_id = '{$itemId}' LIMIT 1";
+      AND item_id = '{$itemId}' AND game_id = '{$gameId}' LIMIT 1";
 
     $rsResult = @mysql_query($query);
     $playerItem = mysql_fetch_object($rsResult);
@@ -501,13 +501,13 @@ abstract class Module
     if (!$prefix) return false;
 
     if($dblLatitude == "" || $dblLongitude == "" || $dblDistenceInMeters == "") return false; //MySQL Math segment freaks out if there is nothing in them ('0' is ok)
-    $query = "SELECT {$prefix}_items.*
-      FROM player_log, {$prefix}_items
+    $query = "SELECT game_items.*
+      FROM player_log, (SELECT * FROM items WHERE game_id = '{$intGameID}') AS game_items
       WHERE 
       player_log.player_id = '{$intPlayerID}' AND
       player_log.game_id = '{$intGameID}' AND
       player_log.event_type = '". $mediaType ."' AND
-      player_log.event_detail_1 = {$prefix}_items.item_id AND
+      player_log.event_detail_1 = items.item_id AND
       player_log.deleted = 0 AND
 
       (((acos(sin(({$dblLatitude}*pi()/180)) * sin((origin_latitude*pi()/180))+cos(({$dblLatitude}*pi()/180)) * 
@@ -520,13 +520,13 @@ abstract class Module
 
 
     if($mediaType == Module::kLOG_UPLOAD_MEDIA_ITEM)
-      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN ".$intGameID."_locations ON notes.note_id = ".$intGameID."_locations.type_id WHERE owner_id = '{$intPlayerID}'";
+      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN (SELECT * FROM locations WHERE game_id = '{$intGameID}') AS game_locations ON notes.note_id = game_locations.type_id WHERE owner_id = '{$intPlayerID}'";
     else if($mediaType == Module::kLOG_UPLOAD_MEDIA_ITEM_IMAGE)
-      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN ".$intGameID."_locations ON notes.note_id = ".$intGameID."_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='PHOTO'";
+      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN (SELECT * FROM locations WHERE game_id = '{$intGameID}') AS game_locations ON notes.note_id = game_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='PHOTO'";
     else if($mediaType == Module::kLOG_UPLOAD_MEDIA_ITEM_AUDIO)
-      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN ".$intGameID."_locations ON notes.note_id = ".$intGameID."_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='AUDIO'";
+      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN (SELECT * FROM locations WHERE game_id = '{$intGameID}') AS game_locations ON notes.note_id = game_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='AUDIO'";
     else if($mediaType == Module::kLOG_UPLOAD_MEDIA_ITEM_VIDEO)
-      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN ".$intGameID."_locations ON notes.note_id = ".$intGameID."_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='VIDEO'";
+      $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN (SELECT * FROM locations WHERE game_id = '{$intGameID}') AS game_locations ON notes.note_id = game_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='VIDEO'";
     else
       NetDebug::trace("error...");
     $queryappendation = "AND (((acos(sin(({$dblLatitude}*pi()/180)) * sin((".$intGameID."_locations.latitude*pi()/180))+cos(({$dblLatitude}*pi()/180)) * 
@@ -633,8 +633,8 @@ abstract class Module
     $query = "SELECT requirement,
       requirement_detail_1,requirement_detail_2,requirement_detail_3,requirement_detail_4,
       boolean_operator, not_operator
-        FROM {$strPrefix}_requirements 
-        WHERE content_type = '{$strObjectType}' AND content_id = '{$intObjectID}'";
+        FROM requirements 
+        WHERE content_type = '{$strObjectType}' AND content_id = '{$intObjectID}' AND game_id = '{$strPrefix}'";
     $rsRequirments = @mysql_query($query);
 
     $andsMet = FALSE;
@@ -769,12 +769,12 @@ abstract class Module
     $changeMade = FALSE;
 
     //Fetch the state changes
-    $query = "SELECT * FROM {$strPrefix}_player_state_changes 
+    $query = "SELECT * FROM player_state_changes 
       WHERE event_type = '{$strEventType}'
-      AND event_detail = '{$strEventDetail}'";
+      AND event_detail = '{$strEventDetail}' AND game_id = '{$strPrefix}'";
     NetDebug::trace($query);
 
-    if(!$rsStateChanges = @mysql_query($query)) return $changeMade;
+    $rsStateChanges = @mysql_query($query);
 
     while ($stateChange = mysql_fetch_array($rsStateChanges)) {
       NetDebug::trace("State Change Found");
@@ -864,7 +864,7 @@ abstract class Module
       $result = mysql_query($query);
       if(($obj = mysql_fetch_object($result)) && $obj->delete_when_viewed == 1) 
       {
-        $query = "DELETE FROM ".$gameId."_locations WHERE location_id = $eventDetail2";
+        $query = "DELETE FROM locations WHERE location_id = $eventDetail2 AND game_id = '{$gameId}'";
         mysql_query($query);
       }
     }
@@ -889,7 +889,7 @@ abstract class Module
   protected function getUnfinishedQuests($playerId, $gameId)
   {
     //Get all quests for game
-    $query = "SELECT * FROM {$gameId}_quests";
+    $query = "SELECT * FROM quests WHERE game_id = '{$gameId}'";
     $result = mysql_query($query);
     $gameQuests = array();
     while($gameQuest = mysql_fetch_object($result))
