@@ -106,7 +106,6 @@
 - (void) beginWithNPC:(Npc *)aNpc;
 - (void) loadNPCImage:(NSInteger)mediaId;
 - (void) continueScript;
-- (void) fixTextBox;
 - (void) didFinishParsing;
 - (void) applyNPCWithGreeting;
 - (void) applyPlayerOptions;

@@ -61,15 +61,17 @@
         [self.manualCode becomeFirstResponder]; 
 
 	}
+	
+	
 	NSLog(@"QRScannerViewController: Loaded");
 }
-
 -(void)cancelButtonTouch{
     [self.manualCode resignFirstResponder];
     self.navigationItem.rightBarButtonItem = nil;	
-}
 
-- (IBAction) scanButtonTapped {
+}
+- (IBAction) scanButtonTapped
+{
     // ADD: present a barcode reader that scans from the camera feed
     ZBarReaderViewController *reader = [ZBarReaderViewController new];
     reader.readerDelegate = self;
@@ -83,8 +85,9 @@
                    config: ZBAR_CFG_ENABLE
                        to: 0];
     
-    // present the controller
-    [self presentViewController:reader animated:YES completion:nil];
+    // present and release the controller
+    [self presentModalViewController: reader
+                            animated: YES];
 }
 
 - (IBAction)qrScanButtonTouchAction: (id) sender{
@@ -99,14 +102,15 @@
     widController.soundToPlay =
     [NSURL fileURLWithPath:[mainBundle pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
      */
-    [self presentViewController:widController animated:YES completion:nil];
+    [self presentModalViewController:widController animated:YES];
+	 
 }
 
 - (IBAction)imageScanButtonTouchAction: (id) sender{
     NSLog(@"QRScannerViewController: Image Scan Button Pressed");
 	
 	self.imageMatchingImagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-	[self presentViewController:self.imageMatchingImagePickerController animated:YES completion:nil];
+	[self presentModalViewController:self.imageMatchingImagePickerController animated:YES];
     
 }
 
@@ -123,10 +127,12 @@
 	[self loadResult:manualCode.text];
     self.navigationItem.rightBarButtonItem = nil;	
 	return YES;
+	
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{    
+{
+    
     self.navigationItem.rightBarButtonItem = self.cancelButton;	
     return YES;
 }
@@ -135,7 +141,10 @@
 #pragma mark UIImagePickerControllerDelegate Protocol Methods
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary  *)info{
-    [picker dismissViewControllerAnimated:NO completion:nil];
+    
+	//[[picker parentViewController] dismissModalViewControllerAnimated:NO];
+    [RootViewController sharedRootViewController].modalPresent=NO;
+    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
     UIImage* image = [info objectForKey:UIImagePickerControllerEditedImage];
     if (!image) image = [info objectForKey:UIImagePickerControllerOriginalImage];                 
     
@@ -175,21 +184,23 @@
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:NO completion:nil];
+    [RootViewController sharedRootViewController].modalPresent=NO;
+    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
 }
 
 
 #pragma mark -
 #pragma mark ZXingDelegateMethods
 - (void)zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)resultString {
-    [controller dismissViewControllerAnimated:NO completion:nil];
+    [RootViewController sharedRootViewController].modalPresent=NO;
+    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
     NSLog(@"QRScannerViewController: Scan result: %@",resultString);
     [self loadResult:resultString];
 }
 
 - (void)zxingControllerDidCancel:(ZXingWidgetController*)controller {
-    [controller dismissViewControllerAnimated:NO completion:nil];
-}
+    [RootViewController sharedRootViewController].modalPresent=NO;
+    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];}
 
 
 #pragma mark QRCScan delegate methods

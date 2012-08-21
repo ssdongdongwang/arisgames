@@ -129,6 +129,7 @@ class Media extends Module
 	}
 
 
+
 	/**
 	 * Create a media record
 	 * @returns the new mediaID on success
@@ -145,8 +146,8 @@ class Media extends Module
 			return new returnData(4, NULL, "Icons must have a valid Image file extension");
 
 		$query = "INSERT INTO media 
-			(media_id, game_id, name, file_name, is_icon)
-			VALUES ('".Module::findLowestIdFromTable('media','media_id')."','{$intGameID}','{$strName}', '{$strFileName}',{$boolIsIcon})";
+			(game_id, name, file_name, is_icon)
+			VALUES ('{$intGameID}','{$strName}', '{$strFileName}',{$boolIsIcon})";
 
 		NetDebug::trace("Running a query = $query");	
 

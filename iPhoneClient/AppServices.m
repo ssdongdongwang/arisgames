@@ -244,16 +244,8 @@ NSString *const kARISServerServicePackage = @"v1";
                                       andArguments:arguments 
                                       andUserInfo:nil];
 	[jsonConnection performAsynchronousRequestWithHandler:
-     @selector(parseResetAndEmailNewPassword:)]; 
-}
-
--(void)parseResetAndEmailNewPassword:(JSONResult *)jsonResult{
-    if(jsonResult == nil){
-    [[RootViewController sharedRootViewController] showAlert:NSLocalizedString(@"ForgotPasswordTitleKey", nil) message:NSLocalizedString(@"ForgotPasswordMessageKey", nil)];
-    }
-    else{
-    [[RootViewController sharedRootViewController] showAlert:NSLocalizedString(@"ForgotEmailSentTitleKey", @"") message:NSLocalizedString(@"ForgotMessageKey", @"")];
-    }
+     nil]; 
+    
 }
 
 - (void)startOverGame:(int)gameId{
@@ -943,7 +935,7 @@ NSString *const kARISServerServicePackage = @"v1";
     
 	//Update the server with the new Player Location
 	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],
-						  [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
+						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].currentGame.gameId],
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.latitude],
 						  [NSString stringWithFormat:@"%f",[AppModel sharedAppModel].playerLocation.coordinate.longitude],
 						  nil];

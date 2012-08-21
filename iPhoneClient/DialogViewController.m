@@ -79,16 +79,12 @@ NSString *const kDialogHtmlTemplate =
 												 selector:@selector(optionsRecievedFromNotification:)
 													 name:@"ConversationNodeOptionsReady"
 												   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fixTextBox) name:@"MovieForcedRotationToPortrait" object:nil];
     }
 	
     return self;
 }
 
-- (void)fixTextBox {
-    self.textboxSize = 0;
-    [self toggleFullScreenTextMode];
-}
+
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -175,31 +171,23 @@ NSString *const kDialogHtmlTemplate =
 	NSLog(@"DialogViewController: toggleTextSize");
     
     CGRect newTextFrame;
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
     switch(textboxSize){
         case 0:
            //text is off screen, move it on screen
-            if(orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) newTextFrame = CGRectMake(0, 332, 320, 128);
-            else{
-                newTextFrame = CGRectMake(0, 216, 480, 84);
-            }
+           newTextFrame = CGRectMake(0, 332, 320, 128);
             break;
         case 1:
             //textbox is normal size, make it full screen
-            if(orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) newTextFrame = CGRectMake(0, 44, 320, 416);
-            else{
-                newTextFrame = CGRectMake(0, 44, 480, 300);
-            }
+            newTextFrame = CGRectMake(0, 44, 320, 416);
             break;
         case 2:
             //text is full screen, move it off screen
-            if(orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) newTextFrame = CGRectMake(0, 480, 320, 128);
-            else {
-              newTextFrame = CGRectMake(0, 320, 480, 128); 
-            }
+            newTextFrame = CGRectMake(0, 480, 320, 128);
             break;
         default:
             //should never reach here
+            newTextFrame = CGRectMake(0, 332, 320, 128);
             break;
     }
 	[UIView beginAnimations:@"toggleTextSize" context:nil];
@@ -242,8 +230,6 @@ NSString *const kDialogHtmlTemplate =
 }
 -(void)viewDidAppear:(BOOL)animated{
     self.navigationItem.leftBarButtonItem = self.navigationItem.backBarButtonItem;
- //   self.textboxSize = 0;
-  //  [self toggleFullScreenTextMode];
 }
 - (void) viewDidDisappear:(BOOL)animated {
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;

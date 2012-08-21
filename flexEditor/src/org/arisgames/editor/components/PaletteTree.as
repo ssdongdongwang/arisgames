@@ -34,8 +34,6 @@ public class PaletteTree extends Tree
     public function PaletteTree()
     {
         super();
-		editorXOffset = 50;
-		editorWidthOffset = -50;
         this.addEventListener(FlexEvent.CREATION_COMPLETE, onComplete);
     }
 
@@ -109,73 +107,9 @@ public class PaletteTree extends Tree
 		}
 		trace("Just got a single click for '" + evt.currentTarget + "'; Selected Item = '" + this.selectedItem + "'; Selected Data = '" + this.selectedData + "'; Object Name = '" + obj.name + "'");
 		
-		var de:DynamicEvent;
-		//Find Level of folder heirarchy
-		var level:int = 0;
-		var ob:ObjectPaletteItemBO = this.selectedItem as ObjectPaletteItemBO;
-		while(ob.parentContentFolderId != 0)
-		{
-			level++;
-			ob = AppUtils.findParentObjectPaletteItem(ob);
-		}
-		if(evt.stageX > ((level*16)+36) && evt.stageX < ((level*16)+58)) //Reeally awful code to detect whether the icon was clicked or not.
-		{
-			if(this.selectedItem.isFolder())
-			{
-				for(var i:int = 0; i < this.selectedItem.children.length; i++)
-				{
-					if(selectedItem.children[i].isFolder())
-					{
-						this.selectedItem.children[i].isHidden = !this.selectedItem.isHidden;
-						for(var j:int = 0; j < selectedItem.children[i].children.length; j++)
-						{
-							de = new DynamicEvent(AppConstants.DYNAMICEVENT_HIDEOBJECTPALETTEITEM);
-							this.selectedItem.children[i].children[j].isHidden = !this.selectedItem.isHidden;
-							de.objectPaletteItem = this.selectedItem.children[i].children[j];
-							AppDynamicEventManager.getInstance().dispatchEvent(de);	
-						}
-					}
-					else
-					{
-						de = new DynamicEvent(AppConstants.DYNAMICEVENT_HIDEOBJECTPALETTEITEM);
-						this.selectedItem.children[i].isHidden = !this.selectedItem.isHidden;
-						de.objectPaletteItem = this.selectedItem.children[i];
-						AppDynamicEventManager.getInstance().dispatchEvent(de);	
-					}
-				}
-				this.selectedItem.isHidden = !this.selectedItem.isHidden;
-			}
-			else
-			{
-				de = new DynamicEvent(AppConstants.DYNAMICEVENT_HIDEOBJECTPALETTEITEM);
-				this.selectedItem.isHidden = !this.selectedItem.isHidden;
-				de.objectPaletteItem = this.selectedItem;
-				AppDynamicEventManager.getInstance().dispatchEvent(de);	
-			}
-		}
-		else
-		{
-			de = new DynamicEvent(AppConstants.DYNAMICEVENT_HIGHLIGHTOBJECTPALETTEITEM);
-			de.objectPaletteItem = this.selectedItem;
-			AppDynamicEventManager.getInstance().dispatchEvent(de);	
-			
-			//Also, unhide when selected
-			if(this.selectedItem.isHidden)
-			{
-				de = new DynamicEvent(AppConstants.DYNAMICEVENT_HIDEOBJECTPALETTEITEM);
-				this.selectedItem.isHidden = !this.selectedItem.isHidden;
-				de.objectPaletteItem = this.selectedItem;
-				AppDynamicEventManager.getInstance().dispatchEvent(de);
-			}
-			
-			
-		}
-		this.invalidateList();
-		// Validate and update properties
-		// of the Tree and redraw it if necessary.
-		this.validateNow();
-		de = new DynamicEvent(AppConstants.APPLICATIONDYNAMICEVENT_GAMEPLACEMARKSLOADED);
-		AppDynamicEventManager.getInstance().dispatchEvent(de);
+		var de:DynamicEvent = new DynamicEvent(AppConstants.DYNAMICEVENT_HIGHLIGHTOBJECTPALETTEITEM);
+		de.objectPaletteItem = this.selectedItem;
+		AppDynamicEventManager.getInstance().dispatchEvent(de);		
 		
 		//Remove placemark editors...
 		GameModel.getInstance().removeOpenPlaceMarkEditors();	

@@ -130,5 +130,4 @@
 - (void) hideNotifications;
 - (void) dismissNearbyObjectView:(UIViewController *)nearbyObjectViewController;
 - (void) handleOpenURLGamesListReady;
-- (void) showAlert:(NSString *)title message:(NSString *)message;
 @end

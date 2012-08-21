@@ -39,7 +39,6 @@
 -(void)dismissTutorial;
 -(IBAction)playerButtonTouch;
 - (void)refreshViewFromModel;
-- (void) playerMoved;
 - (void)updateOverlays;
 
 

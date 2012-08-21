@@ -60,7 +60,6 @@ public class GameDetailsEditorView extends Panel{
 	[Bindable] public var noteShareToMapCb:mx.controls.CheckBox;
 	[Bindable] public var noteShareToBookCb:mx.controls.CheckBox;
 	[Bindable] public var playerCreateTagsCb:mx.controls.CheckBox;
-	[Bindable] public var allowtradingCb:mx.controls.CheckBox;
 	[Bindable] public var isLocationalCb:mx.controls.CheckBox;
 	[Bindable] public var readyForPublicCb:mx.controls.CheckBox;
 	[Bindable] public var playerCreateCommentsCb:mx.controls.CheckBox;
@@ -132,7 +131,6 @@ public class GameDetailsEditorView extends Panel{
 		noteShareToMapCb.selected = GameModel.getInstance().game.noteShareToMap;
 		noteShareToBookCb.selected = GameModel.getInstance().game.noteShareToBook;
 		playerCreateTagsCb.selected = GameModel.getInstance().game.playerCreateTags;
-		allowtradingCb.selected = GameModel.getInstance().game.allowtrading;
 		isLocationalCb.selected = GameModel.getInstance().game.isLocational;
 		readyForPublicCb.selected = GameModel.getInstance().game.readyForPublic;
 		playerCreateCommentsCb.selected = GameModel.getInstance().game.playerCreateComments;
@@ -423,7 +421,6 @@ public class GameDetailsEditorView extends Panel{
 		GameModel.getInstance().game.noteShareToMap = noteShareToMapCb.selected;
 		GameModel.getInstance().game.noteShareToBook = noteShareToBookCb.selected;
 		GameModel.getInstance().game.playerCreateTags = playerCreateTagsCb.selected;
-		GameModel.getInstance().game.allowtrading = allowtradingCb.selected;
 		GameModel.getInstance().game.isLocational = isLocationalCb.selected;
 		GameModel.getInstance().game.readyForPublic = readyForPublicCb.selected;
 		GameModel.getInstance().game.playerCreateComments = playerCreateCommentsCb.selected;

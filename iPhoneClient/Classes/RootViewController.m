@@ -397,16 +397,14 @@ BOOL isShowingNotification;
     [UIView beginAnimations:nil context:context];
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:YES];
     self.tabBarController.selectedIndex = 0;
+    [self hideNotifications];
     self.tabBarController.view.hidden = YES;
     self.gameSelectionTabBarController.view.hidden = NO;
     self.loginViewNavigationController.view.hidden = YES;
     [UIView commitAnimations];
 }
 
-- (void) showAlert:(NSString *)title message:(NSString *)message {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:NSLocalizedString(@"OkKey", @"") otherButtonTitles: nil];
-    [alert show];
-}
+
 
 - (void) showServerAlertWithEmail:(NSString *)title message:(NSString *)message details:(NSString*)detail{
 	errorMessage = message;
@@ -497,11 +495,22 @@ BOOL isShowingNotification;
 	self.nearbyObjectNavigationController = nearbyObjectNavigationControllerAlloc;
 	self.nearbyObjectNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     
+	//Display
+    //self.tabBarController.view.hidden = YES;
+    
+ //   nearbyObjectViewController.view.frame = tabBarController.view.bounds;
     self.nearbyObjectNavigationController.view.frame = tabBarController.view.bounds;
+//    self.tabBarController.tabBar.hidden = YES;
+    
+  //  [((UINavigationController *)self.tabBarController.selectedViewController) pushViewController:nearbyObjectViewController animated:YES];
+    
     [self.tabBarController.view addSubview: self.nearbyObjectNavigationController.view];
 }
 
 - (void)dismissNearbyObjectView:(UIViewController *)nearbyObjectViewController{
+ //   [((UINavigationController *)self.tabBarController.selectedViewController) popViewControllerAnimated:YES];
+//    tabBarController.tabBar.hidden = NO;
+    
     [self.nearbyObjectNavigationController.view removeFromSuperview];
 }
 

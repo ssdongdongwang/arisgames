@@ -45,9 +45,6 @@
 			<mx:FormItem label="Dropable?" id="dropableFI">
             	<mx:CheckBox id="dropable"/>
             </mx:FormItem>
-			<mx:FormItem label="Tradeable?" id="tradeableFI">
-				<mx:CheckBox id="tradeable"/>
-			</mx:FormItem>
             <mx:FormItem label="Destroyable?" id="destroyableFI">
             	<mx:CheckBox id="destroyable"/>
             </mx:FormItem>   
@@ -62,7 +59,7 @@
 
     <mx:ControlBar id="folderControlBar">
         <mx:Spacer width="100%" id="spacer"/>
-		<mx:Button x="200" y="-20" id="duplicate" label="Duplicate Object" click="duplicateObject(event)"/>
+		<mx:Button x="200" y="-20" id="duplicate" label="Duplicate Item" click="duplicateObject(event)"/>
         <mx:Button id="saveButton" label="Save And Close"/>
     </mx:ControlBar>
 

@@ -75,54 +75,6 @@ abstract class Module
   //constants for note icon id
   const kPLAYER_NOTE_DEFAULT_ICON = '94';
 
-    public function findLowestIdFromTable($tableName, $idColumnName)
-    {
-        $query = "
-        SELECT  $idColumnName
-        FROM    (
-            SELECT  1 AS $idColumnName
-        ) q1
-        WHERE   NOT EXISTS
-        (
-            SELECT  1
-            FROM    $tableName
-            WHERE   $idColumnName = 1
-        )
-        UNION ALL
-        SELECT  *
-        FROM    (
-            SELECT  $idColumnName + 1
-            FROM    $tableName t
-            WHERE   NOT EXISTS
-            (
-                SELECT  1
-                FROM    $tableName ti
-                WHERE   ti.$idColumnName = t.$idColumnName + 1
-            )
-            ORDER BY
-            $idColumnName
-            LIMIT 1
-        ) q2
-        ORDER BY
-        $idColumnName
-        LIMIT 1
-        ";
-        if($result = mysql_query($query))
-        {
-            if($lowestNonUsedId = mysql_fetch_object($result)->media_id)
-                return $lowestNonUsedId;
-        }
-        else
-        {
-            //Just going to use the next auto_increment id...
-            $query = "SELECT MAX($idColumnName) as 'nextAIID' FROM $tableName";
-            $result = mysql_query($query);
-            if($nextAutoIncrementId = mysql_fetch_object($result)->nextAIID)
-                return $nextAutoIncrementId;
-        }
-        return null;
-    }
-
   public function Module()
   {
     $this->conn = @mysql_connect(Config::dbHost, Config::dbUser, Config::dbPass);
@@ -413,7 +365,7 @@ abstract class Module
     return ($miles * 1609.344); //convert to meters
   }
 
-  protected function randomLatLnWithinRadius($originLat, $originLon, $minDistTrueScale, $maxDistTrueScale)
+  protected function randomLatLnWithinRadius($originLat, $originLon, $minDistanceTrueScale, $maxDistTrueScale)
   {
     $radius = ((rand(0,1000)/1000)*($maxDistTrueScale-$minDistTrueScale)) + $minDistTrueScale;
     $xDelt = rand(-1000,1000)/1000;
@@ -907,14 +859,12 @@ abstract class Module
     }
     if($shouldCheckSpawnablesForDeletion)
     {
-        //Module::serverErrorLog("Checking ".$type." ".$eventDetail2);
-      $query = "SELECT * FROM spawnables WHERE game_id = $gameId AND active = 1 AND type = '$type' AND type_id = $eventDetail1 LIMIT 1";
+        Module::serverErrorLog("Checking ".$type." ".$eventDetail2);
+      $query = "SELECT * FROM spawnables WHERE game_id = $gameId AND type = '$type' AND type_id = $eventDetail1 LIMIT 1";
       $result = mysql_query($query);
-      if(($obj = mysql_fetch_object($result)) && $obj->delete_when_viewed == 1 && $obj->active == 1) 
+      if(($obj = mysql_fetch_object($result)) && $obj->delete_when_viewed == 1) 
       {
-        //Module::serverErrorLog("Doin it!");
-        $query = "DELETE ".$gameId."_locations, ".$gameId."_qrcodes FROM ".$gameId."_locations LEFT JOIN ".$gameId."_qrcodes ON ".$gameId."_locations.location_id = ".$gameId."_qrcodes.link_id WHERE location_id = $eventDetail2";
-        //Module::serverErrorLog($query);
+        $query = "DELETE FROM ".$gameId."_locations WHERE location_id = $eventDetail2";
         mysql_query($query);
       }
     }

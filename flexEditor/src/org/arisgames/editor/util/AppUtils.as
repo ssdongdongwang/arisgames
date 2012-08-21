@@ -191,7 +191,6 @@ public class AppUtils
         return res;
     }
 
-	//Literally never used \/ - Phil 8/12
     public static function findGameObjectInFolder(go:ObjectPaletteItemBO, folder:ObjectPaletteItemBO):ObjectPaletteItemBO
     {
         if (ArrayUtil.getItemIndex(go, folder.children.toArray()) != -1)
@@ -234,29 +233,6 @@ public class AppUtils
 		return go;
     }
 	
-	public static function findParentObjectPaletteItem(child:ObjectPaletteItemBO):ObjectPaletteItemBO
-	{
-		if(child.parentContentFolderId == 0) return null;
-		var go:ArrayCollection = GameModel.getInstance().game.gameObjects;
-		return findOPIinListOfChildren(child.parentContentFolderId, go);
-	}
-	
-	public static function findOPIinListOfChildren(id:int, list:ArrayCollection):ObjectPaletteItemBO
-	{
-		for(var i:int = 0; i < list.length; i++)
-		{
-			if((list[i] as ObjectPaletteItemBO).id == id)
-			{
-				return list[i] as ObjectPaletteItemBO;
-			}
-			else if((list[i] as ObjectPaletteItemBO).isFolder())
-			{
-				return findOPIinListOfChildren(id, (list[i] as ObjectPaletteItemBO).children);
-			}
-		}
-		return null;
-	}
-	
 	private static function repairPalleteObjectAssociation(o:ObjectPaletteItemBO, lc:Number, pId:Number):void {
 		if (o.isFolder())
 		{
@@ -267,7 +243,7 @@ public class AppUtils
 				o.previousContentId = lc;
 			}
 			trace("Repairing folder-" + o.name +" ID-" + o.id + " PID-" + o.parentFolderId + " prevID-" + o.previousFolderId);
-			// Take care of the children //<- Phil read this and lol'd 8/21/12
+			// Take care of the children
 			for (var klc:Number = o.children.length - 1; klc >= 0; klc--)
 			{
 				var k:ObjectPaletteItemBO = o.children.getItemAt(klc) as ObjectPaletteItemBO;
@@ -381,7 +357,6 @@ public class AppUtils
             item.iconMediaId = data.icon_media_id;
             item.mediaId = data.media_id;
             item.dropable = data.dropable;
-			item.tradeable = data.tradeable;
             item.destroyable = data.destroyable;
 			item.isAttribute = data.is_attribute;
 			item.maxQty = data.max_qty_in_inventory;
@@ -578,6 +553,8 @@ public class AppUtils
 		}
 	}
 
+	
+	
     public function setMainView(mv:MainView):void
     {
         this.mainView = mv;

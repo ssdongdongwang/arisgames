@@ -12,12 +12,10 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
-import flash.net.URLRequest;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
-
-import mx.messaging.AbstractConsumer;
+import flash.net.URLRequest;
 
 
 public class PlaceMarkerIcon extends Sprite {
@@ -33,16 +31,12 @@ public class PlaceMarkerIcon extends Sprite {
 	private var format:TextFormat;
 	private var ct:ColorTransform;
 	public var isHighlighted:Boolean;
-	public var isHidden:Boolean;
 	public var bmp:Bitmap;
-	
 	
 	public var ldr:Loader;
   
   public function PlaceMarkerIcon(label:String) {
 	  super();
-	  isHighlighted = false;
-	  isHidden = false;
 	  
 	  ldr= new Loader();
 	  ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, handleNewIcon);
@@ -146,15 +140,6 @@ public class PlaceMarkerIcon extends Sprite {
 	  labelMc.textColor = 0xFFFFFF;
   }
   
-  public function hide():void
-  {
-	  this.isHidden = true;
-  }
-  
-  public function unHide():void
-  {
-	  this.isHidden = false;
-  }
   public function select():void {
 	  trace("I'm selected");
 	  ct.color = 0x6D838E;
