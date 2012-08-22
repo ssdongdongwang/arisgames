@@ -309,7 +309,4 @@ class Requirements extends Module
 		return in_array($requirementType, $validTypes);
 	}	
 
-
-
-
 }

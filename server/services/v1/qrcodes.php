@@ -283,10 +283,6 @@ class QRCodes extends Module
 
 	}	
 
-
-
-
-
 	/**
 	 * Create a QR Code
 	 * If no code is provided, a random 4 digit number will be generated
@@ -442,9 +438,5 @@ class QRCodes extends Module
 		$validTypes = QRCodes::lookupContentTypeOptionsFromSQL($intGameId);
 		return in_array($strObjectType, $validTypes);
 	}
-
-
-
-
 
 }

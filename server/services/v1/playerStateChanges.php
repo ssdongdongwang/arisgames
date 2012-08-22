@@ -232,7 +232,7 @@ class PlayerStateChanges extends Module
 		$prefix = Module::getPrefix($intGameID);
 		if (!$prefix) return FALSE;
 
-		$query = "SHOW COLUMNS FROM player_state_changes LIKE 'action' WHERE game_id = {$prefix}";
+		$query = "SHOW COLUMNS FROM player_state_changes LIKE 'action'";
 		$result = mysql_query( $query );
 		$row = mysql_fetch_array( $result , MYSQL_NUM );
 		$regex = "/'(.*?)'/";

@@ -870,7 +870,6 @@ class Games extends Module
       `qty` int(11) NOT NULL default '0',
       `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
       PRIMARY KEY  (`id`),
-      UNIQUE KEY `unique` (`player_id`,`item_id`),
       KEY `player_id` (`player_id`),
       KEY `game_id` (`game_id`),
       KEY `item_id` (`item_id`),
@@ -888,8 +887,7 @@ class Games extends Module
                 code varchar(255) NOT NULL,
                 match_media_id INT( 10 ) UNSIGNED NOT NULL DEFAULT  '0',
                 fail_text varchar(256) NOT NULL DEFAULT \"This code doesn't mean anything right now. You should come back later.\",
-                PRIMARY KEY  (qrcode_id),
-                UNIQUE KEY `code` (`code`)
+                PRIMARY KEY  (qrcode_id)
                   )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
     @mysql_query($query);
     if (mysql_error()) return new returnData(6, NULL, 'cannot create qrcodes table');							
@@ -1065,11 +1063,13 @@ class Games extends Module
       Module::serverErrorLog($row->id);
       $query = "INSERT INTO player_items (player_id, item_id, qty, timestamp) SELECT player_id, item_id, qty, timestamp FROM {$intGameId}_player_items WHERE id = {$row->id}";
       mysql_query($query);
+      Module::serverErrorLog($row->id);
       $newPlayerItemIds[$row->id] = mysql_insert_id();
       $query = "UPDATE player_items SET game_id = '{$intGameId}' WHERE id = {$newPlayerItemIds[$row->id]}";
       mysql_query($query);
       $query = "UPDATE player_items SET item_id = {$newItemIds[$row->item_id]} WHERE game_id = '{$intGameId}' AND id = {$newPlayerItemIds[$row->id]}";
       mysql_query($query);
+  //    if($row->id == 1074) Module::serverErrorLog(print_r($newPlayerItemIds, TRUE));
     }
 
     $newPlayerStateChangesIds = array();
@@ -1108,6 +1108,7 @@ class Games extends Module
       mysql_query($query);
       $query = "UPDATE qrcodes SET link_id = {$newLocationIds[$row->link_id]} WHERE game_id = '{$intGameId}' AND qrcode_id = {$newQrcodeIds[$row->qrcode_id]}";
       mysql_query($query);
+     // Module::serverErrorLog(print_r($newLocationIds, TRUE));
     }
 
     $newQuestIds = array();

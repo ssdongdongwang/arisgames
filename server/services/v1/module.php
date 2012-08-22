@@ -137,9 +137,9 @@ abstract class Module
   /**
    * Adds the specified item to the specified player. Returns the actual number added after concidering item max
    */
-  protected function giveItemToPlayer($strGamePrefix, $intItemID, $intPlayerID, $qtyToGive=1) {
-    $currentQty = Module::itemQtyInPlayerInventory($strGamePrefix, $intPlayerID, $intItemID);
-    $item = Items::getItem($strGamePrefix, $intItemID)->data;
+  protected function giveItemToPlayer($intGameId, $intItemID, $intPlayerID, $qtyToGive=1) {
+    $currentQty = Module::itemQtyInPlayerInventory($intGameId, $intPlayerID, $intItemID);
+    $item = Items::getItem($intGameId, $intItemID)->data;
     $maxQty = $item->max_qty_in_inventory; 
 
     NetDebug::trace("Module: giveItemToPlayer: Player currently has $currentQty - Item max is $maxQty");
@@ -153,7 +153,7 @@ abstract class Module
 
     if ($qtyToGive < 1) return 0;
     else {
-      Module::adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $qtyToGive);
+      Module::adjustQtyForPlayerItem($intGameId, $intItemID, $intPlayerID, $qtyToGive);
       return $qtyToGive;
     }
   }
@@ -161,9 +161,9 @@ abstract class Module
   /**
    * Sets the item count for specified item and player. Returns the actual number added after considering item max
    */
-  protected function setItemCountForPlayer($strGamePrefix, $intItemID, $intPlayerID, $qty) {
-    $currentQty = Module::itemQtyInPlayerInventory($strGamePrefix, $intPlayerID, $intItemID);
-    $item = Items::getItem($strGamePrefix, $intItemID)->data;
+  protected function setItemCountForPlayer($intGameId, $intItemID, $intPlayerID, $qty) {
+    $currentQty = Module::itemQtyInPlayerInventory($intGameId, $intPlayerID, $intItemID);
+    $item = Items::getItem($intGameId, $intItemID)->data;
     $maxQty = $item->max_qty_in_inventory; 
 
     //Module::serverErrorLog("Module: setItemCountForPlayer: Player currently has $currentQty. Setting to $qty.");
@@ -177,7 +177,7 @@ abstract class Module
     if ($qty < 0) return 0;
     else {
       $amountToAdjust = $qty - $currentQty;
-      Module::adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $amountToAdjust);
+      Module::adjustQtyForPlayerItem($intGameId, $intItemID, $intPlayerID, $amountToAdjust);
       //Module::serverErrorLog("Module: setItemCountForPlayer: Player amount of item is being adjusted by $amountToAdjust.");
       return $qty;
     }
@@ -187,16 +187,16 @@ abstract class Module
    * Removes the specified item from the user.
    * Removes the specified item from the user.
    */ 
-  protected function takeItemFromPlayer($strGamePrefix, $intItemID, $intPlayerID, $qtyToTake=1) {
-    Module::adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, -$qtyToTake);
+  protected function takeItemFromPlayer($intGameId, $intItemID, $intPlayerID, $qtyToTake=1) {
+    Module::adjustQtyForPlayerItem($intGameId, $intItemID, $intPlayerID, -$qtyToTake);
   }
 
   /**
    * Removes the specified item from the user.
    */ 
-  protected function removeItemFromAllPlayerInventories($strGamePrefix, $intItemID ) {
+  protected function removeItemFromAllPlayerInventories($intGameId, $intItemID ) {
     $query = "DELETE FROM player_items 
-      WHERE item_id = {$intItemID} AND game_id = '{$strGamePrefix}'";
+      WHERE item_id = {$intItemID} AND game_id = '{$intGameId}'";
     $result = @mysql_query($query);
     NetDebug::trace($query . mysql_error());    
   }
@@ -204,10 +204,10 @@ abstract class Module
   /**
    * Updates the qty a player has of an item 
    */ 
-  protected function adjustQtyForPlayerItem($strGamePrefix, $intItemID, $intPlayerID, $amountOfAdjustment) {
+  protected function adjustQtyForPlayerItem($intGameId, $intItemID, $intPlayerID, $amountOfAdjustment) {
     //Get any existing record
     $query = "SELECT * FROM player_items 
-      WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}' LIMIT 1";
+      WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$intGameId}' LIMIT 1";
     $result = @mysql_query($query);
     NetDebug::trace($query . mysql_error());
 
@@ -217,7 +217,7 @@ abstract class Module
       if ($newQty < 1) {
         NetDebug::trace("Adjustment would result in a qty of $newQty so delete the record");
         $query = "DELETE FROM player_items 
-          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}'";
+          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$intGameId}'";
         NetDebug::trace($query);
         @mysql_query($query);
       }
@@ -226,7 +226,7 @@ abstract class Module
         NetDebug::trace("Updating Qty to $newQty");
         $query = "UPDATE player_items 
           SET qty = $newQty
-          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$strGamePrefix}'";
+          WHERE player_id = $intPlayerID AND item_id = $intItemID AND game_id = '{$intGameId}'";
         NetDebug::trace($query);
         @mysql_query($query);
       }
@@ -236,7 +236,7 @@ abstract class Module
       NetDebug::trace("Creating a new player_item record");
 
       $query = "INSERT INTO player_items 
-        (game_id,player_id, item_id, qty) VALUES ({$strGamePrefix},$intPlayerID, $intItemID, $amountOfAdjustment)
+        (game_id,player_id, item_id, qty) VALUES ({$intGameId},$intPlayerID, $intItemID, $amountOfAdjustment)
         ON duplicate KEY UPDATE item_id = $intItemID";
       NetDebug::trace($query);
       @mysql_query($query);
@@ -248,20 +248,20 @@ abstract class Module
     }
 
     if($amountOfAdjustment > 0)
-      Module::processGameEvent($intPlayerID, $strGamePrefix, Module::kLOG_PICKUP_ITEM, $intItemID, $amountOfAdjustment);
+      Module::processGameEvent($intPlayerID, $intGameId, Module::kLOG_PICKUP_ITEM, $intItemID, $amountOfAdjustment);
     else
-      Module::processGameEvent($intPlayerID, $strGamePrefix, Module::kLOG_DROP_ITEM, $intItemID, -1*$amountOfAdjustment);
+      Module::processGameEvent($intPlayerID, $intGameId, Module::kLOG_DROP_ITEM, $intItemID, -1*$amountOfAdjustment);
   }
 
 
   /**
    * Decrement the item_qty at the specified location by the specified amount, default of 1
    */ 
-  protected function decrementItemQtyAtLocation($strGamePrefix, $intLocationID, $intQty = 1) {
+  protected function decrementItemQtyAtLocation($intGameId, $intLocationID, $intQty = 1) {
     //If this location has a null item_qty, decrementing it will still be a null
     $query = "UPDATE locations 
       SET item_qty = item_qty-{$intQty}
-    WHERE location_id = '{$intLocationID}' AND item_qty > 0 AND game_id = '{$strGamePrefix}'";
+    WHERE location_id = '{$intLocationID}' AND item_qty > 0 AND game_id = '{$intGameId}'";
     NetDebug::trace($query);	
     @mysql_query($query);    	
   }
@@ -270,7 +270,7 @@ abstract class Module
   /**
    * Adds an item to Locations at the specified latitude, longitude
    */ 
-  protected function giveItemToWorld($strGamePrefix, $intItemID, $floatLat, $floatLong, $intQty = 1) {
+  protected function giveItemToWorld($intGameId, $intItemID, $floatLat, $floatLong, $intQty = 1) {
     //Find any items on the map nearby
     $clumpingRangeInMeters = 10;
 
@@ -279,7 +279,7 @@ abstract class Module
       COS(($floatLong - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1609.344
       AS `distance`, location_id 
       FROM locations 
-      WHERE type = 'item' AND type_id = '{$intItemID}' AND game_id = '{$strGamePrefix}'
+      WHERE type = 'item' AND type_id = '{$intItemID}' AND game_id = '{$intGameId}'
       HAVING distance<= {$clumpingRangeInMeters}
     ORDER BY distance ASC"; 	
       $result = @mysql_query($query);
@@ -291,25 +291,25 @@ abstract class Module
 
       $query = "UPDATE locations
         SET item_qty = item_qty + {$intQty}
-      WHERE location_id = {$closestLocationWithinClumpingRange->location_id} AND game_id = '{$strGamePrefix}'";
+      WHERE location_id = {$closestLocationWithinClumpingRange->location_id} AND game_id = '{$intGameId}'";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
     }
     else {
       NetDebug::trace("No item exists nearby, creating a new location");   	
 
-      $itemName = $this->getItemName($strGamePrefix, $intItemID);
+      $itemName = $this->getItemName($intGameId, $intItemID);
       $error = 100; //Use 100 meters
-      $icon_media_id = $this->getItemIconMediaId($strGamePrefix, $intItemID); //Set the map icon = the item's icon
+      $icon_media_id = $this->getItemIconMediaId($intGameId, $intItemID); //Set the map icon = the item's icon
 
       $query = "INSERT INTO locations (game_id, name, type, type_id, icon_media_id, latitude, longitude, error, item_qty)
-        VALUES ('{$strGamePrefix}', '{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
+        VALUES ('{$intGameId}', '{$itemName}','Item','{$intItemID}', '{$icon_media_id}', '{$floatLat}','{$floatLong}', '{$error}','{$intQty}')";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
 
       $newId = mysql_insert_id();
       //Create a coresponding QR Code
-      QRCodes::createQRCode($strGamePrefix, "Location", $newId, '');
+      QRCodes::createQRCode($intGameId, "Location", $newId, '');
     }
   }
 
@@ -317,9 +317,9 @@ abstract class Module
   /**
    * Adds a note to Locations at the specified latitude, longitude
    */ 
-  protected function giveNoteToWorld($strGamePrefix, $noteId, $floatLat, $floatLong) {
+  protected function giveNoteToWorld($intGameId, $noteId, $floatLat, $floatLong) {
 
-    $query = "SELECT * FROM locations WHERE type = 'PlayerNote' AND type_id = '{$noteId}' AND game_id = '{$strGamePrefix}'";	
+    $query = "SELECT * FROM locations WHERE type = 'PlayerNote' AND type_id = '{$noteId}' AND game_id = '{$intGameId}'";	
     $result = @mysql_query($query);
     NetDebug::trace($query . ' ' . mysql_error());  
 
@@ -329,7 +329,7 @@ abstract class Module
 
       $query = "UPDATE locations
         SET latitude = '{$floatLat}', longitude = '{$floatLong}'
-        WHERE location_id = {$existingNote->location_id} AND game_id = '{$strGamePrefix}'";
+        WHERE location_id = {$existingNote->location_id} AND game_id = '{$intGameId}'";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
     }
@@ -343,16 +343,16 @@ abstract class Module
       $title = $obj->title;
 
       $query = "INSERT INTO locations (game_id, name, type, type_id, icon_media_id, latitude, longitude, error, item_qty, hidden, force_view, allow_quick_travel)
-        VALUES ('{$strGamePrefix}', '{$title}','PlayerNote','{$noteId}', ".Module::kPLAYER_NOTE_DEFAULT_ICON.", '{$floatLat}','{$floatLong}', '{$error}','1',0,0,0)";
+        VALUES ('{$intGameId}', '{$title}','PlayerNote','{$noteId}', ".Module::kPLAYER_NOTE_DEFAULT_ICON.", '{$floatLat}','{$floatLong}', '{$error}','1',0,0,0)";
       NetDebug::trace($query . ' ' . mysql_error());  
       @mysql_query($query);
 
       $newId = mysql_insert_id();
       //Create a coresponding QR Code
-      QRCodes::createQRCode($strGamePrefix, "Location", $newId, '');
+      QRCodes::createQRCode($intGameId, "Location", $newId, '');
     }
-    Module::processGameEvent($obj->owner_id, $strGamePrefix, Module::kLOG_UPLOAD_MEDIA_ITEM, $noteId, $floatLat, $floatLong);
-    Module::processGameEvent($obj->owner_id, $strGamePrefix, Module::kLOG_DROP_NOTE, $noteId, $floatLat, $floatLong);
+    Module::processGameEvent($obj->owner_id, $intGameId, Module::kLOG_UPLOAD_MEDIA_ITEM, $noteId, $floatLat, $floatLong);
+    Module::processGameEvent($obj->owner_id, $intGameId, Module::kLOG_DROP_NOTE, $noteId, $floatLat, $floatLong);
   }
 
   protected function metersBetweenLatLngs($lat1, $lon1, $lat2, $lon2) { 
@@ -386,7 +386,7 @@ abstract class Module
    **/
   protected function recordExists($strPrefix, $strTable, $intRecordID){
     $key = substr($strTable, 0, strlen($strTable)-1);
-    $query = "SELECT * FROM {$strTable} WHERE {$key} = $intRecordID AND game_id = '{$stPrefix}'";
+    $query = "SELECT * FROM {$strTable} WHERE {$key} = $intRecordID AND game_id = '{$strPrefix}'";
     $rsResult = @mysql_query($query);
     if (mysql_error()) return FALSE;
     if (mysql_num_rows($rsResult) < 1) return FALSE;
