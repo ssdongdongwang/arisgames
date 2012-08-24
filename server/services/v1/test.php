@@ -10,7 +10,6 @@ class Test extends Module
     for($i = 0; $i < 4000; $i++)
     {
       if(!Module::getPrefix($i)) continue;
-      Module::serverErrorLog("Kiling Orphans: {$i}");
       $result = mysql_query("SELECT * FROM ".$i."_locations LEFT JOIN ".$i."_qrcodes ON ".$i."_locations.location_id = ".$i."_qrcodes.link_id WHERE link_id IS NULL");
       while($table = mysql_fetch_object($result))
         QRCodes::createQRCode($i, 'Location', $table->location_id);
@@ -104,37 +103,68 @@ class Test extends Module
         }
 
         if($row->requirement == "PLAYER_HAS_ITEM" || $row->requirement == "PLAYER_VIEWED_ITEM"){
-          Module::serverErrorLog($row->requirement_detail_1);
+	  if(!$row->requirement_detail_1){
+	    Module::serverErrorLog("Noticed a requirement with no item id in game: {$gid}");	
+	    }
+	  else{
           $result = mysql_query("SELECT * FROM {$gid}_items WHERE item_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}"); 
+          }
         } 
         else if($row->requirement == "PLAYER_VIEWED_NODE"){
+        //  Module::serverErrorLog("Kiling Orphans: {$gid} looking at {$row->requirement_id} with detail_1 of {$row->requirement_detail_1}");
+	  if(!$row->requirement_detail_1){
+         //   Module::serverErrorLog("Noticed a requirement with no node id in game: {$gid}");	
+          }
+	  else{
           $result = mysql_query("SELECT * FROM {$gid}_nodes WHERE node_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+          }
         }
         else if($row->requirement == "PLAYER_VIEWED_NPC"){
+	  if(!$row->requirement_detail_1){
+          //  Module::serverErrorLog("Noticed a requirement with no npc id in game: {$gid}");	
+          }
+	  else{
           $result = mysql_query("SELECT * FROM {$gid}_npcs WHERE npc_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+          }
         }
         else if($row->requirement == "PLAYER_VIEWED_WEBPAGE"){
+          if(!$row->requirement_detail_1){
+	    Module::serverErrorLog("Noticed a requirement with no webpage id in game: {$gid}");	
+	    }
+          else{
           $result = mysql_query("SELECT * FROM web_pages WHERE web_page_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+         }
         }
         else if($row->requirement == "PLAYER_VIEWED_AUGBUBBLE"){
+	  if(!$row->requirement_detail_1){
+	    Module::serverErrorLog("Noticed a requirement with no augbubble id in game: {$gid}");	
+	    }
+          else{
           $result = mysql_query("SELECT * FROM aug_bubbles WHERE aug_bubble_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+          }
         }
-        else if($row->requirement == "PLAYER_HAS_UPLOADED_MEDIA_ITEM" || $row->requirement == "PLAYER_HAS_UPLOADED_MEDIA_ITEM_IMAGE" || $row->requirement == "PLAYER_HAS_UPLOADED_MEDIA_ITEM_AUDIO"  || $row->requirement == "PLAYER_HAS_UPLOADED_MEDIA_ITEM_VIDEO"){
-          $result = mysql_query("SELECT * FROM media WHERE media_id = {$row->requirement_detail_1}");
-          if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
-        }
-        else if($row->requirement == "PLAYER_HAS_COMPLETED_QUEST"){
+       else if($row->requirement == "PLAYER_HAS_COMPLETED_QUEST"){
+	  if(!$row->requirement_detail_1){
+          //  Module::serverErrorLog("Noticed a requirement no quest id in game: {$gid}");	
+          }
+	  else{
           $result = mysql_query("SELECT * FROM {$gid}_quests WHERE quest_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+          }
         }
         else if($row->requirement == "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK"){
+           if(!$row->requirement_detail_1){
+	    Module::serverErrorLog("Noticed a requirement with no webhook id in game: {$gid}");	
+	    }
+          else{
           $result = mysql_query("SELECT * FROM web_hooks WHERE web_hook_id = {$row->requirement_detail_1}");
           if(mysql_num_rows($result) < 1) mysql_query("DELETE FROM {$gid}_requirements WHERE requirement_id = {$row->requirement_id}");
+          }
         } 
       }
       $query = "SELECT * FROM {$gid}_player_items";
