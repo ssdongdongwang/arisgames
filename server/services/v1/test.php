@@ -10,6 +10,7 @@ class Test extends Module
     for($i = 0; $i < 4000; $i++)
     {
       if(!Module::getPrefix($i)) continue;
+      Module::serverErrorLog("Kiling Orphans: {$i}");
       $result = mysql_query("SELECT * FROM ".$i."_locations LEFT JOIN ".$i."_qrcodes ON ".$i."_locations.location_id = ".$i."_qrcodes.link_id WHERE link_id IS NULL");
       while($table = mysql_fetch_object($result))
         QRCodes::createQRCode($i, 'Location', $table->location_id);

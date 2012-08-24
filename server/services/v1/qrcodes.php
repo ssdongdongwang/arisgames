@@ -418,7 +418,7 @@ class QRCodes extends Module
 		if (!$prefix) return FALSE;
 
 		$query = "SHOW COLUMNS FROM qrcodes LIKE 'link_type'";
-		NetDebug::trace($query);
+//		NetDebug::trace($query);
 
 		$result = @mysql_query( $query );
 		$row = @mysql_fetch_array( $result , MYSQL_NUM );
