@@ -662,8 +662,9 @@ class Games extends Module
   {
     $query = "SELECT * FROM games ORDER BY game_id";
     $rs = mysql_query($query);
-    for($i = 0; $i< 4000; $i++) 
+    while ($game = mysql_fetch_object($rs))
     {
+      $i = $game->game_id;
       if($i != 159 && $i != 2625 && $i != 3795 && $i != 344 && $i != 4301 &&  $i != 4305 ){
         NetDebug::trace("Delete Game: {$i}");
         Games::oldDeleteGame($i);
@@ -1060,10 +1061,10 @@ class Games extends Module
     $query = "SELECT * FROM {$intGameId}_player_items";
     $result = mysql_query($query);
     while($row = mysql_fetch_object($result)){
-      Module::serverErrorLog($row->id);
+     // Module::serverErrorLog($row->id);
       $query = "INSERT INTO player_items (player_id, item_id, qty, timestamp) SELECT player_id, item_id, qty, timestamp FROM {$intGameId}_player_items WHERE id = {$row->id}";
       mysql_query($query);
-      Module::serverErrorLog($row->id);
+    //  Module::serverErrorLog($row->id);
       $newPlayerItemIds[$row->id] = mysql_insert_id();
       $query = "UPDATE player_items SET game_id = '{$intGameId}' WHERE id = {$newPlayerItemIds[$row->id]}";
       mysql_query($query);
@@ -1165,17 +1166,24 @@ class Games extends Module
     $query = "SELECT * FROM spawnables WHERE game_id = {$intGameId}";
     $result = mysql_query($query);
     while($row = mysql_fetch_object($result)){
+	Module::serverErrorLog("{$row->location_name} old id: {$row->type_id}");
       if($row->type == "Node"){
         $query = "UPDATE spawnables SET type_id = {$newNodeIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
+        Module::serverErrorLog("Node: {$row->location_name} new id: {$newNodeIds[$row->type_id]}");
+Module::serverErrorLog(print_r($newNodeIds, TRUE));
       }
       else if($row->type == "Item"){
         $query = "UPDATE spawnables SET type_id = {$newItemIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
+        Module::serverErrorLog("Item: {$row->location_name} new id: {$newItemIds[$row->type_id]}");
+Module::serverErrorLog(print_r($newItemIds, TRUE));
       }
       else if($row->type == "Npc"){
         $query = "UPDATE spawnables SET type_id = {$newNpcIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
+        Module::serverErrorLog("Npc: {$row->location_name} new id: {$newNpcIds[$row->type_id]}");
+Module::serverErrorLog(print_r($newNpcIds, TRUE));
       }
     }
 
@@ -1204,7 +1212,7 @@ class Games extends Module
         mysql_query($query);
       }
       else if($row->event_type == "VIEW_QUESTS" || $row->event_type == "COMPLETE_QUEST"){
-        $query = "UPDATE player_log SET event_detail_1 = {$newNpcIds[$row->event_detail_1]} WHERE game_id = '{$intGameId}' AND id = {$row->id}";
+        $query = "UPDATE player_log SET event_detail_1 = {$newQuestIds[$row->event_detail_1]} WHERE game_id = '{$intGameId}' AND id = {$row->id}";
         mysql_query($query);
       }
     }
