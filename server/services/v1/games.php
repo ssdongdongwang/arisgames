@@ -689,7 +689,7 @@ class Games extends Module
       Module::serverErrorLog("Migrating Game ID: {$game->game_id}");
       $newIdsArray = Games::migrateGame($game->game_id);
       Games::updateXMLAfterMigration($newIdsArray, $game->game_id); 
-      Games::oneTimeTableUpdate($newIdsArray);
+      Games::oneTimeTableUpdate($newIdsArray, $game->game_id, $game->on_launch_node_id);
       //Fetch the table names for this game
       //           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}_%'";
       //              NetDebug::trace($query);
@@ -1165,7 +1165,7 @@ class Games extends Module
     return $newIdsArray;
   }
 
-  public function oneTimeTableUpdate($newIdsArray)
+  public function oneTimeTableUpdate($newIdsArray, $intGameId, $onLaunchNodeId)
   {
     $newNodeIds = $newIdsArray[4];
     $newItemIds = $newIdsArray[2];
@@ -1173,12 +1173,12 @@ class Games extends Module
     $newLocationsIds = $newIdsArray[3];
     $newQuestIds = $newIdsArray[10];
 
-    $query = "UPDATE games SET on_launch_node_id = {$newIdsArray[4][$game->on_launch_node_id]} WHERE game_id = {$game->game_id}";
+    $query = "UPDATE games SET on_launch_node_id = {$newNodeIds[$onLaunchNodeId]} WHERE game_id = {$game->game_id}";
     mysql_query($query);
 
     $query = "SELECT * FROM spawnables WHERE game_id = {$intGameId}";
     $result = mysql_query($query);
-    while($row = mysql_fetch_object($result)){
+    while($result && $row = mysql_fetch_object($result)){
       Module::serverErrorLog("{$row->location_name} old id: {$row->type_id}");
       if($row->type == "Node"){
         $query = "UPDATE spawnables SET type_id = {$newNodeIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
@@ -1202,7 +1202,7 @@ class Games extends Module
 
     $query = "SELECT * FROM fountains WHERE game_id = {$intGameId}";
     $result = mysql_query($query);
-    while($row = mysql_fetch_object($result)){
+    while($result && $row = mysql_fetch_object($result)){
       if($row->type == "Location"){
         $query = "UPDATE fountians SET location_id = {$newLocationIds[$row->location_id]} WHERE game_id = '{$intGameId}' AND fountain_id = {$row->fountain_id}";
         mysql_query($query);
@@ -1211,7 +1211,7 @@ class Games extends Module
 
     $query = "SELECT * FROM player_log WHERE game_id = {$intGameId}";
     $result = mysql_query($query);
-    while($row = mysql_fetch_object($result)){
+    while($result && $row = mysql_fetch_object($result)){
       if($row->content_type == "VIEW_NODE"){
         $query = "UPDATE player_log SET event_detail_1 = {$newNodeIds[$row->event_detail_1]} WHERE game_id = '{$intGameId}' AND id = {$row->id}";
         mysql_query($query);
@@ -1815,7 +1815,7 @@ class Games extends Module
 
   public function getRecentGamesForPlayer($intPlayerId, $latitude, $longitude, $boolIncludeDevGames = 1){
     $query = "SELECT player_log.game_id, player_log.timestamp, games.ready_for_public FROM player_log, games WHERE player_log.player_id = '{$intPlayerId}' AND player_log.game_id = games.game_id ORDER BY player_log.timestamp DESC";
-
+	
     $result = mysql_query($query);
 
     $x = 0;
