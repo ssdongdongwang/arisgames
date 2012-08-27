@@ -688,10 +688,8 @@ class Games extends Module
       NetDebug::trace("Migrate Game: {$game->game_id}");
       Module::serverErrorLog("Migrating Game ID: {$game->game_id}");
       $newIdsArray = Games::migrateGame($game->game_id);
-      //  $query = "UPDATE games SET on_launch_node_id = {$newIdsArray[4][$game->on_launch_node_id]} WHERE game_id = {$game->game_id}";
-      // mysql_query($query);
       Games::updateXMLAfterMigration($newIdsArray, $game->game_id); 
-
+      Games::oneTimeTableUpdate($newIdsArray);
       //Fetch the table names for this game
       //           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}_%'";
       //              NetDebug::trace($query);
@@ -1054,23 +1052,23 @@ class Games extends Module
       $query = "UPDATE npc_conversations SET npc_id = {$newNpcIds[$row->npc_id]} WHERE game_id = '{$intGameId}' AND conversation_id = {$newNpcConversationIds[$row->conversation_id]}";
       mysql_query($query);
 
-     // Module::serverErrorLog(print_r($newNodeIds, TRUE));
+      // Module::serverErrorLog(print_r($newNodeIds, TRUE));
     } 
 
     $newPlayerItemIds = array();
     $query = "SELECT * FROM {$intGameId}_player_items";
     $result = mysql_query($query);
     while($row = mysql_fetch_object($result)){
-     // Module::serverErrorLog($row->id);
+      // Module::serverErrorLog($row->id);
       $query = "INSERT INTO player_items (player_id, item_id, qty, timestamp) SELECT player_id, item_id, qty, timestamp FROM {$intGameId}_player_items WHERE id = {$row->id}";
       mysql_query($query);
-    //  Module::serverErrorLog($row->id);
+      //  Module::serverErrorLog($row->id);
       $newPlayerItemIds[$row->id] = mysql_insert_id();
       $query = "UPDATE player_items SET game_id = '{$intGameId}' WHERE id = {$newPlayerItemIds[$row->id]}";
       mysql_query($query);
       $query = "UPDATE player_items SET item_id = {$newItemIds[$row->item_id]} WHERE game_id = '{$intGameId}' AND id = {$newPlayerItemIds[$row->id]}";
       mysql_query($query);
-  //    if($row->id == 1074) Module::serverErrorLog(print_r($newPlayerItemIds, TRUE));
+      //    if($row->id == 1074) Module::serverErrorLog(print_r($newPlayerItemIds, TRUE));
     }
 
     $newPlayerStateChangesIds = array();
@@ -1109,7 +1107,7 @@ class Games extends Module
       mysql_query($query);
       $query = "UPDATE qrcodes SET link_id = {$newLocationIds[$row->link_id]} WHERE game_id = '{$intGameId}' AND qrcode_id = {$newQrcodeIds[$row->qrcode_id]}";
       mysql_query($query);
-     // Module::serverErrorLog(print_r($newLocationIds, TRUE));
+      // Module::serverErrorLog(print_r($newLocationIds, TRUE));
     }
 
     $newQuestIds = array();
@@ -1163,27 +1161,42 @@ class Games extends Module
       }
     }
 
+    $newIdsArray = array($newFolderIds, $newFolderContentIds, $newItemIds, $newLocationIds, $newNodeIds, $newNpcConversationIds, $newNpcIds, $newPlayerItemIds, $newPlayerStateChangesIds, $newQrcodeIds, $newQuestIds, $newRequirementIds);
+    return $newIdsArray;
+  }
+
+  public function oneTimeTableUpdate($newIdsArray)
+  {
+    $newNodeIds = $newIdsArray[4];
+    $newItemIds = $newIdsArray[2];
+    $newNpcIds = $newIdsArray[6];
+    $newLocationsIds = $newIdsArray[3];
+    $newQuestIds = $newIdsArray[10];
+
+    $query = "UPDATE games SET on_launch_node_id = {$newIdsArray[4][$game->on_launch_node_id]} WHERE game_id = {$game->game_id}";
+    mysql_query($query);
+
     $query = "SELECT * FROM spawnables WHERE game_id = {$intGameId}";
     $result = mysql_query($query);
     while($row = mysql_fetch_object($result)){
-	Module::serverErrorLog("{$row->location_name} old id: {$row->type_id}");
+      Module::serverErrorLog("{$row->location_name} old id: {$row->type_id}");
       if($row->type == "Node"){
         $query = "UPDATE spawnables SET type_id = {$newNodeIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
         Module::serverErrorLog("Node: {$row->location_name} new id: {$newNodeIds[$row->type_id]}");
-Module::serverErrorLog(print_r($newNodeIds, TRUE));
+        Module::serverErrorLog(print_r($newNodeIds, TRUE));
       }
       else if($row->type == "Item"){
         $query = "UPDATE spawnables SET type_id = {$newItemIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
         Module::serverErrorLog("Item: {$row->location_name} new id: {$newItemIds[$row->type_id]}");
-Module::serverErrorLog(print_r($newItemIds, TRUE));
+        Module::serverErrorLog(print_r($newItemIds, TRUE));
       }
       else if($row->type == "Npc"){
         $query = "UPDATE spawnables SET type_id = {$newNpcIds[$row->type_id]} WHERE game_id = '{$intGameId}' AND spawnable_id = {$row->spawnable_id}";
         mysql_query($query);
         Module::serverErrorLog("Npc: {$row->location_name} new id: {$newNpcIds[$row->type_id]}");
-Module::serverErrorLog(print_r($newNpcIds, TRUE));
+        Module::serverErrorLog(print_r($newNpcIds, TRUE));
       }
     }
 
@@ -1217,8 +1230,7 @@ Module::serverErrorLog(print_r($newNpcIds, TRUE));
       }
     }
 
-    $newIdsArray = array($newFolderIds, $newFolderContentIds, $newItemIds, $newLocationIds, $newNodeIds, $newNpcConversationIds, $newNpcIds, $newPlayerItemIds, $newPlayerStateChangesIds, $newQrcodeIds, $newQuestIds, $newRequirementIds);
-    return $newIdsArray;
+
   }
 
   public function updateXMLAfterMigration($newIdsArray, $intGameId)    
@@ -1229,9 +1241,9 @@ Module::serverErrorLog(print_r($newNpcIds, TRUE));
     while($row = mysql_fetch_object($result)) {
       if($row->text){
         $inputString = $row->text;
-        if((strspn($inputString,"<>") > 0) && (substr_count($inputString, "<dialog>") > 0) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
           $output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
-	  if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
+          if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
           $output = substr($output,22);
           $updateQuery = "UPDATE nodes SET text = '".addslashes($output)."' WHERE node_id = {$row->node_id} AND game_id = {$intGameId}";
           mysql_query($updateQuery);
@@ -1244,9 +1256,9 @@ Module::serverErrorLog(print_r($newNpcIds, TRUE));
     while($row = mysql_fetch_object($result)) {
       if($row->text){
         $inputString = $row->text;
-        if((strspn($inputString,"<>") > 0) && (substr_count($inputString, "<dialog>") > 0) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){ 
           $output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
-	  if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+          if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
           $output = substr($output,22);
           $updateQuery = "UPDATE npcs SET text = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$intGameId}";
           mysql_query($updateQuery);
@@ -1254,9 +1266,9 @@ Module::serverErrorLog(print_r($newNpcIds, TRUE));
       }
       if($row->closing){
         $inputString = $row->closing;
-        if((strspn($inputString,"<>") > 0) && (substr_count($inputString, "<dialog>") > 0) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
           $output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
-	  if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+          if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
           $output = substr($output,22);
           $updateQuery = "UPDATE npcs SET closing = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$intGameId}";
           mysql_query($updateQuery);
@@ -1315,94 +1327,94 @@ Module::serverErrorLog(print_r($newNpcIds, TRUE));
     return $output;
   }
 
-public function oldDeleteGame($intGameID)
-    {
-        $returnData = new returnData(0, NULL, NULL);
+  public function oldDeleteGame($intGameID)
+  {
+    $returnData = new returnData(0, NULL, NULL);
 
-        $prefix = Module::getPrefix($intGameID);
-        if (!$prefix) return new returnData(1, NULL, "game does not exist");
+    $prefix = Module::getPrefix($intGameID);
+    if (!$prefix) return new returnData(1, NULL, "game does not exist");
 
-        //Delete the files
-        $command = 'rm -rf '. Config::gamedataFSPath . "/{$prefix}";
-        NetDebug::trace("deleteFiles command: $command");		
+    //Delete the files
+    $command = 'rm -rf '. Config::gamedataFSPath . "/{$prefix}";
+    NetDebug::trace("deleteFiles command: $command");		
 
-        exec($command, $output, $return);
-        if ($return) return new returnData(4, NULL, "unable to delete game directory");
+    exec($command, $output, $return);
+    if ($return) return new returnData(4, NULL, "unable to delete game directory");
 
-        //Delete the editor_games record
-        $query = "DELETE FROM game_editors WHERE game_id IN (SELECT game_id FROM games WHERE prefix = '{$prefix}_')";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Delete the editor_games record
+    $query = "DELETE FROM game_editors WHERE game_id IN (SELECT game_id FROM games WHERE prefix = '{$prefix}_')";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Fetch the table names for this game
-        $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$prefix}\_%'";
-        NetDebug::trace($query);
-        $result = mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Fetch the table names for this game
+    $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$prefix}\_%'";
+    NetDebug::trace($query);
+    $result = mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Delete any media records
-        $query = "DELETE FROM media WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Delete any media records
+    $query = "DELETE FROM media WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Delete all tables for this game
-        while ($table = mysql_fetch_array($result)) {
-            $query = "DROP TABLE {$table['TABLE_NAME']}";
-            NetDebug::trace($query);
-            mysql_query($query);
-            if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
-        }
+    //Delete all tables for this game
+    while ($table = mysql_fetch_array($result)) {
+      $query = "DROP TABLE {$table['TABLE_NAME']}";
+      NetDebug::trace($query);
+      mysql_query($query);
+      if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    }
 
-        //Delete the game record
-        $query = "DELETE FROM games WHERE prefix = '{$prefix}_'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Delete the game record
+    $query = "DELETE FROM games WHERE prefix = '{$prefix}_'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Delete Web Pages
-        $query = "DELETE FROM web_pages WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Delete Web Pages
+    $query = "DELETE FROM web_pages WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Delete Aug Bubbles
-        $query = "DELETE FROM aug_bubbles WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
-        //And AugBubble Media
-        $query = "DELETE FROM aug_bubble_media WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //Delete Aug Bubbles
+    $query = "DELETE FROM aug_bubbles WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+    //And AugBubble Media
+    $query = "DELETE FROM aug_bubble_media WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
-        //Delete WebHooks
-        $query = "DELETE FROM web_hooks WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+    //Delete WebHooks
+    $query = "DELETE FROM web_hooks WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
 
-        //Delete Tab Bar information
-        $query = "DELETE FROM game_tab_data WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+    //Delete Tab Bar information
+    $query = "DELETE FROM game_tab_data WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
 
-        //Delete Note stuff
-        $query = "DELETE FROM notes WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
-        //Delete Note Media
-        $query = "DELETE FROM note_content WHERE game_id = '{$intGameID}'";
-        NetDebug::trace($query);
-        @mysql_query($query);
-        if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+    //Delete Note stuff
+    $query = "DELETE FROM notes WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+    //Delete Note Media
+    $query = "DELETE FROM note_content WHERE game_id = '{$intGameID}'";
+    NetDebug::trace($query);
+    @mysql_query($query);
+    if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
 
-        return new returnData(0);	
-    }	
+    return new returnData(0);	
+  }	
 
   /**
    * Delete a new game
@@ -2275,7 +2287,7 @@ public function oldDeleteGame($intGameID)
     while($row = mysql_fetch_object($result)) {
       if($row->text){
         $inputString = $row->text;
-        if((strspn($inputString,"<>") > 0) && !(substr_count($inputString,"<p>"))){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
           $output = Games::replaceXMLIds($inputString, $newNpcIds, $newNodeIds, $newItemIds, $newAugBubbleIds, $newWebPageIds, $newMediaIds);
           $output = substr($output,22);
           $updateQuery = "UPDATE nodes SET text = '".addslashes($output)."' WHERE node_id = {$row->node_id} AND game_id = {$newPrefix}";
@@ -2289,7 +2301,7 @@ public function oldDeleteGame($intGameID)
     while($row = mysql_fetch_object($result)) {
       if($row->text){
         $inputString = $row->text;
-        if((strspn($inputString,"<>") > 0) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
           $output = Games::replaceXMLIds($inputString, $newNpcIds, $newNodeIds, $newItemIds, $newAugBubbleIds, $newWebPageIds, $newMediaIds);
           $output = substr($output,22);
           $updateQuery = "UPDATE npcs SET text = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$newPrefix}";
@@ -2298,7 +2310,7 @@ public function oldDeleteGame($intGameID)
       }
       if($row->closing){
         $inputString = $row->closing;
-        if((strspn($inputString,"<>") > 0) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+        if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
           $output = Games::replaceXMLIds($inputString, $newNpcIds, $newNodeIds, $newItemIds, $newAugBubbleIds, $newWebPageIds, $newMediaIds);
           $output = substr($output,22);
           $updateQuery = "UPDATE npcs SET closing = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$newPrefix}";
