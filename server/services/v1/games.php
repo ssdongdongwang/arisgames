@@ -681,8 +681,6 @@ class Games extends Module
 	 */
 	public function migrateTables()
 	{
-		set_time_limit(120);
-
 		Test::killOrphansBeforeMigration();
 		Games::createNewTablesForMigration();
 		$query = "SELECT * FROM games ORDER BY game_id";
