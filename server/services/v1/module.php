@@ -529,9 +529,9 @@ abstract class Module
       $query = "SELECT * FROM note_content LEFT JOIN notes ON note_content.note_id = notes.note_id LEFT JOIN (SELECT * FROM locations WHERE game_id = '{$intGameID}') AS game_locations ON notes.note_id = game_locations.type_id WHERE owner_id = '{$intPlayerID}' AND note_content.type='VIDEO'";
     else
       NetDebug::trace("error...");
-    $queryappendation = "AND (((acos(sin(({$dblLatitude}*pi()/180)) * sin((".$intGameID."_locations.latitude*pi()/180))+cos(({$dblLatitude}*pi()/180)) * 
-      cos((".$intGameID."_locations.latitude*pi()/180)) * 
-      cos((({$dblLongitude} - ".$intGameID."_locations.longitude)*pi()/180))))*180/pi())*60*1.1515*1.609344*1000) < {$dblDistenceInMeters}";
+    $queryappendation = "AND (((acos(sin(({$dblLatitude}*pi()/180)) * sin((game_locations.latitude*pi()/180))+cos(({$dblLatitude}*pi()/180)) * 
+      cos((game_locations.latitude*pi()/180)) * 
+      cos((({$dblLongitude} - game_locations.longitude)*pi()/180))))*180/pi())*60*1.1515*1.609344*1000) < {$dblDistenceInMeters}";
     $result = mysql_query($query.$queryappendation);
     NetDebug::trace(mysql_num_rows($result)." - ".$qty);
     if (mysql_num_rows($result) >= $qty) return true;

@@ -104,7 +104,7 @@ class Test extends Module
 
         if($row->requirement == "PLAYER_HAS_ITEM" || $row->requirement == "PLAYER_VIEWED_ITEM"){
 	  if(!$row->requirement_detail_1){
-	    Module::serverErrorLog("Noticed a requirement with no item id in game: {$gid}");	
+	    Module::serverErrorLog("Noticed a requirement with no item id in game: {$gid} with requirement id: {$row->requirement_id}");	
 	    }
 	  else{
           $result = mysql_query("SELECT * FROM {$gid}_items WHERE item_id = {$row->requirement_detail_1}");
