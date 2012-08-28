@@ -2,6 +2,7 @@
 require_once("module.php");
 require_once("media.php");
 require_once("quests.php");
+require_once("test.php");
 
 class Games extends Module
 {	
@@ -680,6 +681,7 @@ class Games extends Module
 	 */
 	public function migrateTables()
 	{
+		Test::killOrphansBeforeMigration();
 		Games::createNewTablesForMigration();
 		$query = "SELECT * FROM games ORDER BY game_id";
 		$rs = mysql_query($query);
@@ -1222,6 +1224,41 @@ class Games extends Module
 		}
 
 
+	}
+
+	public function checkXMLBeforeMigration()    
+	{
+		$query = "SELECT * FROM games ORDER BY game_id";
+		$rs = mysql_query($query);
+		while ($game = mysql_fetch_object($rs)) 
+		{
+		$intGameId = $game->game_id;
+		//NOTE: substr removes <?xml version="1.0" ? //> from the beginning of the text
+		$query = "SELECT * FROM {$intGameId}_nodes";
+		$result = mysql_query($query);
+		while($row = mysql_fetch_object($result)) {
+			if($row->text){
+				$inputString = $row->text;
+                     		@$output = simplexml_load_string($inputString);
+					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
+			}
+		}
+
+		$query = "SELECT * FROM {$prefix}_npcs";
+		$result = mysql_query($query);
+		while($row = mysql_fetch_object($result)) {
+			if($row->text){
+				$inputString = $row->text;
+                     		@$output = simplexml_load_string($inputString);
+					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+			}
+			if($row->closing){
+				$inputString = $row->closing;
+                     		@$output = simplexml_load_string($inputString);
+					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
+			}
+		}    
+             }
 	}
 
 	public function updateXMLAfterMigration($newIdsArray, $intGameId)    
