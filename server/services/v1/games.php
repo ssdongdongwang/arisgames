@@ -1255,7 +1255,7 @@ class Games extends Module
 			if($row->closing){
 				$inputString = $row->closing;
                      		@$output = simplexml_load_string($inputString);
-					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
+					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
 			}
 		}    
              }
