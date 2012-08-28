@@ -722,6 +722,9 @@ class Games extends Module
 	public function createNewTablesForMigration()
 	{
 
+		/*
+			CREATE TABLE items ( blah blah) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+		*/
 		//Create the SQL tables
 
 		$query = "CREATE TABLE items (
@@ -741,10 +744,11 @@ class Games extends Module
 				origin_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
 				weight INT UNSIGNED NOT NULL DEFAULT  '0',
 				url TINYTEXT NOT NULL,
-				type ENUM(  'NORMAL',  'ATTRIB',  'URL', 'NOTE') CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  'NORMAL',
+				type ENUM(  'NORMAL',  'ATTRIB',  'URL', 'NOTE') NOT NULL DEFAULT  'NORMAL',
 				tradeable TINYINT(1) NOT NULL DEFAULT 1,
-				PRIMARY KEY  (item_id)
-					)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+				PRIMARY KEY  (item_id),
+				KEY game_id (game_id)
+					)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create items table' . mysql_error());
@@ -758,9 +762,9 @@ class Games extends Module
 			   action_detail int(10) unsigned NOT NULL,
 			   action_amount INT NOT NULL DEFAULT  '1',
 			   PRIMARY KEY  (id),
-			   KEY `action_amount` (`action_amount`),
-			   KEY `event_lookup` (`event_type`,`event_detail`)
-				   )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+			   KEY game_id (game_id),
+			   KEY event_lookup (event_type,event_detail)
+				   )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create player_state_changes table' . mysql_error());
 
@@ -778,8 +782,9 @@ class Games extends Module
 				       requirement_detail_3 VARCHAR(30) NULL,
 				       requirement_detail_4 VARCHAR(30) NULL,
 				       PRIMARY KEY  (requirement_id),
-				       KEY `contentIndex` (  `content_type` ,  `content_id` )
-					       )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+    				       KEY game_id (game_id),
+				       KEY contentIndex (content_type, content_id)
+					       )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create requirments table' . mysql_error());
 
@@ -801,8 +806,10 @@ class Games extends Module
 				    wiggle TINYINT(1) NOT NULL default '0',
 				    show_title TINYINT(1) NOT NULL default '0',
 				    spawnstamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				    PRIMARY KEY  (location_id)
-					    )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+				    PRIMARY KEY  (location_id),
+			            KEY latitude (latitude),
+                                    KEY longitude (longitude)
+					    )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		NetDebug::trace($query);	
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create locations table: ' . mysql_error());
@@ -815,8 +822,9 @@ class Games extends Module
 				 text_when_complete tinytext NOT NULL COMMENT 'This is the txt that displays on the completed quests screen',
 				 icon_media_id int(10) unsigned NOT NULL default '0',
 				 sort_index int(10) unsigned NOT NULL default '0',
-				 PRIMARY KEY  (quest_id)
-					 )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+				 PRIMARY KEY  (quest_id),
+             			 KEY game_id (game_id)
+					 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create quests table');
 
@@ -836,8 +844,9 @@ class Games extends Module
 				require_answer_correct_node_id int(10) unsigned NOT NULL default '0',
 				media_id int(10) unsigned NOT NULL default '0',
 				icon_media_id int(10) unsigned NOT NULL default '0',
-				PRIMARY KEY  (node_id)
-					)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+				PRIMARY KEY  (node_id),
+				KEY game_id (game_id)
+					)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create nodes table');
 
@@ -848,8 +857,11 @@ class Games extends Module
 					game_id INT NOT NULL,
 					text tinytext NOT NULL,
 					sort_index int(10) unsigned NOT NULL default '0',
-					PRIMARY KEY  (conversation_id)
-						)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+					PRIMARY KEY  (conversation_id),
+					KEY game_id (game_id),
+				        KEY npc_id (npc_id),
+					KEY node_id (node_id)
+						)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create conversations table');
 
@@ -862,25 +874,25 @@ class Games extends Module
 			       closing TEXT NOT NULL,
 			       media_id int(10) unsigned NOT NULL default '0',
 			       icon_media_id int(10) unsigned NOT NULL default '0',
-			       PRIMARY KEY  (npc_id)
-				       )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+			       PRIMARY KEY  (npc_id),
+ 			       KEY game_id (game_id)
+				       )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create npcs table');
 
 
 		$query = "CREATE TABLE player_items (
-			`id` int(11) NOT NULL auto_increment,
-			`player_id` int(11) unsigned NOT NULL default '0',
-			`game_id` INT NOT NULL,
-			`item_id` int(11) unsigned NOT NULL default '0',
-			`qty` int(11) NOT NULL default '0',
-			`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
-			PRIMARY KEY  (`id`),
-			KEY `player_id` (`player_id`),
-			KEY `game_id` (`game_id`),
-			KEY `item_id` (`item_id`),
-			KEY `qty` (`qty`)
-				)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+			id int(11) NOT NULL auto_increment,
+			player_id int(11) unsigned NOT NULL default '0',
+			game_id INT NOT NULL,
+			item_id int(11) unsigned NOT NULL default '0',
+			qty int(11) NOT NULL default '0',
+			timestamp timestamp NOT NULL default CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			KEY game_id (game_id),
+			KEY player_id (player_id),
+			KEY item_id (item_id)
+				)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create player_items table');
 
@@ -893,8 +905,11 @@ class Games extends Module
 				  code varchar(255) NOT NULL,
 				  match_media_id INT( 10 ) UNSIGNED NOT NULL DEFAULT  '0',
 				  fail_text varchar(256) NOT NULL DEFAULT \"This code doesn't mean anything right now. You should come back later.\",
-				  PRIMARY KEY  (qrcode_id)
-					  )ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;";
+				  PRIMARY KEY  (qrcode_id),
+ 			          KEY game_id (game_id),
+      	 			  KEY total_link (link_type, link_id),
+				  KEY link_id (link_id)
+					  )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create qrcodes table');							
 
@@ -905,8 +920,11 @@ class Games extends Module
 				  parent_id int(11) NOT NULL default '0',
 				  previous_id int(11) NOT NULL default '0',
 				  is_open ENUM('0','1') NOT NULL DEFAULT  '0',
-				  PRIMARY KEY  (folder_id)
-					  ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+				  PRIMARY KEY  (folder_id),
+				  KEY game_id (game_id),
+   				  KEY parent_id (parent_id),
+			    	  KEY previous_id (previous_id)
+					  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folders table');	
 
@@ -919,8 +937,12 @@ class Games extends Module
 					  content_type enum('Node','Item','Npc','WebPage','AugBubble', 'PlayerNote') collate utf8_unicode_ci NOT NULL default 'Node',
 					  content_id int(10) unsigned NOT NULL default '0',
 					  previous_id int(10) unsigned NOT NULL default '0',
-					  PRIMARY KEY  (object_content_id)
-						  ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+					  PRIMARY KEY  (object_content_id),
+					  KEY game_id (game_id),
+					  KEY content (content_type, content_id),
+            				  KEY folder_id (folder_id),
+				          KEY previous_id (previous_id)
+						  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folder contents table: ' . mysql_error());
 	}
@@ -1275,10 +1297,12 @@ class Games extends Module
 				$inputString = $row->text;
 				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
 					$output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
+					else{
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
 					$output = substr($output,22);
 					$updateQuery = "UPDATE nodes SET text = '".addslashes($output)."' WHERE node_id = {$row->node_id} AND game_id = {$intGameId}";
 					mysql_query($updateQuery);
+					}
 				}
 			}
 		}
@@ -1291,9 +1315,11 @@ class Games extends Module
 				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){ 
 					$output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+					else{
 					$output = substr($output,22);
 					$updateQuery = "UPDATE npcs SET text = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$intGameId}";
 					mysql_query($updateQuery);
+					}
 				}
 			}
 			if($row->closing){
@@ -1301,9 +1327,11 @@ class Games extends Module
 				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
 					$output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+					else{
 					$output = substr($output,22);
 					$updateQuery = "UPDATE npcs SET closing = '".addslashes($output)."' WHERE npc_id = {$row->npc_id} AND game_id = {$intGameId}";
 					mysql_query($updateQuery);
+					}
 				}
 			}
 		}    
