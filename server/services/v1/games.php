@@ -1230,6 +1230,8 @@ class Games extends Module
 
 	public function checkXMLBeforeMigration()    
 	{
+		set_time_limit(30);
+
 		$query = "SELECT * FROM games ORDER BY game_id";
 		$rs = mysql_query($query);
 		while ($game = mysql_fetch_object($rs)) 
