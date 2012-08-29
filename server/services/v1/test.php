@@ -554,7 +554,7 @@ class Test extends Module
 			}
 		}  
 	}
-	public function fixBadQuotes(){
+	public function fixBadQuotes($gid){
 		$query = "SELECT * FROM {$gid}_nodes";
 		$result = mysql_query($query);
 		while($result && $row = mysql_fetch_object($result)) {
