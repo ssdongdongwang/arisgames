@@ -683,7 +683,7 @@ class Games extends Module
 	{
 		set_time_limit(120);
 
-		Test::killOrphansBeforeMigration();
+	//	Test::killOrphansBeforeMigration();
 		Games::createNewTablesForMigration();
 		$query = "SELECT * FROM games ORDER BY game_id";
 		$rs = mysql_query($query);
@@ -961,7 +961,7 @@ class Games extends Module
 		$newItemIds = array();
 		$query = "SELECT * FROM {$intGameId}_items";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result &&  $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO items (name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight, url, type) SELECT name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight, url, type FROM {$intGameId}_items WHERE item_id = {$row->item_id}";
 			mysql_query($query);
 			$newItemIds[$row->item_id] = mysql_insert_id();
@@ -972,7 +972,7 @@ class Games extends Module
 		$newNpcIds = array();
 		$query = "SELECT * FROM {$intGameId}_npcs";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO npcs (name, description, text, closing, media_id, icon_media_id) SELECT name, description, text, closing, media_id, icon_media_id FROM {$intGameId}_npcs WHERE npc_id = {$row->npc_id}";
 			mysql_query($query);
 			$newNpcIds[$row->npc_id] = mysql_insert_id();
@@ -983,7 +983,7 @@ class Games extends Module
 		$newNodeIds = array();
 		$query = "SELECT * FROM {$intGameId}_nodes";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO nodes (title, text, opt1_text, opt1_node_id, opt2_text, opt2_node_id, opt3_text, opt3_node_id, require_answer_incorrect_node_id, require_answer_string, require_answer_correct_node_id, media_id, icon_media_id) SELECT title, text, opt1_text, opt1_node_id, opt2_text, opt2_node_id, opt3_text, opt3_node_id, require_answer_incorrect_node_id, require_answer_string, require_answer_correct_node_id, media_id, icon_media_id FROM {$intGameId}_nodes WHERE node_id = {$row->node_id}";
 			mysql_query($query);
 			$newNodeIds[$row->node_id] = mysql_insert_id();
@@ -994,7 +994,7 @@ class Games extends Module
 		$newFolderContentIds = array();
 		$query = "SELECT * FROM {$intGameId}_folder_contents";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO folder_contents (folder_id, content_type, content_id, previous_id) SELECT folder_id, content_type, content_id, previous_id FROM {$intGameId}_folder_contents WHERE object_content_id = {$row->object_content_id}";
 			mysql_query($query);
 			$newFolderContentIds[$row->object_content_id] = mysql_insert_id();
@@ -1005,7 +1005,7 @@ class Games extends Module
 		$newFolderIds = array();
 		$query = "SELECT * FROM {$intGameId}_folders";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO folders (name, parent_id, previous_id, is_open) SELECT name, parent_id, previous_id, is_open FROM {$intGameId}_folders WHERE folder_id = {$row->folder_id}";
 			mysql_query($query);
 			$newFolderIds[$row->folder_id] = mysql_insert_id();
@@ -1015,7 +1015,7 @@ class Games extends Module
 
 		$query = "SELECT * FROM folder_contents WHERE game_id = {$intGameId}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			if($row->folder_id != 0)
 			{
 				$query = "UPDATE folder_contents SET folder_id = {$newFolderIds[$row->folder_id]} WHERE game_id = '{$intGameId}' AND object_content_id = {$row->object_content_id}";
@@ -1047,7 +1047,7 @@ class Games extends Module
 		$newLocationIds = array();
 		$query = "SELECT * FROM {$intGameId}_locations";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO locations (name, description, latitude, longitude, error, type, type_id, icon_media_id, item_qty, hidden, force_view, allow_quick_travel, wiggle, show_title) SELECT name, description, latitude, longitude, error, type, type_id, icon_media_id, item_qty, hidden, force_view, allow_quick_travel, wiggle, show_title FROM {$intGameId}_locations WHERE location_id = {$row-> location_id}";
 			mysql_query($query);
 			$newLocationIds[$row->location_id] = mysql_insert_id();
@@ -1070,7 +1070,7 @@ class Games extends Module
 		$newNpcConversationIds = array();
 		$query = "SELECT * FROM {$intGameId}_npc_conversations";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO npc_conversations (npc_id, node_id, text, sort_index) SELECT npc_id, node_id, text, sort_index FROM {$intGameId}_npc_conversations WHERE conversation_id = {$row->conversation_id}";
 			mysql_query($query);
 			$newNpcConversationIds[$row->conversation_id] = mysql_insert_id();
@@ -1086,7 +1086,7 @@ class Games extends Module
 		$newPlayerItemIds = array();
 		$query = "SELECT * FROM {$intGameId}_player_items";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO player_items (player_id, item_id, qty, timestamp) SELECT player_id, item_id, qty, timestamp FROM {$intGameId}_player_items WHERE id = {$row->id}";
 			mysql_query($query);
 			$newPlayerItemIds[$row->id] = mysql_insert_id();
@@ -1099,7 +1099,7 @@ class Games extends Module
 		$newPlayerStateChangesIds = array();
 		$query = "SELECT * FROM {$intGameId}_player_state_changes";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO player_state_changes (event_type, event_detail, action, action_detail, action_amount) SELECT event_type, event_detail, action, action_detail, action_amount FROM {$intGameId}_player_state_changes WHERE id = {$row->id}";
 			mysql_query($query);
 			$newPlayerStateChangesIds[$row->id] = mysql_insert_id();
@@ -1124,7 +1124,7 @@ class Games extends Module
 		$newQrcodeIds = array();
 		$query = "SELECT * FROM {$intGameId}_qrcodes";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO qrcodes (link_type, link_id, code, match_media_id) SELECT link_type, link_id, code, match_media_id FROM {$intGameId}_qrcodes WHERE qrcode_id = {$row->qrcode_id}";
 			mysql_query($query);
 			$newQrcodeIds[$row->qrcode_id] = mysql_insert_id();
@@ -1137,7 +1137,7 @@ class Games extends Module
 		$newQuestIds = array();
 		$query = "SELECT * FROM {$intGameId}_quests";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO quests (name, description, text_when_complete, icon_media_id, sort_index) SELECT name, description, text_when_complete, icon_media_id, sort_index FROM {$intGameId}_quests WHERE quest_id = {$row->quest_id}";
 			mysql_query($query);
 			$newQuestIds[$row->quest_id] = mysql_insert_id();
@@ -1148,7 +1148,7 @@ class Games extends Module
 		$newRequirementIds = array();
 		$query = "SELECT * FROM {$intGameId}_requirements";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO requirements (content_type, content_id, requirement, not_operator, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3, requirement_detail_4) SELECT content_type, content_id, requirement, not_operator, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3, requirement_detail_4 FROM {$intGameId}_requirements WHERE requirement_id = {$row->requirement_id}";
 			mysql_query($query);
 			$newRequirementIds[$row->requirement_id] = mysql_insert_id();
@@ -1256,32 +1256,38 @@ class Games extends Module
 
 		$query = "SELECT * FROM games ORDER BY game_id";
 		$rs = mysql_query($query);
-		while ($game = mysql_fetch_object($rs)) 
+		while ($rs &&  $game = mysql_fetch_object($rs)) 
 		{
 		$intGameId = $game->game_id;
 		//NOTE: substr removes <?xml version="1.0" ? //> from the beginning of the text
 		$query = "SELECT * FROM {$intGameId}_nodes";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)) {
+		while($result && $row = mysql_fetch_object($result)) {
 			if($row->text){
 				$inputString = $row->text;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
                      		@$output = simplexml_load_string($inputString);
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
+                                }
 			}
 		}
 
 		$query = "SELECT * FROM {$prefix}_npcs";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)) {
+		while($result && $row = mysql_fetch_object($result)) {
 			if($row->text){
 				$inputString = $row->text;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
                      		@$output = simplexml_load_string($inputString);
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+                              }
 			}
 			if($row->closing){
 				$inputString = $row->closing;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
                      		@$output = simplexml_load_string($inputString);
 					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with npc {$row->npc_id}");
+                          }
 			}
 		}    
              }
@@ -1561,7 +1567,7 @@ class Games extends Module
 		//Delete Note stuff
 		$query = "SELECT * FROM notes WHERE game_id = {$intGameId}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			Notes::deleteNote($row->note_id);
 		}
 
@@ -1570,7 +1576,7 @@ class Games extends Module
 		NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
-
+	
 		//Delete Folders
 		$query = "DELETE FROM folders WHERE game_id = '{$intGameId}'";
 		NetDebug::trace($query);
@@ -1659,7 +1665,7 @@ class Games extends Module
 		//Delete the Overlays
 		$query = "SELECT * FROM overlays WHERE game_id = {$intGameId}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "DELETE FROM overlay_tiles WHERE game_id = '{$intGameId}' AND overlay_id = {$row->overlay_id}";
 			mysql_query($query);
 		}
@@ -2043,21 +2049,21 @@ class Games extends Module
 
 		$query = "SELECT * FROM game_tab_data WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO game_tab_data (game_id, tab, tab_index) VALUES ('{$newPrefix}', '{$row->tab}', '{$row->tab_index}')";
 			mysql_query($query);
 		}
 
 		$query = "SELECT * FROM requirements WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO requirements (game_id, content_type, content_id, requirement, not_operator, boolean_operator, requirement_detail_1, requirement_detail_2, requirement_detail_3, requirement_detail_4) VALUES ('{$newPrefix}', '{$row->content_type}', '{$row->content_id}', '{$row->requirement}', '{$row->not_operator}', '{$row->boolean_operator}', '{$row->requirement_detail_1}', '{$row->requirement_detail_2}', '{$row->requirement_detail_3}', '{$row->requirement_detail_4}')";
 			mysql_query($query);
 		}
 
 		$query = "SELECT * FROM quests WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO quests (game_id, name, description, text_when_complete, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->text_when_complete}', '{$row->icon_media_id}', '{$row->boolean_operator}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2075,7 +2081,7 @@ class Games extends Module
 		$newFolderIds = array();
 		$query = "SELECT * FROM folders WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO folders (game_id, name, parent_id, previous_id, is_open) VALUES ('{$newPrefix}', '{$row->name}', '{$row->parent_id}', '{$row->previous_id}', '{$row->is_open}')";
 			mysql_query($query);
 			$newFolderIds[($row->folder_id)] = mysql_insert_id();
@@ -2083,7 +2089,7 @@ class Games extends Module
 
 		$query = "SELECT * FROM folder_contents WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO folder_contents (game_id, folder_id, content_type, content_id, previous_id) VALUES ('{$newPrefix}', '{$newFolderIds[($row->folder_id)]}', '{$row->content_type}', '{$row->content_id}', '{$row->previous_id}')";
 			mysql_query($query);
 
@@ -2095,20 +2101,20 @@ class Games extends Module
 
 		$query = "SELECT * FROM qrcodes WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO qrcodes (game_id, link_type, link_id, code, match_media_id) VALUES ('{$newPrefix}', '{$row->link_type}', '{$row->link_id}', '{$row->code}', '{$row->match_media_id}')";
 			mysql_query($query);
 		}
 
 		$query = "SELECT * FROM overlays WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO overlays (game_id, sort_order, alpha, num_tiles, game_overlay_id) VALUES ('{$newPrefix}', '{$row->sort_order}', '{$row->alpha}', '{$row->num_tiles}', '{$row->game_overlay_id}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
 			$query = "SELECT * FROM overlay_tiles WHERE overlay_id = '{$row->overlay_id}'";
 			$result = mysql_query($query);
-			while($row = mysql_fetch_object($result)){
+			while($result && $row = mysql_fetch_object($result)){
 				$query = "INSERT INTO overlay_tiles (overlay_id, media_id, zoom, x, x_max, y, y_max) VALUES ('{$newID}', '{$row->media_id}', '{$row->zoom}', '{$row->x}', '{$row->x_max}',  '{$row->y}',  '{$row->y_max}')";
 				mysql_query($query);
 			}
@@ -2116,14 +2122,14 @@ class Games extends Module
 
 		$query = "SELECT * FROM fountains WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO fountains (game_id, type, location_id, spawn_probability, spawn_rate, max_amount, last_spawned, active) VALUES ('{$newPrefix}', '{$row->type}', '{$row->location_id}', '{$row->spawn_probability}', '{$row->spawn_rate}', '{$row->max_amount}', '{$row->last_spawned}', '{$row->active}')";
 			mysql_query($query);
 		}
 
 		$query = "SELECT * FROM spawnables WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO spawnables (game_id, type, type_id, amount, max_area, amount_restriction, location_bound_type, latitude, longitude, spawn_probability, spawn_rate, delete_when_viewed, last_spawned, error_range, force_view, hidden, allow_quick_travel, wiggle, time_to_live, active, location_name, show_title, min_area) VALUES ('{$newPrefix}', '{$row->type}', '{$row->type_id}', '{$row->amount}', '{$row->max_area}', '{$row->amount_restriction}', '{$row->location_bound_type}', '{$row->latitude}', '{$row->longitude}', '{$row->spawn_probability}', '{$row->spawn_rate}', '{$row->delete_when_viewed}', '{$row->last_spawned}', '{$row->error_range}', '{$row->force_view}', '{$row->hidden}', '{$row->allow_quick_travel}', '{$row->wiggle}', '{$row->time_to_live}', '{$row->active}', '{$row->location_name}', '{$row->show_title}', '{$row->min_area}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2134,7 +2140,7 @@ class Games extends Module
 
 		$query = "SELECT * FROM locations WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO locations (game_id, name, description, latitude, longitude, error, type, type_id, icon_media_id, item_qty, hidden, force_view, allow_quick_travel) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->latitude}', '{$row->longitude}', '{$row->error}', '{$row->type}', '{$row->type_id}', '{$row->icon_media_id}', '{$row->item_qty}', '{$row->hidden}', '{$row->force_view}', '{$row->allow_quick_travel}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2151,14 +2157,14 @@ class Games extends Module
 
 		$query = "SELECT * FROM npc_conversations WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO npc_conversations (game_id npc_id, node_id, text, sort_index) VALUES ('{$newPrefix}', '{$row->npc_id}', '{$row->node_id}', '{$row->text}', '{$row->sort_index}')";
 			mysql_query($query);
 		}
 
 		$query = "SELECT * FROM player_state_changes WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO player_state_changes (game_id, event_type, event_detail, action, action_detail, action_amount) VALUES ('{$newPrefix}', '{$row->event_type}', '{$row->event_detail}', '{$row->action}', '{$row->action_detail}', '{$row->action_amount}')";
 			mysql_query($query);
 		}
@@ -2166,7 +2172,7 @@ class Games extends Module
 		$newNpcIds = array();
 		$query = "SELECT * FROM npcs WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 
 			$query = "INSERT INTO npcs (game_id, name, description, text, closing, media_id, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->text}', '{$row->closing}', '{$row->media_id}', '{$row->icon_media_id}')";
 			mysql_query($query);
@@ -2198,7 +2204,7 @@ class Games extends Module
 		$newNodeIds = array();
 		$query = "SELECT * FROM nodes WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO nodes (game_id, title, text, opt1_text, opt1_node_id, opt2_text, opt2_node_id, opt3_text, opt3_node_id, require_answer_incorrect_node_id, require_answer_string, require_answer_correct_node_id, media_id, icon_media_id) VALUES ('{$newPrefix}', '{$row->title}', '{$row->text}', '{$row->opt1_text}', '{$row->opt1_node_id}', '{$row->opt2_text}', '{$row->opt2_node_id}', '{$row->opt3_text}', '{$row->opt3_node_id}', '{$row->require_answer_incorrect_node_id}', '{$row->require_answer_string}', '{$row->require_answer_correct_node_id}', '{$row->media_id}', '{$row->icon_media_id}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2232,7 +2238,7 @@ class Games extends Module
 		$newItemIds = array();
 		$query = "SELECT * FROM items WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO items (game_id, name, description, is_attribute, icon_media_id, media_id, dropable, destroyable, max_qty_in_inventory, creator_player_id, origin_latitude, origin_longitude, origin_timestamp, weight, url, type) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->is_attribute}', '{$row->icon_media_id}', '{$row->media_id}', '{$row->dropable}', '{$row->destroyable}', '{$row->max_qty_in_inventory}', '{$row->creator_player_id}', '{$row->origin_latitude}', '{$row->origin_longitude}', '{$row->origin_timestamp}', '{$row->weight}', '{$row->url}', '{$row->type}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2262,7 +2268,7 @@ class Games extends Module
 
 		$query = "SELECT * FROM aug_bubble_media WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO aug_bubble_media (game_id, aug_bubble_id, media_id, text, index) VALUES ('{$newPrefix}', '{$row->aug_bubble_id}', '{$row->media_id}', '{$row->text}', '{$row->index}')";
 			mysql_query($query);
 		}
@@ -2270,7 +2276,7 @@ class Games extends Module
 		$newAugBubbleIds = array();
 		$query = "SELECT * FROM aug_bubbles WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO aug_bubbles (game_id, name, description, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->icon_media_id}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2289,7 +2295,7 @@ class Games extends Module
 		$newWebPageIds = array();
 		$query = "SELECT * FROM web_pages WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO web_pages (game_id, name, url, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->url}', '{$row->icon_media_id}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2305,7 +2311,7 @@ class Games extends Module
 
 		$query = "SELECT * FROM web_hooks WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO web_hooks (game_id, name, url, incoming) VALUES ('{$newPrefix}', '{$row->name}', '".addSlashes($row->url)."', '{$row->incoming}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
@@ -2317,7 +2323,7 @@ class Games extends Module
 		$newMediaIds = array();
 		$query = "SELECT * FROM media WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
-		while($row = mysql_fetch_object($result)){
+		while($result && $row = mysql_fetch_object($result)){
 			$query = "INSERT INTO media (game_id, name, file_name, is_icon) VALUES ('{$newPrefix}', '{$row->name}', '{$row->file_name}', '{$row->is_icon}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
