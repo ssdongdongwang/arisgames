@@ -554,5 +554,51 @@ class Test extends Module
 			}
 		}  
 	}
+	public function fixBadQuotes(){
+		$query = "SELECT * FROM {$gid}_nodes";
+		$result = mysql_query($query);
+		while($result && $row = mysql_fetch_object($result)) {
+			if($row->text){
+				$inputString = $row->text;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+					@$output = simplexml_load_string($inputString);
+					if($output) {
+						$output = str_replace("\“", "\"", $inputString);
+						$output = str_replace("\”", "\"", $inputString);
+                                                $updateQuery = "UPDATE {$gid}_nodes SET text = '".addslashes($output)."' WHERE node_id = {$row->node_id} AND game_id = {$newPrefix}";
+                                                mysql_query($updateQuery);
+					}
+				}
+			}
+		}
 
+		$query = "SELECT * FROM {$gid}_npcs";
+		$result = mysql_query($query);
+		while($result && $row = mysql_fetch_object($result)) {
+			if($row->text){
+				$inputString = $row->text;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+					@$output = simplexml_load_string($inputString);
+                                        if($output) {
+						$output = str_replace("\“", "\"", $inputString);
+                                                $output = str_replace("\”", "\"", $inputString);
+                                                $updateQuery = "UPDATE {$gid}_npcs SET text = '".addslashes($output)."' WHERE npc_id = {$row->npc_id}";
+                                                mysql_query($updateQuery);
+                                        }
+				}
+			}
+			if($row->closing){
+				$inputString = $row->closing;
+				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
+					@$output = simplexml_load_string($inputString);
+                                        if($output) {
+						$output = str_replace("\“", "\"", $inputString);
+                                                $output = str_replace("\”", "\"", $inputString);
+                                                $updateQuery = "UPDATE {$gid}_npcs SET closing = '".addslashes($output)."' WHERE npc_id = {$row->npc_id}";
+                                                mysql_query($updateQuery);
+                                        }
+				}
+			}
+		}
+	}
 }
