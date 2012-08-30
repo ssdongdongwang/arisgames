@@ -172,7 +172,7 @@ class Locations extends Module
         $query = "SELECT {$prefix}_locations.*,{$prefix}_qrcodes.qrcode_id,{$prefix}_qrcodes.code,{$prefix}_qrcodes.match_media_id, {$prefix}_qrcodes.fail_text, f.active AS is_fountain
             FROM {$prefix}_locations 
             LEFT JOIN {$prefix}_qrcodes
-            ON {$prefix}_qrcodes.link_id = {$prefix}_locations.location_id LEFT JOIN
+            ON {$prefix}_locations.location_id = {$prefix}_qrcodes.link_id LEFT JOIN
             (SELECT location_id, active FROM fountains WHERE game_id = $prefix) AS f
             ON {$prefix}_locations.location_id = f.location_id";
         NetDebug::trace($query);	
@@ -463,7 +463,7 @@ class Locations extends Module
             //Destroy spawnables
             if($spawnable->time_to_live != -1)
             {
-                $query = "DELETE  ".$intGameID."_locations, ".$intGameID."_qrcodes FROM ".$intGameID."_locations LEFT_JOIN ".$intGameID."_qrcodes ON ".$intGameID."_locations.location_id = ".$intGameID."_qrcodes.link_id WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND";
+                $query = "DELETE  ".$intGameID."_locations, ".$intGameID."_qrcodes FROM ".$intGameID."_locations LEFT JOIN ".$intGameID."_qrcodes ON ".$intGameID."_locations.location_id = ".$intGameID."_qrcodes.link_id WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND";
                 mysql_query($query);
             }
 
@@ -478,7 +478,8 @@ class Locations extends Module
                 //Module::serverErrorLog($locobj->delete_when_viewed."<- final  ".$spawnable->delete_when_viewed." ".$spawnable->active);
 
                 //Add it
-                $arrayLocations[] = $locobj;
+                if($locobj->type != 'Item' || ($locobj->item_qty == -1 || $locobj->item_qty > 0))
+                    $arrayLocations[] = $locobj;
             }
         }
 

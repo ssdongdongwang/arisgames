@@ -493,6 +493,7 @@ BOOL isShowingNotification;
 
 
 - (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController {
+    [AppServices sharedAppServices].currentlyInteractingWithObject = YES;
 	UINavigationController *nearbyObjectNavigationControllerAlloc = [[UINavigationController alloc] initWithRootViewController:nearbyObjectViewController];
 	self.nearbyObjectNavigationController = nearbyObjectNavigationControllerAlloc;
 	self.nearbyObjectNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -502,7 +503,9 @@ BOOL isShowingNotification;
 }
 
 - (void)dismissNearbyObjectView:(UIViewController *)nearbyObjectViewController{
+    [AppServices sharedAppServices].currentlyInteractingWithObject = NO;
     [self.nearbyObjectNavigationController.view removeFromSuperview];
+    [[AppServices sharedAppServices] fetchAllPlayerLists];
 }
 
 - (void) returnToHomeView{
@@ -527,7 +530,10 @@ BOOL isShowingNotification;
         Node *launchNode = [[AppModel sharedAppModel] nodeForNodeId:[AppModel sharedAppModel].currentGame.launchNodeId];
         [launchNode display];
     }
-    else NSLog(@"AppDelegate: displayIntroNode: Game did not specify an intro node, skipping");
+    else{
+       NSLog(@"AppDelegate: displayIntroNode: Game did not specify an intro node, skipping");
+        [AppServices sharedAppServices].currentlyInteractingWithObject = NO;
+    }
 }
 
 - (void) showNearbyTab:(BOOL)yesOrNo {

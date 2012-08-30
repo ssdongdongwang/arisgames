@@ -26,6 +26,7 @@ NSString *const kARISServerServicePackage = @"v1";
 @synthesize currentlyFetchingLocationList, currentlyFetchingInventory, currentlyFetchingQuestList, currentlyUpdatingServerWithPlayerLocation,currentlyFetchingGameNoteList,currentlyFetchingPlayerNoteList;
 @synthesize currentlyFetchingOneGame, currentlyFetchingNearbyGamesList, currentlyFetchingPopularGamesList, currentlyFetchingRecentGamesList, currentlyFetchingSearchGamesList;
 @synthesize currentlyUpdatingServerWithMapViewed, currentlyUpdatingServerWithQuestsViewed, currentlyUpdatingServerWithInventoryViewed;
+@synthesize currentlyInteractingWithObject;
 
 + (id)sharedAppServices
 {
@@ -1473,7 +1474,7 @@ NSString *const kARISServerServicePackage = @"v1";
 		return;
 	}
     
-    if (currentlyFetchingLocationList) {
+    if (currentlyFetchingLocationList || currentlyInteractingWithObject) {
         NSLog(@"AppModel: Already fetching location list, skipping");
         return;
     }
@@ -2342,7 +2343,7 @@ NSString *const kARISServerServicePackage = @"v1";
     //if(location.wiggle == nil)  location.wiggle = 0;
     location.deleteWhenViewed = [[locationDictionary valueForKey:@"delete_when_viewed"] intValue];
     
-    if([location.objectType isEqualToString:@"PlayerNote"]){
+    if(location.objectType &&[location.objectType isEqualToString:@"PlayerNote"]){
         Note *note = [[AppModel sharedAppModel]noteForNoteId:location.objectId playerListYesGameListNo:YES];
         if(note)location.allowsQuickTravel = YES;
     }

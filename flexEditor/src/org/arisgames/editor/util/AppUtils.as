@@ -7,6 +7,8 @@ import org.arisgames.editor.MainView;
 import org.arisgames.editor.data.PlaceMark;
 import org.arisgames.editor.data.arisserver.AugBubble;
 import org.arisgames.editor.data.arisserver.AugBubbleMedia;
+import org.arisgames.editor.data.arisserver.CustomMap;
+import org.arisgames.editor.data.arisserver.CustomMapMedia;
 import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Location;
 import org.arisgames.editor.data.arisserver.NPC;
@@ -66,6 +68,8 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE;
+			case AppConstants.CONTENTTYPE_CUSTOMMAP_VAL:
+				return AppConstants.CONTENTTYPE_CUSTOMMAP;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE;
 				
@@ -92,6 +96,8 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE_DATABASE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE;
+			case AppConstants.CONTENTTYPE_CUSTOMMAP_VAL:
+				return AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE;	
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE;
             /*
@@ -127,6 +133,10 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
+			case AppConstants.CONTENTTYPE_CUSTOMMAP:
+				return AppConstants.CONTENTTYPE_CUSTOMMAP_VAL;
+			case AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE:
+				return AppConstants.CONTENTTYPE_CUSTOMMAP_VAL;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
@@ -191,6 +201,7 @@ public class AppUtils
         return res;
     }
 
+	//Literally never used \/ - Phil 8/12
     public static function findGameObjectInFolder(go:ObjectPaletteItemBO, folder:ObjectPaletteItemBO):ObjectPaletteItemBO
     {
         if (ArrayUtil.getItemIndex(go, folder.children.toArray()) != -1)
@@ -233,6 +244,29 @@ public class AppUtils
 		return go;
     }
 	
+	public static function findParentObjectPaletteItem(child:ObjectPaletteItemBO):ObjectPaletteItemBO
+	{
+		if(child.parentContentFolderId == 0) return null;
+		var go:ArrayCollection = GameModel.getInstance().game.gameObjects;
+		return findOPIinListOfChildren(child.parentContentFolderId, go);
+	}
+	
+	public static function findOPIinListOfChildren(id:int, list:ArrayCollection):ObjectPaletteItemBO
+	{
+		for(var i:int = 0; i < list.length; i++)
+		{
+			if((list[i] as ObjectPaletteItemBO).id == id)
+			{
+				return list[i] as ObjectPaletteItemBO;
+			}
+			else if((list[i] as ObjectPaletteItemBO).isFolder())
+			{
+				return findOPIinListOfChildren(id, (list[i] as ObjectPaletteItemBO).children);
+			}
+		}
+		return null;
+	}
+	
 	private static function repairPalleteObjectAssociation(o:ObjectPaletteItemBO, lc:Number, pId:Number):void {
 		if (o.isFolder())
 		{
@@ -243,7 +277,7 @@ public class AppUtils
 				o.previousContentId = lc;
 			}
 			trace("Repairing folder-" + o.name +" ID-" + o.id + " PID-" + o.parentFolderId + " prevID-" + o.previousFolderId);
-			// Take care of the children
+			// Take care of the children //<- Phil read this and lol'd 8/21/12
 			for (var klc:Number = o.children.length - 1; klc >= 0; klc--)
 			{
 				var k:ObjectPaletteItemBO = o.children.getItemAt(klc) as ObjectPaletteItemBO;
@@ -271,7 +305,7 @@ public class AppUtils
         }
     }
 
-    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble, playerNote:PlayerNote):void
+    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble, customMap:CustomMap, playerNote:PlayerNote):void
     {
         //trace("matchDataWithGameObject() called: Looking at Game Object Id '" + obj.id + ".  It's Object Type = '" + obj.objectType + "', while it's Content Id = '" + obj.objectId + "'; Is Folder? " + obj.isFolder() + "");
 
@@ -316,6 +350,13 @@ public class AppUtils
 						obj.augBubble = augBubble;
 					}
 					break;
+				case AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE:
+					if (obj.objectId == customMap.customMapId)
+					{
+						//trace("Just matched Game Object Id " + obj.id + " with augBubble of ID = " + augBubble.augBubbleId);
+						obj.customMap = customMap;
+					}
+					break;
 				case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
 					if (obj.objectId == playerNote.playerNoteId)
 					{
@@ -331,7 +372,7 @@ public class AppUtils
             for (var lc:Number = 0; lc < obj.children.length; lc++)
             {
                 var childObj:ObjectPaletteItemBO = obj.children.getItemAt(lc) as ObjectPaletteItemBO;
-                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble, playerNote);
+                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble, customMap, playerNote);
             }
         }
     }
@@ -357,7 +398,7 @@ public class AppUtils
             item.iconMediaId = data.icon_media_id;
             item.mediaId = data.media_id;
             item.dropable = data.dropable;
-			item.tradeable = data.tradeable;
+			item.tradeable = data.tradeable == "1" ? true : false;
             item.destroyable = data.destroyable;
 			item.isAttribute = data.is_attribute;
 			item.maxQty = data.max_qty_in_inventory;
@@ -441,6 +482,31 @@ public class AppUtils
 		else
 		{
 			trace("Data passed in was not an Aug Bubble Result set, returning NULL.");
+			return null;
+		}
+	}
+	
+	public static function parseResultDataIntoCustomMap(data:Object):CustomMap
+	{
+		if (data.hasOwnProperty("game_overlay_id"))
+		{
+			trace("retObj has a overlay_id!  It's value = '" + data.overlay_id + "'.");
+			var customMap:CustomMap = new CustomMap();
+			
+			//customMap.media = new ArrayCollection();
+			//for(var x:Number = 0; x < data.media.length; x++){
+			//	customMap.media.addItem(new CustomMapMedia(data.media[x].media_id, data.media[x].text, data.media[x].index));
+			//}
+			customMap.customMapId = data.game_overlay_id;
+			customMap.name = data.name;
+			customMap.description = data.description;
+			customMap.iconMediaId = data.icon_media_id;
+			
+			return customMap;
+		}
+		else
+		{
+			trace("Data passed in was not a Custom Map Result set, returning NULL.");
 			return null;
 		}
 	}
@@ -554,8 +620,6 @@ public class AppUtils
 		}
 	}
 
-	
-	
     public function setMainView(mv:MainView):void
     {
         this.mainView = mv;

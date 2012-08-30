@@ -18,7 +18,9 @@ public class PlaceMark
 	public var errorText:String;
     public var quantity:Number;
     public var errorRange:Number;
-    public var hidden:Boolean = false;
+	public var hidden:Boolean = false; //data
+	public var isHidden:Boolean = false; //visually
+	public var highlighted:Boolean = false;
     public var forcedView:Boolean = false;
 	public var quickTravel:Boolean = false;	
 	public var wiggle:Boolean = false;	
@@ -47,9 +49,7 @@ public class PlaceMark
 		for (var i:Number = 0; i < 4; i++){
 			qrCode += alphabet[Math.floor(Math.random() * alphabet.length)];
 		}
-		
 		quantity = 1;
-
     }
 
     public function getContentTypeForPublicDisplayAsString():String

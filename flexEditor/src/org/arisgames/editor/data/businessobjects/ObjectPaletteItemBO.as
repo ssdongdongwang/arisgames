@@ -3,6 +3,7 @@ package org.arisgames.editor.data.businessobjects
 import mx.collections.ArrayCollection;
 
 import org.arisgames.editor.data.arisserver.AugBubble;
+import org.arisgames.editor.data.arisserver.CustomMap;
 import org.arisgames.editor.data.arisserver.Item;
 import org.arisgames.editor.data.arisserver.Media;
 import org.arisgames.editor.data.arisserver.NPC;
@@ -25,6 +26,7 @@ public class ObjectPaletteItemBO
     public var media:Media;
 	public var alignMedia:Media;
 	public var isSpawnable:Boolean;
+	public var isHidden:Boolean = false;
 	
     // Relationship Display Information
     //public var children:ObjectPaletteItemChildrenArray;
@@ -46,6 +48,7 @@ public class ObjectPaletteItemBO
     public var page:Node;
 	public var webPage:WebPage;
 	public var augBubble:AugBubble;
+	public var customMap:CustomMap;
 	public var playerNote:PlayerNote;
 
 
@@ -56,6 +59,7 @@ public class ObjectPaletteItemBO
     public function ObjectPaletteItemBO(isFolder:Boolean)
     {
         super();
+		this.isHidden = false;
         if (isFolder)
         {
 			//children = new ObjectPaletteItemChildrenArray(this);
@@ -70,11 +74,13 @@ public class ObjectPaletteItemBO
             return false;
         }
         return true;
-    }
-
-
+    }	
+	
     public function get iconPath():Object
     {
+		if(this.isHidden)
+			return IconUtility.getClass("http://dev.arisgames.org/server/gamedata/0/hidden.png", 20, 20);
+
         if (!isFolder() && iconMedia != null)
         {
             var url:String = iconMedia.urlPath + iconMedia.fileName;
@@ -82,7 +88,7 @@ public class ObjectPaletteItemBO
             return IconUtility.getClass(url, 20, 20);
         }
         trace("iconMedia is null, so returning NULL for iconPath.");
-        return null;
+		return null;
     }
 
     public function set iconPath(value:Object):void
