@@ -722,9 +722,6 @@ class Games extends Module
 	public function createNewTablesForMigration()
 	{
 
-		/*
-			CREATE TABLE items ( blah blah) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-		*/
 		//Create the SQL tables
 
 		$query = "CREATE TABLE items (
@@ -762,8 +759,7 @@ class Games extends Module
 			   action_detail int(10) unsigned NOT NULL,
 			   action_amount INT NOT NULL DEFAULT  '1',
 			   PRIMARY KEY  (id),
-			   KEY game_id (game_id),
-			   KEY event_lookup (event_type,event_detail)
+			   KEY game_event_lookup (game_id, event_type, event_detail)
 				   )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create player_state_changes table' . mysql_error());
@@ -782,8 +778,7 @@ class Games extends Module
 				       requirement_detail_3 VARCHAR(30) NULL,
 				       requirement_detail_4 VARCHAR(30) NULL,
 				       PRIMARY KEY  (requirement_id),
-    				       KEY game_id (game_id),
-				       KEY contentIndex (content_type, content_id)
+				       KEY game_content_index (game_id, content_type, content_id)
 					       )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create requirments table' . mysql_error());
@@ -807,8 +802,8 @@ class Games extends Module
 				    show_title TINYINT(1) NOT NULL default '0',
 				    spawnstamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				    PRIMARY KEY  (location_id),
-			            KEY latitude (latitude),
-                                    KEY longitude (longitude)
+			            KEY game_latitude (game_id, latitude),
+                                    KEY game_longitude (game_id, longitude)
 					    )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		NetDebug::trace($query);	
 		@mysql_query($query);
@@ -858,9 +853,8 @@ class Games extends Module
 					text tinytext NOT NULL,
 					sort_index int(10) unsigned NOT NULL default '0',
 					PRIMARY KEY  (conversation_id),
-					KEY game_id (game_id),
-				        KEY npc_id (npc_id),
-					KEY node_id (node_id)
+					KEY game_npc_node (game_id, npc_id, node_id),
+					KEY game_node (game_id, node_id)
 						)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create conversations table');
@@ -889,9 +883,7 @@ class Games extends Module
 			qty int(11) NOT NULL default '0',
 			timestamp timestamp NOT NULL default CURRENT_TIMESTAMP,
 			PRIMARY KEY  (id),
-			KEY game_id (game_id),
-			KEY player_id (player_id),
-			KEY item_id (item_id)
+			KEY game_player_item (game_id, player_id, item_id)
 				)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create player_items table');
@@ -906,9 +898,7 @@ class Games extends Module
 				  match_media_id INT( 10 ) UNSIGNED NOT NULL DEFAULT  '0',
 				  fail_text varchar(256) NOT NULL DEFAULT \"This code doesn't mean anything right now. You should come back later.\",
 				  PRIMARY KEY  (qrcode_id),
- 			          KEY game_id (game_id),
-      	 			  KEY total_link (link_type, link_id),
-				  KEY link_id (link_id)
+ 			          KEY game_link_id (game_id, link_type, link_id)
 					  )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create qrcodes table');							
@@ -921,9 +911,8 @@ class Games extends Module
 				  previous_id int(11) NOT NULL default '0',
 				  is_open ENUM('0','1') NOT NULL DEFAULT  '0',
 				  PRIMARY KEY  (folder_id),
-				  KEY game_id (game_id),
-   				  KEY parent_id (parent_id),
-			    	  KEY previous_id (previous_id)
+				  KEY game_parent (game_id, parent_id),
+			    	  KEY game_previous (game_id, previous_id)
 					  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folders table');	
@@ -938,12 +927,35 @@ class Games extends Module
 					  content_id int(10) unsigned NOT NULL default '0',
 					  previous_id int(10) unsigned NOT NULL default '0',
 					  PRIMARY KEY  (object_content_id),
-					  KEY game_id (game_id),
-					  KEY content (content_type, content_id),
-            				  KEY folder_id (folder_id),
-				          KEY previous_id (previous_id)
+					  KEY game_content (game_id, content_type, content_id),
+            				  KEY game_folder (game_id, folder_id),
+				          KEY game_previous (game_id, previous_id)
 						  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
+		mysql_query("ALTER TABLE aug_bubble_media ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE aug_bubbles ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE editors ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE fountains ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE game_comments ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE game_editors ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE game_tab_data ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE game_tags ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE games ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE groups ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE media ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE note_content ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE note_likes ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE note_tags ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE notes ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE overlay_tiles ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE overlays ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE player_group ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE player_log ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE players ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE spawnables ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE web_hooks ENGINE = InnoDB;");
+                mysql_query("ALTER TABLE web_pages ENGINE = InnoDB;");
+
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folder contents table: ' . mysql_error());
 	}
 
