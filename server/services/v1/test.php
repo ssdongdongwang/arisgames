@@ -445,28 +445,62 @@ class Test extends Module
 		while($resultMain && $row = mysql_fetch_object($resultMain)){ 
 			if(!$row->requirement_detail_1){
 				if($row->requirement == "PLAYER_HAS_ITEM" || $row->requirement == "PLAYER_VIEWED_ITEM"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which item the player needs to have/have viewed.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which item the player needs to have/have viewed.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+				            Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which item the player needs to have/have viewed.\n");	
+                                        }
 					if(!$row->requirement_detail_2 && $row->requirement == "Player_HAS_ITEM"){
-						Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that requires the player has a certain item, but not the quantity of that item needed.\n");	
+						if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that requires the player has a certain item, but not the quantity of that item needed.\n");	
+						else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+				            Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that requires that the player has a certain item, but not the quantity of that item neeeded.\n");	
+}
 					}
 				} 
 				else if($row->requirement == "PLAYER_VIEWED_NODE"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which node the player needed to view in order to satisfy that requirement.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which node the player needed to view in order to satisfy that requirement.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+						Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of  {$scriptTitle} that doesn't specify which node the player needed to view in order to satisfy that requirement.\n");	
+}
 				}
 				else if($row->requirement == "PLAYER_VIEWED_NPC"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which character the player needed to view in order to satisfy that requirement.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which character the player needed to view in order to satisfy that requirement.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which character the player needed to view in order to satisfy that requirement.\n");	
+}
 				}
 				else if($row->requirement == "PLAYER_VIEWED_WEBPAGE"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which web page the player needed to view in order to satisfy that requirement.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which web page the player needed to view in order to satisfy that requirement.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which web page the player needed to view in order to satisfy that requirement.\n");	
+}
+
 				}
 				else if($row->requirement == "PLAYER_VIEWED_AUGBUBBLE"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which panoramic the player needed to view in order to satisfy that requirement.\n");
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which panoramic the player needed to view in order to satisfy that requirement.\n");
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which panoramic the player needed to view in order to satisfy that requirement.\n");
+}
 				}
 				else if($row->requirement == "PLAYER_HAS_COMPLETED_QUEST"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which quest the player needed to complete in order to satisfy that requirement.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which quest the player needed to complete in order to satisfy that requirement.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which quest the player needed to complete in order to satisfy that requirement.\n");	
+}
 				}
 				else if($row->requirement == "PLAYER_HAS_RECEIVED_INCOMING_WEB_HOOK"){
-					Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which incoming web hook the player needed to receive in order to satisfy that requirement.\n");	
+					if(!($row->content_type == "Node")) Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with id: {$row->content_id} that doesn't specify which incoming web hook the player needed to receive in order to satisfy that requirement.\n");	
+					else{
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->content_id}");
+Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with the title of {$scriptTitle} that doesn't specify which incoming web hook the player needed to receive in order to satisfy that requirement.\n");	
+}
+
 				} 
 			}
 		}
@@ -483,10 +517,12 @@ class Test extends Module
 			}
 			else if($row->event_type == "VIEW_NODE"){
 				if(!$row->action_detail){
-					Module::serverErrorLog("\nThere is a node of id: {$row->event_detail} that doesn't specify what item to give or take when viewed.\n");	
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->event_detail}");
+					Module::serverErrorLog("\nThere is a node with the title of {$scriptTitle} that doesn't specify what item to give or take when viewed.\n");	
 				}
 				if(!$row->action_amount){
-					Module::serverErrorLog("\nThere is a node of id: {$row->event_detail} that doesn't specify what quantity of an item to give or take when viewed.\n");	
+                                            $scriptTitle = mysql_query("SELECT title FROM {$gid}_nodes WHERE node_id = {$row->event_detail}");
+					Module::serverErrorLog("\nThere is a node with the title of {$scriptTitle} that doesn't specify what quantity of an item to give or take when viewed.\n");	
 				}
 			}
 			else if($row->event_type == "VIEW_NPC"){
