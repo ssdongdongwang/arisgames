@@ -1303,8 +1303,8 @@ class Games extends Module
 				$inputString = $row->text;
 				if((strspn($inputString,"<>") > 0) && ((substr_count($inputString, "<npc>") > 0) || (substr_count($inputString, "<pc>") > 0) || (substr_count($inputString, "<dialog>") > 0)) && !(substr_count($inputString,"<p>") > 0) && !(substr_count($inputString,"<b>") > 0) && !(substr_count($inputString,"<i>") > 0) && !(substr_count($inputString,"<img") > 0) && !(substr_count($inputString,"<table>") > 0)){
 					$output = Games::replaceXMLIdsForMigration($inputString, $newIdsArray);
+                                 	if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
 					else{
-					if(!$output) Module::serverErrorLog("Problem with game {$intGameId} with node {$row->node_id}");
 					$output = substr($output,22);
 					$updateQuery = "UPDATE nodes SET text = '".addslashes($output)."' WHERE node_id = {$row->node_id} AND game_id = {$intGameId}";
 					mysql_query($updateQuery);
