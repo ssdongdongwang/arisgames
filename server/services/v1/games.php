@@ -698,18 +698,18 @@ class Games extends Module
 
 			Games::oneTimeTableUpdate($newIdsArray, $game->game_id, $game->on_launch_node_id);
 			//Fetch the table names for this game
-			//           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}_%'";
-			//              NetDebug::trace($query);
-			//              $result = mysql_query($query);
-			//              if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+			           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}_%'";
+			              NetDebug::trace($query);
+			              $result = mysql_query($query);
+			              if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 
 			//Delete all tables for this game
-			//                 while ($table = mysql_fetch_array($result)) {
-			//                  $query = "DROP TABLE {$table['TABLE_NAME']}";
-			//                 NetDebug::trace($query);
-			//                  mysql_query($query);
-			//                 if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
-			//                 }
+			                 while ($table = mysql_fetch_array($result)) {
+			                  $query = "DROP TABLE {$table['TABLE_NAME']}";
+			                 NetDebug::trace($query);
+			                 mysql_query($query);
+			                 if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+			                 }
 		}
 
 		return 0;

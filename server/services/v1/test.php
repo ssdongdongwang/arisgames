@@ -590,7 +590,10 @@ Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with 
 			}
 		}  
 	}
-	public function fixBadQuotes($gid){
+	public function fixBadQuotes(){
+		$gameResult = mysql_query("SELECT * FROM games");
+		while($gameResult && $game = mysql_fetch_object($gameResult)){
+		$gid = $game->game_id;
 		$query = "SELECT * FROM {$gid}_nodes";
 		$result = mysql_query($query);
 		while($result && $row = mysql_fetch_object($result)) {
@@ -635,6 +638,7 @@ Module::serverErrorLog("\nThere is a requirement of a {$row->content_type} with 
                                         }
 				}
 			}
+                   }
 		}
 	}
 }
