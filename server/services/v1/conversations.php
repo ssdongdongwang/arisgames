@@ -89,6 +89,9 @@ class Conversations extends Module
 		$nodeText = addslashes($nodeText);
 		$prefix = Module::getPrefix($gameId);
 
+                $nodeText = str_replace("“", "\"", $nodeText);
+                $nodeText = str_replace("”", "\"", $nodeText);
+
 		$query = "INSERT INTO nodes (game_id, text)
 			VALUES ('{$prefix}','{$conversationText}')";
 		NetDebug::trace("createNode: Running a query = $query");	

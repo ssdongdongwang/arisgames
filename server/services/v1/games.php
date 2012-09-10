@@ -33,7 +33,6 @@ class Games extends Module
 		if (!$game) return new returnData(2, NULL, "invalid game id");
 
 		return new returnData(0, $game);
-
 	}
 
 	/**
@@ -92,13 +91,8 @@ class Games extends Module
 		$gameObj = new stdClass;
 		$gameObj = Games::getFullGameObject($intGameId, $intPlayerId, $boolGetLocationalInfo, $intSkipAtDistance, $latitude, $longitude);
 		if($gameObj != NULL)
-		{
-			NetDebug::trace("Select");
 			$games[] = $gameObj;
-		}
-
 		return new returnData(0, $games, NULL);
-
 	}	
 
 
@@ -180,7 +174,6 @@ class Games extends Module
 		$query = "SELECT * FROM games WHERE game_id = '{$intGameId}'";
 		$result = mysql_query($query);
 		$gameObj = mysql_fetch_object($result);
-
 		//Check if Game Has Been Played
 		$query = "SELECT * FROM player_log WHERE game_id = '{$intGameId}' AND player_id = '{$intPlayerId}' AND deleted = 0 LIMIT 1";
 		$result = mysql_query($query);
@@ -190,7 +183,6 @@ class Games extends Module
 		else{
 			$gameObj->has_been_played = false;
 		}
-
 		//Get Locational Stuff
 		if($boolGetLocationalInfo){
 			if($gameObj->is_locational == true){
@@ -206,7 +198,6 @@ class Games extends Module
 				$gameObj->distance = 0;
 			}
 		}
-
 		//Get Quest Stuff
 		//$questsReturnData = Quests::getQuestsForPlayer($intGameId, $intPlayerId);
 		//$gameObj->totalQuests = $questsReturnData->data->totalQuests;
@@ -223,7 +214,6 @@ class Games extends Module
 			$editorsString .= ', ' . $editor['name'];
 		}
 		$gameObj->editors = $editorsString;
-
 		//Get Num Players
 		$query = "SELECT * FROM players
 			WHERE last_game_id = {$intGameId}";
@@ -232,10 +222,12 @@ class Games extends Module
 
 		//Get the media URLs
 		//NetDebug::trace("Fetch Media for game_id='{$intGameId}' media_id='{$gameObj->icon_media_id}'");	
+
 		//Icon
 		$icon_media_data = Media::getMediaObject($intGameId, $gameObj->icon_media_id);
 		$icon_media = $icon_media_data->data; 
 		$gameObj->icon_media_url = $icon_media->url_path . $icon_media->file_name;
+
 		//Media
 		$media_data = Media::getMediaObject($intGameId, $gameObj->media_id);
 		$media = $media_data->data; 
@@ -268,10 +260,8 @@ class Games extends Module
 		//Calculate score
 		$gameObj->calculatedScore = ($gameObj->rating - 3) * $x;
 		$gameObj->numComments = $x;
-
 		return $gameObj;
 	}
-
 
 	/**
 	 * Fetch the games an editor may edit
@@ -287,24 +277,17 @@ class Games extends Module
 			NetDebug::trace("getGames: User is super admin, load all games");
 			$query = "SELECT * FROM games";
 			NetDebug::trace($query);
-
 		}
 		else {
 			NetDebug::trace("getGames: User is NOT a super admin");
-
 			$query = "SELECT g.* from games g, game_editors ge 
 				WHERE g.game_id = ge.game_id AND ge.editor_id = '$intEditorID'";
-
 			NetDebug::trace($query);
 		}
-
 		$rs = @mysql_query($query);
 		if (mysql_error())  return new returnData(3, NULL, 'SQL error');
-
 		return new returnData(0, $rs, NULL);		
-
 	}
-
 
 	/**
 	 * Create a new game
@@ -323,7 +306,6 @@ class Games extends Module
 		NetDebug::trace($query);
 		if (mysql_num_rows($result = mysql_query($query)) > 0) 
 			return new returnData(4, mysql_fetch_object($result)->game_id, 'duplicate name');
-
 
 		//Create the game record in SQL
 		$query = "INSERT INTO games (name, description, pc_media_id, icon_media_id, media_id,
@@ -345,11 +327,11 @@ class Games extends Module
 		@mysql_query($query);
 		if (mysql_error())  return new returnData(6, NULL, 'cannot update game record');
 
-
 		//Make the creator an editor of the game
 		$query = "INSERT INTO game_editors (game_id,editor_id) VALUES ('{$newGameID}','{$intEditorID}')";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create game_editors record');
+
 
 		$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'QUESTS', '1')";
 		@mysql_query($query);
@@ -378,7 +360,6 @@ class Games extends Module
 		return new returnData(0, $newGameID, NULL);
 	}
 
-
 	/**
 	 * Updates a game's information
 	 * @returns true if a record was updated, false otherwise
@@ -386,11 +367,10 @@ class Games extends Module
 	public function updateGame($intGameId, $strName, $strDescription, $intPCMediaID, $intIconMediaID, $intMediaID,
 			$boolIsLocational, $boolReadyForPublic,
 			$boolShareToMap, $boolShareToBook, $playerCreateTag, $playerCreateComments, $playerLikeNotes,
-			$intIntroNodeId, $intCompleteNodeId, $intInventoryCap)
+			$intIntroNodeId, $intCompleteNodeId, $intInventoryCap, $boolAllowTrading = true)
 	{
 		$strName = addslashes($strName);	
 		$strDescription = addslashes($strDescription);
-
 		$query = "UPDATE games 
 			SET 
 			name = '{$strName}',
@@ -407,7 +387,8 @@ class Games extends Module
 			     ready_for_public = '{$boolReadyForPublic}',
 			     on_launch_node_id = '{$intIntroNodeId}',
 			     game_complete_node_id = '{$intCompleteNodeId}',
-			     inventory_weight_cap = '{$intInventoryCap}'
+			     inventory_weight_cap = '{$intInventoryCap}',
+			     allow_trading = '{$boolAllowTrading}'
 				     WHERE game_id = {$intGameId}";
 		mysql_query($query);
 		if (mysql_error()) return new returnData(3, false, "SQL Error: " . mysql_error());
@@ -416,14 +397,12 @@ class Games extends Module
 		else return new returnData(0, FALSE);		
 	}		
 
-
 	/**
 	 * Updates a game's Player Character Media
 	 * @returns true if a record was updated, false otherwise
 	 */	
 	public function setPCMediaID($intGameId, $intPCMediaID)
 	{
-
 		$query = "UPDATE games 
 			SET pc_media_id = '{$intPCMediaID}'
 			WHERE game_id = {$intGameId}";
@@ -433,7 +412,6 @@ class Games extends Module
 		if (mysql_affected_rows()) return new returnData(0, TRUE);
 		else return new returnData(0, FALSE);		
 	}			
-
 
 	/**
 	 * Updates all game databases using upgradeGameDatabase
@@ -591,21 +569,14 @@ class Games extends Module
 	}
 
 
-
 	/**
 	 * Updates a game's database to the most current version
 	 */	
 	public function upgradeGameDatabase($intGameId)
 	{	
 		set_time_limit(30);
-
 		Module::serverErrorLog("Upgrade Game $intGameId");
-
 		$prefix = Module::getPrefix($intGameId);                
-
-		$query = "ALTER TABLE ".$prefix."_locations ADD COLUMN spawnstamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error());  
 
 		$query = "ALTER TABLE ".$prefix."_locations ADD COLUMN wiggle TINYINT(1) NOT NULL DEFAULT 0";
 		mysql_query($query);
@@ -695,10 +666,9 @@ class Games extends Module
 			Games::updateXMLAfterMigration($newIdsArray, $game->game_id); 
 
 			//IMPORTANT RECOMMENT IN BELOW LINES
-
 			Games::oneTimeTableUpdate($newIdsArray, $game->game_id, $game->on_launch_node_id);
 			//Fetch the table names for this game
-			           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}_%'";
+			           $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" . Config::dbSchema . "' AND TABLE_NAME LIKE '{$game->game_id}\_%'";
 			              NetDebug::trace($query);
 			              $result = mysql_query($query);
 			              if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
@@ -711,7 +681,6 @@ class Games extends Module
 			                 if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 			                 }
 		}
-
 		return 0;
 	}
 
@@ -721,9 +690,7 @@ class Games extends Module
 	 */
 	public function createNewTablesForMigration()
 	{
-
 		//Create the SQL tables
-
 		$query = "CREATE TABLE items (
 			item_id int(11) unsigned NOT NULL auto_increment,
 				game_id INT NOT NULL,
@@ -874,7 +841,6 @@ class Games extends Module
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create npcs table');
 
-
 		$query = "CREATE TABLE player_items (
 			id int(11) NOT NULL auto_increment,
 			player_id int(11) unsigned NOT NULL default '0',
@@ -887,7 +853,6 @@ class Games extends Module
 				)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create player_items table');
-
 
 		$query = "CREATE TABLE qrcodes (
 			qrcode_id int(11) NOT NULL auto_increment,
@@ -916,8 +881,6 @@ class Games extends Module
 					  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create folders table');	
-
-
 
 		$query = "CREATE TABLE folder_contents (
 			object_content_id int(10) unsigned NOT NULL auto_increment,
@@ -1258,14 +1221,11 @@ class Games extends Module
 				mysql_query($query);
 			}
 		}
-
-
 	}
 
 	public function checkXMLBeforeMigration()    
 	{
 		set_time_limit(30);
-
 		$query = "SELECT * FROM games ORDER BY game_id";
 		$rs = mysql_query($query);
 		while ($rs &&  $game = mysql_fetch_object($rs)) 
@@ -1363,12 +1323,10 @@ class Games extends Module
 		$kTagPlaque = "plaque";
 		$kTagItem = "item";
 		$kTagId = "id";
-
 		//& sign will break xml parser, so this is necessary
 		$inputString = str_replace("&", "&#x26;", $inputString);
 
 		@$xml = simplexml_load_string($inputString);
-
 		if(!$xml) return false; 
 
 		foreach($xml->attributes() as $attributeTitle => $attributeValue)
@@ -1376,16 +1334,13 @@ class Games extends Module
 			if(strcmp($attributeTitle, $kTagExitToPlaque) == 0){
 				$xml[$attributeTitle] = Games::getNewId($attributeValue, $newIdsArray[4]);
 			}
-
 			else if(strcmp($attributeTitle, $kTagExitToCharacter) == 0){
 				$xml[$attributeTitle] = Games::getNewId($attributeValue, $newIdsArray[6]);
 			}
-
 			else if(strcmp($attributeTitle, $kTagExitToItem) == 0){
 				$xml[$attributeTitle] = Games::getNewId($attributeValue, $newIdsArray[2]);
 			}
 		}
-
 
 		foreach($xml->children() as $child)
 		{
@@ -1478,6 +1433,7 @@ class Games extends Module
 		NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
+
 		//And AugBubble Media
 		$query = "DELETE FROM aug_bubble_media WHERE game_id = '{$intGameID}'";
 		NetDebug::trace($query);
@@ -1501,6 +1457,7 @@ class Games extends Module
 		NetDebug::trace($query);
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+
 		//Delete Note Media
 		$query = "DELETE FROM note_content WHERE game_id = '{$intGameID}'";
 		NetDebug::trace($query);
@@ -1681,7 +1638,6 @@ class Games extends Module
 			$query = "DELETE FROM overlay_tiles WHERE game_id = '{$intGameId}' AND overlay_id = {$row->overlay_id}";
 			mysql_query($query);
 		}
-
 		$query = "DELETE FROM overlays WHERE game_id = '{$intGameId}'";
 		mysql_query($query);
 
@@ -1707,7 +1663,6 @@ class Games extends Module
 		return new returnData(0, $rsResult);
 	}
 
-
 	/**
 	 * Retrieve editors of a specifc game
 	 *
@@ -1720,7 +1675,6 @@ class Games extends Module
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
 		return new returnData(0, $rsResult);
 	}
-
 
 	/**
 	 * Add an editor to a game
@@ -1766,7 +1720,6 @@ class Games extends Module
 		else return new returnData(0, FALSE);
 	}
 
-
 	/**
 	 * Saves a user comment on a game from client
 	 * @param integer $intPlayerId The player identifier
@@ -1775,7 +1728,6 @@ class Games extends Module
 	 * @param String $comment The user's comment
 	 * @return void
 	 */
-
 	public function saveComment($intPlayerId, $intGameId, $intRating, $comment) {
 		$query = "SELECT * FROM game_comments WHERE game_id = '{$intGameId}' AND player_id = '{$intPlayerId}'";
 		$result = mysql_query($query);
@@ -1785,9 +1737,7 @@ class Games extends Module
 
 		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
 		else return new returnData(0);
-
 	}
-
 
 	/**
 	 * Gets a lightweight game list to populate map on client- ONLY RETURNS GAMES MARKED 'is_locational'
@@ -1796,14 +1746,12 @@ class Games extends Module
 	 * @param 1:Include games in development 0:restrict list to polished games
 	 * @returns gameId, rating, and lat/lon location.
 	 */
-
 	public function getGamesWithLocations($latitude, $longitude, $boolIncludeDevGames = 0) {
 		$games = array();
 
 		if($boolIncludeDevGames) $query = "SELECT game_id, name FROM games WHERE is_locational = 1";
 		else $query = "SELECT game_id, name FROM games WHERE ready_for_public = 1 AND is_locational = 1";
 		$idResult = mysql_query($query);
-
 
 		while($gameId = mysql_fetch_assoc($idResult)){
 			$game = new stdClass;
@@ -1812,7 +1760,6 @@ class Games extends Module
 
 			$query = "SELECT AVG(rating) AS rating FROM game_comments WHERE game_id = {$gameId['game_id']}";
 			$ratingResult = mysql_query($query);
-
 
 			$rating = mysql_fetch_assoc($ratingResult);
 			if($rating['rating'] != NULL){
@@ -1839,7 +1786,6 @@ class Games extends Module
 		return new returnData(0, $games);
 	}
 
-
 	/**
 	 * Gets a game's nearest location to user
 	 * @param integer $latitude User's current latitude
@@ -1847,7 +1793,6 @@ class Games extends Module
 	 * @param integer $gameId Game to find nearest location of
 	 * @returns nearestLocation distance, latitude, and longitude
 	 */
-
 	protected function getNearestLocationOfGameToUser($latitude, $longitude, $gameId){
 		$query = "SELECT latitude, longitude,((ACOS(SIN($latitude * PI() / 180) * SIN(latitude * PI() / 180) + 
 			COS($latitude * PI() / 180) * COS(latitude * PI() / 180) * 
@@ -1862,7 +1807,6 @@ class Games extends Module
 		return $nearestLocation;
 	}
 	
-
 	/**
 	 * Gets a set of games that contain the input string
 	 * @param integer Player Id
@@ -1872,7 +1816,6 @@ class Games extends Module
 	 * @param boolean Search all games or just the polished ones
 	 * @returns array of gameId's who's corresponding games contain the search string
 	 */
-
 	public function getGamesContainingText($intPlayerId, $latitude, $longitude, $textToFind, $boolIncludeDevGames = 1, $page = 0){
 		$textToFind = addSlashes($textToFind);
 		$textToFind = urldecode($textToFind);
@@ -1897,7 +1840,6 @@ class Games extends Module
 		return new returnData(0, $games);
 	}
 
-
 	/**
 	 * Gets a player's 10 most recently played games
 	 * @param integer The player to look for
@@ -1906,12 +1848,11 @@ class Games extends Module
 	 * @param boolean Search all games or just the polished ones
 	 * @returns array of up to 10 gameId's that the player has most recently played
 	 */
-
 	public function getRecentGamesForPlayer($intPlayerId, $latitude, $longitude, $boolIncludeDevGames = 1){
 		$query = "SELECT player_log.game_id, player_log.timestamp, games.ready_for_public FROM player_log, games WHERE player_log.player_id = '{$intPlayerId}' AND player_log.game_id = games.game_id ORDER BY player_log.timestamp DESC";
 
 		$result = mysql_query($query);
-
+		$x = 0;
 		$x = 0;
 		$games = array();
 		if(!$boolIncludeDevGames) {

@@ -167,12 +167,10 @@ class Locations extends Module
         $prefix = Module::getPrefix($intGameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-        $query = "SELECT game_locations.*, f.active AS is_fountain FROM (SELECT * FROM locations WHERE game_id = {$prefix}) AS game_locations LEFT JOIN (SELECT active FROM fountains WHERE game_id = $prefix) AS f ON game_locations.location_id = f.location_id";
-
         $query = "SELECT game_locations.*,game_qrcodes.qrcode_id,game_qrcodes.code,game_qrcodes.match_media_id, game_qrcodes.fail_text, f.active AS is_fountain
             FROM (SELECT * FROM locations WHERE game_id = {$prefix}) AS game_locations
             LEFT JOIN (SELECT * FROM qrcodes WHERE game_id = {$prefix}) AS game_qrcodes
-            ON game_qrcodes.link_id = game_locations.location_id LEFT JOIN
+            ON game_locations.location_id = game_qrcodes.link_id LEFT JOIN
             (SELECT location_id, active FROM fountains WHERE game_id = $prefix) AS f
             ON game_locations.location_id = f.location_id";
         NetDebug::trace($query);	
@@ -434,7 +432,10 @@ class Locations extends Module
             //Destroy spawnables
             if($spawnable->time_to_live != -1)
             {
-                $query = "DELETE game_locations, game_qrcodes FROM (SELECT * FROM locations WHERE game_id = {$prefix}) AS game_locations LEFT_JOIN (SELECT * FROM qrcodes WHERE game_id = {$prefix}) AS game_qrcodes ON game_locations.location_id = game_qrcodes.link_id WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND";
+                $query = "DELETE game_locations, game_qrcodes 
+			FROM (SELECT * FROM locations WHERE game_id = {$prefix}) AS game_locations 
+			LEFT_JOIN (SELECT * FROM qrcodes WHERE game_id = {$prefix}) AS game_qrcodes ON game_locations.location_id = game_qrcodes.link_id 
+			WHERE type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND ((spawnstamp < NOW() - INTERVAL ".$spawnable->time_to_live." SECOND) OR (type = 'Item' AND item_qty = 0))";
                 mysql_query($query);
             }
 

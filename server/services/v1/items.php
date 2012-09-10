@@ -161,7 +161,7 @@ class Items extends Module
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
         $query = "INSERT INTO items 
-            (game_id, name, description, icon_media_id, media_id, dropable, destroyable, is_attribute, max_qty_in_inventory, weight, url, type)
+            (game_id, name, description, icon_media_id, media_id, dropable, destroyable, tradeable, is_attribute, max_qty_in_inventory, weight, url, type)
             VALUES ('{$gameId}',
                     '{$name}', 
                     '{$description}',
