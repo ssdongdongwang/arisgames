@@ -44,7 +44,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-	
+	self.tabBarItem.badgeValue = nil;
 	[self refresh];
 	self.nameLabel.text = [NSString stringWithFormat:@"%@: %@",NSLocalizedString(@"AttributesViewNameKey", @""), [AppModel sharedAppModel].userName];
     self.groupLabel.text = NSLocalizedString(@"AttributesViewGroupKey", @"");
@@ -79,9 +79,9 @@
                     if([topViewController respondsToSelector:@selector(updateQuantityDisplay)])
                         [[[self navigationController] topViewController] respondsToSelector:@selector(updateQuantityDisplay)];
                     
-                    //NEEDS TO BE LOCALIZED \/
-                    [[RootViewController sharedRootViewController] enqueueNotificationWithTitle:@"Attribute Received"
+                    [[RootViewController sharedRootViewController] enqueueNotificationWithTitle:NSLocalizedString(@"AttributeReceivedKey", @"")
                                                                                       andPrompt:[NSString stringWithFormat:@"%d %@ %@",attr.qty - existingAttr.qty,attr.name,@" added"]];
+                    newAttrs++;
                 }
             }
             
@@ -89,18 +89,17 @@
                 if([topViewController respondsToSelector:@selector(updateQuantityDisplay)])
                     [[[self navigationController] topViewController] respondsToSelector:@selector(updateQuantityDisplay)];
                 
-                //NEEDS TO BE LOCALIZED \/
-                [[RootViewController sharedRootViewController] enqueueNotificationWithTitle:@"Attribute Received"
+                [[RootViewController sharedRootViewController] enqueueNotificationWithTitle: NSLocalizedString(@"AttributeReceivedKey", @"")
                                                                                   andPrompt:[NSString stringWithFormat:@"%d %@ %@",attr.qty,attr.name,@" added"]];
                 newAttrs++;
             }
         }
         if (newAttrs > 0) {
-            newAttrsSinceLastView += newAttrs;
+            newAttrsSinceLastView = newAttrs;
             self.tabBarItem.badgeValue = [NSString stringWithFormat:@"%d",newAttrsSinceLastView];
             
             //Vibrate and Play Sound
-            //[((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
+            [((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
         }
         else if (newAttrsSinceLastView < 1) self.tabBarItem.badgeValue = nil;
     }

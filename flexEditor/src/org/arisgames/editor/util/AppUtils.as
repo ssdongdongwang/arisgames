@@ -68,8 +68,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE;
-			case AppConstants.CONTENTTYPE_CUSTOMMAP_VAL:
-				return AppConstants.CONTENTTYPE_CUSTOMMAP;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE;
 				
@@ -96,8 +94,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_WEBPAGE_DATABASE;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_VAL:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE;
-			case AppConstants.CONTENTTYPE_CUSTOMMAP_VAL:
-				return AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE;	
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE;
             /*
@@ -133,10 +129,6 @@ public class AppUtils
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
 			case AppConstants.CONTENTTYPE_AUGBUBBLE_DATABASE:
 				return AppConstants.CONTENTTYPE_AUGBUBBLE_VAL;
-			case AppConstants.CONTENTTYPE_CUSTOMMAP:
-				return AppConstants.CONTENTTYPE_CUSTOMMAP_VAL;
-			case AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE:
-				return AppConstants.CONTENTTYPE_CUSTOMMAP_VAL;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE:
 				return AppConstants.CONTENTTYPE_PLAYER_NOTE_VAL;
 			case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
@@ -174,6 +166,30 @@ public class AppUtils
         return loc;
     }
 
+	public static function findParentObjectPaletteItem(child:ObjectPaletteItemBO):ObjectPaletteItemBO
+	{
+		if(child.parentContentFolderId == 0) return null;
+		var go:ArrayCollection = GameModel.getInstance().game.gameObjects;
+		return findOPIinListOfChildren(child.parentContentFolderId, go);
+	}
+
+	public static function findOPIinListOfChildren(id:int, list:ArrayCollection):ObjectPaletteItemBO
+	{
+		for(var i:int = 0; i < list.length; i++)
+		{
+			if((list[i] as ObjectPaletteItemBO).id == id)
+			{
+				return list[i] as ObjectPaletteItemBO;
+			}
+			else if((list[i] as ObjectPaletteItemBO).isFolder())
+			{
+				return findOPIinListOfChildren(id, (list[i] as ObjectPaletteItemBO).children);
+			}
+		}
+		return null;
+	}
+
+	
     public static function flattenGameObjectIntoArrayCollection(go:ArrayCollection):ArrayCollection
     {
         var res:ArrayCollection = new ArrayCollection();
@@ -244,28 +260,7 @@ public class AppUtils
 		return go;
     }
 	
-	public static function findParentObjectPaletteItem(child:ObjectPaletteItemBO):ObjectPaletteItemBO
-	{
-		if(child.parentContentFolderId == 0) return null;
-		var go:ArrayCollection = GameModel.getInstance().game.gameObjects;
-		return findOPIinListOfChildren(child.parentContentFolderId, go);
-	}
-	
-	public static function findOPIinListOfChildren(id:int, list:ArrayCollection):ObjectPaletteItemBO
-	{
-		for(var i:int = 0; i < list.length; i++)
-		{
-			if((list[i] as ObjectPaletteItemBO).id == id)
-			{
-				return list[i] as ObjectPaletteItemBO;
-			}
-			else if((list[i] as ObjectPaletteItemBO).isFolder())
-			{
-				return findOPIinListOfChildren(id, (list[i] as ObjectPaletteItemBO).children);
-			}
-		}
-		return null;
-	}
+
 	
 	private static function repairPalleteObjectAssociation(o:ObjectPaletteItemBO, lc:Number, pId:Number):void {
 		if (o.isFolder())
@@ -305,7 +300,7 @@ public class AppUtils
         }
     }
 
-    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble, customMap:CustomMap, playerNote:PlayerNote):void
+    public static function matchDataWithGameObject(obj:ObjectPaletteItemBO, objType:String, npc:NPC, item:Item, node:Node, webPage:WebPage, augBubble:AugBubble, playerNote:PlayerNote):void
     {
         //trace("matchDataWithGameObject() called: Looking at Game Object Id '" + obj.id + ".  It's Object Type = '" + obj.objectType + "', while it's Content Id = '" + obj.objectId + "'; Is Folder? " + obj.isFolder() + "");
 
@@ -350,13 +345,6 @@ public class AppUtils
 						obj.augBubble = augBubble;
 					}
 					break;
-				case AppConstants.CONTENTTYPE_CUSTOMMAP_DATABASE:
-					if (obj.objectId == customMap.customMapId)
-					{
-						//trace("Just matched Game Object Id " + obj.id + " with augBubble of ID = " + augBubble.augBubbleId);
-						obj.customMap = customMap;
-					}
-					break;
 				case AppConstants.CONTENTTYPE_PLAYER_NOTE_DATABASE:
 					if (obj.objectId == playerNote.playerNoteId)
 					{
@@ -372,7 +360,7 @@ public class AppUtils
             for (var lc:Number = 0; lc < obj.children.length; lc++)
             {
                 var childObj:ObjectPaletteItemBO = obj.children.getItemAt(lc) as ObjectPaletteItemBO;
-                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble, customMap, playerNote);
+                matchDataWithGameObject(childObj, objType, npc, item, node, webPage, augBubble, playerNote);
             }
         }
     }
@@ -488,10 +476,10 @@ public class AppUtils
 	
 	public static function parseResultDataIntoCustomMap(data:Object):CustomMap
 	{
-		if (data.hasOwnProperty("game_overlay_id"))
+		if (data.hasOwnProperty("overlay_id"))
 		{
 			trace("retObj has a overlay_id!  It's value = '" + data.overlay_id + "'.");
-			var customMap:CustomMap = new CustomMap();
+			var customMap:CustomMap = new CustomMap(data.name, data.overlay_id, 0);
 			
 			//customMap.media = new ArrayCollection();
 			//for(var x:Number = 0; x < data.media.length; x++){
@@ -499,8 +487,7 @@ public class AppUtils
 			//}
 			customMap.customMapId = data.game_overlay_id;
 			customMap.name = data.name;
-			customMap.description = data.description;
-			customMap.iconMediaId = data.icon_media_id;
+
 			
 			return customMap;
 		}

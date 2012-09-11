@@ -147,9 +147,8 @@
 		//Check if anything is new since last time
 		int newItems = 0;
         UIViewController *topViewController =  [[self navigationController] topViewController];
-		for (Item *item in newInventory) {	
-            
-            
+		
+        for (Item *item in newInventory) {	
 			BOOL match = NO;
 			for (Item *existingItem in self.inventory) {
 				if (existingItem.itemId == item.itemId) match = YES;	
@@ -159,6 +158,7 @@
                     
                     [[RootViewController sharedRootViewController] enqueueNotificationWithTitle:NSLocalizedString(@"AppModelItemReceivedKey", @"")
                                                                                       andPrompt:[NSString stringWithFormat:@"%d %@ %@",item.qty - existingItem.qty,item.name,NSLocalizedString(@"InventoryAddedToKey", @"")]];
+                    newItems ++;
                 }
 			}
             
@@ -173,11 +173,11 @@
                 
                 [[RootViewController sharedRootViewController] enqueueNotificationWithTitle:NSLocalizedString(@"AppModelItemReceivedKey", @"")
                                                                                   andPrompt:[NSString stringWithFormat:@"%d %@ %@",item.qty,item.name,NSLocalizedString(@"InventoryAddedToKey", @"")]];
-				newItems ++;;
+				newItems ++;
 			}
 		}
 		if (newItems > 0) {
-			newItemsSinceLastView += newItems;
+			newItemsSinceLastView = newItems;
 			self.tabBarItem.badgeValue = [NSString stringWithFormat:@"%d",newItemsSinceLastView];
             
 			//Vibrate and Play Sound
