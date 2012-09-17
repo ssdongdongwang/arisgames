@@ -93,7 +93,7 @@ class Conversations extends Module
                 $nodeText = str_replace("”", "\"", $nodeText);
 
 		$query = "INSERT INTO nodes (game_id, text)
-			VALUES ('{$prefix}','{$conversationText}')";
+			VALUES ('{$prefix}','{$nodeText}')";
 		NetDebug::trace("createNode: Running a query = $query");	
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(3, NULL, "SQL Error:" . mysql_error() . "while running query:" . $query);	

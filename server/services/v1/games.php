@@ -1807,6 +1807,7 @@ class Games extends Module
 		return $nearestLocation;
 	}
 	
+
 	/**
 	 * Gets a set of games that contain the input string
 	 * @param integer Player Id

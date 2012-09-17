@@ -152,7 +152,7 @@ class Items extends Module
      * @returns a returnData object containing the new item identifier
      * @see returnData
      */
-    public static function createItem($gameId, $name, $description, $iconMediaId, $mediaId, $droppable, $destroyable, $attribute, $maxQuantityInPlayerInventory, $weight, $url, $type)
+    public static function createItem($gameId, $name, $description, $iconMediaId, $mediaId, $droppable, $destroyable, $tradeable, $attribute, $maxQuantityInPlayerInventory, $weight, $url, $type)
     {
         $name = addslashes($name);	
         $description = addslashes($description);	
@@ -169,6 +169,7 @@ class Items extends Module
                     '{$mediaId}', 
                     '{$droppable}',
                     '{$destroyable}',
+		    '{$tradeable}',
                     '{$attribute}',
                     '{$maxQuantityInPlayerInventory}',
                     '{$weight}',
@@ -200,7 +201,7 @@ class Items extends Module
      * @see returnData
      */
     public static function updateItem($gameId, $itemId, $name, $description, 
-            $iconMediaId, $mediaId, $droppable, $destroyable, $attribute, $maxQuantityInPlayerInventory, $weight, $url, $type)
+            $iconMediaId, $mediaId, $droppable, $destroyable, $tradeable, $attribute, $maxQuantityInPlayerInventory, $weight, $url, $type)
     {
         $prefix = Module::getPrefix($gameId);
 
@@ -216,6 +217,7 @@ class Items extends Module
                 media_id = '{$mediaId}', 
                 dropable = '{$droppable}',
                 destroyable = '{$destroyable}',
+		tradeatbke = '{$tradeable}',
                 is_attribute = '{$attribute}',
                 max_qty_in_inventory = '{$maxQuantityInPlayerInventory}',
                 weight = '{$weight}',

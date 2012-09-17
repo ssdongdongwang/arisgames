@@ -127,12 +127,12 @@ class Notes extends Module
 		return new returnData(0, $newAve);	
 	}
 
-	//Gets all notes accessible through the notebook by an arbitrary player
-	function getNotesForGame($gameId, $playerId) 
-	{
-		$query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND parent_note_id = '0' AND public_to_notebook = '1'";
-		$result = @mysql_query($query);
-		if (mysql_error()) return new returnData(1, NULL, mysql_error());
+    //Gets all notes accessible through the notebook by an arbitrary player
+    function getNotesForGame($gameId, $playerId) 
+    {
+        $query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND parent_note_id = '0' AND (public_to_notebook = '1' OR public_to_map = '1')";
+        $result = @mysql_query($query);
+        if (mysql_error()) return new returnData(1, NULL, mysql_error());
 
 		$notes = array();
 		while($note = mysql_fetch_object($result))
