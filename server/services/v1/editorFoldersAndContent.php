@@ -134,11 +134,6 @@ class EditorFoldersAndContent extends Module
 				mysql_query($query);
 			}
 		}
-		// NEED TO DO THIS FOR CUSTOM MAPS else if($row->content_type == "CustomMap") {
-		//	$query = "INSERT INTO overlays (game_id, name, url, icon_media_id) SELECT game_id, name, url, icon_media_id FROM web_pages WHERE web_page_id = '{$row->content_id}'";
-		//	mysql_query($query);
-		//	$newContentId = mysql_insert_id();
-		//}
 
 		$query = "INSERT INTO folder_contents (game_id, folder_id, content_type, content_id, previous_id) VALUES ('{$intGameId}', '{$row->folder_id}', '{$row->content_type}', '{$newContentId}', '{$row->previous_id}')";
 		mysql_query($query);
