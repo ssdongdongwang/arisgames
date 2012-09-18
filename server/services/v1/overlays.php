@@ -179,6 +179,7 @@ class Overlays extends Module
 	 */
 	public function getCurrentOverlaysForPlayer($intGameID, $intPlayerID)
 	{
+		return new returnData(0, array());
 		$prefix = Module::getPrefix($intGameID);
 		if (!$prefix && $intGameID != 0) return new returnData(1, NULL, "invalid game id");
         

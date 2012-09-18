@@ -51,7 +51,7 @@ class Games extends Module
 	public function getGamesForPlayerAtLocation($playerId, $latitude, $longitude, $maxDistance=99999999, $locational, $includeGamesinDevelopment)
 	{
 		if ($includeGamesinDevelopment) $query = "SELECT game_id FROM games WHERE is_locational = '{$locational}'";
-		else $query = "SELECT game_id FROM games WHERE is_locational = '{$locational}' AND ready_for_public = TRUE ";
+		else $query = "SELECT game_id FROM games WHERE is_locational = '{$locational}' AND ready_for_public = TRUE";
 
 		$gamesRs = @mysql_query($query);
 		NetDebug::trace(mysql_error());
@@ -1798,8 +1798,8 @@ class Games extends Module
 			COS($latitude * PI() / 180) * COS(latitude * PI() / 180) * 
 			COS(($longitude - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1609.344
 			AS `distance`
-			FROM {$gameId}_locations
-			WHERE type != 'Item' OR item_qty > 0
+			FROM locations
+			WHERE game_id = {$gameId} AND (type != 'Item' OR item_qty > 0)
 			ORDER BY distance ASC";
 		$nearestLocationRs = @mysql_query($query);
 		$nearestLocation = @mysql_fetch_object($nearestLocationRs);

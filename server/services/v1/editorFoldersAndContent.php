@@ -192,15 +192,16 @@ class EditorFoldersAndContent extends Module
 		$media = $mediaReturnObject->data;
 		$content->icon_media = $media;
 		$content->icon_media_id = $contentDetails->icon_media_id;
-                $content->is_spawnable = Spawnables::hasActiveSpawnable($intGameId, $content->content_type, $content->content_id);
+		$content->is_spawnable = Spawnables::hasActiveSpawnable($intGameId, $content->content_type, $content->content_id);
 
-                if ($content->content_type != 'WebPage' && $content->content_type != 'PlayerNote' && $content->content_type != 'AugBubble' && $content->content_type != 'CustomMap'){
+		if ($content->content_type != 'WebPage' && $content->content_type != 'PlayerNote' && $content->content_type != 'AugBubble' && $content->content_type != 'CustomMap'){
 			//Get the Media
 			$mediaHelper = new Media;
 			$mediaReturnObject = $mediaHelper->getMediaObject($intGameId, $contentDetails->media_id);
 			$media = $mediaReturnObject->data;
 			$content->media = $media;
 			$content->media_id = $contentDetails->media_id;
+		}
 		/* Depricated
 		   if ($content->content_type == 'AugBubble'){
 		//Get the Alignment Media
@@ -238,8 +239,8 @@ class EditorFoldersAndContent extends Module
 				     is_open = '{$boolIsOpen}'
 					     WHERE 
 					     folder_id = {$intFolderID} AND
-                                             game_id = '{$intGameId}'
-			";
+					     game_id = '{$intGameId}'
+					     ";
 
 			NetDebug::trace($query);
 			@mysql_query($query);
@@ -279,7 +280,7 @@ class EditorFoldersAndContent extends Module
 					  previous_id = '{$intSortOrder}'
 						  WHERE 
 						  object_content_id = {$intObjectContentID} AND
-                                                  game_id = {$intGameId}
+						  game_id = {$intGameId}
 			";
 
 			NetDebug::trace($query);
@@ -336,7 +337,7 @@ class EditorFoldersAndContent extends Module
 		$content = @mysql_fetch_object($contentQueryResult);
 		if (mysql_error()) return new returnData(3, NULL, "SQL Error");
 
-                Spawnables::deleteSpawnablesOfObject($intGameId, $content->content_type, $content->content_id);
+		Spawnables::deleteSpawnablesOfObject($intGameId, $content->content_type, $content->content_id);
 
 		//Delete the content record
 		$query = "DELETE FROM folder_contents WHERE object_content_id = {$intContentID} AND game_id = '{$intGameId}'";
