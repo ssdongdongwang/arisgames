@@ -211,6 +211,7 @@
 		AB2223F510502CD800A4255E /* Quest.m in Sources */ = {isa = PBXBuildFile; fileRef = AB2223F410502CD800A4255E /* Quest.m */; };
 		AB2FE579120A154B00758F8C /* LogoutButton.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2FE578120A154B00758F8C /* LogoutButton.png */; };
 		AB301DA2151BC37B00EFB79F /* libZXingWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB1CA8B313C7CCBF00131F81 /* libZXingWidget.a */; };
+		AB348BB61602E0AA004EF293 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AB348BB51602E0AA004EF293 /* Default-568h@2x.png */; };
 		AB35E034155C607900430AF7 /* 14-gear.png in Resources */ = {isa = PBXBuildFile; fileRef = AB35E032155C607900430AF7 /* 14-gear.png */; };
 		AB35E035155C607900430AF7 /* 14-gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AB35E033155C607900430AF7 /* 14-gear@2x.png */; };
 		AB35E038155C60DA00430AF7 /* 16-tag.png in Resources */ = {isa = PBXBuildFile; fileRef = AB35E036155C60DA00430AF7 /* 16-tag.png */; };
@@ -753,6 +754,7 @@
 		AB2223F310502CD800A4255E /* Quest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quest.h; sourceTree = "<group>"; };
 		AB2223F410502CD800A4255E /* Quest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Quest.m; sourceTree = "<group>"; };
 		AB2FE578120A154B00758F8C /* LogoutButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LogoutButton.png; sourceTree = "<group>"; };
+		AB348BB51602E0AA004EF293 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		AB35E032155C607900430AF7 /* 14-gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "14-gear.png"; sourceTree = "<group>"; };
 		AB35E033155C607900430AF7 /* 14-gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "14-gear@2x.png"; sourceTree = "<group>"; };
 		AB35E036155C60DA00430AF7 /* 16-tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "16-tag.png"; sourceTree = "<group>"; };
@@ -1627,6 +1629,7 @@
 				28A0AB4B0D9B1048005BE974 /* ARIS_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.mm */,
 				A7A1728B0F4F27120017E865 /* Default.png */,
+				AB348BB51602E0AA004EF293 /* Default-568h@2x.png */,
 				A7A172940F4F273B0017E865 /* Icon.icns */,
 				A7A1728A0F4F27120017E865 /* Icon.png */,
 				4ADE919A13CB7CB80009F4AF /* UIImage+Scale.h */,
@@ -2312,6 +2315,7 @@
 				4A7F910015B09FFC00988446 /* pingtone.wav in Resources */,
 				ABDF2CCB15DB4379008E8CA0 /* textToggle.png in Resources */,
 				2DEE862315E6BEF500F506CE /* img.png in Resources */,
+				AB348BB61602E0AA004EF293 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2721,8 +2725,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: UW Division of Information Technology";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gagnon";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gagnon";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2731,8 +2735,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				ONLY_ACTIVE_ARCH = NO;
-				PROVISIONING_PROFILE = "0F878890-EE14-459C-A1D8-9D5C40DC6596";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0F878890-EE14-459C-A1D8-9D5C40DC6596";
+				PROVISIONING_PROFILE = "14F61364-2841-45A9-8620-5290E0E4C76D";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "14F61364-2841-45A9-8620-5290E0E4C76D";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -2747,8 +2751,8 @@
 				);
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: UW Division of Information Technology";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: UW Division of Information Technology";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: David Gagnon";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: David Gagnon";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2772,8 +2776,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = ARIS;
-				PROVISIONING_PROFILE = "0F878890-EE14-459C-A1D8-9D5C40DC6596";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0F878890-EE14-459C-A1D8-9D5C40DC6596";
+				PROVISIONING_PROFILE = "14F61364-2841-45A9-8620-5290E0E4C76D";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "14F61364-2841-45A9-8620-5290E0E4C76D";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = iphoneos;

@@ -95,7 +95,7 @@
 
 @synthesize controlTypeSupported;
 
-@synthesize motionManager, referenceAttitude;
+@synthesize referenceAttitude;
 
 @synthesize delegate;
 
@@ -127,8 +127,6 @@
 - (void)initializeValues
 {
 	animationInterval = kDefaultAnimationTimerInterval;
-	
-    motionManager = [[CMMotionManager alloc] init];
     
     referenceAttitude = nil;
     
@@ -143,7 +141,7 @@
 	deviceOrientationSupported = PLOrientationSupportedAll;
 	
 	isScrollingEnabled = NO;
-	minDistanceToEnableScrolling = kDefaultMinDistanceToEnableScrolling;
+	minDistanceToEnableScrolling = 100000;//kDefaultMinDistanceToEnableScrolling;
 	
 	isInertiaEnabled = YES;
 	inertiaInterval = kDefaultInertiaInterval;
@@ -321,7 +319,7 @@
 - (BOOL)calculateFov:(NSSet *)touches
 {
 	if(![self executeResetAction:touches] && [touches count] == 2)
-	{				
+	{
 		startPoint = [[[touches allObjects] objectAtIndex:0] locationInView:self];
 		endPoint = [[[touches allObjects] objectAtIndex:1] locationInView:self];
 		
@@ -350,6 +348,7 @@
 
 - (BOOL)executeDefaultAction:(NSSet *)touches
 {
+    return NO;
 	if(isValidForFov)
 		[self calculateFov:touches];
 	else
@@ -419,7 +418,7 @@
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event 
-{	
+{
 	if(isValidForFov)
 		return;
 	
@@ -477,7 +476,15 @@
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{ 	
+{
+    [self stopAnimationInternally];
+    isScrolling = NO;
+    
+    if(delegate && [delegate respondsToSelector:@selector(view:didEndScrolling:endPoint:)])
+        [delegate view:self didEndScrolling:startPoint endPoint:endPoint];
+    
+    return;
+
 	NSSet *eventTouches = [event allTouches];
 	
 	if(![self isTouchInView:eventTouches])
@@ -749,7 +756,7 @@
 #pragma mark gyro methods
 
 -(void) enableGyro{
-    CMDeviceMotion *deviceMotion = motionManager.deviceMotion;      
+    CMDeviceMotion *deviceMotion = [AppModel sharedAppModel].motionManager.deviceMotion;      
     //CMAttitude *attitude = deviceMotion.attitude;
     //referenceAttitude = [attitude retain];
     self.gyroTimer = [NSTimer scheduledTimerWithTimeInterval:.03 target:self selector:@selector(getDeviceGLRotationMatrix) userInfo:nil repeats:YES];
@@ -763,7 +770,7 @@
     
    // NSLog(@"PLViewBase: getDeviceGLRotationMatrix: Camera Started at roll: %f pitch: %f yaw: %f",scene.currentCamera.roll,scene.currentCamera.pitch,scene.currentCamera.yaw);
     
-    CMAttitude *attitude = motionManager.deviceMotion.attitude;
+    CMAttitude *attitude = [AppModel sharedAppModel].motionManager.deviceMotion.attitude;
     if (!gyroInit && attitude) {
         gyroInit = YES;
         initPitch = attitude.pitch*180/M_PI;
@@ -882,7 +889,7 @@
 
 - (BOOL)resetWithShake:(UIAcceleration *)acceleration
 {
-	if(!isShakeResetEnabled || !isResetEnabled || isValidForOrientation)
+	if(!isAccelerometerEnabled || !isShakeResetEnabled || !isResetEnabled || isValidForOrientation)
 		return NO;
 	
 	BOOL result = NO;
@@ -1072,8 +1079,6 @@
 		[scene release];
     if(renderer)
 		[renderer release];
-    if(motionManager)
-        [motionManager release];
     if(referenceAttitude)
         [referenceAttitude release];
 	[super dealloc];
