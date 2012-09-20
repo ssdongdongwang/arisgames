@@ -523,14 +523,22 @@ class Games extends Module
 		NetDebug::trace("$query" . ":" . mysql_error());
 
 		$query = "CREATE TABLE `overlays` {
-			`overlay_id` int(11) NOT NULL DEFAULT '0',
-			`game_id` int(11) DEFAULT NULL,
-			`sort_order` int(11) DEFAULT NULL,
-			`alpha` decimal(3,2) DEFAULT NULL,
-			`num_tiles` int(11) DEFAULT NULL,
-			`game_overlay_id` int(11) DEFAULT NULL,
-			PRIMARY KEY (`overlay_id`)
-	}";
+			
+        `overlay_id` int(11) NOT NULL AUTO_INCREMENT,
+        `game_id` int(11) DEFAULT NULL,
+        `sort_order` int(11) DEFAULT NULL,
+        `alpha` decimal(3,2) DEFAULT NULL,
+        `num_tiles` int(11) DEFAULT NULL,
+        `game_overlay_id` int(11) DEFAULT NULL,
+        `name` varchar(100) DEFAULT NULL,
+        `description` varchar(500) DEFAULT NULL,
+        `icon_media_id` int(11) DEFAULT NULL,
+        `sort_index` int(11) DEFAULT NULL,
+        `folder_name` varchar(200) DEFAULT NULL,
+        `file_uploaded` int(11) DEFAULT NULL,
+        PRIMARY KEY (`overlay_id`)
+        
+        }";
 	mysql_query($query);
 	NetDebug::trace("$query" . ":" . mysql_error());
 
@@ -559,42 +567,8 @@ class Games extends Module
 	mysql_query($query);
 	NetDebug::trace("$query" . ":" . mysql_error());
 
-	while ($game = mysql_fetch_object($rs)) 
-	{
-		NetDebug::trace("Upgrade Game: {$game->game_id}");
-		$upgradeResult = Games::upgradeGameDatabase($game->game_id);
-	}
 
 	return new returnData(0);
-	}
-
-
-	/**
-	 * Updates a game's database to the most current version
-	 */	
-	public function upgradeGameDatabase($intGameId)
-	{	
-		set_time_limit(30);
-		Module::serverErrorLog("Upgrade Game $intGameId");
-		$prefix = Module::getPrefix($intGameId);                
-
-		$query = "ALTER TABLE ".$prefix."_locations ADD COLUMN wiggle TINYINT(1) NOT NULL DEFAULT 0";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error()); 
-		//add show_title
-		$query = "ALTER TABLE ".$prefix."_locations ADD column show_title tinyint(1) NOT NULL DEFAULT 1;";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error()); 
-
-		$query = "ALTER TABLE ".$prefix."_requirements CHANGE content_type content_type ENUM('Node','QuestDisplay','QuestComplete','Location','OutgoingWebHook','Spawnable')";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error());  
-
-		$query = "ALTER TABLE ".$prefix."_items ADD COLUMN tradeable TINYINT(1) NOT NULL DEFAULT 1;";
-		mysql_query($query);
-		NetDebug::trace("$query" . ":" . mysql_error());
-
-		/* MAKE SURE TO REFLECT ANY CHANGES IN HERE IN createGame AS WELL!!!!! */
 	}
 
 	/**
@@ -2274,7 +2248,34 @@ class Games extends Module
 			mysql_query($query);
 		}
 
-		$newMediaIds = array();
+        $originalOverlayId = array();
+		$newOverlayId = array();
+		$query = "SELECT * FROM overlays WHERE game_id = {$prefix}";
+		$result = mysql_query($query);
+		while($row = mysql_fetch_object($result)){
+			array_push($originalOverlayId, $row->overlay_id);
+            $origOverlayId = $row->overlay_id;
+            
+			$query = "INSERT INTO overlays (game_id, game_overlay_id, name, sort_index, file_uploaded) VALUES ('{$newPrefix}', '{$row->game_overlay_id}', '{$row->name}', '{$row->sort_index}', '{$row->file_uploaded}')";
+			mysql_query($query);
+			$newID = mysql_insert_id();
+			array_push($newOverlayId, $newID);
+            
+            $query2 = "SELECT * FROM overlay_tiles WHERE overlay_id = {$origOverlayId}";
+            $result2 = mysql_query($query2);
+            while($row2 = mysql_fetch_object($result2)){
+                $query3 = "INSERT INTO overlay_tiles (overlay_id, media_id, zoom, x, y) VALUES ('{$newID}', '{$row2->media_id}', '{$row2->zoom}', '{$row2->x}', '{$row2->y}')";
+                mysql_query($query3);
+            }
+            
+            
+			$query = "UPDATE {$newPrefix}_requirements SET content_id = {$newID} WHERE content_type = 'CustomMap' AND content_id = {$row->overlay_id}";
+			mysql_query($query);
+            
+		}
+        
+		$originalMediaId = array();
+		$newMediaId = array();
 		$query = "SELECT * FROM media WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
 		while($result && $row = mysql_fetch_object($result)){
@@ -2315,6 +2316,9 @@ class Games extends Module
 			mysql_query($query);
 			$query = "UPDATE web_pages SET icon_media_id = {$newID} WHERE icon_media_id = $row->media_id AND game_id = {$newPrefix}";
 			mysql_query($query);
+            $query = "UPDATE overlay_tiles, overlays SET overlay_tiles.media_id = {$newID} WHERE overlay_tiles.media_id = $row->media_id AND overlays.game_id = {$newPrefix} AND overlay_tiles.overlay_id = overlays.overlay_id";
+			mysql_query($query);
+
 		}
 
 		//NOTE: substr removes <?xml version="1.0" ? //> from the beginning of the text
