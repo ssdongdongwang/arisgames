@@ -522,8 +522,7 @@ class Games extends Module
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
 
-		$query = "CREATE TABLE `overlays` {
-			
+		$query = "CREATE TABLE `overlays` (
         `overlay_id` int(11) NOT NULL AUTO_INCREMENT,
         `game_id` int(11) DEFAULT NULL,
         `sort_order` int(11) DEFAULT NULL,
@@ -537,12 +536,11 @@ class Games extends Module
         `folder_name` varchar(200) DEFAULT NULL,
         `file_uploaded` int(11) DEFAULT NULL,
         PRIMARY KEY (`overlay_id`)
-        
-        }";
+        )";
 	mysql_query($query);
 	NetDebug::trace("$query" . ":" . mysql_error());
 
-	$query = "CREATE TABLE `overlay_tiles` {
+	$query = "CREATE TABLE `overlay_tiles` (
 		`overlay_id` int(11) DEFAULT NULL,
 		`media_id` int(11) DEFAULT NULL,
 		`zoom` int(11) DEFAULT NULL,
@@ -550,7 +548,7 @@ class Games extends Module
 		`x_max` int(11) DEFAULT NULL,
 		`y` int(11) DEFAULT NULL,
 		`y_max` int(11) DEFAULT NULL
-	}";
+	)";
 	mysql_query($query);
 	NetDebug::trace("$query" . ":" . mysql_error());
 
@@ -567,6 +565,9 @@ class Games extends Module
 	mysql_query($query);
 	NetDebug::trace("$query" . ":" . mysql_error());
 
+	$query = "ALTER TABLE requirements CHANGE content_type content_type ENUM('Node', 'QuestDisplay', 'QuestComplete', 'Location', 'OutgoingWebHook', 'Spawnable', 'CustomMap');";
+	mysql_query($query);
+	NetDebug::trace("$query" . ":" . mysql_error());
 
 	return new returnData(0);
 	}
