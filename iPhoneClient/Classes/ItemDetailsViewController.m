@@ -184,6 +184,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
     }
     
 	item.hasViewed = YES;
+    
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -272,10 +273,11 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 - (IBAction)pickupButtonTouchAction: (id) sender{
 	NSLog(@"ItemDetailsViewController: pickupButtonTouched");
     
-	
+    //Notify the server this item was displayed
+	[[AppServices sharedAppServices] updateServerItemViewed:item.itemId fromLocation:item.locationId];
+    
 	mode = kItemDetailsPickingUp;
 	
-    
     if(self.item.qty > 1)
     {
         
@@ -294,6 +296,10 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
     {
         [self doActionWithMode:mode quantity:1];
     }
+    
+    //Notify the server this item was displayed:
+    [[AppServices sharedAppServices] updateServerItemViewed:item.itemId fromLocation:item.locationId];
+    
 }
 
 

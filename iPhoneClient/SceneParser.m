@@ -75,6 +75,15 @@ NSString *const kTagVibrate = @"vibrate";
         [self.delegate setHideLeaveConversationButton: ([attributeDict objectForKey:kTagHideLeaveConversationButton] ? [[attributeDict objectForKey:kTagHideLeaveConversationButton]intValue] : 0)];
     }
     
+    if ([attributeDict objectForKey:kTagTitle]) {
+        title = [attributeDict objectForKey:kTagTitle] ? [attributeDict objectForKey:kTagTitle] : @"";
+    }
+    else title = nil;
+    
+    if ([attributeDict objectForKey:kTagVibrate]) {
+        if([[attributeDict objectForKey:kTagVibrate]intValue] > 0) vibrate = YES;
+    }
+    
     if ([elementName isEqualToString:kTagPc]) {
 		isPc = YES;
     }
@@ -83,9 +92,6 @@ NSString *const kTagVibrate = @"vibrate";
         isPc = NO;
         if ([attributeDict objectForKey:kTagMedia]) {
             mediaId = [attributeDict objectForKey:kTagMedia] ? [[attributeDict objectForKey:kTagMedia]intValue] : 0;
-        }
-        if ([attributeDict objectForKey:kTagVibrate]) {
-            if([[attributeDict objectForKey:kTagMedia]intValue] > 0) vibrate = YES;
         }
     }    
     
@@ -135,10 +141,6 @@ NSString *const kTagVibrate = @"vibrate";
     }
     else if ([elementName isEqualToString:kTagItem]) {
         itemId = [attributeDict objectForKey:kTagId] ? [[attributeDict objectForKey:kTagId]intValue] : 0;
-    }
-   
-    if ([attributeDict objectForKey:kTagTitle]) {
-        title = [attributeDict objectForKey:kTagTitle] ? [attributeDict objectForKey:kTagTitle] : @"";
     }
     
 	imageRect = CGRectMake(0, 0, 320, 416);
@@ -216,8 +218,7 @@ NSString *const kTagVibrate = @"vibrate";
                                      imageRect:CGRectMake(0, 0, 320, 416)
                                       zoomTime:kDefaultZoomTime
                               exitToTabWithTitle:nil exitToType:nil
-                                       videoId:0 panoramicId:0 webpageId:0 plaqueId:0 itemId:0 mediaId:0 title:@""];        
-		
+                                       videoId:0 panoramicId:0 webpageId:0 plaqueId:0 itemId:0 mediaId:0 title:@""];
 		[self.script addObject:s];
 	}
 	
