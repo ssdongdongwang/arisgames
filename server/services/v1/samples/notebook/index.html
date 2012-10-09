@@ -21,9 +21,6 @@ function pageLoad()
     //Initialize stuff
     controller = new Controller();
     model = new Model();
-    var centerLoc = new google.maps.LatLng(0, 0);
-    var myOptions = { zoom:4, center:centerLoc, mapTypeId:google.maps.MapTypeId.ROADMAP };
-    map = new google.maps.Map(document.getElementById("map"), myOptions);
     var gameId;
     var playerId;
     if(gameId = parseInt(parseURLParams(document.URL).gameId))
@@ -84,6 +81,8 @@ function finishLoadGame(responseText)
     //  Set actual page visible
     document.getElementById('message').style.display = 'none';
     document.getElementById('content').style.display = 'block';
+
+    google.maps.event.trigger(model.views.gmap, 'resize'); // To fix google maps incorrect sizing bug
 }
 
 </script>
@@ -156,6 +155,7 @@ function finishLoadGame(responseText)
         Click a note to display
     </div>
 
+    <div id='map_note_view_close_button' class='map_note_view_close_button cell_button'>X</div>
     <!-- Note Content Cell -->
     <div id='note_content_cell_construct' class='note_content_cell'></div>
     <!-- Note Comment Cell -->

@@ -87,6 +87,15 @@ function SingleSelectionButton(html, callback)
     this.html.addEventListener('click', this.select, false);
 }
 
+function MapMarker(callback, object)
+{
+    var self = this; // <- I hate javascript.
+    this.callback = callback;
+    this.object = object;
+    this.marker = new google.maps.Marker({ position:this.object.geoloc, map:model.views.gmap, });
+    google.maps.event.addListener(this.marker, 'click', function(e) { self.callback(self); });
+}
+
 /* Sends (self, selected) to callback on click */
 function SelectionCell(html, odd, callback, object)
 {
@@ -280,10 +289,11 @@ function NoteView(html, object)
                 contentHTML.innerHTML = '<img class="note_media" src="'+content.media_url+'" />';
                 break;
             case 'AUDIO':
-                contentHTML.innerHTML = content.media_url;
+                //contentHTML.innerHTML = '<audio class="note_media" controls="controls"><source src="'+content.media_url+'" type="audio/mpeg"><a href="'+content.media_url+'">audio</a></audio>';
+                contentHTML.innerHTML = '<a href="'+content.media_url+'">audio</a>';
                 break;
             case 'VIDEO':
-                contentHTML.innerHTML = content.media_url;
+                contentHTML.innerHTML = '<video class="note_media" controls="controls"><source src="'+content.media_url+'"><a href="'+content.media_url+'">video</a></video>';
                 break;
         }
         return contentHTML;

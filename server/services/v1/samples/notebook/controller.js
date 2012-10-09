@@ -58,27 +58,37 @@ function Controller()
         }
     };
 
-    this.mapContributorClicked = function(sender, selected) {};
+    this.mapContributorClicked = function(sender, selected) 
+    {
+        self.populateMapNotes(false);
+    };
     this.selectAllMapContributors = function() 
     {
         for(var i = 0; i < model.contributorMapCells.length; i++)
             model.contributorMapCells[i].select();
+        self.populateMapNotes(false);
     };
     this.deselectAllMapContributors = function()
     {
         for(var i = 0; i < model.contributorMapCells.length; i++)
             model.contributorMapCells[i].deselect();
+        self.populateMapNotes(false);
     };
-    this.mapTagClicked = function(sender,selected) {};
+    this.mapTagClicked = function(sender,selected) 
+    {
+        self.populateMapNotes(false);
+    };
     this.selectAllMapTags = function()
     {
         for(var i = 0; i < model.tagMapCells.length; i++)
             model.tagMapCells[i].select();
+        self.populateMapNotes(false);
     };
     this.deselectAllMapTags = function()
     {
         for(var i = 0; i < model.tagMapCells.length; i++)
             model.tagMapCells[i].deselect();
+        self.populateMapNotes(false);
     };
     this.listContributorClicked = function(sender,selected) 
     {
@@ -119,12 +129,20 @@ function Controller()
         model.views.noteView = new NoteView(html, note);
         model.views.mapNoteViewContainer.innerHTML = '';
         model.views.listNoteViewContainer.innerHTML = '';
-        if(model.views.mapLayoutButton.selected) model.views.mapNoteViewContainer.appendChild(model.views.noteView.html);
-        if(model.views.listLayoutButton.selected) model.views.listNoteViewContainer.appendChild(model.views.noteView.html);
-
-        if(model.views.contributorSortButton.selected) for(var i = 0; i < model.views.contributorNoteCells.length; i++) model.views.contributorNoteCells[i].deselect();
-        if(model.views.tagSortButton.selected) for(var i = 0; i < model.views.tagNoteCells.length; i++) model.views.tagNoteCells[i].deselect();
-        if(model.views.popularitySortButton.selected) for(var i = 0; i < model.views.popularNoteCells.length; i++) model.views.popularNoteCells[i].deselect();
+        if(model.views.mapLayoutButton.selected)
+        {
+            model.views.mapNoteViewContainer.appendChild(model.views.mapNoteViewCloseButton.html);
+            model.views.mapNoteViewContainer.appendChild(model.views.noteView.html);
+            model.views.mapNoteViewContainer.style.display = 'block';
+            setTimeout(function() { model.views.mapLayout.addEventListener('click', controller.hideMapNoteView, false); }, 100); //timeout to disallow imediate hiding
+        }
+        if(model.views.listLayoutButton.selected) 
+        {
+            model.views.listNoteViewContainer.appendChild(model.views.noteView.html);
+            if(model.views.contributorSortButton.selected) for(var i = 0; i < model.views.contributorNoteCells.length; i++) model.views.contributorNoteCells[i].deselect();
+            if(model.views.tagSortButton.selected) for(var i = 0; i < model.views.tagNoteCells.length; i++) model.views.tagNoteCells[i].deselect();
+            if(model.views.popularitySortButton.selected) for(var i = 0; i < model.views.popularNoteCells.length; i++) model.views.popularNoteCells[i].deselect();
+        }
     };
 
     this.populateModel = function(gameData)
@@ -155,6 +173,7 @@ function Controller()
 
                 //Add to various note lists
                 model.addNote(model.backpacks[i].notes[j]);
+                model.addMapNote(model.backpacks[i].notes[j]);
                 model.addContributorNote(model.backpacks[i].notes[j]);
                 model.addTagNote(model.backpacks[i].notes[j]);
                 model.addPopularNote(model.backpacks[i].notes[j]);
@@ -178,6 +197,7 @@ function Controller()
         this.populateListTags();
         this.selectAllListTags();
 
+        this.populateMapNotes(true);
         this.populateNotesByContributor();
         //this.populateNotesByTag();
         //this.populateNotesByPopularity();
@@ -243,6 +263,30 @@ function Controller()
             model.tagListCells[model.tagListCells.length] = tmpcell;
         }
     };
+    this.populateMapNotes = function(center)
+    {
+        for(var i = 0; i < model.mapMarkers.length; i++)
+        {
+            model.mapMarkers[i].marker.setMap(null);
+        }
+        model.mapMarkers = [];
+        var tmpmarker;
+        for(var i = 0; i < model.mapNotes.length; i++)
+        {
+            if(!model.mapContributorSelected(model.mapNotes[i].username)) continue;
+            if(!model.mapTagsSelected(model.mapNotes[i].tags)) continue;
+            tmpmarker = new MapMarker(this.noteSelected, model.mapNotes[i]);
+            model.mapMarkers[model.mapMarkers.length] = tmpmarker;
+        }
+        
+        if(center)
+        {
+            var bounds = new google.maps.LatLngBounds();
+            for(var i = 0; i < model.mapMarkers.length; i++)
+                bounds.extend(model.mapMarkers[i].object.geoloc);
+            setTimeout(function(){ model.views.gmap.fitBounds(bounds); }, 100);
+        }
+    }
     this.populateNotesByContributor = function()
     {
         model.views.noteListSelector.innerHTML = ''; //Clear the children
@@ -268,7 +312,7 @@ function Controller()
         model.views.tagNoteCells = [];
         for(var i = 0; i < model.tagNotes.length; i++)
         {
-            if(!model.listTagsSelected(model.contributorNotes[i].tags)) continue;
+            if(!model.listTagsSelected(model.tagNotes[i].tags)) continue;
             tmpcell = new SingleSelectionCell(model.views.constructNoteListSelectorCell.cloneNode(true), 123-123, this.noteSelected, model.tagNotes[i]);
             tmpcell.html.firstChild.innerHTML = '<span class="note_cell_title">'+model.tagNotes[i].title+' - </span><span class="note_cell_author">'+model.tagNotes[i].username+'</span>';
             model.views.noteListSelector.appendChild(tmpcell.html);
@@ -311,5 +355,11 @@ function Controller()
         if(index >= list.length) index = 0;
         if(index < 0) index = list.length-1;
         list[index].select();
+    }
+
+    this.hideMapNoteView = function()
+    {
+        model.views.mapNoteViewContainer.style.display = 'none';
+        model.views.mapLayout.removeEventListener('click', controller.hideMapNoteView, false);
     }
 }
