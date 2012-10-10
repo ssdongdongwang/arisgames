@@ -134,6 +134,21 @@ class Nodes extends Module
 	}
 
 
+        public function deleteNodesReferencedByObject($intGameId, $type, $intNpcId)
+        {
+		$prefix = Module::getPrefix($intGameId);
+		if (!$prefix) return new returnData(1, NULL, "invalid game id");
+
+		$query = "SELECT node_id FROM npc_conversations WHERE game_id = {$intGameId} AND npc_id = {$intNpcId}";
+		$result = @mysql_query($query);
+		if (mysql_error()) return new returnData(3, NULL, "SQL Error");
+
+                while($nid = mysql_fetch_object($result))
+                    Nodes::deleteNode($intGameId, $nid->node_id);
+
+		return new returnData(0);
+        }
+
 	/**
 	 * Delete a specific nodes
 	 * @returns returnCode 0 if successfull
