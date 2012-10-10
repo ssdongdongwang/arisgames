@@ -1825,7 +1825,7 @@ class Games extends Module
 	 * @returns array of up to 10 gameId's that the player has most recently played
 	 */
 	public function getRecentGamesForPlayer($intPlayerId, $latitude, $longitude, $boolIncludeDevGames = 1){
-		$query = "SELECT p_log.*, games.ready_for_public FROM (SELECT player_id, game_id, timestamp FROM player_log WHERE player_id = {$intPlayerId} AND game_id != 0 AND active = 1 ORDER BY timestamp DESC) as p_log LEFT JOIN games ON p_log.game_id = games.game_id ".($boolIncludeDevGames ? "" : "WHERE games.ready_for_public = 1 ")."GROUP BY game_id ORDER BY timestamp DESC LIMIT 10"; 
+		$query = "SELECT p_log.*, games.ready_for_public FROM (SELECT player_id, game_id, timestamp FROM player_log WHERE player_id = {$intPlayerId} AND game_id != 0 ORDER BY timestamp DESC) as p_log LEFT JOIN games ON p_log.game_id = games.game_id ".($boolIncludeDevGames ? "" : "WHERE games.ready_for_public = 1 ")."GROUP BY game_id ORDER BY timestamp DESC LIMIT 10"; 
 		$result = mysql_query($query);
 		$x = 0;
 		$x = 0;
