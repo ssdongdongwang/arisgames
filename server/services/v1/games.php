@@ -332,7 +332,6 @@ class Games extends Module
 		@mysql_query($query);
 		if (mysql_error()) return new returnData(6, NULL, 'cannot create game_editors record');
 
-
 		$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'QUESTS', '1')";
 		@mysql_query($query);
 		$query = "INSERT INTO `game_tab_data` (`game_id` ,`tab` ,`tab_index`) VALUES ('{$strShortName}', 'GPS', '2')";
@@ -521,6 +520,7 @@ class Games extends Module
 		$query = "ALTER TABLE games ADD COLUMN allow_trading TINYINT(1) NOT NULL DEFAULT 1;";
 		mysql_query($query);
 		NetDebug::trace("$query" . ":" . mysql_error());
+        
 
 		$query = "CREATE TABLE `overlays` (
         `overlay_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -822,6 +822,7 @@ class Games extends Module
 			game_id INT NOT NULL,
 			item_id int(11) unsigned NOT NULL default '0',
 			qty int(11) NOT NULL default '0',
+			viewed tinyint(1) NOT NULL default '0',
 			timestamp timestamp NOT NULL default CURRENT_TIMESTAMP,
 			PRIMARY KEY  (id),
 			KEY game_player_item (game_id, player_id, item_id)

@@ -49,7 +49,7 @@ class Items extends Module
         $prefix = Module::getPrefix($gameId);
         if (!$prefix) return new returnData(1, NULL, "invalid game id");
 
-        $query = "SELECT game_items.*, game_player_items.qty FROM (SELECT * FROM items WHERE game_id = {$gameId}) AS game_items JOIN (SELECT * FROM player_items WHERE game_id = {$gameId} AND player_id = $playerId) AS game_player_items ON game_items.item_id = game_player_items.item_id";
+        $query = "SELECT game_items.*, game_player_items.qty, game_player_items.viewed FROM (SELECT * FROM items WHERE game_id = {$gameId}) AS game_items JOIN (SELECT * FROM player_items WHERE game_id = {$gameId} AND player_id = $playerId) AS game_player_items ON game_items.item_id = game_player_items.item_id";
         NetDebug::trace($query);
 
         $rsResult = @mysql_query($query);
