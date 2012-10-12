@@ -3673,13 +3673,13 @@ class Notes extends Module
 
 	private static function getNoteContentsAPI($noteId)
 	{
-		$query = "SELECT nc.media_id, nc.type, nc.text, nc.game_id, nc.title, m.file_name, m.game_id FROM note_content as nc LEFT JOIN media as m ON nc.media_id = m.media_id WHERE note_id = '{$noteId}'";
+		$query = "SELECT nc.media_id, nc.type, nc.text, nc.game_id, nc.title, m.file_path, m.game_id FROM note_content as nc LEFT JOIN media as m ON nc.media_id = m.media_id WHERE note_id = '{$noteId}'";
 		$result = mysql_query($query);
 
 		$contents = array();
 		while($content = mysql_fetch_object($result))
 		{
-			$content->media_url = Media::getMediaDirectoryURL($content->game_id)->data . '/' . $content->file_name;
+			$content->media_url = Media::getMediaDirectoryURL($content->game_id)->data . '/' . $content->file_path;
 			$contents[] = $content;
 		}
 

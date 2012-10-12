@@ -160,7 +160,7 @@ class Overlays extends Module
 			$tile['sort_order'] = $overlayRow['sort_order'];
 			$tile['alpha'] = $overlayRow['alpha'];
             $tile['zoom'] = $overlayRow['zoom'];
-            $tile['file_name'] = $overlayRow['file_name'];
+            $tile['file_path'] = $overlayRow['file_path'];
             $tile['media_id'] = $overlayRow['media_id'];
             $tile['x'] = $overlayRow['x'];
             $tile['y'] = $overlayRow['y'];
@@ -211,7 +211,7 @@ class Overlays extends Module
 			$tile['sort_order'] = $overlayRow['sort_order'];
 			$tile['alpha'] = $overlayRow['alpha'];
             $tile['zoom'] = $overlayRow['zoom'];
-            $tile['file_name'] = $overlayRow['file_name'];
+            $tile['file_path'] = $overlayRow['file_path'];
             $tile['media_id'] = $overlayRow['media_id'];
             $tile['x'] = $overlayRow['x'];
             $tile['y'] = $overlayRow['y'];
@@ -249,7 +249,7 @@ class Overlays extends Module
 			$tile['sort_order'] = $tileRow['sort_order'];
 			$tile['alpha'] = $tileRow['alpha'];
             $tile['zoom'] = $tileRow['zoom'];
-            $tile['file_name'] = $tileRow['file_name'];
+            $tile['file_path'] = $tileRow['file_path'];
             $tile['media_id'] = $tileRow['media_id'];
             $tile['x'] = $tileRow['x'];
             $tile['y'] = $tileRow['y'];
@@ -335,7 +335,7 @@ class Overlays extends Module
                                         $fullFileName = $intOverlayID . "_" . $dirZoomName . "_" . $dirXName . "_" . $fileYName . "_" . time();
                                         $fullNewDirAndFileName = $sGameDir . $fullFileName;
                                         $fullOldDirAndFileName = $sOverlayDir. "/" . $intOverlayID . "/" . $dirZoomName . "/" . $dirXName . "/" . $fileYName;
-                                        $query3 = "INSERT INTO media SET game_id = {$intGameID}, name = '{$fullFileName}', file_name = '{$fullFileName}'";
+                                        $query3 = "INSERT INTO media SET game_id = {$intGameID}, name = '{$fullFileName}', file_path = '{$fullFileName}'";
                                         $rsResult3 = @mysql_query($query3);
                                         if (mysql_error()) return new returnData(3, NULL, "SQL Error inserting Media: ". $query3);   
                                         
@@ -409,7 +409,7 @@ class Overlays extends Module
                                         $fullFileName = $overlayId . "_" . $dirZoomName . "_" . $dirXName . "_" . $fileYName;
                                         $fullNewDirAndFileName = $sGameDir . $fullFileName;
                                         $fullOldDirAndFileName = $sOverlayDir. "/" . $dirMain1Name . "/"  . $dirZoomName . "/" . $dirXName . "/" . $fileYName;
-                                        $query3 = "INSERT INTO media SET game_id = {$intGameID}, name = '{$fullFileName}', file_name = '{$fullFileName}'";
+                                        $query3 = "INSERT INTO media SET game_id = {$intGameID}, name = '{$fullFileName}', file_path = '{$fullFileName}'";
                                         $rsResult3 = @mysql_query($query3);
                                         if (mysql_error()) return new returnData(3, NULL, "SQL Error inserting Media: ". $query3);   
                                         
@@ -599,7 +599,7 @@ class Overlays extends Module
 			return new returnData(4, NULL, "Icons must have a valid Image file extension");
 
 		$query = "INSERT INTO media 
-			(game_id, name, file_name, is_icon)
+			(game_id, name, file_path, is_icon)
 			VALUES ('{$intGameID}','{$strName}', '{$strFileName}',{$boolIsIcon})";
 
 		NetDebug::trace("Running a query = $query");	
@@ -609,12 +609,12 @@ class Overlays extends Module
 
 		$media->media_id = mysql_insert_id();
 		$media->name = $strName;
-		$media->file_name = $strFileName;
+		$media->file_path = $strFileName;
 		$media->is_icon = $boolIsIcon;
 		$media->url_path = Config::gamedataWWWPath . "/{$intGameID}/" . Config::gameMediaSubdir;
 
 		if ($media->is_icon == '1') $media->type = self::MEDIA_ICON;
-		else $media->type = Media::getMediaType($media->file_name);
+		else $media->type = Media::getMediaType($media->file_path);
 
 		return new returnData(0,$media);
 	}*/
@@ -672,7 +672,7 @@ class Overlays extends Module
 		if (mysql_error()) return new returnData(3, NULL, "SQL Error:" . mysql_error());
 
 		//Delete the file		
-		$fileToDelete = Config::gamedataFSPath . "/{$intGameID}/" . $mediaRow['file_name'];
+		$fileToDelete = Config::gamedataFSPath . "/{$intGameID}/" . $mediaRow['file_path'];
 		if (!@unlink($fileToDelete)) 
 			return new returnData(4, NULL, "Record Deleted but file was not: $fileToDelete");
 

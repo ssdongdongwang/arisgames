@@ -106,7 +106,7 @@ for($i = 0; $i < count($_POST['game']->backpacks); $i++)
                         $_POST['game']->backpacks[$i]->notes[$j]->contents[$k]->title.
                         " id_".
                         $_POST['game']->backpacks[$i]->notes[$j]->contents[$k]->media_id.
-                        substr($_POST['game']->backpacks[$i]->notes[$j]->contents[$k]->file_name, -4)
+                        substr($_POST['game']->backpacks[$i]->notes[$j]->contents[$k]->file_path, -4)
                     );
                     break;
             }
@@ -135,7 +135,7 @@ for($i = 0; $i < count($_POST['game']->backpacks); $i++)
                             $_POST['game']->backpacks[$i]->notes[$j]->comments[$k]->contents[$l]->title.
                             " id_".
                             $_POST['game']->backpacks[$i]->notes[$j]->comments[$k]->contents[$l]->media_id. 
-                            substr($_POST['game']->backpacks[$i]->notes[$j]->comments[$k]->contents[$l]->file_name, -4)
+                            substr($_POST['game']->backpacks[$i]->notes[$j]->comments[$k]->contents[$l]->file_path, -4)
                         );
                         break;
                 }
