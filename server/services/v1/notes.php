@@ -3673,7 +3673,8 @@ class Notes extends Module
 
 	private static function getNoteContentsAPI($noteId)
 	{
-		$query = "SELECT nc.media_id, nc.type, nc.text, nc.game_id, nc.title, m.file_path, m.game_id FROM note_content as nc LEFT JOIN media as m ON nc.media_id = m.media_id WHERE note_id = '{$noteId}'";
+		//the whole 'm.file_path AS file_name' is for legacy reasons... Phil 10/12/2012
+		$query = "SELECT nc.media_id, nc.type, nc.text, nc.game_id, nc.title, m.file_path, m.file_path AS file_name, m.game_id FROM note_content as nc LEFT JOIN media as m ON nc.media_id = m.media_id WHERE note_id = '{$noteId}'";
 		$result = mysql_query($query);
 
 		$contents = array();

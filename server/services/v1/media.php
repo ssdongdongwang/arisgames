@@ -35,6 +35,7 @@ class Media extends Module
 			$mediaItem['media_id'] = $mediaRow['media_id'];
 			$mediaItem['name'] = $mediaRow['name'];
 			$mediaItem['file_path'] = $mediaRow['file_path'];
+			$mediaItem['file_name'] = $mediaRow['file_path']; //this is for legacy reasons... Phil 10/12/2012
 			$mediaItem['url_path'] = Config::gamedataWWWPath . "/" . Config::gameMediaSubdir;
 
 			if ($mediaRow['is_icon'] == '1') $mediaItem['type'] = self::MEDIA_ICON;
@@ -75,6 +76,7 @@ class Media extends Module
 		$mediaItem->media_id = $mediaRow->media_id;
 		$mediaItem->name = $mediaRow->name;
 		$mediaItem->file_path = $mediaRow->file_path;
+		$mediaItem->file_name = $mediaRow->file_path; //this is for legacy reasons... Phil 10/12/2012
 
 		$mediaItem->url_path = Config::gamedataWWWPath . "/" . Config::gameMediaSubdir;
 
@@ -147,6 +149,7 @@ class Media extends Module
 		$media->media_id = mysql_insert_id();
 		$media->name = $strName;
 		$media->file_path = $intGameID."/".$strFileName;
+		$media->file_name = $intGameID."/".$strFileName; //this is for legacy reasons... Phil 10/12/2012
 		$media->is_icon = $boolIsIcon;
 		$media->url_path = Config::gamedataWWWPath . "/" . Config::gameMediaSubdir;
 

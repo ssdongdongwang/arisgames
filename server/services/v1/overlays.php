@@ -161,6 +161,7 @@ class Overlays extends Module
 			$tile['alpha'] = $overlayRow['alpha'];
             $tile['zoom'] = $overlayRow['zoom'];
             $tile['file_path'] = $overlayRow['file_path'];
+            $tile['file_name'] = $overlayRow['file_path']; //For legacy reasons... Phil 10/12/2012
             $tile['media_id'] = $overlayRow['media_id'];
             $tile['x'] = $overlayRow['x'];
             $tile['y'] = $overlayRow['y'];
@@ -212,6 +213,7 @@ class Overlays extends Module
 			$tile['alpha'] = $overlayRow['alpha'];
             $tile['zoom'] = $overlayRow['zoom'];
             $tile['file_path'] = $overlayRow['file_path'];
+            $tile['file_name'] = $overlayRow['file_path']; //For legacy reasons... Phil 10/12/2012
             $tile['media_id'] = $overlayRow['media_id'];
             $tile['x'] = $overlayRow['x'];
             $tile['y'] = $overlayRow['y'];
@@ -250,6 +252,7 @@ class Overlays extends Module
 			$tile['alpha'] = $tileRow['alpha'];
             $tile['zoom'] = $tileRow['zoom'];
             $tile['file_path'] = $tileRow['file_path'];
+            $tile['file_name'] = $tileRow['file_path']; //For legacy reasons... Phil 10/12/2012
             $tile['media_id'] = $tileRow['media_id'];
             $tile['x'] = $tileRow['x'];
             $tile['y'] = $tileRow['y'];
@@ -581,111 +584,5 @@ class Overlays extends Module
         
         
     }
-    
-	/**
-	 * Create a media record
-	 * @returns the new mediaID on success
-	 */
-    /*
-	public function createMedia($intGameID, $strName, $strFileName, $boolIsIcon)
-	{
-
-		$prefix = Module::getPrefix($intGameID);
-		if (!$prefix || $intGameID == 0) return new returnData(1, NULL, "invalid game id");
-
-		$strName = addslashes($strName);
-
-		if ($boolIsIcon && $this->getMediaType($strFileName) != self::MEDIA_IMAGE)
-			return new returnData(4, NULL, "Icons must have a valid Image file extension");
-
-		$query = "INSERT INTO media 
-			(game_id, name, file_path, is_icon)
-			VALUES ('{$intGameID}','{$strName}', '{$strFileName}',{$boolIsIcon})";
-
-		NetDebug::trace("Running a query = $query");	
-
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error:".mysql_error());
-
-		$media->media_id = mysql_insert_id();
-		$media->name = $strName;
-		$media->file_path = $strFileName;
-		$media->is_icon = $boolIsIcon;
-		$media->url_path = Config::gamedataWWWPath . "/{$intGameID}/" . Config::gameMediaSubdir;
-
-		if ($media->is_icon == '1') $media->type = self::MEDIA_ICON;
-		else $media->type = Media::getMediaType($media->file_path);
-
-		return new returnData(0,$media);
-	}*/
-
-
-
-	/**
-	 * Update a specific Media
-	 * @returns true if edit was done, false if no changes were made
-	 */
-    /*
-	public function renameMedia($intGameID, $intMediaID, $strName)
-	{
-		$prefix = Module::getPrefix($intGameID);
-		if (!$prefix) return new returnData(1, NULL, "invalid game id");
-
-		$strName = addslashes($strName);
-
-		//Update this record
-		$query = "UPDATE media 
-			SET name = '{$strName}' 
-			WHERE media_id = '{$intMediaID}' and game_id = '{$intGameID}'";
-
-		NetDebug::trace("updateNpc: Running a query = $query");	
-
-		@mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error");
-
-		if (mysql_affected_rows()) return new returnData(0, TRUE);
-		else return new returnData(0, FALSE);	
-	}*/
-
-
-	/**
-	 * Delete a Media Item
-	 * @returns true if delete was done, false if no changes were made
-	 */
-    /*
-	public function deleteMedia($intGameID, $intMediaID)
-	{
-
-		$query = "SELECT * FROM media 
-			WHERE media_id = {$intMediaID} and game_id = {$intGameID}";
-		$rsResult = @mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error:". mysql_error());
-
-		$mediaRow = mysql_fetch_array($rsResult);
-		if ($mediaRow === FALSE) return new returnData(2, NULL, "Invalid Media Record");
-
-		//Delete the Record
-		$query = "DELETE FROM media 
-			WHERE media_id = {$intMediaID} and game_id = {$intGameID}";
-
-		$rsResult = @mysql_query($query);
-		if (mysql_error()) return new returnData(3, NULL, "SQL Error:" . mysql_error());
-
-		//Delete the file		
-		$fileToDelete = Config::gamedataFSPath . "/{$intGameID}/" . $mediaRow['file_path'];
-		if (!@unlink($fileToDelete)) 
-			return new returnData(4, NULL, "Record Deleted but file was not: $fileToDelete");
-
-		//Done
-		if (mysql_affected_rows()) return new returnData(0, TRUE);
-		else return new returnData(0, FALSE);	
-
-
-	}	*/
-
-
-
-
-
 }
 ?>
