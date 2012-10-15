@@ -53,8 +53,8 @@ class Items extends Module
         NetDebug::trace($query);
 
         $rsResult = @mysql_query($query);
-        if (!$rsResult) return new returnData(0, NULL);
         if (mysql_error()) return new returnData(3, NULL, "SQL Error");
+        if (!$rsResult) return new returnData(3, NULL, "Something bad happened");
         return new returnData(0, $rsResult);
     }	
 
