@@ -294,13 +294,13 @@ function generatePlayerLocations()
             WHERE latitude <> 0
             AND longitude <> 0';
 
-  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 10 MINUTE) AND NOW()';
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 HOUR) AND NOW()';
   $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
     echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.org/server/stats/map_icons/player_alpha_100.png\' });' . "\n";
 
 
-  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()';
+  $interval = ' AND updated BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()';
   $result = mysql_query($query.$interval);
   while ($row = mysql_fetch_object($result))
     echo 'new google.maps.Marker({ position: new google.maps.LatLng(' . $row->latitude . ',' . $row->longitude . '), map: map, icon: \'http://arisgames.org/server/stats/map_icons/player_alpha_66.png\' });' . "\n";
