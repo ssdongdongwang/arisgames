@@ -31,6 +31,7 @@
 			//document.getElementById('playerBackPacks').innerHTML = "Success!-<br />"+response.data;	
 			formatPage(response.data);
                         gameJSON = response.data;
+                        preloadDumpMedia(gameJSON);
 		}
 	}
 

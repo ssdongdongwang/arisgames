@@ -18,6 +18,7 @@ class Movables extends Module
                        move_stamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        active TINYINT(1) NOT NULL DEFAULT 1);";
         mysql_query($query);
+    
     }
 
     public static function createMovable($gameId, $type, $typeId, $locationName, $algorithm_type, $algorithm_detail, $velocity, $moveStamp, $lat, $lon, $deleteWhenViewed, $errorRange, $forceView, $hidden, $allowQuickTravel, $wiggle, $showTitle = 0)

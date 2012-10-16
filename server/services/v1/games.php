@@ -147,9 +147,9 @@ class Games extends Module
 		return new returnData(0, $result, NULL);
 	}
 
-	public function saveTab($intGameId, $stringTabType, $intIndex)
+	public function saveTab($intGameId, $stringTabType, $intIndex, $tabDetail1 = 0)
 	{
-		$query = "UPDATE game_tab_data SET tab_index = '{$intIndex}' WHERE game_id = '{$intGameId}' AND tab = '{$stringTabType}'";
+		$query = "UPDATE game_tab_data SET tab_index = '{$intIndex}' AND tab_detail_1 = '{$tabDetail1}' WHERE game_id = '{$intGameId}' AND tab = '{$stringTabType}'";
 		mysql_query($query);
 		return new returnData(0);
 	}
@@ -252,7 +252,7 @@ class Games extends Module
 			$playerOb = mysql_fetch_assoc($player);
 			$comments[$x]->username = $playerOb['user_name'];
 			$comments[$x]->rating = $row['rating'];
-			$comments[$x]->text = $row['comment'];
+			$comments[$x]->text = $row['comment'] == 'Comment' ? "" : $row['comment'];
 			$x++;
 		}
 		$gameObj->comments = $comments;
@@ -296,7 +296,7 @@ class Games extends Module
 	public function createGame($intEditorID, $strFullName, $strDescription, $intPCMediaID, $intIconMediaID, $intMediaID,
 			$boolIsLocational, $boolReadyForPublic, 
 			$boolShareToMap, $boolShareToBook, $playerCreateTag, $playerCreateComments, $playerLikeNotes,
-			$intIntroNodeId, $intCompleteNodeId, $intInventoryCap)
+			$intIntroNodeId, $intCompleteNodeId, $intInventoryCap, $boolAllowTrading = true)
 	{
 		$strFullName = addslashes($strFullName);	
 		$strDescription = addslashes($strDescription);
@@ -311,11 +311,11 @@ class Games extends Module
 		$query = "INSERT INTO games (name, description, pc_media_id, icon_media_id, media_id,
 			is_locational, ready_for_public,
 			allow_share_note_to_map, allow_share_note_to_book, allow_player_tags, allow_note_comments, allow_note_likes,
-			on_launch_node_id, game_complete_node_id, inventory_weight_cap, created)
+			on_launch_node_id, game_complete_node_id, inventory_weight_cap, created, allow_trading)
 				VALUES ('{$strFullName}','{$strDescription}','{$intPCMediaID}','{$intIconMediaID}', '{$intMediaID}',
 						'{$boolIsLocational}', '{$boolReadyForPublic}', 
 						'{$boolShareToMap}', '{$boolShareToBook}', '{$playerCreateTag}', '{$playerCreateComments}','{$playerLikeNotes}',
-						'{$intIntroNodeId}','{$intCompleteNodeId}','{$intInventoryCap}', NOW())";
+						'{$intIntroNodeId}','{$intCompleteNodeId}','{$intInventoryCap}', NOW(), '{$boolAllowTrading}')";
 		@mysql_query($query);
 		if (mysql_error())  return new returnData(6, NULL, "cannot create game record using SQL: $query");
 		$newGameID = mysql_insert_id();
@@ -627,7 +627,7 @@ class Games extends Module
 	 */
 	public function migrateTables()
 	{
-		set_time_limit(120);
+		set_time_limit(100000000);
 
 	//	Test::killOrphansBeforeMigration();
 		Games::createNewTablesForMigration();
@@ -656,6 +656,15 @@ class Games extends Module
 			                 if (mysql_error()) return new returnData(3, NULL, 'SQL Error');	
 			                 }
 		}
+		$query = "ALTER TABLE media CHANGE file_name file_path VARCHAR(255) NOT NULL;";
+		@mysql_query($query);
+
+		$query = "UPDATE media SET file_path = CONCAT(game_id,'/',file_path);";
+		@mysql_query($query);
+		
+		$query = "ALTER TABLE game_tab_data ADD COLUMN tab_detail_1 INT DEFAULT 0";
+          	@mysql_query($query);	
+
 		return 0;
 	}
 
@@ -871,6 +880,7 @@ class Games extends Module
 				          KEY game_previous (game_id, previous_id)
 						  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 		@mysql_query($query);
+
 		mysql_query("ALTER TABLE aug_bubble_media ENGINE = InnoDB;");
                 mysql_query("ALTER TABLE aug_bubbles ENGINE = InnoDB;");
                 mysql_query("ALTER TABLE editors ENGINE = InnoDB;");
@@ -1705,14 +1715,28 @@ class Games extends Module
 	 * @return void
 	 */
 	public function saveComment($intPlayerId, $intGameId, $intRating, $comment) {
+                if($comment == 'Comment') $comment = "";
 		$query = "SELECT * FROM game_comments WHERE game_id = '{$intGameId}' AND player_id = '{$intPlayerId}'";
 		$result = mysql_query($query);
 		if(mysql_num_rows($result) > 0) $query = "UPDATE game_comments SET rating='{$intRating}', comment='{$comment}' WHERE game_id = '{$intGameId}' AND player_id = '{$intPlayerId}'";
 		else $query = "INSERT INTO game_comments (game_id, player_id, rating, comment) VALUES ('{$intGameId}', '{$intPlayerId}', '{$intRating}', '{$comment}')";
 		mysql_query($query);
 
-		if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
-		else return new returnData(0);
+                if (mysql_error()) return new returnData(3, NULL, 'SQL Error');
+
+                $query = "SELECT editors.email FROM (SELECT * FROM game_editors WHERE game_id = ".$intGameId.") AS ge LEFT JOIN editors ON ge.editor_id = editors.editor_id";
+                $result = mysql_query($query);
+                if(mysql_num_rows($result) > 0)
+                {
+                    $gameName = mysql_fetch_object(mysql_query("SELECT name FROM games WHERE game_id = $intGameId"))->name;
+                    $playerName = mysql_fetch_object(mysql_query("SELECT user_name FROM players WHERE player_id = $intPlayerId"))->user_name;
+                    $sub = "New Rating for '".$gameName."'";
+                    $body = "Congratulations! People are playing your ARIS game! \n".$playerName." Recently gave your game ".$intRating." stars out of 5" . (($comment && $comment != 'Comment') ? ", commenting \"".$comment."\"" : ".");
+                }
+                while($ob = mysql_fetch_object($result))
+                    Module::sendEmail($ob->email,$sub,$body);
+
+		return new returnData(0);
 	}
 
 	/**
@@ -1950,7 +1974,7 @@ class Games extends Module
 					$game->pc_media_id, $game->icon_media_id, $game->media_id,
 					$game->is_locational, $game->ready_for_public, 
 					$game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments, $game->allow_note_likes,
-					$game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
+					$game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap, $game->allow_trading);
 		}
 		else
 		{
@@ -1962,7 +1986,7 @@ class Games extends Module
 					$game->pc_media_id, $game->icon_media_id, $game->media_id,
 					$game->is_locational, $game->ready_for_public, 
 					$game->allow_share_note_to_map, $game->allow_share_note_to_book, $game->allow_player_tags, $game->allow_player_comments, $game->allow_note_likes,
-					$game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap);
+					$game->on_launch_node_id, $game->game_complete_node_id, $game->inventory_weight_cap, $game->allow_trading);
 
 			while($editors = mysql_fetch_object($rs)){
 				Games::addEditorToGame($editors->editor_id, $newGameId->data);
@@ -1979,7 +2003,7 @@ class Games extends Module
 		$query = "SELECT * FROM game_tab_data WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
 		while($result && $row = mysql_fetch_object($result)){
-			$query = "INSERT INTO game_tab_data (game_id, tab, tab_index) VALUES ('{$newPrefix}', '{$row->tab}', '{$row->tab_index}')";
+			$query = "INSERT INTO game_tab_data (game_id, tab, tab_index, tab_detail_1) VALUES ('{$newPrefix}', '{$row->tab}', '{$row->tab_index}', '{$row->tab_detail_1}')";
 			mysql_query($query);
 		}
 
