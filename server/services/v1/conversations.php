@@ -144,6 +144,8 @@ class Conversations extends Module
 		if (!$nodeIdObject) return new returnData(2, NULL, "No such conversation");			
 		$nodeId = $nodeIdObject->node_id;
 
+                $nodeText = str_replace("“", "\"", $nodeText);
+                $nodeText = str_replace("”", "\"", $nodeText);
 
 		$query = "UPDATE nodes SET text = '{$nodeText}', title = '{$conversationText}' WHERE game_id = '{$prefix}' AND node_id = {$nodeId}";
 		NetDebug::trace("Running a query = $query");	

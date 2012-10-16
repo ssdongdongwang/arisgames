@@ -40,19 +40,15 @@ function formatPage(game)
         //This next line is absolutely ridiculous and I have no idea why it works
         author = (game.authors[author]);
 
-        add("<div class='gameauthor'>\n");
-        add(author.name+"\n");
-        add("</div>\n");//<- class gameauthor
-    }
-    add("</div>\n");//<- class gameauthors
-    add("</div>\n");//<- class 'gametext'
-    add("<div class='gamelinks'>\n");
-    add("<a href='#' onClick='window.open(\"\", \"Dump\"); document.getElementById(\"dumpForm\").submit();'>Dump?</a>");
-    add("<form style='display:none;' id='dumpForm' method='POST' target='Dump' action='../../dump.php?gameId="+game.game_id+"'>");
-    add("<input id='dumpFormInput' type='text' name='game'></input>");
-    add("</form>");//<- form dumpForm
-    add("</div>\n");//<- class gamelinks
-    add("</div>\n");//<- class pageheader
+    add("<div class='gameauthor'>\n");
+    add(author.name+"\n");
+    add("</div>\n");//<- class gameauthor
+  add("</div>\n");//<- class gameauthors
+  add("</div>\n");//<- class 'gametext'
+  add("<div class='gamelinks'>\n");
+  add("<a href='javascript:dump();'>Dump?</a>");
+  add("</div>\n");//<- class gamelinks
+  add("</div>\n");//<- class pageheader
 
     add("<div class='spacer headerspacer'></div>\n");
 

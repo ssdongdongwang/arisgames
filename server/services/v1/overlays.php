@@ -226,7 +226,6 @@ class Overlays extends Module
 		return $returnData;
 	}
 
-    
 	/**
 	 * Fetch one Tile
 	 * @returns the media item
