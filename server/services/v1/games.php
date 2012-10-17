@@ -665,6 +665,9 @@ class Games extends Module
 		$query = "ALTER TABLE game_tab_data ADD COLUMN tab_detail_1 INT DEFAULT 0";
           	@mysql_query($query);	
 
+		$query = "ALTER TABLE quests ADD COLUMN exit_to_tab ENUM('NONE', 'GPS','NEARBY','QUESTS','INVENTORY','PLAYER','QR','NOTE','STARTOVER','PICKGAME');";
+		@mysql_query($query);
+
 		return 0;
 	}
 
@@ -2017,7 +2020,7 @@ class Games extends Module
 		$query = "SELECT * FROM quests WHERE game_id = {$prefix}";
 		$result = mysql_query($query);
 		while($result && $row = mysql_fetch_object($result)){
-			$query = "INSERT INTO quests (game_id, name, description, text_when_complete, icon_media_id) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->text_when_complete}', '{$row->icon_media_id}', '{$row->boolean_operator}')";
+			$query = "INSERT INTO quests(game_id, name, description, text_when_complete, icon_media_id, exit_to_tab) VALUES ('{$newPrefix}', '{$row->name}', '{$row->description}', '{$row->text_when_complete}', '{$row->icon_media_id}', '{$row->boolean_operator}', '{$row->exit_to_tab}')";
 			mysql_query($query);
 			$newID = mysql_insert_id();
 
