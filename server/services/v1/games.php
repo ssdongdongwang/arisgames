@@ -668,6 +668,9 @@ class Games extends Module
 		$query = "ALTER TABLE quests ADD COLUMN exit_to_tab ENUM('NONE', 'GPS','NEARBY','QUESTS','INVENTORY','PLAYER','QR','NOTE','STARTOVER','PICKGAME');";
 		@mysql_query($query);
 
+		$query = "ALTER TABLE media ADD COLUMN display_name VARCHAR(32) DEFAULT '';";
+		@mysql_query($query);
+
 		return 0;
 	}
 
