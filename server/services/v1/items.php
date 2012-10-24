@@ -217,7 +217,7 @@ class Items extends Module
                 media_id = '{$mediaId}', 
                 dropable = '{$droppable}',
                 destroyable = '{$destroyable}',
-		tradeatbke = '{$tradeable}',
+		tradeable = '{$tradeable}',
                 is_attribute = '{$attribute}',
                 max_qty_in_inventory = '{$maxQuantityInPlayerInventory}',
                 weight = '{$weight}',
