@@ -147,9 +147,19 @@ BOOL isShowingNotification;
         audioRecorderNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
         
         //QR Scanner Developer View
-        QRScannerViewController *qrScannerViewController = [[QRScannerViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
-        UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
-        qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+      QRScannerViewController *qrScannerViewController = [[QRScannerViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
+       UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
+       qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+        
+        //QR Scanner Developer View
+        //ARParentViewController *qrScannerViewController = [[ARParentViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
+        //UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
+        //qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+        
+        //New AR View
+        //ARParentViewController *arParentViewController = [[ARParentViewController alloc] initWithNibName:@"ARParentViewController" bundle:nil];
+       // UINavigationController *arParentNavigationController = [[UINavigationController alloc] initWithRootViewController: arParentViewController];
+       // arParentNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
         
         //Logout View
         AccountSettingsViewController *accountSettingsViewController = [[AccountSettingsViewController alloc] initWithNibName:@"Account" bundle:nil];
@@ -185,7 +195,7 @@ BOOL isShowingNotification;
                                                  gpsNavigationController,
                                                  inventoryNavigationController,
                                                  qrScannerNavigationController,
-                                                 //arNavigationController,
+                                                 //arParentNavigationController,
                                                  attributesNavigationController,
                                                  notesNavigationController,
                                                  bogusSelectGameViewController,
@@ -808,6 +818,7 @@ Notes on how this works:(Phil Dougherty- 10/23/12)
         else if([tmpTab.tabName isEqualToString:@"GPS"]) tmpTab.tabName = NSLocalizedString(@"MapViewTitleKey",@"");
         else if([tmpTab.tabName isEqualToString:@"INVENTORY"]) tmpTab.tabName = NSLocalizedString(@"InventoryViewTitleKey",@"");
         else if([tmpTab.tabName isEqualToString:@"QR"]) tmpTab.tabName = NSLocalizedString(@"QRScannerTitleKey",@"");
+        else if([tmpTab.tabName isEqualToString:@"AR"]) tmpTab.tabName = NSLocalizedString(@"ARTitleKey",@"");
         else if([tmpTab.tabName isEqualToString:@"PLAYER"]) tmpTab.tabName = NSLocalizedString(@"PlayerTitleKey",@"");
         else if([tmpTab.tabName isEqualToString:@"NOTE"]) tmpTab.tabName = NSLocalizedString(@"NotebookTitleKey",@"");
         else if([tmpTab.tabName isEqualToString:@"PICKGAME"]) tmpTab.tabName = NSLocalizedString(@"GamePickerTitleKey",@"");

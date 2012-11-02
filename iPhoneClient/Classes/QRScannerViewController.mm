@@ -13,6 +13,7 @@
 #import "AppServices.h"
 #import <QRCodeReader.h>
 #import "ZBarReaderViewController.h"
+#import "QCARutils.h"
 
 
 @implementation QRScannerViewController 
@@ -105,8 +106,23 @@
 - (IBAction)imageScanButtonTouchAction: (id) sender{
     NSLog(@"QRScannerViewController: Image Scan Button Pressed");
 	
-	self.imageMatchingImagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-	[self presentViewController:self.imageMatchingImagePickerController animated:YES completion:nil];
+	/*self.imageMatchingImagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+	[self presentViewController:self.imageMatchingImagePickerController animated:YES completion:nil];*/
+    
+    
+    CGRect screenBounds = [[UIScreen mainScreen] bounds];
+    //window = [[UIWindow alloc] initWithFrame: screenBounds];
+    
+    
+    [QCARutils getInstance].targetType = TYPE_FRAMEMARKERS;
+    
+    // Add the EAGLView and the overlay view to the window
+    ARParentViewController *arParentViewController = [[ARParentViewController alloc] init];
+    arParentViewController.arViewRect = screenBounds;
+    
+    [[self navigationController] pushViewController:arParentViewController animated:YES];
+    
+    
     
 }
 

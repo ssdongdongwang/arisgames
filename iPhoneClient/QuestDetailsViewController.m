@@ -56,6 +56,8 @@
             self.quest.exitToTabName = NSLocalizedString(@"InventoryViewTitleKey",@"");
         else if([self.quest.exitToTabName isEqualToString:@"QR"])
             self.quest.exitToTabName = NSLocalizedString(@"QRScannerTitleKey",@"");
+        else if([self.quest.exitToTabName isEqualToString:@"AR"])
+            self.quest.exitToTabName = NSLocalizedString(@"ARTitleKey",@"");
         else if([self.quest.exitToTabName isEqualToString:@"PLAYER"])
             self.quest.exitToTabName = NSLocalizedString(@"PlayerTitleKey",@"");
         else if([self.quest.exitToTabName isEqualToString:@"NOTE"])

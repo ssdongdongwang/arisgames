@@ -35,7 +35,7 @@
 #import "AttributesViewController.h"
 #import "CameraViewController.h"
 #import "AudioRecorderViewController.h"
-#import "ARViewViewControler.h"
+#import "ARParentViewController.h"
 #import "QRScannerViewController.h"
 #import "AccountSettingsViewController.h"
 #import "PlayerSettingsViewController.h"

@@ -15,8 +15,6 @@
 		1F027FB211A7BEAF006B06DE /* MultiFormatReader.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F027FA611A7BEAF006B06DE /* MultiFormatReader.mm */; };
 		1F027FB311A7BEAF006B06DE /* NSString+HTML.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F027FA711A7BEAF006B06DE /* NSString+HTML.h */; };
 		1F027FB411A7BEAF006B06DE /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F027FA811A7BEAF006B06DE /* NSString+HTML.m */; };
-		1F027FB511A7BEAF006B06DE /* OverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F027FA911A7BEAF006B06DE /* OverlayView.h */; };
-		1F027FB611A7BEAF006B06DE /* OverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F027FAA11A7BEAF006B06DE /* OverlayView.m */; };
 		1F027FBB11A7BEBF006B06DE /* TwoDDecoderResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F027FB711A7BEBF006B06DE /* TwoDDecoderResult.h */; };
 		1F027FBC11A7BEBF006B06DE /* TwoDDecoderResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F027FB811A7BEBF006B06DE /* TwoDDecoderResult.m */; };
 		1F027FBD11A7BEBF006B06DE /* ZXingWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F027FB911A7BEBF006B06DE /* ZXingWidgetController.h */; };
@@ -244,8 +242,6 @@
 		1F027FA611A7BEAF006B06DE /* MultiFormatReader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MultiFormatReader.mm; path = Classes/MultiFormatReader.mm; sourceTree = "<group>"; };
 		1F027FA711A7BEAF006B06DE /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+HTML.h"; path = "Classes/NSString+HTML.h"; sourceTree = "<group>"; };
 		1F027FA811A7BEAF006B06DE /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+HTML.m"; path = "Classes/NSString+HTML.m"; sourceTree = "<group>"; };
-		1F027FA911A7BEAF006B06DE /* OverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OverlayView.h; path = Classes/OverlayView.h; sourceTree = "<group>"; };
-		1F027FAA11A7BEAF006B06DE /* OverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverlayView.m; path = Classes/OverlayView.m; sourceTree = "<group>"; };
 		1F027FB711A7BEBF006B06DE /* TwoDDecoderResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TwoDDecoderResult.h; path = Classes/TwoDDecoderResult.h; sourceTree = "<group>"; };
 		1F027FB811A7BEBF006B06DE /* TwoDDecoderResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TwoDDecoderResult.m; path = Classes/TwoDDecoderResult.m; sourceTree = "<group>"; };
 		1F027FB911A7BEBF006B06DE /* ZXingWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZXingWidgetController.h; path = Classes/ZXingWidgetController.h; sourceTree = "<group>"; };
@@ -535,8 +531,6 @@
 				1F027FA611A7BEAF006B06DE /* MultiFormatReader.mm */,
 				1F027FA711A7BEAF006B06DE /* NSString+HTML.h */,
 				1F027FA811A7BEAF006B06DE /* NSString+HTML.m */,
-				1F027FA911A7BEAF006B06DE /* OverlayView.h */,
-				1F027FAA11A7BEAF006B06DE /* OverlayView.m */,
 				E5345A00119876A5000CB77F /* Actions */,
 				E53459EF119876A5000CB77F /* ParsedResults */,
 				E53459D4119876A5000CB77F /* ResultParsers */,
@@ -945,7 +939,6 @@
 				1F027FAD11A7BEAF006B06DE /* DecoderDelegate.h in Headers */,
 				1F027FAE11A7BEAF006B06DE /* FormatReader.h in Headers */,
 				1F027FB311A7BEAF006B06DE /* NSString+HTML.h in Headers */,
-				1F027FB511A7BEAF006B06DE /* OverlayView.h in Headers */,
 				1F027FBB11A7BEBF006B06DE /* TwoDDecoderResult.h in Headers */,
 				1F027FBD11A7BEBF006B06DE /* ZXingWidgetController.h in Headers */,
 				1F027FCD11A7BED6006B06DE /* AddContactAction.h in Headers */,
@@ -1111,7 +1104,6 @@
 				1F027FAF11A7BEAF006B06DE /* FormatReader.mm in Sources */,
 				1F027FB211A7BEAF006B06DE /* MultiFormatReader.mm in Sources */,
 				1F027FB411A7BEAF006B06DE /* NSString+HTML.m in Sources */,
-				1F027FB611A7BEAF006B06DE /* OverlayView.m in Sources */,
 				1F027FBC11A7BEBF006B06DE /* TwoDDecoderResult.m in Sources */,
 				1F027FBE11A7BEBF006B06DE /* ZXingWidgetController.m in Sources */,
 				1F027FCE11A7BED6006B06DE /* AddContactAction.m in Sources */,
