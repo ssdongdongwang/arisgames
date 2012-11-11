@@ -1228,7 +1228,7 @@ class Games extends Module
 		$nearestLocation = mysql_fetch_object($nearestLocationRs);
 		return $nearestLocation;
 	}
-
+	
 
 	/**
 	 * Gets a set of games that contain the input string
