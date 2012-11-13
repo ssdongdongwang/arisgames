@@ -114,7 +114,15 @@
     //window = [[UIWindow alloc] initWithFrame: screenBounds];
     
     
-    [QCARutils getInstance].targetType = TYPE_FRAMEMARKERS;
+    //[QCARutils getInstance].targetType = TYPE_FRAMEMARKERS;
+    
+    QCARutils *qUtils = [QCARutils getInstance];
+    
+    // Provide a list of targets we're expecting - the first in the list is the default
+    [qUtils addTargetName:@"Stones & Chips" atPath:@"StonesAndChips.xml"];
+    [qUtils addTargetName:@"Tarmac" atPath:@"Tarmac.xml"];
+    [qUtils addTargetName:@"Test" atPath:@"Test.xml"];
+    
     
     // Add the EAGLView and the overlay view to the window
     ARParentViewController *arParentViewController = [[ARParentViewController alloc] init];

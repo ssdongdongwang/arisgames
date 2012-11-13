@@ -412,8 +412,10 @@ static QCARutils *qUtils = nil; // singleton class
     // Initialize the image or marker tracker
     QCAR::TrackerManager& trackerManager = QCAR::TrackerManager::getInstance();
 
-    if (targetType != TYPE_FRAMEMARKERS)
-    {
+    // GWS: Here we also have to get tracker type(s) from ARIS and set them up appropriately.  For now, initializing both types.
+    
+    //if (targetType != TYPE_FRAMEMARKERS)
+    //{
         // Image Tracker...
         QCAR::Tracker* trackerBase = trackerManager.initTracker(QCAR::Tracker::IMAGE_TRACKER);
         if (trackerBase == NULL)
@@ -425,12 +427,12 @@ static QCARutils *qUtils = nil; // singleton class
             NSLog(@"Successfully initialized ImageTracker.");
             res = 1;
         }
-    }
-    else
-    {
+   // }
+   // else
+    //{
         // Marker Tracker...
-        QCAR::Tracker* trackerBase = trackerManager.initTracker(QCAR::Tracker::MARKER_TRACKER);
-        if (trackerBase == NULL)
+        QCAR::Tracker* trackerBase2 = trackerManager.initTracker(QCAR::Tracker::MARKER_TRACKER);
+        if (trackerBase2 == NULL)
         {
             NSLog(@"Failed to initialize MarkerTracker.");            
         }
@@ -439,7 +441,7 @@ static QCARutils *qUtils = nil; // singleton class
             NSLog(@"Successfully initialized MarkerTracker.");
             
             // Create the markers required
-            QCAR::MarkerTracker* markerTracker = static_cast<QCAR::MarkerTracker*>(trackerBase);
+            QCAR::MarkerTracker* markerTracker = static_cast<QCAR::MarkerTracker*>(trackerBase2);
             if (markerTracker == NULL)
             {
                 NSLog(@"Failed to get MarkerTracker.");
@@ -463,7 +465,7 @@ static QCARutils *qUtils = nil; // singleton class
                 }
             }
         }
-    }
+    //}
     
     if (res == 0)
     {
@@ -536,11 +538,17 @@ static QCARutils *qUtils = nil; // singleton class
         if (QCAR::CameraDevice::getInstance().start()) {
             // Start the tracker
             QCAR::TrackerManager& trackerManager = QCAR::TrackerManager::getInstance();
-            QCAR::Tracker* tracker = trackerManager.getTracker(targetType == TYPE_FRAMEMARKERS ?
-                                                               QCAR::Tracker::MARKER_TRACKER :
-                                                               QCAR::Tracker::IMAGE_TRACKER);
+            
+            // GWS: Here, need to get what kind of markers to be tracking (image or frame or both) from ARIS server and set up trackers accordingly.  Right now set up for both, which will be wasteful.
+            QCAR::Tracker* tracker = trackerManager.getTracker(QCAR::Tracker::MARKER_TRACKER);
+            
             if(tracker != 0)
                 tracker->start();
+            
+            QCAR::Tracker* tracker2 = trackerManager.getTracker(QCAR::Tracker::IMAGE_TRACKER);
+            
+            if(tracker2 != 0)
+                tracker2->start();
             
             // Cache the projection matrix:
             const QCAR::CameraCalibration& cameraCalibration = QCAR::CameraDevice::getInstance().getCameraCalibration();

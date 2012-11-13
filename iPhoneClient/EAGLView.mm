@@ -152,13 +152,22 @@ QCAR::State state;
             const QCAR::Trackable* trackable = state.getActiveTrackable(i);
             QCAR::Matrix44F modelViewMatrix = QCAR::Tool::convertPose2GLMatrix(trackable->getPose());        
             
-            // Check the type of the trackable:
-            assert(trackable->getType() == QCAR::Trackable::MARKER);
-            const QCAR::Marker* marker = static_cast<const QCAR::Marker*>(trackable);
+            const QCAR::Marker* marker;
+            const QCAR::ImageTarget* imageTarget;
+            int textureIndex;
             
-            // Choose the object and texture based on the marker ID
-            int textureIndex = marker->getMarkerId();
-            assert(textureIndex < [textures count]);
+            // Check the type of the trackable:
+            if(trackable->getType() == QCAR::Trackable::MARKER) {
+                marker = static_cast<const QCAR::Marker*>(trackable);
+            
+                // Choose the object and texture based on the marker ID
+                textureIndex = marker->getMarkerId();
+                assert(textureIndex < [textures count]);
+            } else if (trackable->getType() == QCAR::Trackable::IMAGE_TARGET) {
+                imageTarget = static_cast<const QCAR::ImageTarget*>(trackable);
+                textureIndex = 0;
+            }
+            
             
             Object3D *obj3D = [objects3D objectAtIndex:textureIndex];
             
@@ -258,8 +267,12 @@ QCAR::State state;
         QCAR::Matrix44F modelViewMatrix = QCAR::Tool::convertPose2GLMatrix(trackable->getPose());
         
         // Check the type of the trackable:
-        assert(trackable->getType() == QCAR::Trackable::MARKER);
-        const QCAR::Marker* marker = static_cast<const QCAR::Marker*>(trackable);
+        const QCAR::Marker* marker;
+        const QCAR::ImageTarget* imageTarget;
+        if(trackable->getType() == QCAR::Trackable::MARKER)
+            marker = static_cast<const QCAR::Marker*>(trackable);
+        else
+            imageTarget = static_cast<const QCAR::ImageTarget*>(trackable);
         
         // if found on frame
         if (trackable->getStatus() == QCAR::Trackable::DETECTED) {
