@@ -164,6 +164,20 @@
 		3A62ECB4164C13CC002B0B20 /* Tarmac.dat in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECB0164C13C9002B0B20 /* Tarmac.dat */; };
 		3A62ECB5164C13CC002B0B20 /* Tarmac.xml in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECB1164C13CB002B0B20 /* Tarmac.xml */; };
 		3A62ECC1164C4EBE002B0B20 /* Test.xml in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECBF164C4EBE002B0B20 /* Test.xml */; };
+		3A62ECC41652B28A002B0B20 /* VideoPlayerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A62ECC31652B289002B0B20 /* VideoPlayerHelper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		3A62ECC71652B2A4002B0B20 /* SampleMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A62ECC61652B2A2002B0B20 /* SampleMath.cpp */; };
+		3A62ECD31652B8A9002B0B20 /* VuforiaSizzleReel_1.m4v in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECC81652B898002B0B20 /* VuforiaSizzleReel_1.m4v */; };
+		3A62ECD41652B8A9002B0B20 /* VuforiaSizzleReel_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECC91652B899002B0B20 /* VuforiaSizzleReel_1.png */; };
+		3A62ECD51652B8A9002B0B20 /* VuforiaSizzleReel_2.m4v in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCA1652B89A002B0B20 /* VuforiaSizzleReel_2.m4v */; };
+		3A62ECD61652B8A9002B0B20 /* VuforiaSizzleReel_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCB1652B89C002B0B20 /* VuforiaSizzleReel_2.png */; };
+		3A62ECD71652B8A9002B0B20 /* start_medium_press.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCC1652B89F002B0B20 /* start_medium_press.png */; };
+		3A62ECD81652B8A9002B0B20 /* start_medium.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCD1652B8A0002B0B20 /* start_medium.png */; };
+		3A62ECD91652B8A9002B0B20 /* start_large_press.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCE1652B8A2002B0B20 /* start_large_press.png */; };
+		3A62ECDA1652B8A9002B0B20 /* start_large.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECCF1652B8A3002B0B20 /* start_large.png */; };
+		3A62ECDB1652B8A9002B0B20 /* icon_error.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECD01652B8A5002B0B20 /* icon_error.png */; };
+		3A62ECDC1652B8A9002B0B20 /* icon_loading.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECD11652B8A6002B0B20 /* icon_loading.png */; };
+		3A62ECDD1652B8A9002B0B20 /* icon_play.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECD21652B8A7002B0B20 /* icon_play.png */; };
+		3A62ECE41652C384002B0B20 /* VPParentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A62ECE31652C383002B0B20 /* VPParentViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3A69944B1625F6610015B48A /* newBanner.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A69944A1625F6610015B48A /* newBanner.png */; };
 		3AA83345159E3FF3002CC61D /* TileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83342159E3FF3002CC61D /* TileOverlay.m */; };
 		3AA83346159E3FF3002CC61D /* TileOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83344159E3FF3002CC61D /* TileOverlayView.m */; };
@@ -714,6 +728,24 @@
 		3A62ECB0164C13C9002B0B20 /* Tarmac.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = Tarmac.dat; sourceTree = "<group>"; };
 		3A62ECB1164C13CB002B0B20 /* Tarmac.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Tarmac.xml; sourceTree = "<group>"; };
 		3A62ECBF164C4EBE002B0B20 /* Test.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Test.xml; sourceTree = "<group>"; };
+		3A62ECC21652B287002B0B20 /* VideoPlayerHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoPlayerHelper.h; sourceTree = "<group>"; };
+		3A62ECC31652B289002B0B20 /* VideoPlayerHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerHelper.m; sourceTree = "<group>"; };
+		3A62ECC51652B2A1002B0B20 /* SampleMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleMath.h; sourceTree = "<group>"; };
+		3A62ECC61652B2A2002B0B20 /* SampleMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SampleMath.cpp; sourceTree = "<group>"; };
+		3A62ECC81652B898002B0B20 /* VuforiaSizzleReel_1.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = VuforiaSizzleReel_1.m4v; sourceTree = "<group>"; };
+		3A62ECC91652B899002B0B20 /* VuforiaSizzleReel_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = VuforiaSizzleReel_1.png; sourceTree = "<group>"; };
+		3A62ECCA1652B89A002B0B20 /* VuforiaSizzleReel_2.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = VuforiaSizzleReel_2.m4v; sourceTree = "<group>"; };
+		3A62ECCB1652B89C002B0B20 /* VuforiaSizzleReel_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = VuforiaSizzleReel_2.png; sourceTree = "<group>"; };
+		3A62ECCC1652B89F002B0B20 /* start_medium_press.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = start_medium_press.png; sourceTree = "<group>"; };
+		3A62ECCD1652B8A0002B0B20 /* start_medium.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = start_medium.png; sourceTree = "<group>"; };
+		3A62ECCE1652B8A2002B0B20 /* start_large_press.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = start_large_press.png; sourceTree = "<group>"; };
+		3A62ECCF1652B8A3002B0B20 /* start_large.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = start_large.png; sourceTree = "<group>"; };
+		3A62ECD01652B8A5002B0B20 /* icon_error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_error.png; sourceTree = "<group>"; };
+		3A62ECD11652B8A6002B0B20 /* icon_loading.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_loading.png; sourceTree = "<group>"; };
+		3A62ECD21652B8A7002B0B20 /* icon_play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_play.png; sourceTree = "<group>"; };
+		3A62ECE21652C382002B0B20 /* VPParentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPParentViewController.h; sourceTree = "<group>"; };
+		3A62ECE31652C383002B0B20 /* VPParentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPParentViewController.m; sourceTree = "<group>"; };
+		3A62ECE51652DA4E002B0B20 /* Quad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quad.h; sourceTree = "<group>"; };
 		3A69944A1625F6610015B48A /* newBanner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = newBanner.png; sourceTree = "<group>"; };
 		3AA83341159E3FF3002CC61D /* TileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileOverlay.h; sourceTree = "<group>"; };
 		3AA83342159E3FF3002CC61D /* TileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TileOverlay.m; sourceTree = "<group>"; };
@@ -1452,13 +1484,31 @@
 				3A62EC991641AC83002B0B20 /* letter_C.png */,
 				3A62EC9A1641AC83002B0B20 /* letter_Q.png */,
 				3A62ECAE164C13C6002B0B20 /* StonesAndChips.dat */,
+				3A62ECE21652C382002B0B20 /* VPParentViewController.h */,
+				3A62ECE31652C383002B0B20 /* VPParentViewController.m */,
 				3A62ECAF164C13C8002B0B20 /* StonesAndChips.xml */,
 				3A62ECB0164C13C9002B0B20 /* Tarmac.dat */,
+				3A62ECC51652B2A1002B0B20 /* SampleMath.h */,
+				3A62ECC81652B898002B0B20 /* VuforiaSizzleReel_1.m4v */,
+				3A62ECC91652B899002B0B20 /* VuforiaSizzleReel_1.png */,
+				3A62ECE51652DA4E002B0B20 /* Quad.h */,
+				3A62ECCA1652B89A002B0B20 /* VuforiaSizzleReel_2.m4v */,
+				3A62ECCB1652B89C002B0B20 /* VuforiaSizzleReel_2.png */,
+				3A62ECCC1652B89F002B0B20 /* start_medium_press.png */,
+				3A62ECCD1652B8A0002B0B20 /* start_medium.png */,
+				3A62ECCE1652B8A2002B0B20 /* start_large_press.png */,
+				3A62ECCF1652B8A3002B0B20 /* start_large.png */,
+				3A62ECD01652B8A5002B0B20 /* icon_error.png */,
+				3A62ECD11652B8A6002B0B20 /* icon_loading.png */,
+				3A62ECD21652B8A7002B0B20 /* icon_play.png */,
+				3A62ECC61652B2A2002B0B20 /* SampleMath.cpp */,
 				3A62ECB1164C13CB002B0B20 /* Tarmac.xml */,
 				3A62ECBF164C4EBE002B0B20 /* Test.xml */,
 				3A62ECA41641CFD8002B0B20 /* smile.png */,
 				3A62ECA01641CB6A002B0B20 /* Smile.jpeg */,
 				3A62EC9B1641AC83002B0B20 /* letter_R.png */,
+				3A62ECC21652B287002B0B20 /* VideoPlayerHelper.h */,
+				3A62ECC31652B289002B0B20 /* VideoPlayerHelper.m */,
 				3ABD20CD1639D37F00C2EAD6 /* EAGLView.mm */,
 				3AEFB3781641970E00695706 /* ARCommon */,
 				3ABD20CE1639D37F00C2EAD6 /* FrameMarkersAppDelegate.h */,
@@ -2604,6 +2654,17 @@
 				3A62ECB4164C13CC002B0B20 /* Tarmac.dat in Resources */,
 				3A62ECB5164C13CC002B0B20 /* Tarmac.xml in Resources */,
 				3A62ECC1164C4EBE002B0B20 /* Test.xml in Resources */,
+				3A62ECD31652B8A9002B0B20 /* VuforiaSizzleReel_1.m4v in Resources */,
+				3A62ECD41652B8A9002B0B20 /* VuforiaSizzleReel_1.png in Resources */,
+				3A62ECD51652B8A9002B0B20 /* VuforiaSizzleReel_2.m4v in Resources */,
+				3A62ECD61652B8A9002B0B20 /* VuforiaSizzleReel_2.png in Resources */,
+				3A62ECD71652B8A9002B0B20 /* start_medium_press.png in Resources */,
+				3A62ECD81652B8A9002B0B20 /* start_medium.png in Resources */,
+				3A62ECD91652B8A9002B0B20 /* start_large_press.png in Resources */,
+				3A62ECDA1652B8A9002B0B20 /* start_large.png in Resources */,
+				3A62ECDB1652B8A9002B0B20 /* icon_error.png in Resources */,
+				3A62ECDC1652B8A9002B0B20 /* icon_loading.png in Resources */,
+				3A62ECDD1652B8A9002B0B20 /* icon_play.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2821,6 +2882,9 @@
 				3AEFB3931641970E00695706 /* Shader.vsh in Sources */,
 				3AEFB3941641970E00695706 /* ShaderUtils.cpp in Sources */,
 				3AEFB3951641970E00695706 /* Texture.mm in Sources */,
+				3A62ECC41652B28A002B0B20 /* VideoPlayerHelper.m in Sources */,
+				3A62ECC71652B2A4002B0B20 /* SampleMath.cpp in Sources */,
+				3A62ECE41652C384002B0B20 /* VPParentViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

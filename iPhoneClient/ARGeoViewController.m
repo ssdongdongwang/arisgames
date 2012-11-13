@@ -12,11 +12,11 @@
 
 @implementation ARGeoViewController
 
-@synthesize centerLocation;
+//@synthesize centerLocation;
 
 - (void)setCenterLocation:(CLLocation *)newLocation {
-	centerLocation = newLocation;
-	
+	//centerLocation = newLocation;
+	/*
 	for (ARGeoCoordinate *geoLocation in self.coordinates) {
 		if ([geoLocation isKindOfClass:[ARGeoCoordinate class]]) {
 			[geoLocation calibrateUsingOrigin:centerLocation];
@@ -25,7 +25,8 @@
 				self.maximumScaleDistance = geoLocation.radialDistance;
 			}
 		}
-	}
+     
+	}*/
 }
 
 @end

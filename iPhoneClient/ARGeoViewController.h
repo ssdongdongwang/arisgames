@@ -11,9 +11,9 @@
 #import "ARViewController.h"
 
 @interface ARGeoViewController : ARViewController {
-	CLLocation *centerLocation;
+//	CLLocation *centerLocation;
 }
 
-@property (nonatomic) CLLocation *centerLocation;
+//@property (nonatomic) CLLocation *centerLocation;
 
 @end
