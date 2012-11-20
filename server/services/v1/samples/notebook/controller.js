@@ -152,6 +152,7 @@ function Controller()
         model.backpacks = model.gameData.backpacks;
         for(var i = 0; i < model.backpacks.length; i++)
         {
+            if(model.backpacks == "Invalid Player ID") continue;
             for(var j = 0; j < model.backpacks[i].notes.length; j++)
             {
                 //Fix up note tags
@@ -283,7 +284,8 @@ function Controller()
         {
             var bounds = new google.maps.LatLngBounds();
             for(var i = 0; i < model.mapMarkers.length; i++)
-                bounds.extend(model.mapMarkers[i].object.geoloc);
+                if(model.mapMarkers[i].object.geoloc.Xa != 0 && model.mapMarkers[i].object.geoloc.Ya != 0)
+                    bounds.extend(model.mapMarkers[i].object.geoloc);
             setTimeout(function(){ model.views.gmap.fitBounds(bounds); }, 100);
         }
     }
