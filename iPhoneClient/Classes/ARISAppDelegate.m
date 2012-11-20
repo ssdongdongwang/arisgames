@@ -50,11 +50,24 @@ int steps = 0;
 	NSLog(@"Current language: %@", currentLanguage);
     
     //[[UIAccelerometer sharedAccelerometer] setUpdateInterval:0.2];
+    
+    
+    QRScannerViewController *qrScannerViewController = [[QRScannerViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
+    //UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
+    //qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+    
+    //[(UINavigationController*)self.gameSelectionTabBarController.selectedViewController pushViewController:qrScannerViewController animated:YES];
+    //[self.navigationController pushViewController:qrScannerNavigationController animated:YES];
+    //[qrScannerViewController showARCamera];
+    
+    //[window addSubView:qrScannerNavigationController.view];
+    //[self.window makeKeyAndVisible];
 
-    if([window respondsToSelector:@selector(setRootViewController:)])
-        [window setRootViewController:[RootViewController sharedRootViewController]];
-    else
-        [window addSubview:[RootViewController sharedRootViewController].view];
+   // if([window respondsToSelector:@selector(setRootViewController:)])
+        [window setRootViewController:qrScannerViewController];
+    //[qrScannerViewController showARCamera];
+    //else
+    //    [window addSubview:[RootViewController sharedRootViewController].view];*/
 }
 
 

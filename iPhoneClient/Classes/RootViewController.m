@@ -42,6 +42,7 @@ BOOL isShowingNotification;
 @synthesize pubClient;
 @synthesize privClient,loadingVC;
 //@synthesize toolbarViewController;
+@synthesize qrScannerNavigationController;
 
 + (id)sharedRootViewController
 {
@@ -96,7 +97,7 @@ BOOL isShowingNotification;
 
         
         //Setup NearbyObjects View
-        NearbyObjectsViewController *nearbyObjectsViewController = [[NearbyObjectsViewController alloc]initWithNibName:@"NearbyObjectsViewController" bundle:nil];
+        /*NearbyObjectsViewController *nearbyObjectsViewController = [[NearbyObjectsViewController alloc]initWithNibName:@"NearbyObjectsViewController" bundle:nil];
         UINavigationController *nearbyObjectsNavigationControllerAlloc = [[UINavigationController alloc] initWithRootViewController:nearbyObjectsViewController];
         self.nearbyObjectsNavigationController = nearbyObjectsNavigationControllerAlloc;
         self.nearbyObjectsNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -135,22 +136,19 @@ BOOL isShowingNotification;
         NotebookViewController *notesViewController = [[NotebookViewController alloc] initWithNibName:@"NotebookViewController" bundle:nil];
         UINavigationController *notesNavigationController = [[UINavigationController alloc] initWithRootViewController: notesViewController];
         notesNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-        
+        */
         //Setup Camera View
         /*CameraViewController *cameraViewController = [[[CameraViewController alloc] initWithNibName:@"Camera" bundle:nil] autorelease];
          UINavigationController *cameraNavigationController = [[UINavigationController alloc] initWithRootViewController: cameraViewController];
          cameraNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;*/
         
         //Setup Audio Recorder View
-        AudioRecorderViewController *audioRecorderViewController = [[AudioRecorderViewController alloc] initWithNibName:@"AudioRecorderViewController" bundle:nil];
+        /*AudioRecorderViewController *audioRecorderViewController = [[AudioRecorderViewController alloc] initWithNibName:@"AudioRecorderViewController" bundle:nil];
         UINavigationController *audioRecorderNavigationController = [[UINavigationController alloc] initWithRootViewController: audioRecorderViewController];
-        audioRecorderNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
+        audioRecorderNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;*/	
         
         //QR Scanner Developer View
-      QRScannerViewController *qrScannerViewController = [[QRScannerViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
-       UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
-       qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-        
+            
         //QR Scanner Developer View
         //ARParentViewController *qrScannerViewController = [[ARParentViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
         //UINavigationController *qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
@@ -162,7 +160,7 @@ BOOL isShowingNotification;
        // arParentNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
         
         //Logout View
-        AccountSettingsViewController *accountSettingsViewController = [[AccountSettingsViewController alloc] initWithNibName:@"Account" bundle:nil];
+        /*AccountSettingsViewController *accountSettingsViewController = [[AccountSettingsViewController alloc] initWithNibName:@"Account" bundle:nil];
         UINavigationController *accountSettingsNavigationController = [[UINavigationController alloc] initWithRootViewController: accountSettingsViewController];
         accountSettingsNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
         
@@ -181,10 +179,10 @@ BOOL isShowingNotification;
   //      [loginViewNavigationController.view setFrame:UIScreen.mainScreen.applicationFrame];
         loginViewNavigationController.view.frame = self.view.frame;
         [self.view addSubview:loginViewNavigationController.view];
-        
+        */
         
         //Setup the Main Tab Bar
-        UITabBarController *tabBarControllerAlloc = [[UITabBarController alloc] init];
+        /*UITabBarController *tabBarControllerAlloc = [[UITabBarController alloc] init];
         self.tabBarController = tabBarControllerAlloc;
         self.tabBarController.delegate = self;
         UINavigationController *moreNavController = self.tabBarController.moreNavigationController;
@@ -208,10 +206,10 @@ BOOL isShowingNotification;
         [self.tabBarController.view setFrame:self.view.bounds];
         [self.view addSubview:self.tabBarController.view];
         [AppModel sharedAppModel].defaultGameTabList = self.tabBarController.customizableViewControllers;
-        
+        */
         //Setup the Game Selection Tab Bar
         
-        UITabBarController *gameSelectionTabBarControllerAlloc = [[UITabBarController alloc] init];
+        /*UITabBarController *gameSelectionTabBarControllerAlloc = [[UITabBarController alloc] init];
         self.gameSelectionTabBarController = gameSelectionTabBarControllerAlloc;
         self.gameSelectionTabBarController.delegate = self;
         
@@ -237,12 +235,7 @@ BOOL isShowingNotification;
         anaccountSettingsNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
         
         self.gameSelectionTabBarController.viewControllers = [NSMutableArray arrayWithObjects:
-                                                              gamePickerNearbyNC,
-                                                              //gamePickerMapNC,
-                                                              gamePickerSearchNC,
-                                                              gamePickerPopularNC,
-                                                              gamePickerRecentNC,
-                                                              anaccountSettingsNavigationController,
+                                                            qrScannerNavigationController,
                                                               nil];
         //[self.gameSelectionTabBarController.view setFrame:UIScreen.mainScreen.applicationFrame];
         [self.view addSubview:self.gameSelectionTabBarController.view];
@@ -270,7 +263,9 @@ BOOL isShowingNotification;
                                        selector:@selector(startUpdatingLocation) 
                                        userInfo:nil 
                                         repeats:NO];
+        */
         
+        /*
         //Set up visibility of views at top of heirarchy
         [[AppModel sharedAppModel] loadUserDefaults];
         if ([AppModel sharedAppModel].playerId == 0)
@@ -285,19 +280,20 @@ BOOL isShowingNotification;
             [AppModel sharedAppModel].loggedIn = YES;
             self.loginViewNavigationController.view.hidden = YES;
             self.tabBarController.view.hidden = YES;
-            /*if([AppModel sharedAppModel].museumMode)
-            {
+            /*if([AppModel sharedAppModel].museumMode)*/
+        /*
+        {
                 self.gameSelectionTabBarController.view.hidden = YES;
                 self.playerSettingsViewNavigationController.view.hidden = NO;
-            }*/
+            }
             //else
             //{
-                self.gameSelectionTabBarController.view.hidden = NO;
+               // self.gameSelectionTabBarController.view.hidden = NO;
                 self.playerSettingsViewNavigationController.view.hidden = YES;
             //}
         }
         //self.waitingIndicatorView = [[WaitingIndicatorView alloc] init];
-        
+        */
         /*//PUSHER STUFF
          //Setup Pusher Client
          self.pubClient = [PTPusher pusherWithKey:@"7fe26fe9f55d4b78ea02" delegate:self];
@@ -318,7 +314,11 @@ BOOL isShowingNotification;
          name:PTPusherEventReceivedNotification
          object:privChannel];
          */
+        
+         
     }
+    
+  
     return self;
 }
 
@@ -335,7 +335,24 @@ BOOL isShowingNotification;
 
 - (void)viewWillAppear:(BOOL)animated{
     [[UIApplication sharedApplication] setStatusBarOrientation:UIDeviceOrientationPortrait animated:NO];
+
 }
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    //QRScannerViewController *qrScannerViewController = [[QRScannerViewController alloc] initWithNibName:@"QRScanner" bundle:nil];
+   // qrScannerNavigationController = [[UINavigationController alloc] initWithRootViewController: qrScannerViewController];
+   // qrScannerNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+    
+    //[(UINavigationController*)self.gameSelectionTabBarController.selectedViewController pushViewController:qrScannerViewController animated:YES];
+    //[self.navigationController pushViewController:qrScannerNavigationController animated:YES];
+    //[qrScannerViewController showARCamera];
+    
+    //[window addSubView:qrScannerNavigationController.view];
+    //[self.window makeKeyAndVisible];
+}
+
+
 
 /*
 Notes on how this works:(Phil Dougherty- 10/23/12)

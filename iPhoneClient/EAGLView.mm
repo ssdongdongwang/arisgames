@@ -37,7 +37,6 @@ Qualcomm Confidential and Proprietary
 #define MAKESTRING(x) #x
 #define NUM_PLANE_VERTEX 12
 #define NUM_PLANE_INDEX 6
-#define NUM_VIDEO_TARGETS 2
 
 namespace {
     // Letter object scale factor and translation
@@ -78,9 +77,23 @@ namespace {
         "icon_play.png",
         "icon_loading.png",
         "icon_error.png",
-        "VuforiaSizzleReel_1.png",
-        "VuforiaSizzleReel_2.png"
-    };
+        "Plaid.png",
+        "longEarrings.png",
+        "Glasses.png",
+        "Guilt.png"
+       
+    }; //,
+    //"Delicious.png",
+   // "Glasses.png",
+   // "Guilt.png",
+   // "Long Earrings.png",
+   // "PayForThat.png",
+   // "Plaid.png",
+  // // "Purple Shirt.png",
+   // "TalkingAbout.png",
+  //  "Tumeric.png",
+   // "WaterFountain.png",
+   // "YouFoundMe.png"
     
     enum tagObjectIndex {
         OBJECT_PLAY_ICON,
@@ -271,7 +284,7 @@ QCAR::State state;
                 textureIndex = 0;
             }
             
-            
+     
             Object3D *obj3D = [objects3D objectAtIndex:textureIndex];
             
             // Render with OpenGL 2
@@ -365,9 +378,13 @@ QCAR::State state;
     [dataLock lock];
     
     // Assume all targets are inactive (used when determining tap locations)
-    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-        videoData[i].isActive = NO;
-    }
+    
+    int playerIndex = 0;
+    
+    
+    //for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+    //    videoData[i].isActive = NO;
+    //}
     
     // Did we find any trackables this frame?
     for (int i = 0; i < numActiveTrackables; ++i) {
@@ -375,15 +392,35 @@ QCAR::State state;
         const QCAR::Trackable* trackable = state.getActiveTrackable(i);
         
         // VideoPlayerHelper to use for current target
-        int playerIndex = 0;    // stones
+        //playerIndex = 0;    // stones
         
-        if (strcmp(trackable->getName(), "chips") == 0)
-        {
-            playerIndex = 1;
-        }
+        //if (strcmp(trackable->getName(), "chips") == 0)
+        //{
+        //    playerIndex = 1;
+        //}
         
         // Mark this video (target) as active
-        videoData[playerIndex].isActive = YES;
+        // Check the type of the trackable:
+        
+        const QCAR::Marker* marker;
+        if(trackable->getType() == QCAR::Trackable::MARKER) {
+           marker = static_cast<const QCAR::Marker*>(trackable);
+            
+            // Choose the object and texture based on the marker ID
+            playerIndex = marker->getMarkerId();// *2;
+        
+            videoData[playerIndex].isActive = YES;
+            
+            
+           /* if (videoData[playerIndex + 1].isActive && [videoPlayerHelper[playerIndex + 1] getStatus] == REACHED_END) {
+                videoData[playerIndex + 1].isActive = NO;
+            }
+            
+            if (videoData[playerIndex + 1].isActive) {
+                videoData[playerIndex].isActive = NO;
+                playerIndex = (marker->getMarkerId() * 2) + 1;
+            }*/
+        }
         
         // Get the target size (used to determine if taps are within the target)
         if (0.0f == videoData[playerIndex].targetPositiveDimensions.data[0] ||
@@ -420,6 +457,12 @@ QCAR::State state;
         // getStatus again after making the call to play, in order to update the
         // value held in currentStatus.
         // --- END INFORMATION ---
+        
+        // auto play
+        if (currentStatus != PLAYING && currentStatus != REACHED_END) {
+            [videoPlayerHelper[playerIndex] play:NO fromPosition:0];
+            currentStatus = [videoPlayerHelper[playerIndex] getStatus];
+        }
         
         switch (currentStatus) {
             case PLAYING: {
@@ -643,25 +686,26 @@ QCAR::State state;
     // will be -1)
     touchedTarget = [self tapInsideTargetWithID];
     
+    [videoPlayerHelper[touchedTarget] play:NO fromPosition:0];
+    
+  /*  [videoPlayerHelper[touchedTarget] stop];
+    [videoPlayerHelper[touchedTarget + 1] play:NO fromPosition:0];
+    videoData[touchedTarget + 1].isActive = YES;
+*/
+    
+    //[videoPlayerHelper[touchedTarget] play:NO fromPosition:0];
+    
     // Ignore touches when videoPlayerHelper is playing in fullscreen mode
-    if (-1 != touchedTarget && PLAYING_FULLSCREEN != [videoPlayerHelper[touchedTarget] getStatus]) {
+    /*if (-1 != touchedTarget && PLAYING_FULLSCREEN != [videoPlayerHelper[touchedTarget] getStatus]) {
         if (NO == tapPending) {
             [NSTimer scheduledTimerWithTimeInterval:DOUBLE_TAP_INTERVAL target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
         }
-    }
-
-}
-
-- (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
+    }*/
+    
+    
     // iOS requires all events handled if touchesBegan is handled and not forwarded
-}
-
-- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    /*// iOS requires all events handled if touchesBegan is handled and not forwarded
-    UITouch* touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
+    //UITouch* touch = [touches anyObject];
+    /*CGPoint location = [touch locationInView:self];
     NSLog(@"touch x: %f", location.x);
     NSLog(@"touch y: %f", location.y);
     
@@ -684,7 +728,7 @@ QCAR::State state;
         
         // if found on frame
         if (trackable->getStatus() == QCAR::Trackable::DETECTED) {
-        
+            
             //project center point of target to 2D screen cooordinates'
             const QCAR::CameraCalibration& cameraCalibration = QCAR::CameraDevice::getInstance().getCameraCalibration();
             QCAR::Vec2F cameraPoint = QCAR::Tool::projectPoint(cameraCalibration, trackable->getPose(), QCAR::Vec3F(0,0,0));
@@ -694,8 +738,8 @@ QCAR::State state;
             
             NSLog(@"trackable %i cameraPoint x: %f", trackable->getId(), cameraPoint.data[0]);
             NSLog(@"trackable %i cameraPoint y: %f", trackable->getId(), cameraPoint.data[1]);
-           // NSLog(@"trackable %i screenpoint x: %f", trackable->getId(), screenPoint.data[0]);
-           // NSLog(@"trackable %i screenpoint y: %f", trackable->getId(), screenPoint.data[1]);
+            // NSLog(@"trackable %i screenpoint x: %f", trackable->getId(), screenPoint.data[0]);
+            // NSLog(@"trackable %i screenpoint y: %f", trackable->getId(), screenPoint.data[1]);
             
             // get distance between center point of trackable and touch point
             float distance = sqrt(pow(cameraPoint.data[0] - location.x, 2.0f) + pow(cameraPoint.data[1] - location.y, 2.0f));
@@ -710,40 +754,62 @@ QCAR::State state;
         
     }
     
-    // Open ARIS object associated with this trackable
-    NSLog(@"selected Trackable: %i", selectedTrackableID);
-    NSMutableArray *locationsArray = [[NSMutableArray alloc] initWithArray:[AppModel sharedAppModel].locationList];
-    for (int j = 0; j < [locationsArray count]; j++) {
-        Location *location = [locationsArray objectAtIndex:j];
-        //if (location.locationId == selectedTrackableID)
-        if (j == selectedTrackableID)
-             [location display];
-    }*/
-    // Ignore touches when videoPlayerHelper is playing in fullscreen mode
-    if (-1 != touchedTarget && PLAYING_FULLSCREEN != [videoPlayerHelper[touchedTarget] getStatus]) {
-        // If the user double-tapped the screen
-        if (YES == tapPending) {
-            tapPending = NO;
-            MEDIA_STATE mediaState = [videoPlayerHelper[touchedTarget] getStatus];
-            
-            if (ERROR != mediaState && NOT_READY != mediaState) {
-                // Play the video
-                NSLog(@"Playing video with native player");
-                [videoPlayerHelper[touchedTarget] play:YES fromPosition:VIDEO_PLAYBACK_CURRENT_POSITION];
-            }
-            
-            // If any on-texture video is playing, pause it
-            for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-                if (PLAYING == [videoPlayerHelper[i] getStatus]) {
-                    [videoPlayerHelper[i] pause];
-                }
-            }
-        }
-        else {
-            tapPending = YES;
-        }
-    }
+    [videoPlayerHelper[selectedTrackableID] play:NO fromPosition:0];
+    */
+    // switch between videos for this target
+    /*if (fmod(selectedTrackableID,2) ==0) {
+     [videoPlayerHelper[selectedTrackableID] stop];
+     [videoPlayerHelper[selectedTrackableID + 1] play:NO fromPosition:10];
+     videoData[selectedTrackableID + 1].isActive = YES;
+     }*/
     
+    // Open ARIS object associated with this trackable
+    /*NSLog(@"selected Trackable: %i", selectedTrackableID);
+     NSMutableArray *locationsArray = [[NSMutableArray alloc] initWithArray:[AppModel sharedAppModel].locationList];
+     for (int j = 0; j < [locationsArray count]; j++) {
+     Location *location = [locationsArray objectAtIndex:j];
+     //if (location.locationId == selectedTrackableID)
+     if (j == selectedTrackableID)
+     [location display];
+     }*/
+    // Ignore touches when videoPlayerHelper is playing in fullscreen mode
+    /*if (-1 != touchedTarget && PLAYING_FULLSCREEN != [videoPlayerHelper[touchedTarget] getStatus]) {
+     // If the user double-tapped the screen
+     if (YES == tapPending) {
+     tapPending = NO;
+     MEDIA_STATE mediaState = [videoPlayerHelper[touchedTarget] getStatus];
+     
+     if (ERROR != mediaState && NOT_READY != mediaState) {
+     // Play the video
+     NSLog(@"Playing video with native player");
+     [videoPlayerHelper[touchedTarget] play:YES fromPosition:VIDEO_PLAYBACK_CURRENT_POSITION];
+     }
+     
+     // If any on-texture video is playing, pause it
+     for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+     if (PLAYING == [videoPlayerHelper[i] getStatus]) {
+     [videoPlayerHelper[i] pause];
+     }
+     }
+     }
+     else {
+     tapPending = YES;
+     }
+     }*/
+
+}
+
+- (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    // iOS requires all events handled if touchesBegan is handled and not forwarded
+}
+
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    
+    
+    
+
 }
 
 // Fires if the user tapped the screen (no double tap)

@@ -10,6 +10,7 @@
 #import "AppModel.h"
 #import <ZXingWidgetController.h>
 #import "ZBarReaderViewController.h"
+#import "VPParentViewController.h"
 
 
 @interface QRScannerViewController : UIViewController <UINavigationControllerDelegate, 
@@ -22,6 +23,7 @@
     NSString *resultText;
     UIImagePickerController *imageMatchingImagePickerController;
     UIBarButtonItem *cancelButton;
+    float videoPlaybackTime[NUM_VIDEO_TARGETS];
 }
 
 @property (nonatomic) IBOutlet UIButton *qrScanButton;
@@ -32,12 +34,14 @@
 @property (nonatomic) UIImagePickerController *imageMatchingImagePickerController;
 @property (nonatomic) NSString *resultText;
 @property (nonatomic) UIBarButtonItem *cancelButton;
+@property (nonatomic) VPParentViewController *arParentViewController;
 
 - (IBAction) scanButtonTapped;
 - (void)cancelButtonTouch;
 - (IBAction)qrScanButtonTouchAction: (id) sender;
 - (IBAction)imageScanButtonTouchAction: (id) sender;
 - (void) loadResult:(NSString *)result;
+- (void) showARCamera;
 
 - (void)zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)result;
 - (void)zxingControllerDidCancel:(ZXingWidgetController*)controller;

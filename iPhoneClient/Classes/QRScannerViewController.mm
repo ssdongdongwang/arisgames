@@ -14,6 +14,7 @@
 #import <QRCodeReader.h>
 #import "ZBarReaderViewController.h"
 #import "QCARutils.h"
+#import "EAGLView.h"
 
 
 @implementation QRScannerViewController 
@@ -21,6 +22,13 @@
 @synthesize imageMatchingImagePickerController;
 @synthesize qrScanButton,imageScanButton,barcodeButton;
 @synthesize manualCode,resultText,cancelButton;
+@synthesize arParentViewController;
+
+namespace {
+    BOOL firstTime = YES;
+    
+    NSArray *videoArray;
+}
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -35,7 +43,16 @@
 													 name:@"QRCodeObjectReady"
 												   object:nil];
     }
+    
+    
+    videoArray = [NSArray arrayWithObjects:@"Plaid-Square video.mp4", @"LongEarrings-Square video.mp4",@"Glasses-Square video.mp4", @"Guilt-Square video.mp4",nil];//,@"Delicious-Square video.mp4",@"Glasses-Square video.mp4",@"Guilt-Square video.mp4",@"LongEarrings-Square video.mp4",@"PayForThat-Square video.mp4",@"Plaid-Square video.mp4",@"PurpleShirt-Square video.mp4",@"TalkingAbout-Square video.mp4",@"Tumeric-Square video.mp4",@"WaterFountain.png-Square video.mp4",@"YouFoundMe-Square video.mp4", nil];
+
+       
+    //IMG_0032(2).mp4
+    //[self showARCamera];
     return self;
+    
+    
 }
 
 
@@ -50,19 +67,32 @@
 	self.imageMatchingImagePickerController.delegate = self;
 	
     cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"CancelKey",@"") style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonTouch)];      
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		self.qrScanButton.enabled = YES;
-		self.qrScanButton.alpha = 1.0;
-        self.imageScanButton.enabled = YES;
-		self.imageScanButton.alpha = 1.0;
-	}
-	else {
+    //if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+	//	self.qrScanButton.enabled = YES;
+	//	self.qrScanButton.alpha = 1.0;
+    //    self.imageScanButton.enabled = YES;
+	//	self.imageScanButton.alpha = 1.0;
+	//}
+	//else {
 		self.qrScanButton.hidden = YES;
         self.imageScanButton.hidden = YES;
-        [self.manualCode becomeFirstResponder]; 
+        self.barcodeButton.hidden = YES;
+        self.manualCode.hidden = YES;
+   //     [self.manualCode becomeFirstResponder];
 
-	}
+	//}
 	NSLog(@"QRScannerViewController: Loaded");
+    
+    //[self showARCamera];
+    
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+	
+    [self showARCamera];
+    
 }
 
 -(void)cancelButtonTouch{
@@ -91,23 +121,31 @@
 - (IBAction)qrScanButtonTouchAction: (id) sender{
 	NSLog(@"QRScannerViewController: QR Scan Button Pressed");
 	
-    ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO];
+    /*ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO];
     QRCodeReader* qrcodeReader = [[QRCodeReader alloc] init];
     NSSet *readers = [[NSSet alloc ] initWithObjects:qrcodeReader,nil];
-    widController.readers = readers;
+    widController.readers = readers;*/
     /*
     NSBundle *mainBundle = [NSBundle mainBundle];
     widController.soundToPlay =
     [NSURL fileURLWithPath:[mainBundle pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
      */
-    [self presentViewController:widController animated:YES completion:nil];
+    //[self presentViewController:widController animated:YES completion:nil];
+    
+    //[self showARCamera];
 }
 
 - (IBAction)imageScanButtonTouchAction: (id) sender{
+    //[self showARCamera];
+}
+
+
+- (void) showARCamera {
+    
     NSLog(@"QRScannerViewController: Image Scan Button Pressed");
 	
 	/*self.imageMatchingImagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-	[self presentViewController:self.imageMatchingImagePickerController animated:YES completion:nil];*/
+     [self presentViewController:self.imageMatchingImagePickerController animated:YES completion:nil];*/
     
     
     CGRect screenBounds = [[UIScreen mainScreen] bounds];
@@ -125,12 +163,37 @@
     
     
     // Add the EAGLView and the overlay view to the window
-    ARParentViewController *arParentViewController = [[ARParentViewController alloc] init];
+    arParentViewController = [[VPParentViewController alloc] init];
     arParentViewController.arViewRect = screenBounds;
     
-    [[self navigationController] pushViewController:arParentViewController animated:YES];
+    [self presentModalViewController:arParentViewController animated:NO];
     
+    // Load the video for use with the EAGLView
+    EAGLView* arView = [arParentViewController getARView];
     
+#ifdef EXAMPLE_CODE_REMOTE_FILE
+    // Load a remote file for playback
+    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+        VideoPlayerHelper* player = [arView getVideoPlayerHelper:i];
+        [player load:@"http://<SOME_URL>" playImmediately:NO fromPosition:VIDEO_PLAYBACK_CURRENT_POSITION];
+    }
+#else
+    // For each video-augmented target
+    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+        // Load a local file for playback and resume playback if video was
+        // playing when the app went into the background
+        VideoPlayerHelper* player = [arView getVideoPlayerHelper:i];
+        NSString* filename;
+        
+        filename = videoArray[i];
+        if (NO == [player load:filename playImmediately:NO fromPosition:videoPlaybackTime[i]]) {
+            NSLog(@"Failed to load media");
+        }
+
+    }
+#endif
+    
+    firstTime = NO;
     
 }
 
@@ -339,6 +402,39 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
 }
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    // Remove the native movie player view (if it is displayed).  This gives us
+    // a clean restart on iOS 4 and 5
+    [arParentViewController removeMoviePlayerView];
+    
+    EAGLView* arView = [arParentViewController getARView];
+    
+    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+        VideoPlayerHelper* player = [arView getVideoPlayerHelper:i];
+        
+        // If the video is playing, pause it and store the index of the player
+        // so playback can be resumed
+        if (PLAYING == [player getStatus]) {
+            [player pause];
+        }
+        
+        // Store the current video playback time for use when resuming (even if
+        // the player is currently paused)
+        videoPlaybackTime[i] = [player getCurrentPosition];
+        
+        // Unload the video
+        if (NO == [player unload]) {
+            NSLog(@"Failed to unload media");
+        }
+    }
+    
+    // do the same as when the view has dissappeared
+    [arParentViewController viewDidDisappear:NO];
+    
+}
+
 
 
 @end

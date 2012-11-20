@@ -7,10 +7,10 @@
 #import "AR_EAGLView.h"
 #import "VideoPlayerHelper.h"
 
-// Define to load and play a video file from a remote location
+// Define to load and p                                     lay a video file from a remote location
 //#define EXAMPLE_CODE_REMOTE_FILE
 
-#define NUM_VIDEO_TARGETS 2
+#define NUM_VIDEO_TARGETS 4
 
 // This class wraps the CAEAGLLayer from CoreAnimation into a convenient UIView
 // subclass.  The view content is basically an EAGL surface you render your

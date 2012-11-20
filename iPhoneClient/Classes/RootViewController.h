@@ -94,6 +94,7 @@
 @property (nonatomic) IBOutlet UINavigationController *playerSettingsViewNavigationController;
 @property (nonatomic) IBOutlet UINavigationController *nearbyObjectsNavigationController;
 @property (nonatomic) IBOutlet UINavigationController *nearbyObjectNavigationController;
+@property (nonatomic) IBOutlet UINavigationController *qrScannerNavigationController;
 @property (nonatomic) WaitingIndicatorViewController *waitingIndicator;
 @property (nonatomic) WaitingIndicatorView *waitingIndicatorView;
 @property(nonatomic)LoadingViewController *loadingVC;
