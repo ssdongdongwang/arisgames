@@ -39,7 +39,6 @@ function formatPage(game)
     {
         //This next line is absolutely ridiculous and I have no idea why it works
         author = (game.authors[author]);
-
         add("<div class='gameauthor'>\n");
         add(author.name+"\n");
         add("</div>\n");//<- class gameauthor
@@ -53,7 +52,7 @@ function formatPage(game)
     add("</form>");//<- form dumpForm
     add("</div>\n");//<- class gamelinks
     add("</div>\n");//<- class pageheader
-
+    
     add("<div class='spacer headerspacer'></div>\n");
 
     if(game.backpacks && !game.backpacks.length) //game.backbacks is object, not array
@@ -62,7 +61,6 @@ function formatPage(game)
         var bps = new Array(game.backpacks);
         game.backpacks = bps;
     }
-
 
     var firstPlayer = true;
     //Run through for each player given
@@ -106,6 +104,17 @@ function formatPage(game)
                     add("<div class='spacer sectionspacer'> </div>\n");
                 else
                     firstSection=false;
+
+            //Output player header
+            add("<div class='player'>\n");
+            add("<div class='playerheader'>\n");
+            add("<div class='playericon'>\n");
+            add(format_img('profpic.png', '', 'index.html?mode=web&gameId='+game.game_id+'&playerId='+bp.owner.player_id, 'playericonimage'));
+            add("</div>\n");//<- class 'playericon'
+            add("<div class='playertext'>\n");
+            add("<div class='playername'>"+bp.owner.user_name+"</div>\n");
+            add("</div>\n");//<- class 'playertext'
+            add("</div>\n");//<- class 'playerheader'
 
                 firstContent = true;
                 add("<div class='sectionheader'>Attributes</div>\n");
