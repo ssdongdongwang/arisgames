@@ -43,6 +43,41 @@ namespace {
     const float kLetterScale = 25.0f;
     const float kLetterTranslate = 25.0f;
     const float kObjectScale = 2.0f;
+    NSArray *videoArray = [NSArray arrayWithObjects:
+                           @"Plaid-Square video.mp4",
+                           @"LongEarrings-Square video.mp4",
+                           @"Glasses-Square video.mp4",
+                           @"Guilt-Square video.mp4",
+                           @"Delicious-Square video.mp4",
+                           @"AreYouDone-Square video.mp4",
+                           @"BearMusic-Square video.mp4",
+                           @"BearReveal-Square video.mp4",
+                           @"PayForThat-Square video.mp4",
+                           @"PurpleShirt-Square video.mp4",
+                           @"TalkingAbout-Square video.mp4",
+                           @"Tumeric-Square video.mp4",
+                           @"WaterFountain-Square video.mp4",
+                           @"YouFoundMe-Square video.mp4", nil];
+
+    const char* textureFilenames[] = {
+        "icon_play.png",
+        "icon_loading.png",
+        "icon_error.png",
+        "Plaid.png",
+        "longEarrings.png",
+        "Glasses.png",
+        "Guilt.png",
+        "Delicious.png",
+        "AreYouDone.png",
+        "BearMusic.png",
+        "BearReveal.png",
+        "PayForThat.png",
+        "PurpleShirt.png",
+        "TalkingAbout.png",
+        "Tumeric.png",
+        "WaterFountain.png",
+        "YouFoundMe.png"
+    };
     
     // Texture filenames
     /*const char* textureFilenames[] = {
@@ -52,6 +87,8 @@ namespace {
         "letter_R.png"
     };*/
     
+    Boolean loading;
+    int videoPlayingIndex;
     
     static const float planeVertices[] =
     {
@@ -73,27 +110,7 @@ namespace {
         0, 1, 2, 0, 2, 3
     };
     
-    const char* textureFilenames[] = {
-        "icon_play.png",
-        "icon_loading.png",
-        "icon_error.png",
-        "Plaid.png",
-        "longEarrings.png",
-        "Glasses.png",
-        "Guilt.png"
-       
-    }; //,
-    //"Delicious.png",
-   // "Glasses.png",
-   // "Guilt.png",
-   // "Long Earrings.png",
-   // "PayForThat.png",
-   // "Plaid.png",
-  // // "Purple Shirt.png",
-   // "TalkingAbout.png",
-  //  "Tumeric.png",
-   // "WaterFountain.png",
-   // "YouFoundMe.png"
+
     
     enum tagObjectIndex {
         OBJECT_PLAY_ICON,
@@ -117,6 +134,7 @@ namespace {
         1.0, 0.0,
         0.0, 0.0,
     };
+    
     
     struct tagVideoData {
         // Needed to calculate whether a screen tap is inside the target
@@ -167,8 +185,9 @@ QCAR::State state;
         
         // For each target, create a VideoPlayerHelper object and zero the
         // target dimensions
+        videoPlayerHelper = [[VideoPlayerHelper alloc] init];
         for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-            videoPlayerHelper[i] = [[VideoPlayerHelper alloc] init];
+            //videoPlayerHelper[i] = [[VideoPlayerHelper alloc] init];
             
             videoData[i].targetPositiveDimensions.data[0] = 0.0f;
             videoData[i].targetPositiveDimensions.data[1] = 0.0f;
@@ -182,13 +201,13 @@ QCAR::State state;
 
 - (void)dealloc
 {
-    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-        [videoPlayerHelper[i] release];
-    }
+   // for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+   //     [videoPlayerHelper[i] release];
+   // }
     
-    [dataLock release];
+   // [dataLock release];
     
-    [super dealloc];
+   // [super dealloc];
 }
 
 - (void) add3DObjectWith:(int)numVertices ofVertices:(const float *)vertices normals:(const float *)normals texcoords:(const float *)texCoords with:(int)numIndices ofIndices:(const unsigned short *)indices usingTextureIndex:(NSInteger)textureIndex
@@ -206,7 +225,7 @@ QCAR::State state;
     obj3D.texture = [textures objectAtIndex:textureIndex];
     
     [objects3D addObject:obj3D];
-    [obj3D release];    
+    //[obj3D release];
 }
 
 - (void) setup3dObjects
@@ -234,7 +253,7 @@ QCAR::State state;
         Object3D* obj3D = [[Object3D alloc] init];
         obj3D.texture = [textures objectAtIndex:i];
         [objects3D addObject:obj3D];
-        [obj3D release];
+      //  [obj3D release];
     }
     
 }
@@ -385,9 +404,12 @@ QCAR::State state;
     //for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
     //    videoData[i].isActive = NO;
     //}
-    
+       
     // Did we find any trackables this frame?
-    for (int i = 0; i < numActiveTrackables; ++i) {
+    //for (int i = 0; i < numActiveTrackables; ++i) {
+    if (numActiveTrackables > 0) {
+        
+        int i = 0;
         // Get the trackable
         const QCAR::Trackable* trackable = state.getActiveTrackable(i);
         
@@ -448,7 +470,8 @@ QCAR::State state;
         // Retain value between calls
         static GLuint videoTextureID[NUM_VIDEO_TARGETS] = {0};
         
-        MEDIA_STATE currentStatus = [videoPlayerHelper[playerIndex] getStatus];
+       // MEDIA_STATE currentStatus = [videoPlayerHelper[playerIndex] getStatus];
+        MEDIA_STATE currentStatus = [videoPlayerHelper getStatus];
         
         // --- INFORMATION ---
         // One could trigger automatic playback of a video at this point.  This
@@ -459,13 +482,44 @@ QCAR::State state;
         // --- END INFORMATION ---
         
         // auto play
-        if (currentStatus != PLAYING && currentStatus != REACHED_END) {
-            [videoPlayerHelper[playerIndex] play:NO fromPosition:0];
-            currentStatus = [videoPlayerHelper[playerIndex] getStatus];
+        
+        
+       
+
+        currentStatus = [videoPlayerHelper getStatus];
+        if (videoPlayingIndex == playerIndex) {
+            if (currentStatus != PLAYING && currentStatus != REACHED_END && loading == NO) {
+                [videoPlayerHelper unload];
+                    if (NO == [videoPlayerHelper load:videoArray[playerIndex] playImmediately:YES fromPosition:0]) {
+                        NSLog(@"Failed to load media");
+                        
+                    }
+                    loading = YES;
+                    videoPlayingIndex = playerIndex;
+            }
+        } else {
+            [videoPlayerHelper unload];
+                if (NO == [videoPlayerHelper load:videoArray[playerIndex] playImmediately:YES fromPosition:0]) {
+                    NSLog(@"Failed to load media");
+                    
+                }
+                loading = YES;
+                videoPlayingIndex = playerIndex;
+            
         }
+        
+
+        
+        
+        //if (currentStatus != PLAYING && currentStatus != REACHED_END) {
+        //    [videoPlayerHelper[playerIndex] play:NO fromPosition:0];
+            currentStatus = [videoPlayerHelper getStatus];
+            
+       // }
         
         switch (currentStatus) {
             case PLAYING: {
+                if (playerIndex == videoPlayingIndex) {
                 // If the tracking lost timer is scheduled, terminate it
                 if (nil != trackingLostTimer) {
                     // Timer termination must occur on the same thread on which
@@ -475,12 +529,14 @@ QCAR::State state;
                 
                 // Upload the decoded video data for the latest frame to OpenGL
                 // and obtain the video texture ID
-                GLuint videoTexID = [videoPlayerHelper[playerIndex] updateVideoData];
+                GLuint videoTexID = [videoPlayerHelper updateVideoData];
                 
                 if (0 == videoTextureID[playerIndex]) {
                     videoTextureID[playerIndex] = videoTexID;
                 }
                 
+                loading = NO;
+                }
                 // Fallthrough
             }
             case PAUSED:
@@ -493,7 +549,14 @@ QCAR::State state;
                     // to [videoPlayerHelper updateVideoData]
                     frameTextureID = videoTextureID[playerIndex];
                 }
+                loading = NO;
+                break;
                 
+            case REACHED_END:
+                //[videoPlayerHelper unload];
+                videoTextureID[playerIndex] = 0;
+                displayVideoFrame = NO;
+                loading = NO;
                 break;
                 
             default:
@@ -504,7 +567,7 @@ QCAR::State state;
         
         if (YES == displayVideoFrame) {
             // ---- Display the video frame -----
-            aspectRatio = (float)[videoPlayerHelper[playerIndex] getVideoHeight] / (float)[videoPlayerHelper[playerIndex] getVideoWidth];
+            aspectRatio = (float)[videoPlayerHelper getVideoHeight] / (float)[videoPlayerHelper getVideoWidth];
             texCoords = videoQuadTextureCoords;
         }
         else {
@@ -525,8 +588,8 @@ QCAR::State state;
             ShaderUtils::translatePoseMatrix(0.0f, 0.0f, videoData[playerIndex].targetPositiveDimensions.data[0],
                                              &modelViewMatrixVideo.data[0]);
             
-            ShaderUtils::scalePoseMatrix(videoData[playerIndex].targetPositiveDimensions.data[0],
-                                         videoData[playerIndex].targetPositiveDimensions.data[0] * aspectRatio,
+            ShaderUtils::scalePoseMatrix(videoData[playerIndex].targetPositiveDimensions.data[0] * 1.4,
+                                         videoData[playerIndex].targetPositiveDimensions.data[0] * aspectRatio * 1.4,
                                          videoData[playerIndex].targetPositiveDimensions.data[0],
                                          &modelViewMatrixVideo.data[0]);
             
@@ -580,6 +643,9 @@ QCAR::State state;
                     
                 default: {
                     // ----- Display busy icon -----
+                    //Object3D* obj3D = [objects3D objectAtIndex:OBJECT_BUSY_ICON];
+                    //iconTextureID = [[obj3D texture] textureID];
+
                     Object3D* obj3D = [objects3D objectAtIndex:OBJECT_BUSY_ICON];
                     iconTextureID = [[obj3D texture] textureID];
                     break;
@@ -645,12 +711,12 @@ QCAR::State state;
     // If a video is playing on texture and we have lost tracking, create a
     // timer on the main thread that will pause video playback after
     // TRACKING_LOST_TIMEOUT seconds
-    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-        if (nil == trackingLostTimer && NO == videoData[i].isActive && PLAYING == [videoPlayerHelper[i] getStatus]) {
-            [self performSelectorOnMainThread:@selector(createTrackingLostTimer) withObject:nil waitUntilDone:YES];
-            break;
-        }
-    }
+    //for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+    //    if (nil == trackingLostTimer && NO == videoData[i].isActive && PLAYING == [videoPlayerHelper[i] getStatus]) {
+    //        [self performSelectorOnMainThread:@selector(createTrackingLostTimer) withObject:nil waitUntilDone:YES];
+    //        break;
+    //    }
+    //}
     
     [dataLock unlock];
     // ----- End synchronise data access -----
@@ -686,7 +752,7 @@ QCAR::State state;
     // will be -1)
     touchedTarget = [self tapInsideTargetWithID];
     
-    [videoPlayerHelper[touchedTarget] play:NO fromPosition:0];
+    [videoPlayerHelper play:NO fromPosition:0];
     
   /*  [videoPlayerHelper[touchedTarget] stop];
     [videoPlayerHelper[touchedTarget + 1] play:NO fromPosition:0];
@@ -819,7 +885,7 @@ QCAR::State state;
         tapPending = NO;
         
         // Get the state of the video player for the target the user touched
-        MEDIA_STATE mediaState = [videoPlayerHelper[touchedTarget] getStatus];
+        MEDIA_STATE mediaState = [videoPlayerHelper getStatus];
         
 #ifdef EXAMPLE_CODE_REMOTE_FILE
         // With remote files, single tap starts playback using the native player
@@ -830,17 +896,19 @@ QCAR::State state;
         }
 #else
         // If any on-texture video is playing, pause it
-        for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-            if (PLAYING == [videoPlayerHelper[i] getStatus]) {
-                [videoPlayerHelper[i] pause];
-            }
-        }
+       
+        
+        //for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+        //    if (PLAYING == [videoPlayerHelper[i] getStatus]) {
+       //         [videoPlayerHelper[i] pause];
+       //     }
+        //}
         
         // For the target the user touched
         if (ERROR != mediaState && NOT_READY != mediaState && PLAYING != mediaState) {
             // Play the video
             NSLog(@"Playing video with on-texture player");
-            [videoPlayerHelper[touchedTarget] play:NO fromPosition:VIDEO_PLAYBACK_CURRENT_POSITION];
+            [videoPlayerHelper play:NO fromPosition:VIDEO_PLAYBACK_CURRENT_POSITION];
         }
 #endif
     }
@@ -890,7 +958,7 @@ QCAR::State state;
 // Get a pointer to a VideoPlayerHelper object held by this EAGLView
 - (VideoPlayerHelper*)getVideoPlayerHelper:(int)index
 {
-    return videoPlayerHelper[index];
+    return videoPlayerHelper;
 }
 
 QCAR::Vec2F cameraPointToScreenPoint(QCAR::Vec2F cameraPoint)
@@ -974,9 +1042,11 @@ QCAR::Vec2F cameraPointToScreenPoint(QCAR::Vec2F cameraPoint)
 {
     // Tracking has been lost for TRACKING_LOST_TIMEOUT seconds, pause playback
     // (we can safely do this on all our VideoPlayerHelpers objects)
-    for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
-        [videoPlayerHelper[i] pause];
-    }
+    
+    
+    //for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
+        [videoPlayerHelper pause];
+    //}
     trackingLostTimer = nil;
 }
 

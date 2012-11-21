@@ -196,6 +196,8 @@
 		3A7AA22E165C3437006222D1 /* BearReveal.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA220165C3436006222D1 /* BearReveal.png */; };
 		3A7AA22F165C3437006222D1 /* BearMusic.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA221165C3436006222D1 /* BearMusic.png */; };
 		3A7AA230165C3437006222D1 /* AreYouDone.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA222165C3436006222D1 /* AreYouDone.png */; };
+		3A7AA232165D6212006222D1 /* Delicious.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA231165D6211006222D1 /* Delicious.png */; };
+		3A7AA234165D625E006222D1 /* Delicious-Square video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */; };
 		3AA83345159E3FF3002CC61D /* TileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83342159E3FF3002CC61D /* TileOverlay.m */; };
 		3AA83346159E3FF3002CC61D /* TileOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83344159E3FF3002CC61D /* TileOverlayView.m */; };
 		3AA83349159E4029002CC61D /* Overlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83348159E4029002CC61D /* Overlay.m */; };
@@ -203,7 +205,7 @@
 		3ABD20C51639D30100C2EAD6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD20C41639D30100C2EAD6 /* OpenGLES.framework */; };
 		3ABD20C71639D31700C2EAD6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD20C61639D31700C2EAD6 /* UIKit.framework */; };
 		3ABD20C91639D32A00C2EAD6 /* libQCAR.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD20C81639D32A00C2EAD6 /* libQCAR.a */; };
-		3ABD20D71639D37F00C2EAD6 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3ABD20CD1639D37F00C2EAD6 /* EAGLView.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		3ABD20D71639D37F00C2EAD6 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3ABD20CD1639D37F00C2EAD6 /* EAGLView.mm */; };
 		3ABD20D81639D37F00C2EAD6 /* FrameMarkersAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3ABD20CF1639D37F00C2EAD6 /* FrameMarkersAppDelegate.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3ABD20D91639D37F00C2EAD6 /* FrameMarkers-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3ABD20D41639D37F00C2EAD6 /* FrameMarkers-Info.plist */; };
 		3ABD21341639E03300C2EAD6 /* libQCAR.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD21331639E03300C2EAD6 /* libQCAR.a */; };
@@ -781,6 +783,8 @@
 		3A7AA220165C3436006222D1 /* BearReveal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BearReveal.png; sourceTree = "<group>"; };
 		3A7AA221165C3436006222D1 /* BearMusic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BearMusic.png; sourceTree = "<group>"; };
 		3A7AA222165C3436006222D1 /* AreYouDone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AreYouDone.png; sourceTree = "<group>"; };
+		3A7AA231165D6211006222D1 /* Delicious.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delicious.png; sourceTree = "<group>"; };
+		3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Delicious-Square video.mp4"; sourceTree = "<group>"; };
 		3AA83341159E3FF3002CC61D /* TileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileOverlay.h; sourceTree = "<group>"; };
 		3AA83342159E3FF3002CC61D /* TileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TileOverlay.m; sourceTree = "<group>"; };
 		3AA83343159E3FF3002CC61D /* TileOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileOverlayView.h; sourceTree = "<group>"; };
@@ -1710,7 +1714,9 @@
 				3A7AA21B165C3434006222D1 /* PayForThat.png */,
 				3A7AA21D165C3434006222D1 /* longEarrings.png */,
 				3A7AA21E165C3435006222D1 /* Guilt.png */,
+				3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */,
 				3A7AA21F165C3435006222D1 /* Glasses.png */,
+				3A7AA231165D6211006222D1 /* Delicious.png */,
 				3A7AA220165C3436006222D1 /* BearReveal.png */,
 				3A7AA221165C3436006222D1 /* BearMusic.png */,
 				3A7AA222165C3436006222D1 /* AreYouDone.png */,
@@ -2733,6 +2739,8 @@
 				3A7AA22E165C3437006222D1 /* BearReveal.png in Resources */,
 				3A7AA22F165C3437006222D1 /* BearMusic.png in Resources */,
 				3A7AA230165C3437006222D1 /* AreYouDone.png in Resources */,
+				3A7AA232165D6212006222D1 /* Delicious.png in Resources */,
+				3A7AA234165D625E006222D1 /* Delicious-Square video.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

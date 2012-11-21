@@ -10,7 +10,7 @@
 // Define to load and p                                     lay a video file from a remote location
 //#define EXAMPLE_CODE_REMOTE_FILE
 
-#define NUM_VIDEO_TARGETS 4
+#define NUM_VIDEO_TARGETS 14
 
 // This class wraps the CAEAGLLayer from CoreAnimation into a convenient UIView
 // subclass.  The view content is basically an EAGL surface you render your
@@ -20,7 +20,7 @@
 {
 @private
     // Instantiate one VideoPlayerHelper per target
-    VideoPlayerHelper* videoPlayerHelper[NUM_VIDEO_TARGETS];
+    VideoPlayerHelper* videoPlayerHelper;
     
     // Used to differentiate between taps and double taps
     BOOL tapPending;

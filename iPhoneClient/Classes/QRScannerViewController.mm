@@ -182,13 +182,13 @@ namespace {
     for (int i = 0; i < NUM_VIDEO_TARGETS; ++i) {
         // Load a local file for playback and resume playback if video was
         // playing when the app went into the background
-        VideoPlayerHelper* player = [arView getVideoPlayerHelper:i];
-        NSString* filename;
+     //   VideoPlayerHelper* player = [arView getVideoPlayerHelper:i];
+    //    NSString* filename;
         
-        filename = videoArray[i];
-        if (NO == [player load:filename playImmediately:NO fromPosition:videoPlaybackTime[i]]) {
-            NSLog(@"Failed to load media");
-        }
+     //   filename = videoArray[i];
+     //   if (NO == [player load:filename playImmediately:NO fromPosition:videoPlaybackTime[i]]) {
+     //       NSLog(@"Failed to load media");
+      //  }
 
     }
 #endif

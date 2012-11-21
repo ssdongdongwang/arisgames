@@ -451,10 +451,20 @@ static QCARutils *qUtils = nil; // singleton class
                 NSLog(@"Successfully got MarkerTracker.");
                 
                 // Create frame markers:
-                if (!markerTracker->createFrameMarker(0, "MarkerQ", QCAR::Vec2F(50,50)) ||
-                    !markerTracker->createFrameMarker(1, "MarkerC", QCAR::Vec2F(50,50)) ||
-                    !markerTracker->createFrameMarker(2, "MarkerA", QCAR::Vec2F(50,50)) ||
-                    !markerTracker->createFrameMarker(3, "MarkerR", QCAR::Vec2F(50,50)))
+                if (!markerTracker->createFrameMarker(0, "0", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(1, "1", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(2, "2", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(3, "3", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(4, "4", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(5, "5", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(6, "6", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(7, "7", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(8, "8", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(9, "9", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(10, "10", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(11, "11", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(12, "12", QCAR::Vec2F(50,50)) ||
+                    !markerTracker->createFrameMarker(13, "13", QCAR::Vec2F(50,50)))
                 {
                     NSLog(@"Failed to create frame markers.");
                 }
