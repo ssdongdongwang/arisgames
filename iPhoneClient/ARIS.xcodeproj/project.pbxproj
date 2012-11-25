@@ -176,8 +176,6 @@
 		3A62ECDD1652B8A9002B0B20 /* icon_play.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A62ECD21652B8A7002B0B20 /* icon_play.png */; };
 		3A62ECE41652C384002B0B20 /* VPParentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A62ECE31652C383002B0B20 /* VPParentViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3A69944B1625F6610015B48A /* newBanner.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A69944A1625F6610015B48A /* newBanner.png */; };
-		3A7AA1C6165706B3006222D1 /* IMG_0032.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA1C5165706B3006222D1 /* IMG_0032.jpg */; };
-		3A7AA1DA165C1B49006222D1 /* 39.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA1D9165C1B49006222D1 /* 39.jpg */; };
 		3A7AA1EA165C24BA006222D1 /* WaterFountain-Square video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA1DC165C24B7006222D1 /* WaterFountain-Square video.mp4 */; };
 		3A7AA1EE165C24BA006222D1 /* LongEarrings-Square video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA1E0165C24B8006222D1 /* LongEarrings-Square video.mp4 */; };
 		3A7AA1EF165C24BA006222D1 /* Plaid-Square video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA1E1165C24B8006222D1 /* Plaid-Square video.mp4 */; };
@@ -196,7 +194,6 @@
 		3A7AA22E165C3437006222D1 /* BearReveal.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA220165C3436006222D1 /* BearReveal.png */; };
 		3A7AA22F165C3437006222D1 /* BearMusic.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA221165C3436006222D1 /* BearMusic.png */; };
 		3A7AA230165C3437006222D1 /* AreYouDone.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA222165C3436006222D1 /* AreYouDone.png */; };
-		3A7AA232165D6212006222D1 /* Delicious.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA231165D6211006222D1 /* Delicious.png */; };
 		3A7AA234165D625E006222D1 /* Delicious-Square video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */; };
 		3AA83345159E3FF3002CC61D /* TileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83342159E3FF3002CC61D /* TileOverlay.m */; };
 		3AA83346159E3FF3002CC61D /* TileOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA83344159E3FF3002CC61D /* TileOverlayView.m */; };
@@ -210,10 +207,11 @@
 		3ABD20D91639D37F00C2EAD6 /* FrameMarkers-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3ABD20D41639D37F00C2EAD6 /* FrameMarkers-Info.plist */; };
 		3ABD21341639E03300C2EAD6 /* libQCAR.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD21331639E03300C2EAD6 /* libQCAR.a */; };
 		3ABD21361639E09500C2EAD6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD21351639E09500C2EAD6 /* Security.framework */; };
+		3AC1A1C21662764E00106B5B /* Delicious.png in Resources */ = {isa = PBXBuildFile; fileRef = 3AC1A1C11662764E00106B5B /* Delicious.png */; };
+		3AC1A1CB1662784400106B5B /* ARParentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AC1A1CA1662784400106B5B /* ARParentViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		3AC1A1CE166278BD00106B5B /* ARViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AC1A1CD166278BD00106B5B /* ARViewController.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AEB8F5315265E08006C12AF /* ARISUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEB8F5215265E08006C12AF /* ARISUploader.m */; };
 		3AEFB38C1641970E00695706 /* AR_EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB37A1641970E00695706 /* AR_EAGLView.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		3AEFB38D1641970E00695706 /* ARParentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB37C1641970E00695706 /* ARParentViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		3AEFB38E1641970E00695706 /* ARViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB37E1641970E00695706 /* ARViewController.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AEFB38F1641970E00695706 /* OverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB3801641970E00695706 /* OverlayView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AEFB3901641970E00695706 /* OverlayViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB3821641970E00695706 /* OverlayViewController.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AEFB3911641970E00695706 /* QCARutils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB3841641970E00695706 /* QCARutils.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -763,8 +761,6 @@
 		3A62ECE31652C383002B0B20 /* VPParentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VPParentViewController.m; path = ../../VPParentViewController.m; sourceTree = "<group>"; };
 		3A62ECE51652DA4E002B0B20 /* Quad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Quad.h; path = ../../Quad.h; sourceTree = "<group>"; };
 		3A69944A1625F6610015B48A /* newBanner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = newBanner.png; sourceTree = "<group>"; };
-		3A7AA1C5165706B3006222D1 /* IMG_0032.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0032.jpg; sourceTree = "<group>"; };
-		3A7AA1D9165C1B49006222D1 /* 39.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 39.jpg; sourceTree = "<group>"; };
 		3A7AA1DC165C24B7006222D1 /* WaterFountain-Square video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "WaterFountain-Square video.mp4"; sourceTree = "<group>"; };
 		3A7AA1E0165C24B8006222D1 /* LongEarrings-Square video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "LongEarrings-Square video.mp4"; sourceTree = "<group>"; };
 		3A7AA1E1165C24B8006222D1 /* Plaid-Square video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Plaid-Square video.mp4"; sourceTree = "<group>"; };
@@ -783,7 +779,6 @@
 		3A7AA220165C3436006222D1 /* BearReveal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BearReveal.png; sourceTree = "<group>"; };
 		3A7AA221165C3436006222D1 /* BearMusic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BearMusic.png; sourceTree = "<group>"; };
 		3A7AA222165C3436006222D1 /* AreYouDone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AreYouDone.png; sourceTree = "<group>"; };
-		3A7AA231165D6211006222D1 /* Delicious.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delicious.png; sourceTree = "<group>"; };
 		3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Delicious-Square video.mp4"; sourceTree = "<group>"; };
 		3AA83341159E3FF3002CC61D /* TileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileOverlay.h; sourceTree = "<group>"; };
 		3AA83342159E3FF3002CC61D /* TileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TileOverlay.m; sourceTree = "<group>"; };
@@ -838,14 +833,15 @@
 		3ABD210D1639DABD00C2EAD6 /* VirtualButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VirtualButton.h; path = thirdParty/QCAR/VirtualButton.h; sourceTree = SOURCE_ROOT; };
 		3ABD21331639E03300C2EAD6 /* libQCAR.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQCAR.a; path = "../../../Development/iOS/vuforia-sdk-ios-1-5-9/build/lib/arm/libQCAR.a"; sourceTree = "<group>"; };
 		3ABD21351639E09500C2EAD6 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Security.framework; sourceTree = "<group>"; };
+		3AC1A1C11662764E00106B5B /* Delicious.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Delicious.png; path = "../../../ARIS 2.0 Vuforia/iPhoneClient/thirdParty/ARCommon/Delicious.png"; sourceTree = "<group>"; };
+		3AC1A1C91662784400106B5B /* ARParentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARParentViewController.h; sourceTree = "<group>"; };
+		3AC1A1CA1662784400106B5B /* ARParentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARParentViewController.m; sourceTree = "<group>"; };
+		3AC1A1CC166278BD00106B5B /* ARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
+		3AC1A1CD166278BD00106B5B /* ARViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ARViewController.mm; sourceTree = "<group>"; };
 		3AEB8F5115265E08006C12AF /* ARISUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARISUploader.h; sourceTree = "<group>"; };
 		3AEB8F5215265E08006C12AF /* ARISUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARISUploader.m; sourceTree = "<group>"; };
 		3AEFB3791641970E00695706 /* AR_EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AR_EAGLView.h; sourceTree = "<group>"; };
 		3AEFB37A1641970E00695706 /* AR_EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AR_EAGLView.mm; sourceTree = "<group>"; };
-		3AEFB37B1641970E00695706 /* ARParentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARParentViewController.h; sourceTree = "<group>"; };
-		3AEFB37C1641970E00695706 /* ARParentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARParentViewController.m; sourceTree = "<group>"; };
-		3AEFB37D1641970E00695706 /* ARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
-		3AEFB37E1641970E00695706 /* ARViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ARViewController.mm; sourceTree = "<group>"; };
 		3AEFB37F1641970E00695706 /* OverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OverlayView.h; sourceTree = "<group>"; };
 		3AEFB3801641970E00695706 /* OverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OverlayView.m; sourceTree = "<group>"; };
 		3AEFB3811641970E00695706 /* OverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OverlayViewController.h; sourceTree = "<group>"; };
@@ -1517,8 +1513,6 @@
 		29B97314FDCFA39411CA2CEA /* ARIS */ = {
 			isa = PBXGroup;
 			children = (
-				3A7AA1C5165706B3006222D1 /* IMG_0032.jpg */,
-				3A7AA1D9165C1B49006222D1 /* 39.jpg */,
 				3AEFB3781641970E00695706 /* ARCommon */,
 				3ABD20A11639D1EC00C2EAD6 /* QCAR */,
 				3A69944A1625F6610015B48A /* newBanner.png */,
@@ -1695,6 +1689,10 @@
 				3ABD20CC1639D37F00C2EAD6 /* EAGLView.h */,
 				3A62EC981641AC83002B0B20 /* letter_A.png */,
 				3A62EC991641AC83002B0B20 /* letter_C.png */,
+				3AC1A1CC166278BD00106B5B /* ARViewController.h */,
+				3AC1A1CD166278BD00106B5B /* ARViewController.mm */,
+				3AC1A1C91662784400106B5B /* ARParentViewController.h */,
+				3AC1A1CA1662784400106B5B /* ARParentViewController.m */,
 				3A62EC9A1641AC83002B0B20 /* letter_Q.png */,
 				3A62ECAE164C13C6002B0B20 /* StonesAndChips.dat */,
 				3A62ECE21652C382002B0B20 /* VPParentViewController.h */,
@@ -1716,7 +1714,7 @@
 				3A7AA21E165C3435006222D1 /* Guilt.png */,
 				3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */,
 				3A7AA21F165C3435006222D1 /* Glasses.png */,
-				3A7AA231165D6211006222D1 /* Delicious.png */,
+				3AC1A1C11662764E00106B5B /* Delicious.png */,
 				3A7AA220165C3436006222D1 /* BearReveal.png */,
 				3A7AA221165C3436006222D1 /* BearMusic.png */,
 				3A7AA222165C3436006222D1 /* AreYouDone.png */,
@@ -1744,10 +1742,6 @@
 				3ABD20CF1639D37F00C2EAD6 /* FrameMarkersAppDelegate.mm */,
 				3AEFB3791641970E00695706 /* AR_EAGLView.h */,
 				3AEFB37A1641970E00695706 /* AR_EAGLView.mm */,
-				3AEFB37B1641970E00695706 /* ARParentViewController.h */,
-				3AEFB37C1641970E00695706 /* ARParentViewController.m */,
-				3AEFB37D1641970E00695706 /* ARViewController.h */,
-				3AEFB37E1641970E00695706 /* ARViewController.mm */,
 				3AEFB37F1641970E00695706 /* OverlayView.h */,
 				3AEFB3801641970E00695706 /* OverlayView.m */,
 				3AEFB3811641970E00695706 /* OverlayViewController.h */,
@@ -2719,8 +2713,6 @@
 				3A62ECDB1652B8A9002B0B20 /* icon_error.png in Resources */,
 				3A62ECDC1652B8A9002B0B20 /* icon_loading.png in Resources */,
 				3A62ECDD1652B8A9002B0B20 /* icon_play.png in Resources */,
-				3A7AA1C6165706B3006222D1 /* IMG_0032.jpg in Resources */,
-				3A7AA1DA165C1B49006222D1 /* 39.jpg in Resources */,
 				3A7AA1EA165C24BA006222D1 /* WaterFountain-Square video.mp4 in Resources */,
 				3A7AA1EE165C24BA006222D1 /* LongEarrings-Square video.mp4 in Resources */,
 				3A7AA1EF165C24BA006222D1 /* Plaid-Square video.mp4 in Resources */,
@@ -2739,8 +2731,8 @@
 				3A7AA22E165C3437006222D1 /* BearReveal.png in Resources */,
 				3A7AA22F165C3437006222D1 /* BearMusic.png in Resources */,
 				3A7AA230165C3437006222D1 /* AreYouDone.png in Resources */,
-				3A7AA232165D6212006222D1 /* Delicious.png in Resources */,
 				3A7AA234165D625E006222D1 /* Delicious-Square video.mp4 in Resources */,
+				3AC1A1C21662764E00106B5B /* Delicious.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2949,8 +2941,6 @@
 				3ABD20D71639D37F00C2EAD6 /* EAGLView.mm in Sources */,
 				3ABD20D81639D37F00C2EAD6 /* FrameMarkersAppDelegate.mm in Sources */,
 				3AEFB38C1641970E00695706 /* AR_EAGLView.mm in Sources */,
-				3AEFB38D1641970E00695706 /* ARParentViewController.m in Sources */,
-				3AEFB38E1641970E00695706 /* ARViewController.mm in Sources */,
 				3AEFB38F1641970E00695706 /* OverlayView.m in Sources */,
 				3AEFB3901641970E00695706 /* OverlayViewController.mm in Sources */,
 				3AEFB3911641970E00695706 /* QCARutils.mm in Sources */,
@@ -2961,6 +2951,8 @@
 				3A62ECC41652B28A002B0B20 /* VideoPlayerHelper.m in Sources */,
 				3A62ECC71652B2A4002B0B20 /* SampleMath.cpp in Sources */,
 				3A62ECE41652C384002B0B20 /* VPParentViewController.m in Sources */,
+				3AC1A1CB1662784400106B5B /* ARParentViewController.m in Sources */,
+				3AC1A1CE166278BD00106B5B /* ARViewController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
