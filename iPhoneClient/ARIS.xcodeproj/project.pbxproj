@@ -207,9 +207,9 @@
 		3ABD20D91639D37F00C2EAD6 /* FrameMarkers-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3ABD20D41639D37F00C2EAD6 /* FrameMarkers-Info.plist */; };
 		3ABD21341639E03300C2EAD6 /* libQCAR.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD21331639E03300C2EAD6 /* libQCAR.a */; };
 		3ABD21361639E09500C2EAD6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABD21351639E09500C2EAD6 /* Security.framework */; };
-		3AC1A1C21662764E00106B5B /* Delicious.png in Resources */ = {isa = PBXBuildFile; fileRef = 3AC1A1C11662764E00106B5B /* Delicious.png */; };
 		3AC1A1CB1662784400106B5B /* ARParentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AC1A1CA1662784400106B5B /* ARParentViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AC1A1CE166278BD00106B5B /* ARViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AC1A1CD166278BD00106B5B /* ARViewController.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		3AC1A1D016627B7600106B5B /* Delicious.png in Resources */ = {isa = PBXBuildFile; fileRef = 3AC1A1CF16627B7600106B5B /* Delicious.png */; };
 		3AEB8F5315265E08006C12AF /* ARISUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEB8F5215265E08006C12AF /* ARISUploader.m */; };
 		3AEFB38C1641970E00695706 /* AR_EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB37A1641970E00695706 /* AR_EAGLView.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		3AEFB38F1641970E00695706 /* OverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEFB3801641970E00695706 /* OverlayView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -833,11 +833,11 @@
 		3ABD210D1639DABD00C2EAD6 /* VirtualButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VirtualButton.h; path = thirdParty/QCAR/VirtualButton.h; sourceTree = SOURCE_ROOT; };
 		3ABD21331639E03300C2EAD6 /* libQCAR.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQCAR.a; path = "../../../Development/iOS/vuforia-sdk-ios-1-5-9/build/lib/arm/libQCAR.a"; sourceTree = "<group>"; };
 		3ABD21351639E09500C2EAD6 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Security.framework; sourceTree = "<group>"; };
-		3AC1A1C11662764E00106B5B /* Delicious.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Delicious.png; path = "../../../ARIS 2.0 Vuforia/iPhoneClient/thirdParty/ARCommon/Delicious.png"; sourceTree = "<group>"; };
 		3AC1A1C91662784400106B5B /* ARParentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARParentViewController.h; sourceTree = "<group>"; };
 		3AC1A1CA1662784400106B5B /* ARParentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARParentViewController.m; sourceTree = "<group>"; };
 		3AC1A1CC166278BD00106B5B /* ARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
 		3AC1A1CD166278BD00106B5B /* ARViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ARViewController.mm; sourceTree = "<group>"; };
+		3AC1A1CF16627B7600106B5B /* Delicious.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delicious.png; sourceTree = "<group>"; };
 		3AEB8F5115265E08006C12AF /* ARISUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARISUploader.h; sourceTree = "<group>"; };
 		3AEB8F5215265E08006C12AF /* ARISUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARISUploader.m; sourceTree = "<group>"; };
 		3AEFB3791641970E00695706 /* AR_EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AR_EAGLView.h; sourceTree = "<group>"; };
@@ -1707,6 +1707,7 @@
 				3A7AA216165C3432006222D1 /* WaterFountain.png */,
 				3A7AA217165C3432006222D1 /* Tumeric.png */,
 				3A7AA218165C3433006222D1 /* TalkingAbout.png */,
+				3AC1A1CF16627B7600106B5B /* Delicious.png */,
 				3A7AA219165C3433006222D1 /* PurpleShirt.png */,
 				3A7AA21A165C3434006222D1 /* Plaid.png */,
 				3A7AA21B165C3434006222D1 /* PayForThat.png */,
@@ -1714,7 +1715,6 @@
 				3A7AA21E165C3435006222D1 /* Guilt.png */,
 				3A7AA233165D625D006222D1 /* Delicious-Square video.mp4 */,
 				3A7AA21F165C3435006222D1 /* Glasses.png */,
-				3AC1A1C11662764E00106B5B /* Delicious.png */,
 				3A7AA220165C3436006222D1 /* BearReveal.png */,
 				3A7AA221165C3436006222D1 /* BearMusic.png */,
 				3A7AA222165C3436006222D1 /* AreYouDone.png */,
@@ -2732,7 +2732,7 @@
 				3A7AA22F165C3437006222D1 /* BearMusic.png in Resources */,
 				3A7AA230165C3437006222D1 /* AreYouDone.png in Resources */,
 				3A7AA234165D625E006222D1 /* Delicious-Square video.mp4 in Resources */,
-				3AC1A1C21662764E00106B5B /* Delicious.png in Resources */,
+				3AC1A1D016627B7600106B5B /* Delicious.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
