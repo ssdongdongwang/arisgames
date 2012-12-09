@@ -46,15 +46,17 @@
  */
 
 #import <Foundation/Foundation.h>
-
 #import <CoreLocation/CoreLocation.h>
+#import "ARISMoviePlayerViewController.h"
 
 @interface PlaceOfInterest : NSObject
 
-@property (nonatomic, retain)   UIView      *view;
-@property (nonatomic, retain)   CLLocation  *location;
-@property                       BOOL        frozen;
+@property                       BOOL                            bIsMovie;
+@property (nonatomic, retain)   UIView                          *view;
+@property (nonatomic, retain)   MPMoviePlayerViewController     *moviePlayer;
+@property (nonatomic, retain)   CLLocation                      *location;
 
 + (PlaceOfInterest *)placeOfInterestWithView:(UIView *)view at:(CLLocation *)location;
++ (PlaceOfInterest *)placeOfInterestWithMoviePlayer:(MPMoviePlayerViewController *)moviePlayer at:(CLLocation *)location;
 
 @end

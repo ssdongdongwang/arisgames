@@ -19,6 +19,8 @@
 @property(readwrite, assign) int mediaId;
 // POSSIBLE CHANGE MADE
 @property(readwrite, assign) Node *node;
+// CHANGE MADE
+@property(readwrite, assign) Location *loc;
 
 + (NearbyObjectARCoordinate *)coordinateWithNearbyLocation:(Location *)aNearbyLocation;
 

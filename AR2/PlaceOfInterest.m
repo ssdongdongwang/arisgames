@@ -49,15 +49,16 @@
 
 @implementation PlaceOfInterest
 
-@synthesize view, location, frozen;
+@synthesize view, location, bIsMovie, moviePlayer;
 
 - (id)init
 {
     self = [super init];
     if (self) {
 		view = nil;
+        moviePlayer = nil;
 		location = nil;
-        frozen = NO;
+        bIsMovie = NO;
     }    
     return self;
 }
@@ -74,6 +75,16 @@
 	PlaceOfInterest *poi = [[[PlaceOfInterest alloc] init] autorelease];
 	poi.view = view;
 	poi.location = location;
+    poi.bIsMovie = NO;
+	return poi;
+}
+
++ (PlaceOfInterest *)placeOfInterestWithMoviePlayer:(MPMoviePlayerViewController *)moviePlayer at:(CLLocation *)location
+{
+    PlaceOfInterest *poi = [[[PlaceOfInterest alloc] init] autorelease];
+	poi.view = moviePlayer.moviePlayer.view;
+	poi.location = location;
+    poi.bIsMovie = YES;
 	return poi;
 }
 

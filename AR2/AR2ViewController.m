@@ -54,13 +54,17 @@
 #import "NearbyObjectARCoordinate.h"
 #import "Location.h"
 
+#import "ARISMoviePlayerViewController.h"
+
+#import "DialogViewController.h"
 
 #import <CoreLocation/CoreLocation.h>
 
 @implementation AR2ViewController
 
-@synthesize playerViewController = _playerViewController;
-@synthesize placesOfInterest = _placesOfInterest;
+//@synthesize playerViewController = _playerViewController;
+@synthesize placesOfInterest = _placesOfInterest, videoURLS, ARISMoviePlayer;
+//@synthesize ARISMoviePlayer, player, waiting;
 
 //Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -106,11 +110,13 @@
         NSLog(@"type: %@", nearbyLocation.objectType);
         NSLog(@"kind: %lu", nearbyLocation.kind);
         
-        if (nearbyLocation.kind == NearbyObjectNode) {
+        if ((nearbyLocation.kind == NearbyObjectNode) || (nearbyLocation.kind == NearbyObjectItem) || (nearbyLocation.kind == NearbyObjectNPC)) {
         
-            tempCoordinate = [NearbyObjectARCoordinate coordinateWithNearbyLocation: nearbyLocation];
+            tempCoordinate = [NearbyObjectARCoordinate coordinateWithNearbyLocation:nearbyLocation];
 //            if (nearbyLocation.kind == NearbyObjectNode) {
-                tempCoordinate.node = (Node*)nearbyLocation.object;
+            tempCoordinate.node = (Node*)nearbyLocation.object;
+//            tempCoordinate.loc = (Location*)nearbyLocation;
+                
 //            }
             [tempLocationArray addObject:tempCoordinate];
             NSLog(@"AR2ViewController: Added %@", tempCoordinate.title);
@@ -119,22 +125,31 @@
 	}
 
     self.placesOfInterest = [NSMutableArray arrayWithCapacity:[tempLocationArray count]];
+    self.videoURLS = [NSMutableDictionary dictionaryWithCapacity:3];
+    
+    ARISMoviePlayer = [[ARISMoviePlayerViewController alloc] init];
+    ARISMoviePlayer.moviePlayer.view.frame = CGRectMake(0, 0, 200, 200);
+    [ARISMoviePlayer shouldAutorotateToInterfaceOrientation:YES];
+    ARISMoviePlayer.moviePlayer.movieSourceType = MPMovieSourceTypeStreaming;
+    [ARISMoviePlayer.moviePlayer setControlStyle:MPMovieControlStyleDefault];
+    [ARISMoviePlayer.moviePlayer setFullscreen:NO];
+    [ARISMoviePlayer.moviePlayer setShouldAutoplay:NO];
+    
     int t = 0;
     NSLog(@"temp loc array: %@", tempLocationArray);
     for (NearbyObjectARCoordinate *noc in tempLocationArray) {
         
-//        UIView *movieView = [[UIView alloc] initWithFrame:CGRectZero];
-//        MPMoviePlayerController *mpc = [[MPMoviePlayerController alloc] init];
+        Media *m = [[AppModel sharedAppModel] mediaForMediaId:noc.node.mediaId];
+        NSLog(@"M TYPE: %@", m.type);
+        NSLog(@"M URL: %@", m.url);
+        NSLog(@"NOC KIND: %i", noc.node.kind);
         
         if (noc.node.kind == NearbyObjectNode) {
         
-        NSLog(@"displaying(?) node id: %i, %lu", noc.node.nodeId, noc.node.kind);
-        
-            Media *m = [[AppModel sharedAppModel] mediaForMediaId:noc.node.mediaId];
-            NSLog(@"M TYPE: %@", m.type);
+            NSLog(@"displaying(?) node id: %i, %lu", noc.node.mediaId, noc.node.kind);
             if ([m.type compare:@"Image"] == NSOrderedSame) {
                 
-                NSLog(@"ITEM!");
+                NSLog(@"PLAQUE!");
                 AsyncMediaImageView *imgView = [[AsyncMediaImageView alloc] initWithFrame:CGRectZero andMedia:[[AppModel sharedAppModel] mediaForMediaId:noc.node.mediaId]];
                 
                 imgView.frame = CGRectMake(0, 0, 200, 200);
@@ -146,47 +161,149 @@
 
             } else if ([m.type compare:@"Video"] == NSOrderedSame) {
                 
-                AsyncMediaPlayerButton *player = [[AsyncMediaPlayerButton alloc] initWithFrame:CGRectZero media:[[AppModel sharedAppModel] mediaForMediaId:noc.node.mediaId] presentingController:self];
-
-                player.frame = CGRectMake(0, 0, 200, 200);
-            
-                NSLog(@"player: %i: %@", t, player);
-                NSLog(@"player: %f, %f", noc.geoLocation.coordinate.latitude, noc.geoLocation.coordinate.longitude);
+                NSLog(@"VIDEO PLAQUE!");
+                [videoURLS setObject:m.url forKey:[NSNumber numberWithInt:t]];
                 
-                PlaceOfInterest *poi = [PlaceOfInterest placeOfInterestWithView:player at:[[[CLLocation alloc] initWithLatitude:noc.geoLocation.coordinate.latitude longitude:noc.geoLocation.coordinate.longitude] autorelease]];
+                MPMoviePlayerController *player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:m.url]];
+                UIImage *thumbnail = [player thumbnailImageAtTime:0.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
+                UIImageView *tVw = [[UIImageView alloc] initWithImage:thumbnail];
+                tVw.frame = CGRectMake(0, 0, 200, 200);
+                tVw.contentMode = UIViewContentModeScaleAspectFit;
+                //Player autoplays audio on init
+                [player stop];
+                [NSThread sleepForTimeInterval:0.05];
+                
+                NSLog(@"thumb: %@", [thumbnail description]);
+                
+                UIView *opaque = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+                [opaque setBackgroundColor:[UIColor darkGrayColor]];
+                [opaque setUserInteractionEnabled:YES];
+                UIButton *playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+                [playBtn setTag:t];
+                [playBtn setFrame:CGRectMake(146, 146, 64, 64)];
+                [playBtn setTitle:@"play" forState:UIControlStateNormal];
+                [playBtn addTarget:self action:@selector(playMovie:) forControlEvents:UIControlEventTouchUpInside];
+                
+                [opaque addSubview:tVw];
+                [opaque addSubview:playBtn];
+                
+                PlaceOfInterest *poi = [PlaceOfInterest placeOfInterestWithView:opaque at:[[[CLLocation alloc] initWithLatitude:noc.geoLocation.coordinate.latitude longitude:noc.geoLocation.coordinate.longitude] autorelease]];
+                
                 [self.placesOfInterest insertObject:poi atIndex:t];
                 NSLog(@"pois: %@", self.placesOfInterest);
+                NSLog(@"t: %i", t);
                 t++;
+                [player release];
+            }
+        } else if (noc.node.kind == NearbyObjectItem) {
+            NSLog(@"displaying(?) node id: %i, %lu", noc.node.mediaId, noc.node.kind);
+            if ([m.type compare:@"Image"] == NSOrderedSame) {
+                
+                NSLog(@"IMAGE ITEM!");
+                
+                UIView *imgitmBaseVw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+                [imgitmBaseVw setUserInteractionEnabled:YES];
+                
+                AsyncMediaImageView *imgView = [[AsyncMediaImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200) andMedia:m];
+                NSLog(@"m uid: %i", m.uid);
+                UIButton *transp = [UIButton buttonWithType:UIButtonTypeCustom];
+                transp.frame = CGRectMake(68, 68, 64, 64);
+                [transp setTitle:@"GO!" forState:UIControlStateNormal];
+                transp.tag = [m.uid intValue];
+                [transp addTarget:self action:@selector(tapItem:) forControlEvents:UIControlEventTouchUpInside];
+                
+                [imgitmBaseVw addSubview:imgView];
+                [imgitmBaseVw addSubview:transp];
+                
+                PlaceOfInterest *poi = [PlaceOfInterest placeOfInterestWithView:imgitmBaseVw at:[[[CLLocation alloc] initWithLatitude:noc.geoLocation.coordinate.latitude longitude:noc.geoLocation.coordinate.longitude] autorelease]];
+                
+                NSLog(@"subviews: %@", [poi.view subviews]);
+                
+                [self.placesOfInterest insertObject:poi atIndex:t];
+                t++;
+            }
+            
+        } else if (noc.node.kind == NearbyObjectNPC) {
+            NSLog(@"it's a character!");
+            if ([m.type compare:@"Image"] == NSOrderedSame) {
+                
+                UIView *imgitmBaseVw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+                [imgitmBaseVw setUserInteractionEnabled:YES];
+
+                NSLog(@"CHARACTER ITEM!");
+                AsyncMediaImageView *imgView = [[AsyncMediaImageView alloc] initWithFrame:CGRectZero andMedia:m];
+
+                UIButton *transp = [UIButton buttonWithType:UIButtonTypeCustom];
+                transp.frame = CGRectMake(68, 68, 64, 64);
+                [transp setTitle:@"GO!" forState:UIControlStateNormal];
+                transp.tag = [m.uid intValue];
+                [transp addTarget:self action:@selector(tapItem:) forControlEvents:UIControlEventTouchUpInside];
+                
+                [imgitmBaseVw addSubview:imgView];
+                [imgitmBaseVw addSubview:transp];
+
+//                imgView.frame = CGRectMake(0, 0, 200, 200);
+                
+                PlaceOfInterest *poi = [PlaceOfInterest placeOfInterestWithView:imgitmBaseVw at:[[[CLLocation alloc] initWithLatitude:noc.geoLocation.coordinate.latitude longitude:noc.geoLocation.coordinate.longitude] autorelease]];
+                
+                [self.placesOfInterest insertObject:poi atIndex:t];
+                t++;
+            }
+
+        }
+
+    }
+    NSLog(@"ar view: %@", [arView description]);
+    [(AR2View *)arView setPlacesOfInterest:self.placesOfInterest];
+    
+    for (PlaceOfInterest *poi in self.placesOfInterest) {
+        for (UIView *vw in [poi.view subviews]) {
+            for (UIView *vw2 in [vw subviews]) {
+                NSLog(@"description: %@", [vw2 description]);
+                NSLog(@"tag: %i, opacity: %f, %i", vw2.tag, vw2.alpha, vw2.userInteractionEnabled);
+                for (UIView *vw3 in [vw2 subviews]) {
+                    NSLog(@"        description: %@", [vw3 description]);
+                    NSLog(@"        tag: %i, opacity: %f, %i", vw3.tag, vw3.alpha, vw3.userInteractionEnabled);
+                }
             }
         }
     }
-    NSLog(@"ar view: %@", [arView description]);
-    [(AR2View *)arView setPlacesOfInterest:self.placesOfInterest];	
     
 }
 
-//- (void)playMovieForTag:(int)tag {
-//    for (PlaceOfInterest *poi in self.placesOfInterest) {
-//        if ([poi.view viewWithTag:tag] != nil) {
-//            [poi.view viewWithTag:tag] superview
-//        }
-//    }
-//}
-             
-- (void)freezeVideo:(UIButton *)button {
-        
-    NSLog(@"freezeVideo called (tag: %i)", button.tag);
-    if (button.tag >= 1000) {
-        
-        NSLog(@"movie view: %@", button.superview.description);
-        
-        int index = button.tag - 1000;
-        PlaceOfInterest *poi = [self.placesOfInterest objectAtIndex:index];
-        
-        poi.frozen = !poi.frozen;
-        
+- (void)tapItem:(UIButton *)sender {
+    NSLog(@"tapped: %i", sender.tag);
+    ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
+    itemVC.item = [[AppModel sharedAppModel] itemForItemId:sender.tag];
+    [self.navigationController pushViewController:itemVC animated:YES];
+}
+
+- (void)playMovie:(UIButton *)sender {
+    
+    if ([ARISMoviePlayer.moviePlayer playbackState] == MPMoviePlaybackStatePlaying) {
+        [ARISMoviePlayer.moviePlayer stop];
     }
     
+    [ARISMoviePlayer.moviePlayer.view removeFromSuperview];
+    
+    NSString *vurl = [videoURLS objectForKey:[NSNumber numberWithInt:sender.tag]];
+    [ARISMoviePlayer.moviePlayer setContentURL:[NSURL URLWithString:vurl]];
+    [ARISMoviePlayer.moviePlayer prepareToPlay];
+    
+    [NSThread sleepForTimeInterval:0.05];
+    
+    NSLog(@"url: %@", [ARISMoviePlayer.moviePlayer contentURL]);
+    
+    [[sender superview] addSubview:ARISMoviePlayer.moviePlayer.view];
+
+
+}
+
+- (void)tapCharacter:(UIButton *)sender {
+    DialogViewController *dialogVC = [[DialogViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle]];
+    [dialogVC beginWithNPC:[[AppModel sharedAppModel] npcForNpcId:sender.tag]];
+    [[RootViewController sharedRootViewController] displayNearbyObjectView:dialogVC];
+
 }
 
 - (void)viewDidUnload

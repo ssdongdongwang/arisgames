@@ -378,9 +378,7 @@ void ecefToEnu(double lat, double lon, double x, double y, double z, double xr, 
 //        lpf[2] = v[2]; //lpf[2]*0.9 + v[2]*0.1;
         
 		if (v[2] < -1.0f) {
-			if (poi.frozen == NO) {
-                poi.view.center = CGPointMake(x*self.bounds.size.width, (self.bounds.size.height*(1-y))+((v[2]*60.0)/15000.0));
-            }
+            poi.view.center = CGPointMake(x*self.bounds.size.width, (self.bounds.size.height*(1-y))+((v[2]*60.0)/15000.0));
 			poi.view.hidden = NO;
 		} else {
 			poi.view.hidden = YES;

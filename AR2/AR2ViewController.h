@@ -53,11 +53,10 @@
 #import "NearbyObjectARCoordinate.h"
 
 
+@interface AR2ViewController : UIViewController {}
 
-@interface AR2ViewController : UIViewController {	
-}
-
-@property (nonatomic, retain) MPMoviePlayerController *playerViewController;
-@property (nonatomic, retain) NSMutableArray *placesOfInterest;
+@property (nonatomic, strong) NSMutableArray *placesOfInterest;
+@property (nonatomic, strong) NSMutableDictionary *videoURLS;
+@property (nonatomic, strong) ARISMoviePlayerViewController *ARISMoviePlayer;
 
 @end
