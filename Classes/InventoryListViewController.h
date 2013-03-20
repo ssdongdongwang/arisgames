@@ -10,7 +10,7 @@
 #import "AppModel.h"
 #import "ARISAppDelegate.h"
 #import "Item.h"
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 
 @interface InventoryListViewController : UIViewController
 {

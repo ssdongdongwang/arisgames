@@ -7,57 +7,43 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
-#import "QRCodeProtocol.h"
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
 
-@interface Item : NSObject <NearbyObjectProtocol,QRCodeProtocol> {
+@interface Item : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
+{
 	int itemId;
-	NSString *name;
+    int iconMediaId;
 	int mediaId;
-	int iconMediaId;
-	//int locationId; //null if in the player's inventory
 	int qty;
 	int maxQty;
     int weight;
-	NSString *idescription;
     BOOL isAttribute;
-	BOOL forcedDisplay;
-	BOOL dropable;
-	BOOL destroyable;
-    BOOL hasViewed;
+	BOOL isDroppable;
+	BOOL isDestroyable;
     BOOL isTradeable;
-	nearbyObjectKind kind;
+    NSString *name;
+    NSString *idescription;
     NSString *url;
     NSString *type;
-    int creatorId;
 }
 
-@property (copy, readwrite) NSString *name;
-@property (copy, readwrite) NSString *type;
-
-@property (readwrite, assign) nearbyObjectKind kind;
-- (nearbyObjectKind) kind;
-@property (readwrite, assign) BOOL forcedDisplay;
-@property (readwrite, assign) BOOL hasViewed;
-@property (readwrite, assign) BOOL isTradeable;
-@property (readwrite, assign) int itemId;
-@property (readwrite, assign) int creatorId;
-
-@property (readwrite, assign) int locationId;
-@property (readwrite, assign) int mediaId;
-
-@property (readwrite, assign) int weight;
-@property (readwrite, assign) int qty;
-@property (readwrite, assign) int maxQty;
-@property (copy, readwrite) NSString *idescription;
-@property (readwrite, assign) int iconMediaId;
-@property (readwrite, assign) BOOL dropable;
-@property (readwrite, assign) BOOL destroyable;
-@property (readwrite, assign) BOOL isAttribute;
-
+@property (nonatomic, assign) int itemId;
+@property (nonatomic, assign) int iconMediaId;
+@property (nonatomic, assign) int mediaId;
+@property (nonatomic, assign) int qty;
+@property (nonatomic, assign) int maxQty;
+@property (nonatomic, assign) int weight;
+@property (nonatomic, assign) BOOL isAttribute;
+@property (nonatomic, assign) BOOL isDroppable;
+@property (nonatomic, assign) BOOL isDestroyable;
+@property (nonatomic, assign) BOOL isTradeable;
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *idescription;
 @property (nonatomic, strong) NSString *url;
+@property (nonatomic, strong) NSString *type;
 
-- (void) display;
+- (BOOL) compareTo:(Item *)other;
 - (Item *) copy;
 
 @end

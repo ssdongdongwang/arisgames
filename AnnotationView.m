@@ -7,10 +7,8 @@
 //
 
 #import "AnnotationView.h"
-#import "Annotation.h"
+#import "Location.h"
 #import "Media.h"
-#import "NearbyObjectProtocol.h"
-
 
 @implementation AnnotationView
 
@@ -21,36 +19,42 @@
 @synthesize subtitleFont;
 @synthesize icon;
 @synthesize showTitle;
-@synthesize iconView;
 @synthesize shouldWiggle;
+@synthesize iconView;
 @synthesize totalWiggleOffsetFromOriginalPosition;
 @synthesize incrementalWiggleOffset;
 @synthesize xOnSinWave;
 
-- (id)initWithAnnotation:(Annotation *)annotation reuseIdentifier:(NSString *)reuseIdentifier
+- (id)initWithLocation:(Location *)location reuseIdentifier:(NSString *)reuseIdentifier
 {
-	if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier])
+	if (self = [super initWithAnnotation:location reuseIdentifier:reuseIdentifier])
     {
-        self.titleFont = [UIFont fontWithName:@"Arial" size:18];
+        self.titleFont    = [UIFont fontWithName:@"Arial" size:18];
         self.subtitleFont = [UIFont fontWithName:@"Arial" size:12];
         
-        self.showTitle = (annotation.location.showTitle && annotation.title != nil && ![annotation.title isEqualToString:@""]) ? YES : NO;
-        self.shouldWiggle = annotation.location.wiggle;
+        self.showTitle = (location.showTitle && ![location.name isEqualToString:@""]) ? YES : NO;
+        self.shouldWiggle = location.wiggle;
         self.totalWiggleOffsetFromOriginalPosition = 0;
         self.incrementalWiggleOffset = 0;
         self.xOnSinWave = 0;
 
         CGRect imageViewFrame;
-        if(self.showTitle || annotation.kind == NearbyObjectPlayer) {
+        if(self.showTitle || [location.object.objectType isEqualToString:@"Player"])
+        {
             //Find width of annotation
-            CGSize titleSize = [annotation.title sizeWithFont:titleFont];
-            CGSize subtitleSize = [annotation.subtitle sizeWithFont:subtitleFont];
+            CGSize titleSize    = [location.name sizeWithFont:titleFont];
+            CGSize subtitleSize = [location.name sizeWithFont:subtitleFont];
             int maxWidth = titleSize.width > subtitleSize.width ? titleSize.width : subtitleSize.width;
             if(maxWidth > ANNOTATION_MAX_WIDTH) maxWidth = ANNOTATION_MAX_WIDTH;
             
             titleRect = CGRectMake(0, 0, maxWidth, titleSize.height);
-            if (annotation.subtitle)
+
+            NSString *subtitle;
+            if ([location.object.objectType isEqualToString:@"Item"] && ((Item *)location.object).qty > 1 && location.name != nil)
+            {
+                subtitle = [NSString stringWithFormat:@"x %d",((Item *)location.object).qty];
                 subtitleRect = CGRectMake(0, titleRect.origin.y+titleRect.size.height, maxWidth, subtitleSize.height);
+            }
             else
                 subtitleRect = CGRectMake(0,0,0,0);
             
@@ -59,7 +63,7 @@
             contentRect.size.height += ANNOTATION_PADDING*2;
             
             titleRect=CGRectOffset(titleRect, ANNOTATION_PADDING, ANNOTATION_PADDING);
-            if(annotation.subtitle) subtitleRect=CGRectOffset(subtitleRect, ANNOTATION_PADDING, ANNOTATION_PADDING);
+            if(subtitle) subtitleRect=CGRectOffset(subtitleRect, ANNOTATION_PADDING, ANNOTATION_PADDING);
             
             imageViewFrame = CGRectMake((contentRect.size.width/2)-(IMAGE_WIDTH/2), 
                                         contentRect.size.height+POINTER_LENGTH, 
@@ -85,29 +89,33 @@
         self.iconView.userInteractionEnabled = NO;
         
         //Only load the icon media if it is > 0, otherwise, lets load a default
-        if (annotation.iconMediaId != 0) {
-            Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId:annotation.iconMediaId];
+        if (location.object.iconMediaId != 0) {
+            Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId:location.object.iconMediaId];
             [self.iconView loadImageFromMedia:iconMedia];
         }
-        else if (annotation.kind == NearbyObjectItem) self.iconView.image = [UIImage imageNamed:@"item.png"];
-        else if (annotation.kind == NearbyObjectNode) self.iconView.image = [UIImage imageNamed:@"page.png"];
-        else if (annotation.kind == NearbyObjectNPC) self.iconView.image = [UIImage imageNamed:@"npc.png"];
-        else if (annotation.kind == NearbyObjectPlayer) self.iconView.image = [UIImage imageNamed:@"player.png"];
-        else if (annotation.kind == NearbyObjectWebPage) self.iconView.image = [UIImage imageNamed:@"page.png"];
-        else if (annotation.kind == NearbyObjectNote) self.iconView.image = [UIImage imageNamed:@"noteicon.png"];
+        //These cases should already be taken care of, as each object sets its default when init'd.
+        else if ([location.object.objectType isEqualToString:@"Item"])       self.iconView.image = [UIImage imageNamed:@"item.png"];
+        else if ([location.object.objectType isEqualToString:@"Node"])       self.iconView.image = [UIImage imageNamed:@"page.png"];
+        else if ([location.object.objectType isEqualToString:@"Npc"])        self.iconView.image = [UIImage imageNamed:@"npc.png"];
+        else if ([location.object.objectType isEqualToString:@"Player"])     self.iconView.image = [UIImage imageNamed:@"player.png"];
+        else if ([location.object.objectType isEqualToString:@"WebPage"])    self.iconView.image = [UIImage imageNamed:@"page.png"];
+        else if ([location.object.objectType isEqualToString:@"PlayerNote"]) self.iconView.image = [UIImage imageNamed:@"noteicon.png"];
         
         self.opaque = NO; 
     }
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	asyncData= nil;
 	[iconView removeFromSuperview];
 }
 
-- (void)drawRect:(CGRect)rect {
-    if (self.showTitle) {
+- (void)drawRect:(CGRect)rect
+{
+    if (self.showTitle)
+    {
         CGMutablePathRef calloutPath = CGPathCreateMutable();
         CGPoint pointerPoint = CGPointMake(self.contentRect.origin.x + 0.5 * self.contentRect.size.width,  self.contentRect.origin.y + self.contentRect.size.height + POINTER_LENGTH);
         CGFloat radius = 7.0;

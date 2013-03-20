@@ -9,8 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "AppModel.h"
 #import "Item.h"
-#import "itemDetailsMode.h"
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 
 @interface ItemActionViewController : UIViewController<UIPickerViewDelegate, UIPickerViewDataSource> {
     IBOutlet UIButton *backButton;

@@ -484,7 +484,7 @@ didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)movieFinishedCallback:(NSNotification*) aNotification
 {
-	NSLog(@"ItemDetailsViewController: movieFinishedCallback");
+	NSLog(@"ItemViewController: movieFinishedCallback");
 	[self dismissMoviePlayerViewControllerAnimated];
 }
 - (void)dealloc

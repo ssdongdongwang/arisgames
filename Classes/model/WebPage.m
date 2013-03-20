@@ -7,40 +7,65 @@
 //
 
 #import "WebPage.h"
-#import "ARISAppDelegate.h"
-#import "AppModel.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 
 @implementation WebPage
-@synthesize iconMediaId,webPageId,name,url,kind,locationId;
 
--(nearbyObjectKind) kind
+@synthesize webPageId;
+@synthesize iconMediaId;
+@synthesize name;
+@synthesize url;
+
+- (int) objectId
 {
-    return NearbyObjectWebPage;
+    return webPageId;
 }
 
-- (WebPage *) init {
-    self = [super init];
-    if (self) {
-		kind = NearbyObjectWebPage;
-        iconMediaId = 4;
-    }
-    return self;	
-}
-
-- (void) display
+- (NSString *) objectType
 {
-	webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
-	webPageViewController.webPage = self;
-	[[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
+    return @"WebPage";
 }
 
-- (NSString *) name {
-    return self.name;
+- (int) iconMediaId
+{
+	if (iconMediaId == 0) return 4;
+	else return iconMediaId;
 }
 
-- (int)	iconMediaId {
-    return 4; 
+- (DisplayObjectViewController *) viewControllerForDisplay
+{
+	return [[WebPageViewController alloc] initWithWebPage:self];
+}
+
+- (void) wasDisplayed
+{
+    
+}
+
+- (void) finishedDisplay
+{
+    [[AppServices sharedAppServices] updateServerItemViewed:webPageId fromLocation:nil];
+    //Phil should remove "fromLocation". The location get's its own chance to update server
+}
+
+- (BOOL) compareTo:(WebPage *)other
+{
+	return other.webPageId == self.webPageId;
+}
+
+- (WebPage *) copy
+{
+    WebPage *c = [[WebPage alloc] init];
+    c.webPageId   = self.webPageId;
+    c.iconMediaId = self.iconMediaId;
+    c.name        = self.name;
+    c.url         = self.url;
+    return c;
+}
+
+- (NSString *) description
+{
+    return [NSString stringWithFormat:@"WebPage- Id:%d\tName:%@\tUrl:%@",self.webPageId,self.name,self.url];
 }
 
 @end

@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DisplayObjectViewController.h"
 #import "Panoramic.h"
 #import "PLView.h"
 #import "Media.h"
 
-@interface PanoramicViewController : UIViewController <UIImagePickerControllerDelegate>{
+@interface PanoramicViewController : DisplayObjectViewController <UIImagePickerControllerDelegate>
+{
     Panoramic *panoramic;
     IBOutlet PLView	*plView;
     NSURLConnection *connection;
@@ -22,12 +24,10 @@
     BOOL viewHasAlreadyAppeared;
     int numTextures;
     int lblSpacing;
-    NSObject *delegate;
     BOOL showedAlignment;
 }
 
 @property (nonatomic) Panoramic *panoramic;
-@property (nonatomic) NSObject *delegate;
 @property(nonatomic) IBOutlet PLView *plView;
 @property (nonatomic) NSURLConnection *connection;
 @property (nonatomic) NSMutableData* data;
@@ -39,7 +39,7 @@
 @property (readwrite,assign) int numTextures;
 @property (readwrite,assign) int lblSpacing;
 
-
+- (id) initWithPanoramic:(Panoramic *)p;
 - (void)loadImageFromMedia:(Media *) aMedia;
 -(IBAction) sliderValueChanged: (id) sender;
 - (void)showPanoView;

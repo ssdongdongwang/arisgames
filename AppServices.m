@@ -8,6 +8,7 @@
 
 #import "AppServices.h"
 #import "ARISUploader.h"
+#import "NSDictionary+ValidParsers.h"
 
 static const int kDefaultCapacity = 10;
 static const BOOL kEmptyBoolValue = NO;
@@ -33,12 +34,6 @@ BOOL currentlyUpdatingServerWithQuestsViewed;
 BOOL currentlyUpdatingServerWithInventoryViewed;
 
 @interface AppServices()
-
-- (BOOL)      validBoolForKey:  (NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary;
-- (NSInteger) validIntForKey:   (NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary;
-- (float)     validFloatForKey: (NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary;
-- (double)    validDoubleForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary;
-- (id)        validObjectForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary;
 
 @end
 
@@ -723,9 +718,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void) contentAddedToNoteWithText:(JSONResult *)result
 {
-    if([self validObjectForKey:@"noteId" inDictionary:result.userInfo])
-        [[AppModel sharedAppModel].uploadManager deleteContentFromNoteId:[self validIntForKey:@"noteId"      inDictionary:result.userInfo]
-                                                              andFileURL:[self validObjectForKey:@"localURL" inDictionary:result.userInfo]];
+    if([result.userInfo validObjectForKey:@"noteId"])
+        [[AppModel sharedAppModel].uploadManager deleteContentFromNoteId:[result.userInfo validIntForKey:@"noteId"]
+                                                              andFileURL:[result.userInfo validObjectForKey:@"localURL"]];
     [[AppModel sharedAppModel].uploadManager contentFinishedUploading];
     [self fetchPlayerNoteListAsync];
 }
@@ -844,10 +839,10 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 - (void)noteContentUploadDidfinish:(ARISUploader*)uploader {
 	NSLog(@"Model: Upload Note Content Request Finished. Response: %@", [uploader responseString]);
 	
-        int noteId = [self validObjectForKey:@"noteId" inDictionary:[uploader userInfo]] ? [self validIntForKey:@"noteId" inDictionary:[uploader userInfo]] : 0;
-        NSString *title = [self validObjectForKey:@"title" inDictionary:[uploader userInfo]];
-        NSString *type = [self validObjectForKey:@"type" inDictionary:[uploader userInfo]];
-        NSURL *localUrl = [self validObjectForKey:@"url" inDictionary:[uploader userInfo]];
+        int noteId = [[uploader userInfo] validObjectForKey:@"noteId"] ? [[uploader userInfo] validIntForKey:@"noteId"] : 0;
+        NSString *title = [[uploader userInfo] validObjectForKey:@"title"];
+        NSString *type  = [[uploader userInfo] validObjectForKey:@"type"];
+        NSURL *localUrl = [[uploader userInfo] validObjectForKey:@"url"];
         NSString *newFileName = [uploader responseString];
     
     //TODO: Check that the response string is actually a new filename that was made on the server, not an error
@@ -892,7 +887,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	[alert show];
     
     NSNumber *nId = [[NSNumber alloc]initWithInt:5];
-    nId = [self validObjectForKey:@"noteId" inDictionary:[uploader userInfo]];
+    nId = [[uploader userInfo] validObjectForKey:@"noteId"];
 	//if (description == NULL) description = @"filename";
     
     [[AppModel sharedAppModel].uploadManager contentFailedUploading];
@@ -925,9 +920,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	
 	[[RootViewController sharedRootViewController] removeWaitingIndicator];
     
-        if (jsonResult.data && [self validObjectForKey:@"media_id" inDictionary:((NSDictionary *)jsonResult.data)])
+        if (jsonResult.data && [((NSDictionary *)jsonResult.data) validObjectForKey:@"media_id"])
     {
-        [AppModel sharedAppModel].playerMediaId = [self validIntForKey:@"media_id" inDictionary:((NSDictionary*)jsonResult.data)];
+        [AppModel sharedAppModel].playerMediaId = [((NSDictionary*)jsonResult.data) validIntForKey:@"media_id"];
         [[AppModel sharedAppModel] saveUserDefaults];
     }
 }
@@ -1216,22 +1211,22 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     int overlaysIndex = 0;
     while (overlayDictionary = [overlayListEnumerator nextObject]) {
         // if new overlay in database
-        if (currentOverlayID != [self validIntForKey:@"overlay_id" inDictionary:overlayDictionary]) {
+        if (currentOverlayID != [overlayDictionary validIntForKey:@"overlay_id"]) {
             // add previous overlay to overlay list
             [tempOverlayList addObject:tempOverlay];
             
             // create new overlay
             tempOverlay.index = overlaysIndex;
-            tempOverlay.overlayId = [self validIntForKey:@"overlay_id" inDictionary:overlayDictionary];;
-            tempOverlay.num_tiles = [self validIntForKey:@"num_tiles" inDictionary:overlayDictionary];;
-            //tempOverlay.alpha = [[self validObjectForKey:@"alpha" inDictionary:overlayDictionary] floatValue] ;
+            tempOverlay.overlayId = [overlayDictionary validIntForKey:@"overlay_id"];;
+            tempOverlay.num_tiles = [overlayDictionary validIntForKey:@"num_tiles"];;
+            //tempOverlay.alpha = [[overlayDictionary validObjectForKey:@"alpha"] floatValue] ;
             tempOverlay.alpha = 1.0;
-            [tempOverlay.tileFileName addObject:[self validObjectForKey:@"file_path" inDictionary:overlayDictionary]];
-            [tempOverlay.tileMediaID addObject:[self validObjectForKey:@"media_id" inDictionary:overlayDictionary]];
-            [tempOverlay.tileX addObject:[self validObjectForKey:@"x" inDictionary:overlayDictionary]];
-            [tempOverlay.tileY addObject:[self validObjectForKey:@"y" inDictionary:overlayDictionary]];
-            [tempOverlay.tileZ addObject:[self validObjectForKey:@"zoom" inDictionary:overlayDictionary]];
-            Media *media = [[AppModel sharedAppModel] mediaForMediaId:[self validIntForKey:@"media_id" inDictionary:overlayDictionary]];
+            [tempOverlay.tileFileName addObject:[overlayDictionary validObjectForKey:@"file_path"]];
+            [tempOverlay.tileMediaID addObject:[overlayDictionary validObjectForKey:@"media_id"]];
+            [tempOverlay.tileX addObject:[overlayDictionary validObjectForKey:@"x"]];
+            [tempOverlay.tileY addObject:[overlayDictionary validObjectForKey:@"y"]];
+            [tempOverlay.tileZ addObject:[overlayDictionary validObjectForKey:@"zoom"]];
+            Media *media = [[AppModel sharedAppModel] mediaForMediaId:[overlayDictionary validIntForKey:@"media_id"]];
             [tempOverlay.tileImage addObject:media];
             currentOverlayID = tempOverlay.overlayId;
             overlaysIndex += 1;
@@ -1239,12 +1234,12 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
         else
         {
             // add tiles to existing overlay
-            [tempOverlay.tileFileName addObject:[self validObjectForKey:@"file_path" inDictionary:overlayDictionary]];
-            [tempOverlay.tileMediaID addObject:[self validObjectForKey:@"media_id" inDictionary:overlayDictionary]];
-            [tempOverlay.tileX addObject:[self validObjectForKey:@"x" inDictionary:overlayDictionary]];
-            [tempOverlay.tileY addObject:[self validObjectForKey:@"y" inDictionary:overlayDictionary]];
-            [tempOverlay.tileZ addObject:[self validObjectForKey:@"zoom" inDictionary:overlayDictionary]];
-            Media *media = [[AppModel sharedAppModel] mediaForMediaId:[self validIntForKey:@"media_id" inDictionary:overlayDictionary]];
+            [tempOverlay.tileFileName addObject:[overlayDictionary validObjectForKey:@"file_path"]];
+            [tempOverlay.tileMediaID addObject:[overlayDictionary validObjectForKey:@"media_id"]];
+            [tempOverlay.tileX addObject:[overlayDictionary validObjectForKey:@"x"]];
+            [tempOverlay.tileY addObject:[overlayDictionary validObjectForKey:@"y"]];
+            [tempOverlay.tileZ addObject:[overlayDictionary validObjectForKey:@"zoom"]];
+            Media *media = [[AppModel sharedAppModel] mediaForMediaId:[overlayDictionary validIntForKey:@"media_id"]];
             [tempOverlay.tileImage addObject:media];
             currentOverlayID = tempOverlay.overlayId;
         }
@@ -1522,9 +1517,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	while ((tagDictionary = [gameTagEnumerator nextObject]))
     {
         Tag *t = [[Tag alloc]init];
-        t.tagName = [self validObjectForKey:@"tag" inDictionary:tagDictionary];
-        t.playerCreated = [self validBoolForKey:@"player_created" inDictionary:tagDictionary];
-        t.tagId = [self validIntForKey:@"tag_id" inDictionary:tagDictionary];
+        t.tagName = [tagDictionary validObjectForKey:@"tag"];
+        t.playerCreated = [tagDictionary validBoolForKey:@"player_created"];
+        t.tagId = [tagDictionary validIntForKey:@"tag_id"];
 		[tempTagsList addObject:t];
 	}
 	[AppModel sharedAppModel].gameTagList = tempTagsList;
@@ -1694,154 +1689,97 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 }
 
 #pragma mark Parsers
-- (BOOL) validBoolForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary {
-	id theObject = [aDictionary valueForKey:aKey];
-	return [theObject respondsToSelector:@selector(boolValue)] ? [theObject boolValue] : kEmptyBoolValue;
-}
-
-- (NSInteger) validIntForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary {
-	id theObject = [aDictionary valueForKey:aKey];
-	return [theObject respondsToSelector:@selector(intValue)] ? [theObject intValue] : kEmptyIntValue;
-}
-
-- (float) validFloatForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary {
-	id theObject = [aDictionary valueForKey:aKey];
-	return [theObject respondsToSelector:@selector(floatValue)] ? [theObject floatValue] : kEmptyFloatValue;
-}
-
-- (double) validDoubleForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary {
-	id theObject = [aDictionary valueForKey:aKey];
-	return [theObject respondsToSelector:@selector(doubleValue)] ? [theObject doubleValue] : kEmptyDoubleValue;
-}
-
-- (id) validObjectForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary {
-	id theObject = [aDictionary valueForKey:aKey];
-	return (theObject == [NSNull null]) ? nil : theObject;
-}
-
-- (NSString *) validStringForKey:(NSString *const)aKey inDictionary:(NSDictionary *const)aDictionary
-{
-    id theObject = [aDictionary valueForKey:aKey];
-    return ([theObject respondsToSelector:@selector(isEqualToString:)]) ? theObject : @"";
-}
 
 -(Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary
 {
     Item *item = [[Item alloc] init];
-    item.itemId       = [self validIntForKey:@"item_id"              inDictionary:itemDictionary];
-    item.mediaId      = [self validIntForKey:@"media_id"             inDictionary:itemDictionary];
-    item.iconMediaId  = [self validIntForKey:@"icon_media_id"        inDictionary:itemDictionary];
-    item.maxQty       = [self validIntForKey:@"max_qty_in_inventory" inDictionary:itemDictionary];
-    item.weight       = [self validIntForKey:@"weight"               inDictionary:itemDictionary];
-    item.creatorId    = [self validIntForKey:@"creator_player_id"    inDictionary:itemDictionary];
-    item.url          = [self validObjectForKey:@"url"               inDictionary:itemDictionary];
-    item.type         = [self validObjectForKey:@"type"              inDictionary:itemDictionary];
-    item.name         = [self validObjectForKey:@"name"              inDictionary:itemDictionary];
-    item.idescription = [self validObjectForKey:@"description"       inDictionary:itemDictionary];
-    item.dropable     = [self validBoolForKey:@"dropable"            inDictionary:itemDictionary];
-    item.destroyable  = [self validBoolForKey:@"destroyable"         inDictionary:itemDictionary];
-    item.isAttribute  = [self validBoolForKey:@"is_attribute"        inDictionary:itemDictionary];
-    item.isTradeable  = [self validBoolForKey:@"tradeable"           inDictionary:itemDictionary];
+    item.itemId       = [itemDictionary validIntForKey:@"item_id"];
+    item.mediaId      = [itemDictionary validIntForKey:@"media_id"];
+    item.iconMediaId  = [itemDictionary validIntForKey:@"icon_media_id"];
+    item.maxQty       = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
+    item.weight       = [itemDictionary validIntForKey:@"weight"];
+    item.creatorId    = [itemDictionary validIntForKey:@"creator_player_id"];
+    item.url          = [itemDictionary validObjectForKey:@"url"];
+    item.type         = [itemDictionary validObjectForKey:@"type"];
+    item.name         = [itemDictionary validObjectForKey:@"name"];
+    item.idescription = [itemDictionary validObjectForKey:@"description"];
+    item.dropable     = [itemDictionary validBoolForKey:@"dropable"];
+    item.destroyable  = [itemDictionary validBoolForKey:@"destroyable"];
+    item.isAttribute  = [itemDictionary validBoolForKey:@"is_attribute"];
+    item.isTradeable  = [itemDictionary validBoolForKey:@"tradeable"];
 	
-	return item;
+    return item;
 }
 -(Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary
 {
-	Node *node = [[Node alloc] init];
-	node.nodeId          = [self validIntForKey:@"node_id"                          inDictionary:nodeDictionary];
-    node.mediaId         = [self validIntForKey:@"media_id"                         inDictionary:nodeDictionary];
-	node.iconMediaId     = [self validIntForKey:@"icon_media_id"                    inDictionary:nodeDictionary];
-	node.nodeIfCorrect   = [self validIntForKey:@"require_answer_correct_node_id"   inDictionary:nodeDictionary];
-	node.nodeIfIncorrect = [self validIntForKey:@"require_answer_incorrect_node_id" inDictionary:nodeDictionary];
-	node.name            = [self validObjectForKey:@"title"                         inDictionary:nodeDictionary];
-	node.text            = [self validObjectForKey:@"text"                          inDictionary:nodeDictionary];
-	node.answerString    = [self validObjectForKey:@"require_answer_string"         inDictionary:nodeDictionary];
- 
-	//Add options here
-	int optionNodeId;
-	NSString *text;
-	NodeOption *option;
-	
-	if ([self validObjectForKey:@"opt1_node_id" inDictionary:nodeDictionary] && [self validIntForKey:@"opt1_node_id" inDictionary:nodeDictionary] > 0)
-    {
-		optionNodeId= [self validIntForKey:@"opt1_node_id" inDictionary:nodeDictionary];
-		text = [self validObjectForKey:@"opt1_text" inDictionary:nodeDictionary];
-		option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:NO];
-		[node addOption:option];
-	}
-	if ([self validObjectForKey:@"opt2_node_id" inDictionary:nodeDictionary] && [self validIntForKey:@"opt2_node_id" inDictionary:nodeDictionary] > 0)
-    {
-		optionNodeId = [self validIntForKey:@"opt2_node_id" inDictionary:nodeDictionary];
-		text = [self validObjectForKey:@"opt2_text" inDictionary:nodeDictionary];
-		option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:NO];
-		[node addOption:option];
-	}
-	if ([self validObjectForKey:@"opt3_node_id" inDictionary:nodeDictionary] && [self validIntForKey:@"opt3_node_id" inDictionary:nodeDictionary] > 0)
-    {
-		optionNodeId = [self validIntForKey:@"opt3_node_id" inDictionary:nodeDictionary];
-		text = [self validObjectForKey:@"opt3_text" inDictionary:nodeDictionary];
-		option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:NO];
-		[node addOption:option];
-	}
-	
-	return node;
+    Node *node = [[Node alloc] init];
+    node.nodeId          = [nodeDictionary validIntForKey:@"node_id"];
+    node.mediaId         = [nodeDictionary validIntForKey:@"media_id"];
+    node.iconMediaId     = [nodeDictionary validIntForKey:@"icon_media_id"];
+    node.nodeIfCorrect   = [nodeDictionary validIntForKey:@"require_answer_correct_node_id"];
+    node.nodeIfIncorrect = [nodeDictionary validIntForKey:@"require_answer_incorrect_node_id"];
+    node.name            = [nodeDictionary validObjectForKey:@"title"];
+    node.text            = [nodeDictionary validObjectForKey:@"text"];
+    node.answerString    = [nodeDictionary validObjectForKey:@"require_answer_string"];
+
+    return node;
 }
 
 -(Note *)parseNoteFromDictionary: (NSDictionary *)noteDictionary
 {
-	Note *aNote = [[Note alloc] init];
-    aNote.dropped       = [self validBoolForKey:@"dropped"            inDictionary:noteDictionary];
-    aNote.showOnMap     = [self validBoolForKey:@"public_to_map"      inDictionary:noteDictionary];
-    aNote.showOnList    = [self validBoolForKey:@"public_to_notebook" inDictionary:noteDictionary];
-    aNote.userLiked     = [self validBoolForKey:@"player_liked"       inDictionary:noteDictionary];
-    aNote.noteId        = [self validIntForKey:@"note_id"             inDictionary:noteDictionary];
-    aNote.parentNoteId  = [self validIntForKey:@"parent_note_id"      inDictionary:noteDictionary];
-    aNote.parentRating  = [self validIntForKey:@"parent_rating"       inDictionary:noteDictionary];
-    aNote.numRatings    = [self validIntForKey:@"likes"               inDictionary:noteDictionary];
-    aNote.creatorId     = [self validIntForKey:@"owner_id"            inDictionary:noteDictionary];
-    aNote.latitude      = [self validDoubleForKey:@"lat"              inDictionary:noteDictionary];
-    aNote.longitude     = [self validDoubleForKey:@"lon"              inDictionary:noteDictionary];
-    aNote.username      = [self validObjectForKey:@"username"         inDictionary:noteDictionary];
-    aNote.title         = [self validObjectForKey:@"title"            inDictionary:noteDictionary];
-    aNote.text          = [self validObjectForKey:@"text"             inDictionary:noteDictionary];
+    Note *aNote = [[Note alloc] init];
+    aNote.dropped       = [noteDictionary validBoolForKey:@"dropped"];
+    aNote.showOnMap     = [noteDictionary validBoolForKey:@"public_to_map"];
+    aNote.showOnList    = [noteDictionary validBoolForKey:@"public_to_notebook"];
+    aNote.userLiked     = [noteDictionary validBoolForKey:@"player_liked"];
+    aNote.noteId        = [noteDictionary validIntForKey:@"note_id"];
+    aNote.parentNoteId  = [noteDictionary validIntForKey:@"parent_note_id"];
+    aNote.parentRating  = [noteDictionary validIntForKey:@"parent_rating"];
+    aNote.numRatings    = [noteDictionary validIntForKey:@"likes"];
+    aNote.creatorId     = [noteDictionary validIntForKey:@"owner_id"];
+    aNote.latitude      = [noteDictionary validDoubleForKey:@"lat"];
+    aNote.longitude     = [noteDictionary validDoubleForKey:@"lon"];
+    aNote.username      = [noteDictionary validObjectForKey:@"username"];
+    aNote.title         = [noteDictionary validObjectForKey:@"title"];
+    aNote.text          = [noteDictionary validObjectForKey:@"text"];
     
-    NSArray *contents = [self validObjectForKey:@"contents" inDictionary:noteDictionary];
+    NSArray *contents = [noteDictionary validObjectForKey:@"contents"];
     for (NSDictionary *content in contents)
     {
         NoteContent *c = [[NoteContent alloc] init];
-        c.text      = [self validObjectForKey:@"text"    inDictionary:content];
-        c.title     = [self validObjectForKey:@"title"   inDictionary:content];
-        c.type      = [self validObjectForKey:@"type"    inDictionary:content];
-        c.contentId = [self validIntForKey:@"content_id" inDictionary:content];
-        c.mediaId   = [self validIntForKey:@"media_id"   inDictionary:content];
-        c.noteId    = [self validIntForKey:@"note_id"    inDictionary:content];
-        c.sortIndex = [self validIntForKey:@"sort_index" inDictionary:content];
-        int returnCode = [self validIntForKey:@"returnCode" inDictionary:[self validObjectForKey:@"media" inDictionary:content]];
-        NSDictionary *m = [self validObjectForKey:@"data" inDictionary:[self validObjectForKey:@"media" inDictionary:content]];
+        c.text      = [content validObjectForKey:@"text"];
+        c.title     = [content validObjectForKey:@"title"];
+        c.type      = [content validObjectForKey:@"type"];
+        c.contentId = [content validIntForKey:@"content_id"];
+        c.mediaId   = [content validIntForKey:@"media_id"];
+        c.noteId    = [content validIntForKey:@"note_id"];
+        c.sortIndex = [content validIntForKey:@"sort_index"];
+        int returnCode  = [[content validObjectForKey:@"media"] validIntForKey:@"returnCode"];
+        NSDictionary *m = [[content validObjectForKey:@"media"] validObjectForKey:@"data"];
         if(returnCode == 0 && m)
         {
             Media *media = [[AppModel sharedAppModel].mediaCache mediaForMediaId:c.mediaId];
-            NSString *fileName = [self validObjectForKey:@"file_path" inDictionary:m];
-            if(fileName == nil) fileName = [self validObjectForKey:@"file_name" inDictionary:m];
-            NSString *urlPath = [self validObjectForKey:@"url_path" inDictionary:m];
+            NSString *fileName = [m validObjectForKey:@"file_path"];
+            if(fileName == nil) fileName = [m validObjectForKey:@"file_name"];
+            NSString *urlPath = [m validObjectForKey:@"url_path"];
             NSString *fullUrl = [NSString stringWithFormat:@"%@%@", urlPath, fileName];
             media.url = fullUrl;
-            media.type = [self validObjectForKey:@"type" inDictionary:m];
+            media.type = [m validObjectForKey:@"type"];
         }
         
         [aNote.contents addObject:c];
     }
     
-    NSArray *tags = [self validObjectForKey:@"tags" inDictionary:noteDictionary];
+    NSArray *tags = [noteDictionary validObjectForKey:@"tags"];
     for (NSDictionary *tagOb in tags) 
     {
         Tag *tag = [[Tag alloc] init];
-        tag.tagName       = [self validObjectForKey:@"tag"          inDictionary:tagOb];
-        tag.playerCreated = [self validBoolForKey:@"player_created" inDictionary:tagOb];
-        tag.tagId         = [self validIntForKey:@"tag_id"          inDictionary:tagOb];
+        tag.tagName       = [tagOb validObjectForKey:@"tag"];
+        tag.playerCreated = [tagOb validBoolForKey:@"player_created"];
+        tag.tagId         = [tagOb validIntForKey:@"tag_id"];
         [aNote.tags addObject:tag];
     }
-    NSArray *comments = [self validObjectForKey:@"comments" inDictionary:noteDictionary];
+    NSArray *comments = [noteDictionary validObjectForKey:@"comments"];
     NSEnumerator *enumerator = [((NSArray *)comments) objectEnumerator];
 	NSDictionary *dict;
     while ((dict = [enumerator nextObject]))
@@ -1864,13 +1802,13 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 -(Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary
 {
 	Npc *npc = [[Npc alloc] init];
-	npc.npcId       = [self validIntForKey:@"npc_id"         inDictionary:npcDictionary];
-    npc.mediaId     = [self validIntForKey:@"media_id"       inDictionary:npcDictionary];
-	npc.iconMediaId = [self validIntForKey:@"icon_media_id"  inDictionary:npcDictionary];
-	npc.name        = [self validObjectForKey:@"name"        inDictionary:npcDictionary];
-	npc.greeting    = [self validObjectForKey:@"text"        inDictionary:npcDictionary];
-	npc.description = [self validObjectForKey:@"description" inDictionary:npcDictionary];
-    npc.closing     = [self validStringForKey:@"closing"     inDictionary:npcDictionary];
+	npc.npcId       = [npcDictionary validIntForKey:@"npc_id"];
+    npc.mediaId     = [npcDictionary validIntForKey:@"media_id"];
+	npc.iconMediaId = [npcDictionary validIntForKey:@"icon_media_id"];
+	npc.name        = [npcDictionary validObjectForKey:@"name"];
+	npc.greeting    = [npcDictionary validObjectForKey:@"text"];
+	npc.description = [npcDictionary validObjectForKey:@"description"];
+    npc.closing     = [npcDictionary validStringForKey:@"closing"];
     
 	return npc;
 }
@@ -1878,63 +1816,64 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 - (Tab *)parseTabFromDictionary:(NSDictionary *)tabDictionary
 {
     Tab *tab = [[Tab alloc] init];
-    tab.tabIndex   = [self validIntForKey:@"tab_index"       inDictionary:tabDictionary];
-    tab.tabName    = [self validObjectForKey:@"tab"          inDictionary:tabDictionary];
-    tab.tabDetail1 = [self validObjectForKey:@"tab_detail_1" inDictionary:tabDictionary] ? [self validIntForKey:@"tab_detail_1" inDictionary:tabDictionary] : 0;
+    tab.tabIndex   = [tabDictionary validIntForKey:@"tab_index"];
+    tab.tabName    = [tabDictionary validObjectForKey:@"tab"];
+    tab.tabDetail1 = [tabDictionary validObjectForKey:@"tab_detail_1"] ? [tabDictionary validIntForKey:@"tab_detail_1"] : 0;
     return tab;
 }
 
 -(WebPage *)parseWebPageFromDictionary: (NSDictionary *)webPageDictionary
 {
-	WebPage *webPage = [[WebPage alloc] init];
-	webPage.webPageId   = [self validIntForKey:@"web_page_id"   inDictionary:webPageDictionary];
-	webPage.name        = [self validObjectForKey:@"name"       inDictionary:webPageDictionary];
-	webPage.url         = [self validObjectForKey:@"url"        inDictionary:webPageDictionary];
-	webPage.iconMediaId = [self validIntForKey:@"icon_media_id" inDictionary:webPageDictionary];
-	return webPage;
+    WebPage *webPage = [[WebPage alloc] init];
+    webPage.webPageId   = [webPageDictionary validIntForKey:@"web_page_id"];
+    webPage.name        = [webPageDictionary validObjectForKey:@"name"];
+    webPage.url         = [webPageDictionary validObjectForKey:@"url"];
+    webPage.iconMediaId = [webPageDictionary validIntForKey:@"icon_media_id"];
+    return webPage;
 }
 
 -(Panoramic *)parsePanoramicFromDictionary: (NSDictionary *)panoramicDictionary
 {
-	Panoramic *pan = [[Panoramic alloc] init];
-    pan.panoramicId  = [self validIntForKey:@"aug_bubble_id"      inDictionary:panoramicDictionary];
-    pan.name         = [self validObjectForKey:@"name"            inDictionary:panoramicDictionary];
-	pan.description  = [self validObjectForKey:@"description"     inDictionary:panoramicDictionary];
-    pan.alignMediaId = [self validIntForKey:@"alignment_media_id" inDictionary:panoramicDictionary];
-    pan.iconMediaId  = [self validIntForKey:@"icon_media_id"      inDictionary:panoramicDictionary];
+    Panoramic *pan = [[Panoramic alloc] init];
+    pan.panoramicId  = [panoramicDictionary validIntForKey:@"aug_bubble_id"];
+    pan.name         = [panoramicDictionary validObjectForKey:@"name"];
+    pan.description  = [panoramicDictionary validObjectForKey:@"description"];
+    pan.alignMediaId = [panoramicDictionary validIntForKey:@"alignment_media_id"];
+    pan.iconMediaId  = [panoramicDictionary validIntForKey:@"icon_media_id"];
     
     //parse out the active quests into quest objects
-	NSMutableArray *media = [[NSMutableArray alloc] init];
-    NSArray *incomingPanMediaArray = [self validObjectForKey:@"media" inDictionary:panoramicDictionary];
-	NSEnumerator *incomingPanMediaEnumerator = [incomingPanMediaArray objectEnumerator];
+    NSMutableArray *media = [[NSMutableArray alloc] init];
+    NSArray *incomingPanMediaArray = [panoramicDictionary validObjectForKey:@"media"];
+    NSEnumerator *incomingPanMediaEnumerator = [incomingPanMediaArray objectEnumerator];
     NSDictionary* currentPanMediaDictionary;
-	while (currentPanMediaDictionary = (NSDictionary*)[incomingPanMediaEnumerator nextObject])
+    while (currentPanMediaDictionary = (NSDictionary*)[incomingPanMediaEnumerator nextObject])
     {
         PanoramicMedia *pm = [[PanoramicMedia alloc] init];
-        pm.text = [self validObjectForKey:@"text" inDictionary:currentPanMediaDictionary];
-        if ([self validObjectForKey:@"media_id" inDictionary:currentPanMediaDictionary] && [self validIntForKey:@"media_id" inDictionary:currentPanMediaDictionary] > 0)
-            pm.mediaId = [self validIntForKey:@"media_id" inDictionary:currentPanMediaDictionary];
-		[media addObject:pm];
-	}
+        pm.text = [currentPanMediaDictionary validObjectForKey:@"text"];
+        if ([currentPanMediaDictionary validObjectForKey:@"media_id"] && [currentPanMediaDictionary validIntForKey:@"media_id"] > 0)
+            pm.mediaId = [currentPanMediaDictionary validIntForKey:@"media_id"];
+        [media addObject:pm];
+    }
     
     pan.media = [NSArray arrayWithArray: media];
     
-	return pan;
+    return pan;
 }
 
 -(void)parseGameNoteListFromJSON: (JSONResult *)jsonResult
 {
-	NSArray *noteListArray = (NSArray *)jsonResult.data;
+    NSArray *noteListArray = (NSArray *)jsonResult.data;
     NSMutableDictionary *tempNoteList = [[NSMutableDictionary alloc]init];
     
-	NSEnumerator *enumerator = [((NSArray *)noteListArray) objectEnumerator];
-	NSDictionary *dict;
-	while ((dict = [enumerator nextObject])) {
+    NSEnumerator *enumerator = [((NSArray *)noteListArray) objectEnumerator];
+    NSDictionary *dict;
+    while ((dict = [enumerator nextObject])) 
+    {
         Note *tmpNote = [self parseNoteFromDictionary:dict];
         [tempNoteList setObject:tmpNote forKey:[NSNumber numberWithInt:tmpNote.noteId]];
-	}
+    }
     
-	[AppModel sharedAppModel].gameNoteList = tempNoteList;
+    [AppModel sharedAppModel].gameNoteList = tempNoteList;
     NSLog(@"NSNotification: NewNoteListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNoteListReady"      object:nil]];
     NSLog(@"NSNotification: GameNoteListRefreshed");
@@ -1950,20 +1889,20 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 {
     NSLog(@"Parsing Player Note List");
     
-	NSArray *noteListArray = (NSArray *)jsonResult.data;
+    NSArray *noteListArray = (NSArray *)jsonResult.data;
     NSLog(@"NSNotification: ReceivedNoteList");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ReceivedNoteList" object:nil]];
-	NSMutableDictionary *tempNoteList = [[NSMutableDictionary alloc] init];
-	NSEnumerator *enumerator = [((NSArray *)noteListArray) objectEnumerator];
-	NSDictionary *dict;
-	while ((dict = [enumerator nextObject])) {
-		Note *tmpNote = [self parseNoteFromDictionary:dict];
-		
-		[tempNoteList setObject:tmpNote forKey:[NSNumber numberWithInt:tmpNote.noteId]];
-	}
+    NSMutableDictionary *tempNoteList = [[NSMutableDictionary alloc] init];
+    NSEnumerator *enumerator = [((NSArray *)noteListArray) objectEnumerator];
+    NSDictionary *dict;
+    while ((dict = [enumerator nextObject]))
+    {
+        Note *tmpNote = [self parseNoteFromDictionary:dict];
+	[tempNoteList setObject:tmpNote forKey:[NSNumber numberWithInt:tmpNote.noteId]];
+    }
     
     
-	[AppModel sharedAppModel].playerNoteList = tempNoteList;
+    [AppModel sharedAppModel].playerNoteList = tempNoteList;
     NSLog(@"NSNotification: NewNoteListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNoteListReady" object:nil]];
     currentlyFetchingPlayerNoteList = NO;
@@ -1976,98 +1915,99 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     
     NSArray *conversationOptionsArray = (NSArray *)jsonResult.data;
 	
-	NSMutableArray *conversationNodeOptions = [[NSMutableArray alloc] initWithCapacity:3];
+    NSMutableArray *conversationNodeOptions = [[NSMutableArray alloc] initWithCapacity:3];
 	
-	NSEnumerator *conversationOptionsEnumerator = [conversationOptionsArray objectEnumerator];
-	NSDictionary *conversationDictionary;
+    NSEnumerator *conversationOptionsEnumerator = [conversationOptionsArray objectEnumerator];
+    NSDictionary *conversationDictionary;
 	
-	while ((conversationDictionary = [conversationOptionsEnumerator nextObject])) {
-		//Make the Node Option and add it to the Npc
-		int optionNodeId = [self validIntForKey:@"node_id" inDictionary:conversationDictionary];
-		NSString *text = [self validObjectForKey:@"text" inDictionary:conversationDictionary];
-        BOOL hasViewed = [self validBoolForKey:@"has_viewed" inDictionary:conversationDictionary];
-		NodeOption *option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:hasViewed];
-		[conversationNodeOptions addObject:option];
-	}
+    while ((conversationDictionary = [conversationOptionsEnumerator nextObject]))
+    {
+	//Make the Node Option and add it to the Npc
+	int optionNodeId = [conversationDictionary validIntForKey:@"node_id"];
+	NSString *text = [conversationDictionary validObjectForKey:@"text"];
+        BOOL hasViewed = [conversationDictionary validBoolForKey:@"has_viewed"];
+	NodeOption *option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:hasViewed];
+	[conversationNodeOptions addObject:option];
+    }
 	
-	//return conversationNodeOptions;
+    //return conversationNodeOptions;
     NSLog(@"NSNotification: ConversationNodeOptionsReady");
-	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ConversationNodeOptionsReady" object:conversationNodeOptions]];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ConversationNodeOptionsReady" object:conversationNodeOptions]];
 }
 
 -(void)parseLoginResponseFromJSON:(JSONResult *)jsonResult
 {
-	NSLog(@"AppServices: parseLoginResponseFromJSON");
+    NSLog(@"AppServices: parseLoginResponseFromJSON");
 	
-	[[RootViewController sharedRootViewController] removeWaitingIndicator];
+    [[RootViewController sharedRootViewController] removeWaitingIndicator];
     
-	if (jsonResult.data != [NSNull null])
+    if (jsonResult.data != [NSNull null])
     {
-		[AppModel sharedAppModel].loggedIn = YES;
-		[AppModel sharedAppModel].playerId = [self validIntForKey:@"player_id" inDictionary:((NSDictionary*)jsonResult.data)];
-		[AppModel sharedAppModel].playerMediaId = [self validIntForKey:@"media_id" inDictionary:((NSDictionary*)jsonResult.data)];
-        [AppModel sharedAppModel].userName = [self validObjectForKey:@"user_name" inDictionary:((NSDictionary*)jsonResult.data)];
-        [AppModel sharedAppModel].displayName = [self validObjectForKey:@"display_name" inDictionary:((NSDictionary*)jsonResult.data) ];
+	[AppModel sharedAppModel].loggedIn = YES;
+	[AppModel sharedAppModel].playerId = [((NSDictionary*)jsonResult.data) validIntForKey:@"player_id"];
+	[AppModel sharedAppModel].playerMediaId = [((NSDictionary*)jsonResult.data) validIntForKey:@"media_id"];
+        [AppModel sharedAppModel].userName = [((NSDictionary*)jsonResult.data) validObjectForKey:@"user_name"];
+        [AppModel sharedAppModel].displayName = [((NSDictionary*)jsonResult.data)  validObjectForKey:@"display_name"];
         [[AppServices sharedAppServices] setShowPlayerOnMap];
         [[AppModel sharedAppModel] saveUserDefaults];
         
         //Subscribe to player channel
         //[RootViewController sharedRootViewController].playerChannel = [[RootViewController sharedRootViewController].client subscribeToPrivateChannelNamed:[NSString stringWithFormat:@"%d-player-channel",[AppModel sharedAppModel].playerId]];
     }
-	else
-        [AppModel sharedAppModel].loggedIn = NO;
+    else
+      [AppModel sharedAppModel].loggedIn = NO;
     
     NSLog(@"NSNotification: NewLoginResponseReady");
-	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewLoginResponseReady" object:nil]];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewLoginResponseReady" object:nil]];
 }
 
 -(void)parseSelfRegistrationResponseFromJSON: (JSONResult *)jsonResult
 {
-	if (!jsonResult)
+    if (!jsonResult)
     {
-        NSLog(@"NSNotification: SelfRegistrationFailed");
-		[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationFailed" object:nil]];
-	}
+      NSLog(@"NSNotification: SelfRegistrationFailed");
+      [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationFailed" object:nil]];
+    }
     
     int newId = [(NSDecimalNumber*)jsonResult.data intValue];
     
-	if (newId > 0)
+    if (newId > 0)
     {
         NSLog(@"NSNotification: SelfRegistrationSucceeded");
-		[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationSucceeded" object:nil]];
-	}
-	else
+	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationSucceeded" object:nil]];
+    }
+    else
     {
         NSLog(@"NSNotification: SelfRegistrationFailed");
-		[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationFailed" object:nil]];
-	}
+	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"SelfRegistrationFailed" object:nil]];
+    }
 }
 
 - (Game *)parseGame:(NSDictionary *)gameSource
 {
     Game *game = [[Game alloc] init];
     
-    game.gameId                   = [self validIntForKey:@"game_id"               inDictionary:gameSource];
-    game.hasBeenPlayed            = [self validBoolForKey:@"has_been_played"      inDictionary:gameSource];
-    game.isLocational             = [self validBoolForKey:@"is_locational"        inDictionary:gameSource];
-    game.showPlayerLocation       = [self validBoolForKey:@"show_player_location" inDictionary:gameSource];
-    game.inventoryModel.weightCap = [self validIntForKey:@"inventory_weight_cap"  inDictionary:gameSource];
-    game.rating                   = [self validIntForKey:@"rating"                inDictionary:gameSource];
-    game.pcMediaId                = [self validIntForKey:@"pc_media_id"           inDictionary:gameSource];
-    game.numPlayers               = [self validIntForKey:@"numPlayers"            inDictionary:gameSource];
-    game.playerCount              = [self validIntForKey:@"count"                 inDictionary:gameSource];
-    game.gdescription             = [self validStringForKey:@"description"        inDictionary:gameSource];
-    game.name                     = [self validStringForKey:@"name"               inDictionary:gameSource];
-    game.authors                  = [self validStringForKey:@"editors"            inDictionary:gameSource];
-    game.mapType                  = [self validObjectForKey:@"map_type"           inDictionary:gameSource];
+    game.gameId                   = [gameSource validIntForKey:@"game_id"];
+    game.hasBeenPlayed            = [gameSource validBoolForKey:@"has_been_played"];
+    game.isLocational             = [gameSource validBoolForKey:@"is_locational"];
+    game.showPlayerLocation       = [gameSource validBoolForKey:@"show_player_location"];
+    game.inventoryModel.weightCap = [gameSource validIntForKey:@"inventory_weight_cap"];
+    game.rating                   = [gameSource validIntForKey:@"rating"];
+    game.pcMediaId                = [gameSource validIntForKey:@"pc_media_id"];
+    game.numPlayers               = [gameSource validIntForKey:@"numPlayers"];
+    game.playerCount              = [gameSource validIntForKey:@"count"];
+    game.gdescription             = [gameSource validStringForKey:@"description"];
+    game.name                     = [gameSource validStringForKey:@"name"];
+    game.authors                  = [gameSource validStringForKey:@"editors"];
+    game.mapType                  = [gameSource validObjectForKey:@"map_type"];
     if (!game.mapType || (![game.mapType isEqualToString:@"STREET"] && ![game.mapType isEqualToString:@"SATELLITE"] && ![game.mapType isEqualToString:@"HYBRID"])) game.mapType = @"STREET";
 
-    NSString *distance = [self validObjectForKey:@"distance" inDictionary:gameSource];
+    NSString *distance = [gameSource validObjectForKey:@"distance"];
     if (distance) game.distanceFromPlayer = [distance doubleValue];
     else game.distanceFromPlayer = 999999999;
     
-    NSString *latitude  = [self validObjectForKey:@"latitude" inDictionary:gameSource];
-    NSString *longitude = [self validObjectForKey:@"longitude" inDictionary:gameSource];
+    NSString *latitude  = [gameSource validObjectForKey:@"latitude"];
+    NSString *longitude = [gameSource validObjectForKey:@"longitude"];
     if (latitude && longitude)
         game.location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
     else
@@ -2077,51 +2017,51 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
     
     int iconMediaId;
-    if((iconMediaId = [self validIntForKey:@"icon_media_id" inDictionary:gameSource]) > 0)
+    if((iconMediaId = [gameSource validIntForKey:@"icon_media_id"]) > 0)
     {
         game.iconMedia = [[AppModel sharedAppModel] mediaForMediaId:iconMediaId];
         game.iconMediaUrl = [NSURL URLWithString:game.iconMedia.url];
     }
     NSString *iconMediaUrl;
-    if(!game.iconMedia && (iconMediaUrl = [self validObjectForKey:@"icon_media_url" inDictionary:gameSource]) && [iconMediaUrl length]>0)
+    if(!game.iconMedia && (iconMediaUrl = [gameSource validObjectForKey:@"icon_media_url"]) && [iconMediaUrl length]>0)
     {
         game.iconMediaUrl = [NSURL URLWithString:iconMediaUrl];
         game.iconMedia = [[AppModel sharedAppModel].mediaCache mediaForUrl:game.iconMediaUrl];
     }
     
     int mediaId;
-    if((mediaId = [self validIntForKey:@"media_id" inDictionary:gameSource]) > 0)
+    if((mediaId = [gameSource validIntForKey:@"media_id"]) > 0)
     {
         game.splashMedia = [[AppModel sharedAppModel] mediaForMediaId:mediaId];
         game.mediaUrl = [NSURL URLWithString:game.splashMedia.url];
     }
     NSString *mediaUrl;
-    if (!game.splashMedia && (mediaUrl = [self validObjectForKey:@"media_url" inDictionary:gameSource]) && [mediaUrl length]>0)
+    if (!game.splashMedia && (mediaUrl = [gameSource validObjectForKey:@"media_url"]) && [mediaUrl length]>0)
     {
         game.mediaUrl = [NSURL URLWithString:mediaUrl];
         game.splashMedia = [[AppModel sharedAppModel].mediaCache mediaForUrl:game.mediaUrl];
     }
     
-    game.questsModel.totalQuestsInGame = [self validIntForKey:@"totalQuests"               inDictionary:gameSource];
-    game.launchNodeId                  = [self validIntForKey:@"on_launch_node_id"         inDictionary:gameSource];
-    game.completeNodeId                = [self validIntForKey:@"game_complete_node_id"     inDictionary:gameSource];
-    game.calculatedScore               = [self validIntForKey:@"calculatedScore"           inDictionary:gameSource];
-    game.numReviews                    = [self validIntForKey:@"numComments"               inDictionary:gameSource];
-    game.allowsPlayerTags              = [self validBoolForKey:@"allow_player_tags"        inDictionary:gameSource];
-    game.allowShareNoteToMap           = [self validBoolForKey:@"allow_share_note_to_map"  inDictionary:gameSource];
-    game.allowShareNoteToList          = [self validBoolForKey:@"allow_share_note_to_book" inDictionary:gameSource];
-    game.allowNoteComments             = [self validBoolForKey:@"allow_note_comments"      inDictionary:gameSource];
-    game.allowNoteLikes                = [self validBoolForKey:@"allow_note_likes"         inDictionary:gameSource];
-    game.allowTrading                  = [self validBoolForKey:@"allow_trading"            inDictionary:gameSource];
+    game.questsModel.totalQuestsInGame = [gameSource validIntForKey:@"totalQuests"];
+    game.launchNodeId                  = [gameSource validIntForKey:@"on_launch_node_id"];
+    game.completeNodeId                = [gameSource validIntForKey:@"game_complete_node_id"];
+    game.calculatedScore               = [gameSource validIntForKey:@"calculatedScore"];
+    game.numReviews                    = [gameSource validIntForKey:@"numComments"];
+    game.allowsPlayerTags              = [gameSource validBoolForKey:@"allow_player_tags"];
+    game.allowShareNoteToMap           = [gameSource validBoolForKey:@"allow_share_note_to_map"];
+    game.allowShareNoteToList          = [gameSource validBoolForKey:@"allow_share_note_to_book"];
+    game.allowNoteComments             = [gameSource validBoolForKey:@"allow_note_comments"];
+    game.allowNoteLikes                = [gameSource validBoolForKey:@"allow_note_likes"];
+    game.allowTrading                  = [gameSource validBoolForKey:@"allow_trading"];
     
-    NSArray *comments = [self validObjectForKey:@"comments" inDictionary:gameSource];
+    NSArray *comments = [gameSource validObjectForKey:@"comments"];
     for (NSDictionary *comment in comments) {
         //This is returning an object with playerId,tex, and rating. Right now, we just want the text
         //TODO: Create a Comments object
         Comment *c = [[Comment alloc] init];
-        c.text = [self validObjectForKey:@"text" inDictionary:comment];
-        c.playerName = [self validObjectForKey:@"username" inDictionary:comment];
-        NSString *cRating = [self validObjectForKey:@"rating" inDictionary:comment];
+        c.text = [comment validObjectForKey:@"text"];
+        c.playerName = [comment validObjectForKey:@"username"];
+        NSString *cRating = [comment validObjectForKey:@"rating"];
         if (cRating) c.rating = [cRating intValue];
         [game.comments addObject:c];
     }
@@ -2246,26 +2186,26 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 -(Location*)parseLocationFromDictionary: (NSDictionary*)locationDictionary
 {
     Location *location = [[Location alloc] init];
-    location.locationId        = [self validIntForKey:@"location_id"         inDictionary:locationDictionary];
-    location.objectId          = [self validIntForKey:@"type_id"             inDictionary:locationDictionary];
-    location.qty               = [self validIntForKey:@"item_qty"            inDictionary:locationDictionary];
-    location.iconMediaId       = [self validIntForKey:@"icon_media_id"       inDictionary:locationDictionary];
-    location.name              = [self validObjectForKey:@"name"             inDictionary:locationDictionary];
-    location.objectType        = [self validObjectForKey:@"type"             inDictionary:locationDictionary];
-    location.hidden            = [self validBoolForKey:@"hidden"             inDictionary:locationDictionary];
-    location.forcedDisplay     = [self validBoolForKey:@"force_view"         inDictionary:locationDictionary];
-    location.showTitle         = [self validBoolForKey:@"show_title"         inDictionary:locationDictionary];
-    location.wiggle            = [self validBoolForKey:@"wiggle"             inDictionary:locationDictionary];
-    location.allowsQuickTravel = [self validBoolForKey:@"allow_quick_travel" inDictionary:locationDictionary];
-    location.error             = [self validIntForKey:@"error"               inDictionary:locationDictionary];
+    location.locationId        = [locationDictionary validIntForKey:@"location_id"];
+    location.objectId          = [locationDictionary validIntForKey:@"type_id"];
+    location.qty               = [locationDictionary validIntForKey:@"item_qty"];
+    location.iconMediaId       = [locationDictionary validIntForKey:@"icon_media_id"];
+    location.name              = [locationDictionary validObjectForKey:@"name"];
+    location.objectType        = [locationDictionary validObjectForKey:@"type"];
+    location.hidden            = [locationDictionary validBoolForKey:@"hidden"];
+    location.forcedDisplay     = [locationDictionary validBoolForKey:@"force_view"];
+    location.showTitle         = [locationDictionary validBoolForKey:@"show_title"];
+    location.wiggle            = [locationDictionary validBoolForKey:@"wiggle"];
+    location.allowsQuickTravel = [locationDictionary validBoolForKey:@"allow_quick_travel"];
+    location.error             = [locationDictionary validIntForKey:@"error"];
     if(location.error < 0) location.error = 9999999999;
-    location.location          = [[CLLocation alloc] initWithLatitude:[self validDoubleForKey:@"latitude"  inDictionary:locationDictionary]
-                                                            longitude:[self validDoubleForKey:@"longitude" inDictionary:locationDictionary]];
+    location.location          = [[CLLocation alloc] initWithLatitude:[locationDictionary validDoubleForKey:@"latitude"]
+                                                            longitude:[locationDictionary validDoubleForKey:@"longitude"]];
     
     NSNumber *num = [NSNumber numberWithInt:location.wiggle];
     if(num == nil)  location.wiggle = 0;
     //if(location.wiggle == nil)  location.wiggle = 0;
-    location.deleteWhenViewed = [self validIntForKey:@"delete_when_viewed" inDictionary:locationDictionary];
+    location.deleteWhenViewed = [locationDictionary validIntForKey:@"delete_when_viewed"];
     
     if(location.objectType &&[location.objectType isEqualToString:@"PlayerNote"])
     {
@@ -2317,25 +2257,25 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     for(int i = 0; i < [serverMediaArray count]; i++)
     {
         //Check if the id is valid, but doesn't exist in the cached array
-        int mediaId = [self validIntForKey:@"media_id" inDictionary:[serverMediaArray objectAtIndex:i]];
+        int mediaId = [[serverMediaArray objectAtIndex:i] validIntForKey:@"media_id"];
         if(mediaId >= 1 && ![cachedMediaMap objectForKey:[NSNumber numberWithInt:mediaId]])
         {
             //Cache it
             NSDictionary *tempMediaDict = [serverMediaArray objectAtIndex:i];
-            NSString *fileName = [self validObjectForKey:@"file_path" inDictionary:tempMediaDict] ? [self validObjectForKey:@"file_path" inDictionary:tempMediaDict] : [self validObjectForKey:@"file_name" inDictionary:tempMediaDict];
+            NSString *fileName = [tempMediaDict validObjectForKey:@"file_path"] ? [tempMediaDict validObjectForKey:@"file_path"] : [tempMediaDict validObjectForKey:@"file_name"];
             tmpMedia = [[AppModel sharedAppModel].mediaCache addMediaToCache:mediaId];
-            tmpMedia.url = [NSString stringWithFormat:@"%@%@", [self validObjectForKey:@"url_path" inDictionary:tempMediaDict], fileName];
-            tmpMedia.type = [self validObjectForKey:@"type" inDictionary:tempMediaDict];
-            tmpMedia.gameid = [NSNumber numberWithInt:[self validIntForKey:@"game_id" inDictionary:tempMediaDict]];
+            tmpMedia.url = [NSString stringWithFormat:@"%@%@", [tempMediaDict validObjectForKey:@"url_path"], fileName];
+            tmpMedia.type = [tempMediaDict validObjectForKey:@"type"];
+            tmpMedia.gameid = [NSNumber numberWithInt:[tempMediaDict validIntForKey:@"game_id"]];
             NSLog(@"Cached Media: %d with URL: %@",mediaId,tmpMedia.url);
         }
         else if((tmpMedia = [cachedMediaMap objectForKey:[NSNumber numberWithInt:mediaId]]) && (tmpMedia.url == nil || tmpMedia.type == nil || tmpMedia.gameid == nil))
         {
             NSDictionary *tempMediaDict = [serverMediaArray objectAtIndex:i];
-            NSString *fileName = [self validObjectForKey:@"file_path" inDictionary:tempMediaDict] ? [self validObjectForKey:@"file_path" inDictionary:tempMediaDict] : [self validObjectForKey:@"file_name" inDictionary:tempMediaDict];
-            tmpMedia.url = [NSString stringWithFormat:@"%@%@", [self validObjectForKey:@"url_path" inDictionary:tempMediaDict], fileName];
-            tmpMedia.type = [self validObjectForKey:@"type" inDictionary:tempMediaDict];
-            tmpMedia.gameid = [NSNumber numberWithInt:[self validIntForKey:@"game_id" inDictionary:tempMediaDict]];
+            NSString *fileName = [tempMediaDict validObjectForKey:@"file_path"] ? [tempMediaDict validObjectForKey:@"file_path"] : [tempMediaDict validObjectForKey:@"file_name"];
+            tmpMedia.url = [NSString stringWithFormat:@"%@%@", [tempMediaDict validObjectForKey:@"url_path"], fileName];
+            tmpMedia.type = [tempMediaDict validObjectForKey:@"type"];
+            tmpMedia.gameid = [NSNumber numberWithInt:[tempMediaDict validIntForKey:@"game_id"]];
             NSLog(@"Cached Media: %d with URL: %@",mediaId,tmpMedia.url);
         }
     }
@@ -2469,22 +2409,22 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	while ((itemDictionary = [inventoryEnumerator nextObject]))
     {
         Item *item = [[Item alloc] init];
-        item.itemId       = [self validIntForKey:@"item_id"              inDictionary:itemDictionary];
-        item.mediaId      = [self validIntForKey:@"media_id"             inDictionary:itemDictionary];
-        item.iconMediaId  = [self validIntForKey:@"icon_media_id"        inDictionary:itemDictionary];
-        item.creatorId    = [self validIntForKey:@"creator_player_id"    inDictionary:itemDictionary];
-        item.qty          = [self validIntForKey:@"qty"                  inDictionary:itemDictionary];
-        item.maxQty       = [self validIntForKey:@"max_qty_in_inventory" inDictionary:itemDictionary];
-        item.weight       = [self validIntForKey:@"weight"               inDictionary:itemDictionary];
-        item.dropable     = [self validBoolForKey:@"dropable"            inDictionary:itemDictionary];
-        item.destroyable  = [self validBoolForKey:@"destroyable"         inDictionary:itemDictionary];
-        item.isAttribute  = [self validBoolForKey:@"is_attribute"        inDictionary:itemDictionary];
-        item.isTradeable  = [self validBoolForKey:@"tradeable"           inDictionary:itemDictionary];
-        item.hasViewed    = [self validBoolForKey:@"viewed"              inDictionary:itemDictionary];
-        item.url          = [self validObjectForKey:@"url"               inDictionary:itemDictionary];
-        item.type         = [self validObjectForKey:@"type"              inDictionary:itemDictionary];
-        item.name         = [self validObjectForKey:@"name"              inDictionary:itemDictionary];
-        item.idescription = [self validObjectForKey:@"description"       inDictionary:itemDictionary];
+        item.itemId       = [itemDictionary validIntForKey:@"item_id"];
+        item.mediaId      = [itemDictionary validIntForKey:@"media_id"];
+        item.iconMediaId  = [itemDictionary validIntForKey:@"icon_media_id"];
+        item.creatorId    = [itemDictionary validIntForKey:@"creator_player_id"];
+        item.qty          = [itemDictionary validIntForKey:@"qty"];
+        item.maxQty       = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
+        item.weight       = [itemDictionary validIntForKey:@"weight"];
+        item.dropable     = [itemDictionary validBoolForKey:@"dropable"];
+        item.destroyable  = [itemDictionary validBoolForKey:@"destroyable"];
+        item.isAttribute  = [itemDictionary validBoolForKey:@"is_attribute"];
+        item.isTradeable  = [itemDictionary validBoolForKey:@"tradeable"];
+        item.hasViewed    = [itemDictionary validBoolForKey:@"viewed"];
+        item.url          = [itemDictionary validObjectForKey:@"url"];
+        item.type         = [itemDictionary validObjectForKey:@"type"];
+        item.name         = [itemDictionary validObjectForKey:@"name"];
+        item.idescription = [itemDictionary validObjectForKey:@"description"];
 
         if(item.isAttribute)[tempAttributes addObject:item];
         else                [tempInventory  addObject:item];
@@ -2505,15 +2445,15 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     NSLog(@"ParseQRCodeObjectFromJSON: Coolio!");
     [[RootViewController sharedRootViewController] removeWaitingIndicator];
     
-	NSObject<QRCodeProtocol> *qrCodeObject;
+	NSObject *qrCodeObject;
     
 	if (jsonResult.data)
     {
 		NSDictionary *qrCodeDictionary = (NSDictionary *)jsonResult.data;
         if(![qrCodeDictionary isKindOfClass:[NSString class]])
         {
-            NSString *type = [self validObjectForKey:@"link_type" inDictionary:qrCodeDictionary];
-            NSDictionary *objectDictionary = [self validObjectForKey:@"object" inDictionary:qrCodeDictionary];
+            NSString *type = [qrCodeDictionary validObjectForKey:@"link_type"];
+            NSDictionary *objectDictionary = [qrCodeDictionary validObjectForKey:@"object"];
             if ([type isEqualToString:@"Location"]) qrCodeObject = [self parseLocationFromDictionary:objectDictionary];
         }
         else qrCodeObject = qrCodeDictionary;
@@ -2538,21 +2478,21 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	NSDictionary *questListsDictionary = (NSDictionary *)jsonResult.data;
 	
     //Active Quests
-    NSArray *activeQuestDicts = [self validObjectForKey:@"active" inDictionary:questListsDictionary];
+    NSArray *activeQuestDicts = [questListsDictionary validObjectForKey:@"active"];
 	NSEnumerator *activeQuestDictsEnumerator = [activeQuestDicts objectEnumerator];
 	NSDictionary *activeQuestDict;
     NSMutableArray *activeQuestObjects = [[NSMutableArray alloc] init];
 	while ((activeQuestDict = [activeQuestDictsEnumerator nextObject]))
     {
         Quest *quest = [[Quest alloc] init];
-        quest.questId                = [self validIntForKey:@"quest_id"             inDictionary:activeQuestDict];
-        quest.mediaId                = [self validIntForKey:@"active_media_id"      inDictionary:activeQuestDict];
-        quest.iconMediaId            = [self validIntForKey:@"active_icon_media_id" inDictionary:activeQuestDict];
-        quest.sortNum                = [self validIntForKey:@"sort_index"           inDictionary:activeQuestDict];
-        quest.name                   = [self validObjectForKey:@"name"              inDictionary:activeQuestDict];
-        quest.qdescription           = [self validObjectForKey:@"description"       inDictionary:activeQuestDict];
-        quest.fullScreenNotification = [self validBoolForKey:@"full_screen_notify"  inDictionary:activeQuestDict];
-        quest.exitToTabName          = [self validObjectForKey:@"exit_to_tab"       inDictionary:activeQuestDict];
+        quest.questId                = [activeQuestDict validIntForKey:@"quest_id"];
+        quest.mediaId                = [activeQuestDict validIntForKey:@"active_media_id"];
+        quest.iconMediaId            = [activeQuestDict validIntForKey:@"active_icon_media_id"];
+        quest.sortNum                = [activeQuestDict validIntForKey:@"sort_index"];
+        quest.name                   = [activeQuestDict validObjectForKey:@"name"];
+        quest.qdescription           = [activeQuestDict validObjectForKey:@"description"];
+        quest.fullScreenNotification = [activeQuestDict validBoolForKey:@"full_screen_notify"];
+        quest.exitToTabName          = [activeQuestDict validObjectForKey:@"exit_to_tab"];
         
         if     (!quest.exitToTabName)                               quest.exitToTabName = @"NONE";
         else if([quest.exitToTabName isEqualToString:@"QUESTS"])    quest.exitToTabName = NSLocalizedString(@"QuestViewTitleKey",@"");
@@ -2568,21 +2508,21 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	}
     
     //Completed Quests
-    NSArray *completedQuestDicts = [self validObjectForKey:@"completed" inDictionary:questListsDictionary];
+    NSArray *completedQuestDicts = [questListsDictionary validObjectForKey:@"completed"];
 	NSEnumerator *completedQuestDictsEnumerator = [completedQuestDicts objectEnumerator];
 	NSDictionary *completedQuestDict;
     NSMutableArray *completedQuestObjects = [[NSMutableArray alloc] init];
 	while ((completedQuestDict = [completedQuestDictsEnumerator nextObject]))
     {
         Quest *quest = [[Quest alloc] init];
-        quest.questId                = [self validIntForKey:@"quest_id"               inDictionary:completedQuestDict];
-        quest.mediaId                = [self validIntForKey:@"complete_media_id"      inDictionary:completedQuestDict];
-        quest.iconMediaId            = [self validIntForKey:@"complete_icon_media_id" inDictionary:completedQuestDict];
-        quest.sortNum                = [self validIntForKey:@"sort_index"             inDictionary:completedQuestDict];
-        quest.fullScreenNotification = [self validBoolForKey:@"full_screen_notify"    inDictionary:completedQuestDict];
-        quest.name                   = [self validObjectForKey:@"name"                inDictionary:completedQuestDict];
-        quest.qdescription           = [self validObjectForKey:@"text_when_complete"  inDictionary:completedQuestDict];
-        quest.exitToTabName          = [self validObjectForKey:@"exit_to_tab"         inDictionary:completedQuestDict];
+        quest.questId                = [completedQuestDict validIntForKey:@"quest_id"];
+        quest.mediaId                = [completedQuestDict validIntForKey:@"complete_media_id"];
+        quest.iconMediaId            = [completedQuestDict validIntForKey:@"complete_icon_media_id"];
+        quest.sortNum                = [completedQuestDict validIntForKey:@"sort_index"];
+        quest.fullScreenNotification = [completedQuestDict validBoolForKey:@"full_screen_notify"];
+        quest.name                   = [completedQuestDict validObjectForKey:@"name"];
+        quest.qdescription           = [completedQuestDict validObjectForKey:@"text_when_complete"];
+        quest.exitToTabName          = [completedQuestDict validObjectForKey:@"exit_to_tab"];
         
         if     (!quest.exitToTabName)                               quest.exitToTabName =  @"NONE";
         else if([quest.exitToTabName isEqualToString:@"QUESTS"])    quest.exitToTabName = NSLocalizedString(@"QuestViewTitleKey",@"");

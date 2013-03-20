@@ -1,12 +1,12 @@
 //
-//  ItemDetailsViewController.m
+//  ItemViewController.m
 //  ARIS
 //
 //  Created by David Gagnon on 4/2/09.
 //  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
 //
 
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 #import "ARISAppDelegate.h"
 #import "AppServices.h"
 #import "AsyncMediaPlayerButton.h"
@@ -14,12 +14,11 @@
 #import "Item.h"
 #import "ItemActionViewController.h"
 #import "WebPage.h"
-#import "webpageViewController.h"
-#import "DialogViewController.h"
+#import "WebPageViewController.h"
+#import "NpcViewController.h"
 #import "NoteEditorViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "UIImage+Scale.h"
-
 
 NSString *const kItemDetailsDescriptionHtmlTemplate = 
 @"<html>"
@@ -38,21 +37,16 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 @"<body>%@</body>"
 @"</html>";
 
-@implementation ItemDetailsViewController
-@synthesize item, inInventory,mode,itemImageView, itemWebView,activityIndicator,isLink,itemDescriptionView,textBox,saveButton,scrollView, delegate;
+@implementation ItemViewController
+@synthesize item, inInventory,mode,itemImageView, itemWebView,activityIndicator,isLink,itemDescriptionView,textBox,saveButton,scrollView;
 
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(movieFinishedCallback:)
-													 name:MPMoviePlayerPlaybackDidFinishNotification
-												   object:nil];
-		//[[NSNotificationCenter defaultCenter] addObserver:self
-		//										 selector:@selector(movieLoadStateChanged:)
-		//											 name:MPMoviePlayerLoadStateDidChangeNotification
-		//										   object:nil];
+- (id) initWithItem:(Item *)i
+{
+    if ((self = [super initWithNibName:@"ItemViewController" bundle:nil]))
+    {
+        self.item = i;
+        
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieFinishedCallback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
 		mode = kItemDetailsViewing;
     }
     return self;
@@ -82,8 +76,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 		
 		[toolBar setItems:[NSMutableArray arrayWithObjects: dropButton, deleteButton, detailButton,  nil] animated:NO];
         
-		if (!item.dropable) dropButton.enabled = NO;
-		if (!item.destroyable) deleteButton.enabled = NO;
+		if (!item.isDroppable)   dropButton.enabled   = NO;
+		if (!item.isDestroyable) deleteButton.enabled = NO;
 	}
 	else
     {
@@ -169,47 +163,10 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         textBox.text = item.idescription;
         [self.scrollView addSubview:textBox];
         [self.scrollView addSubview:saveButton];
-        if(([AppModel sharedAppModel].playerId != self.item.creatorId))
-        {
-            self.textBox.userInteractionEnabled = NO;
-            [saveButton removeFromSuperview];
-            self.navigationItem.rightBarButtonItem = nil;        
-        }
+        self.textBox.userInteractionEnabled = NO;
+        [saveButton removeFromSuperview];
+        self.navigationItem.rightBarButtonItem = nil;        
     }
-    else if (self.item.creatorId == [AppModel sharedAppModel].playerId)
-    {
-        UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"EditKey", @"") style:UIBarButtonItemStylePlain target:self action:@selector(editButtonPressed)];
-        self.navigationItem.rightBarButtonItem = editButton;
-    }
-    
-	item.hasViewed = YES;
-}
-
--(void)viewDidAppear:(BOOL)animated
-{
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
--(BOOL)shouldAutorotate{
-    return YES;
-}
-
--(NSInteger)supportedInterfaceOrientations
-{
-    NSInteger mask = 0;
-    if ([self shouldAutorotateToInterfaceOrientation:UIInterfaceOrientationLandscapeLeft])
-        mask |= UIInterfaceOrientationMaskLandscapeLeft;
-    if ([self shouldAutorotateToInterfaceOrientation:UIInterfaceOrientationLandscapeRight])
-        mask |= UIInterfaceOrientationMaskLandscapeRight;
-    if ([self shouldAutorotateToInterfaceOrientation:UIInterfaceOrientationPortrait])
-        mask |= UIInterfaceOrientationMaskPortrait;
-    if ([self shouldAutorotateToInterfaceOrientation:UIInterfaceOrientationPortraitUpsideDown])
-        mask |= UIInterfaceOrientationMaskPortraitUpsideDown;
-    return mask;
 }
 
 - (void)updateQuantityDisplay
@@ -220,18 +177,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 - (IBAction)backButtonTouchAction:(id)sender
 {
-	NSLog(@"ItemDetailsViewController: Notify server of Item view and Dismiss Item Details View");
-	
-	//Notify the server this item was displayed
-	[[AppServices sharedAppServices] updateServerItemViewed:item.itemId fromLocation:item.locationId];
-	
-    if([self.delegate isKindOfClass:[DialogViewController class]])
-        [self.navigationController popViewControllerAnimated:YES];
-    else
-    {
-        [self.navigationController popToRootViewControllerAnimated:YES];
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-    }
+    [delegate displayObjectViewControllerWasDismissed:self];
 }
 
 -(IBAction)playMovie:(id)sender
@@ -295,10 +241,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         [[self navigationController] pushViewController:itemActionVC animated:YES];
         [self updateQuantityDisplay];
     }
-    else 
+    else
         [self doActionWithMode:mode quantity:1];
-    
-    [[AppServices sharedAppServices] updateServerItemViewed:item.itemId fromLocation:item.locationId];
 }
 
 -(void)doActionWithMode:(ItemDetailsModeType)itemMode quantity:(int)quantity
@@ -432,11 +376,9 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 - (void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
-    UITouch       *touch = [touches anyObject];
-	NSLog(@"got a touchesEnded.");
-	
-    if([touch tapCount] == 2) {
-		//NSLog(@"TouchCount is 2.");
+    UITouch *touch = [touches anyObject];	
+    if([touch tapCount] == 2)
+    {
 		CGAffineTransform transform = CGAffineTransformIdentity;
 		transform = CGAffineTransformScale(transform, 1.0, 1.0);
 		itemImageView.transform = transform;
@@ -471,19 +413,14 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
 	
-	if (descriptionShowing) { //description is showing, so hide
-		[self hideView:self.itemDescriptionView];
-		//[notesButton setStyle:UIBarButtonItemStyleBordered]; //set button style
-		descriptionShowing = NO;
-	} else {  //description is not showing, so show
-		[self showView:self.itemDescriptionView];
-		//[notesButton setStyle:UIBarButtonItemStyleDone];
-		descriptionShowing = YES;
-	}
+	if(descriptionShowing) { [self hideView:self.itemDescriptionView]; descriptionShowing = NO; }
+    else                   { [self showView:self.itemDescriptionView]; descriptionShowing = YES; }
 }
+
 #pragma mark WebViewDelegate 
 
--(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+-(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
     if(webView == self.itemWebView){
     if ([[[request URL] absoluteString] hasPrefix:@"aris://closeMe"]) {
         [self.navigationController popToRootViewControllerAnimated:YES];
@@ -496,7 +433,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
     }   
     }else{
         if(self.isLink && ![[[request URL]absoluteString] isEqualToString:@"about:blank"]) {
-            webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
+            WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
             WebPage *temp = [[WebPage alloc]init];
             temp.url = [[request URL]absoluteString];
             webPageViewController.webPage = temp;
@@ -514,47 +451,48 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
     return YES;
 }
 
--(void)webViewDidFinishLoad:(UIWebView *)webView {
-    if(webView == self.itemWebView){
+-(void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    if(webView == self.itemWebView)
+    {
         self.itemWebView.hidden = NO;
-        [self dismissWaitingIndicator];}
+        [self dismissWaitingIndicator];
+    }
 }
 
--(void)webViewDidStartLoad:(UIWebView *)webView {
+-(void)webViewDidStartLoad:(UIWebView *)webView
+{
     if(webView == self.itemWebView)[self showWaitingIndicator];
 }
 
--(void)showWaitingIndicator {
+-(void)showWaitingIndicator
+{
     [self.activityIndicator startAnimating];
 }
 
--(void)dismissWaitingIndicator {
+-(void)dismissWaitingIndicator
+{
     [self.activityIndicator stopAnimating];
 }
 
 #pragma mark Note functions
--(void)textViewDidBeginEditing:(UITextView *)textView{
+-(void)textViewDidBeginEditing:(UITextView *)textView
+{
     if([self.textBox.text isEqualToString:@"Write note here..."])
         [self.textBox setText:@""];
     self.textBox.frame = CGRectMake(0, 0, 320, 230);
 }
 
--(void)hideKeyboard {
+-(void)hideKeyboard
+{
     [self.textBox resignFirstResponder];
     self.textBox.frame = CGRectMake(0, 0, 320, 335);
 }
 
 #pragma mark Memory Management
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
-}
-
 - (void)dealloc {
     NSLog(@"Item Details View: Dealloc");
-	// free our movie player
-	//remove listeners
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     itemDescriptionView.delegate = nil;
     [itemDescriptionView stopLoading];

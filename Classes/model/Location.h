@@ -8,49 +8,41 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import "NearbyObjectProtocol.h"
+#import <MapKit/MapKit.h>
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
 
-@interface Location : NSObject <NearbyObjectProtocol>
+@interface Location : NSObject <MKAnnotation>
 {
-	int iconMediaId;
+    int locationId;
+    NSObject<DisplayableObjectProtocol, LocationObjectProtocol> *object;
 	NSString *name;
-	CLLocation *location;
-	int error;
-	NSString *objectType;
-	nearbyObjectKind kind; //for the protocol
-	int objectId;
+	CLLocation *latlon;
+    int qty;
+	int errorRange;
 	bool hidden;
 	bool forcedDisplay;
 	bool allowsQuickTravel;
     bool showTitle;
-	int qty;
-    id delegate;
     bool wiggle;
-    int deleteWhenViewed;
+    bool deleteWhenViewed;
 }
 
-@property(readwrite, assign) int locationId;
-@property(copy, readwrite) NSString *name;
-@property(readwrite, assign) int iconMediaId;
+@property (nonatomic, assign) int locationId;
+@property (nonatomic, strong) NSObject<DisplayableObjectProtocol, LocationObjectProtocol> *object;
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) CLLocation *latlon;
+@property (nonatomic, assign) int qty;
+@property (nonatomic, assign) int errorRange;
+@property (nonatomic, assign) bool hidden;
+@property (nonatomic, assign) bool forcedDisplay;
+@property (nonatomic, assign) bool allowsQuickTravel;
+@property (nonatomic, assign) bool showTitle;
+@property (nonatomic, assign) bool wiggle;
+@property (nonatomic, assign) bool deleteWhenViewed;
 
-@property(copy, readwrite) CLLocation *location;
-@property(readwrite) int error;
-@property(copy, readwrite) NSString *objectType;
-@property(readonly) nearbyObjectKind kind;
-- (nearbyObjectKind) kind;
-@property(unsafe_unretained, readonly) NSObject<NearbyObjectProtocol> *object;
-
-@property(readwrite) int objectId;
-@property(readwrite) bool hidden;
-@property(readwrite) bool forcedDisplay;
-@property(readwrite) bool allowsQuickTravel;
-@property(readwrite) bool showTitle;
-@property(readwrite) int qty;
-@property(readwrite) bool wiggle;
-@property(readwrite) int deleteWhenViewed;
-@property(nonatomic, strong)id delegate;
-
-- (void) display;
-- (BOOL)compareTo:(Location *)other;
+- (Location *) initFromDictionary:(NSDictionary *)d;
+- (BOOL) compareTo:(Location *)other;
+- (Location *) copy;
 
 @end

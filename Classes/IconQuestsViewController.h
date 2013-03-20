@@ -17,7 +17,7 @@
 #import "Media.h"
 #import "AsyncMediaImageView.h"
 #import "WebPage.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 
 #define ICONWIDTH 76
 #define ICONHEIGHT 90

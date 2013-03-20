@@ -7,47 +7,74 @@
 //
 
 #import "Node.h"
-#import "ARISAppDelegate.h"
-#import "AppModel.h"
 #import "NodeViewController.h"
+#import "AppServices.h"
 
 @implementation Node
-@synthesize nodeId, name, text, mediaId, iconMediaId, kind, forcedDisplay, numberOfOptions, options;
-@synthesize answerString, nodeIfCorrect, nodeIfIncorrect, locationId;
 
--(nearbyObjectKind) kind { return NearbyObjectNode; }
+@synthesize nodeId;
+@synthesize iconMediaId;
+@synthesize mediaId;
+@synthesize name;
+@synthesize text;
 
-- (Node *) init {
-    if (self = [super init]) {
-		kind = NearbyObjectNode;
-		options = [[NSMutableArray alloc] init];
-    }
-    return self;	
+- (int) objectId
+{
+    return nodeId;
 }
 
-- (int) iconMediaId {
-	return 3; 
+- (NSString *) objectType
+{
+    return @"Node";
 }
 
-- (void) display{
-	NSLog(@"Node: Display Self Requested");
-
-	NodeViewController *nodeViewController = [[NodeViewController alloc] initWithNibName:@"Node" bundle: [NSBundle mainBundle]];
-	nodeViewController.node = self; //currentNode;
-	
-	[[RootViewController sharedRootViewController] displayNearbyObjectView:nodeViewController];
+- (int) iconMediaId
+{
+	if (iconMediaId == 0) return 3;
+	else return iconMediaId;
 }
 
-- (NSInteger) numberOfOptions {
-	return [options count];
+- (int) mediaId
+{
+	if (mediaId == 0) return 3;
+	else return mediaId;
 }
 
-- (void) addOption:(NodeOption *)newOption{
-	[options addObject:newOption];
+- (DisplayObjectViewController *) viewControllerForDisplay
+{
+	return [[NodeViewController alloc] initWithNode:self];
 }
 
+- (void) wasDisplayed
+{
+    
+}
 
- 
+- (void) finishedDisplay
+{
+    [[AppServices sharedAppServices] updateServerItemViewed:nodeId fromLocation:nil];
+    //Phil should remove "fromLocation". The location get's its own chance to update server
+}
 
+- (BOOL) compareTo:(Node *)other
+{
+	return other.nodeId == self.nodeId;
+}
+
+- (Node *) copy
+{
+    Node *c = [[Node alloc] init];
+    c.nodeId      = self.nodeId;
+    c.iconMediaId = self.iconMediaId;
+    c.mediaId     = self.mediaId;
+    c.name        = self.name;
+    c.text        = self.text;
+    return c;
+}
+
+- (NSString *) description
+{
+    return [NSString stringWithFormat:@"Node- Id:%d\tName:%@",self.nodeId,self.name];
+}
 
 @end

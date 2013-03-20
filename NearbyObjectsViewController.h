@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NearbyObjectProtocol.h"
-
 
 @interface NearbyObjectsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
 {

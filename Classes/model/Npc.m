@@ -6,53 +6,67 @@
 //  Copyright 2009 University of Wisconsin - Madison. All rights reserved.
 //
 
-#import "ARISAppDelegate.h"
-#import "AppModel.h"
-#import "DialogViewController.h"
+#import "NpcViewController.h"
 #import "Npc.h"
 
 @implementation Npc
+
 @synthesize npcId;
-@synthesize name;
-@synthesize greeting,closing;
-@synthesize description;
-@synthesize mediaId;
 @synthesize iconMediaId;
-@synthesize kind;
-@synthesize forcedDisplay;
-@synthesize locationId;
+@synthesize mediaId;
+@synthesize name;
+@synthesize ndescription;
+@synthesize greeting;
+@synthesize closing;
 
-
--(nearbyObjectKind) kind {
-	return NearbyObjectNPC;
+- (int) objectId
+{
+    return npcId;
 }
 
-- (Npc *)init {
-	self = [super init];
-    if (self) {
-    }
-    return self;	
+- (NSString *) objectType
+{
+    return @"Npc";
 }
 
-- (int) iconMediaId {
-	if (iconMediaId < 1) return 1;
+- (int) iconMediaId
+{
+	if (iconMediaId == 0) return 1;
 	else return iconMediaId;
 }
 
-- (int) mediaId {
-	if (mediaId < 1) return 1; 
+- (int) mediaId
+{
+	if (mediaId == 0) return 1;
 	else return mediaId;
 }
 
-- (void) display{
-	NSLog(@"Npc: Display Self Requested");
-	DialogViewController *dialogController = [[DialogViewController alloc] initWithNibName:@"Dialog"
-																					bundle:[NSBundle mainBundle]];
-	[dialogController beginWithNPC:self];
-	[[RootViewController sharedRootViewController] displayNearbyObjectView:dialogController];
+- (DisplayObjectViewController *) viewControllerForDisplay
+{
+	return [[NpcViewController alloc] initWithNpc:self];
 }
 
+- (BOOL) compareTo:(Npc *)other
+{
+	return other.npcId == self.npcId;
+}
 
- 
+- (Npc *) copy
+{
+    Npc *c = [[Npc alloc] init];
+    c.npcId        = self.npcId;
+    c.iconMediaId  = self.iconMediaId;
+    c.mediaId      = self.mediaId;
+    c.name         = self.name;
+    c.ndescription = self.ndescription;
+    c.greeting     = self.greeting;
+    c.closing      = self.closing;
+    return c;
+}
+
+- (NSString *) description
+{
+    return [NSString stringWithFormat:@"Npc- Id:%d\tName:%@",self.npcId,self.name];
+}
 
 @end

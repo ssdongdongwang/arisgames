@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DisplayObjectViewController.h"
 #import "AppModel.h"
 #import "Node.h"
 #import "ARISMoviePlayerViewController.h"
 #import "AsyncMediaImageView.h"
 
-@interface NodeViewController : UIViewController <UIScrollViewDelegate,UIWebViewDelegate,AsyncMediaImageViewDelegate>
+@interface NodeViewController : DisplayObjectViewController <UIScrollViewDelegate,UIWebViewDelegate,AsyncMediaImageViewDelegate>
 {
 	Node *node;
     
-    BOOL isLink;
     BOOL hasMedia;
     BOOL imageLoaded;
     BOOL webLoaded;
@@ -35,7 +35,6 @@
 
 @property(readwrite) Node *node;
 
-@property(readwrite, assign) BOOL isLink;
 @property(readwrite, assign) BOOL hasMedia;
 @property(readwrite, assign) BOOL imageLoaded;
 @property(readwrite, assign) BOOL webLoaded;
@@ -47,5 +46,7 @@
 
 @property(nonatomic)UIActivityIndicatorView *webViewSpinner;
 @property(nonatomic)AsyncMediaImageView *mediaImageView;
+
+- (id)initWithNode:(Node *)n;
 
 @end

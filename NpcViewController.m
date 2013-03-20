@@ -1,6 +1,6 @@
 //
-//  aris_conversationViewController.m
-//  aris-conversation
+//  NpcViewController.m
+//  ARIS
 //
 //  Created by Kevin Harris on 09/11/17.
 //  Copyright Studio Tectorum 2009. All rights reserved.
@@ -9,7 +9,7 @@
 #import "AppModel.h"
 #import "AppServices.h"
 #import "AsyncMediaImageView.h"
-#import "DialogViewController.h"
+#import "NpcViewController.h"
 #import "Media.h"
 #import "Node.h"
 #import "Scene.h"
@@ -17,10 +17,10 @@
 #import "Panoramic.h"
 #import "PanoramicViewController.h"
 #import "WebPage.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 #import "Item.h"
 #import "NodeViewController.h"
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 
 const NSInteger kStartingIndex = 0;
 const NSInteger kMaxOptions = 20;
@@ -48,7 +48,7 @@ NSString *const kDialogHtmlTemplate =
 @"</html>";
 
 
-@interface DialogViewController()
+@interface NpcViewController ()
 - (void) loadCharacterImage:(NSInteger)mediaId withPriorId:(NSInteger *)priorId inView:(AsyncMediaImageView *)aView;
 - (void) movePcIn;
 - (void) moveNpcIn;
@@ -60,7 +60,8 @@ NSString *const kDialogHtmlTemplate =
 
 @end
 
-@implementation DialogViewController
+@implementation NpcViewController
+
 @synthesize npcImage, pcImage, npcWebView, pcWebView, pcTableView,exitToTabVal;
 @synthesize npcScrollView, pcScrollView, npcImageScrollView, pcImageScrollView, pcActivityIndicator;
 @synthesize npcContinueButton, pcContinueButton, textSizeButton, specialBackButton;
@@ -69,9 +70,11 @@ NSString *const kDialogHtmlTemplate =
 @synthesize closingScriptPlaying, textboxSize;
 @synthesize waiting;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
+- (id)initWithNpc:(Npc *)n
+{
+    if ((self = [super initWithNibName:@"NpcViewController" bundle:nil]))
     {
+        self.npc = n;
         lastPcId = 0;
         currentNode = nil;
         pcTitle = NSLocalizedString(@"DialogPlayerName",@"");
@@ -167,7 +170,7 @@ NSString *const kDialogHtmlTemplate =
 - (void) viewDidDisappear:(BOOL)animated
 {
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
-	NSLog(@"DialogViewController: View Did Disapear");
+	NSLog(@"NpcViewController: View Did Disapear");
 }
 
 -(void) imageFinishedLoading
@@ -177,7 +180,7 @@ NSString *const kDialogHtmlTemplate =
 
 -(void) toggleFullScreenTextMode
 {
-	NSLog(@"DialogViewController: toggleTextSize");
+	NSLog(@"NpcViewController: toggleTextSize");
     
     CGRect newTextFrame;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -225,7 +228,7 @@ NSString *const kDialogHtmlTemplate =
 
 - (IBAction) backButtonTouchAction:(id)sender
 {
-	NSLog(@"DialogViewController: Notify server of NPC view and Dismiss view");
+	NSLog(@"NpcViewController: Notify server of NPC view and Dismiss view");
 	[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
 }
 
@@ -269,12 +272,12 @@ NSString *const kDialogHtmlTemplate =
 
 - (IBAction)npcScrollerTouchAction
 {
-	NSLog(@"DialogViewController: NPC ScrollView Touched");
+	NSLog(@"NpcViewController: NPC ScrollView Touched");
 }
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	NSLog(@"DialogViewController: touchesBegan");
+	NSLog(@"NpcViewController: touchesBegan");
 	[pcAnswerView resignFirstResponder];
 }
 
@@ -333,17 +336,17 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) continueScript
 {
-    NSLog(@"DialogVC: continueScript");
+    NSLog(@"NpcViewController: continueScript");
 	if (scriptIndex < [currentScript count])
     {
-        NSLog(@"DialogVC: continueScript: Scenes still exist, load the next one");
+        NSLog(@"NpcViewController: continueScript: Scenes still exist, load the next one");
 		Scene *currentScene = [currentScript objectAtIndex:scriptIndex];
         
         if (currentScene.videoId !=0)
         {
             //Setup the Button
             Media *media = [[AppModel sharedAppModel] mediaForMediaId:currentScene.videoId];
-            NSLog(@"DialogViewController: VideoURL: %@", media.url);
+            NSLog(@"NpcViewController: VideoURL: %@", media.url);
             //Create movie player object
             ARISMoviePlayerViewController *mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
 
@@ -368,7 +371,7 @@ NSString *const kDialogHtmlTemplate =
         }
         else if(currentScene.webId != 0)
         {
-            webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
+            WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
             webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:currentScene.webId];
             webPageViewController.delegate = self;
             [self.navigationController pushViewController:webPageViewController animated:YES];
@@ -387,9 +390,9 @@ NSString *const kDialogHtmlTemplate =
         }
         else if(currentScene.itemId != 0)
         {
-            ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-            itemVC.item = [[AppModel sharedAppModel] itemForItemId:currentScene.itemId];
-            itemVC.item.qty = 1;
+            Item *i = [[AppModel sharedAppModel] itemForItemId:currentScene.itemId];
+            i.qty = 1;
+            ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:i];
             [self.navigationController pushViewController:itemVC animated:YES];
             itemVC.delegate = self;
             
@@ -404,7 +407,7 @@ NSString *const kDialogHtmlTemplate =
 	}
 	else
     {
-        NSLog(@"DialogVC: continueScript: No more scenes left. Checking for exitTo tags before loading options");
+        NSLog(@"NpcViewController: continueScript: No more scenes left. Checking for exitTo tags before loading options");
   
         if(cachedScene.exitToTabWithTitle) self.exitToTabVal = cachedScene.exitToTabWithTitle;
         
@@ -439,22 +442,23 @@ NSString *const kDialogHtmlTemplate =
             }
             else if([cachedScene.exitToType isEqualToString:@"webpage"])
             {
-                webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
+                WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
                 webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:[cachedScene.exitToTabWithTitle intValue]];
             //    webPageViewController.delegate = self; if it is the delegate, then it uses the wrong method to close, if there is a good reason for this to be here then put it back : Jacob Hanshaw 2/9/13
                 [[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
             }
             else if([cachedScene.exitToType isEqualToString:@"item"])
             {
-                ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-                itemVC.item = [[AppModel sharedAppModel] itemForItemId:[cachedScene.exitToTabWithTitle intValue]];                
+                Item *i = [[AppModel sharedAppModel] itemForItemId:[cachedScene.exitToTabWithTitle intValue]]
+                i.qty = 1;
+                ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:i];
                 [[RootViewController sharedRootViewController] displayNearbyObjectView:itemVC];
             }
             else if([cachedScene.exitToType isEqualToString:@"character"])
             {
-                DialogViewController *dialogVC = [[DialogViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle]];
-                [dialogVC beginWithNPC:[[AppModel sharedAppModel] npcForNpcId:[cachedScene.exitToTabWithTitle intValue]]];
-                [[RootViewController sharedRootViewController] displayNearbyObjectView:dialogVC];
+                NpcViewController *npcVC = [[NpcViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle]];
+                [npcVC beginWithNPC:[[AppModel sharedAppModel] npcForNpcId:[cachedScene.exitToTabWithTitle intValue]]];
+                [[RootViewController sharedRootViewController] displayNearbyObjectView:npcVC];
             }
             else if([cachedScene.exitToType isEqualToString:@"panoramic"])
             {
@@ -473,7 +477,7 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) applyPlayerOptions
 {
-	NSLog(@"DialogVC: Apply Player Options");
+	NSLog(@"NpcViewController: Apply Player Options");
 	++scriptIndex;
 	
 	// Display the appropriate question for the PC
@@ -497,7 +501,7 @@ NSString *const kDialogHtmlTemplate =
 		if (currentNode.numberOfOptions > 0)
         {
 			//There are node options
-            NSLog(@"DialogVC: Apply Player Options: Node Options Exist");
+            NSLog(@"NpcViewController: Apply Player Options: Node Options Exist");
 
             [self moveAllOutWithPostSelector:nil];
             [self movePcIn];
@@ -515,7 +519,7 @@ NSString *const kDialogHtmlTemplate =
 		else
         {
 			//No node options, load the conversations
-            NSLog(@"DialogVC: Apply Player Options: Load Conversations");
+            NSLog(@"NpcViewController: Apply Player Options: Load Conversations");
 
             [[AppServices sharedAppServices] fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
 			[self showWaitingIndicatorForPlayerOptions];
@@ -525,14 +529,14 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) optionsReceivedFromNotification:(NSNotification*)notification
 {
-    NSLog(@"DialogVC: optionsReceivedFromNotification");
+    NSLog(@"NpcViewController: optionsReceivedFromNotification");
     [self dismissWaitingIndicatorForPlayerOptions];
 	[self finishApplyingPlayerOptions:(NSArray*)[notification object]];
 }
 
 - (void) finishApplyingPlayerOptions:(NSArray*)options
 {
-    NSLog(@"DialogVC: finishApplyingPlayerOptions");
+    NSLog(@"NpcViewController: finishApplyingPlayerOptions");
 
     currentNode = nil;
 	pcWebView.hidden = YES;
@@ -546,7 +550,7 @@ NSString *const kDialogHtmlTemplate =
     //Now our options are populated with node or conversation choices, display
 	if ([options count] == 0 && [currentNpc.closing length] > 1 && !self.closingScriptPlaying)
     {
-			NSLog(@"DialogViewController: Play Closing Script: %@",currentNpc.closing);
+			NSLog(@"NpcViewController: Play Closing Script: %@",currentNpc.closing);
 			pcWebView.hidden = YES;
 			self.closingScriptPlaying = YES; 		
 			[parser parseText:currentNpc.closing];
@@ -565,7 +569,7 @@ NSString *const kDialogHtmlTemplate =
         [pcImageScrollView zoomToRect:[pcImage frame] animated:NO];
         
         self.title = pcTitle;
-		NSLog(@"DialogViewController: Player options exist or no closing script exists, put them on the screen");
+		NSLog(@"NpcViewController: Player options exist or no closing script exists, put them on the screen");
 
         NSSortDescriptor *sortDescriptor;
         sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"hasViewed"
@@ -830,13 +834,13 @@ NSString *const kDialogHtmlTemplate =
         
     if ([mainCommand isEqualToString:@"inventory"])
     {
-        NSLog(@"WebPageVC: aris://inventory/ called");
+        NSLog(@"WebPageViewController: aris://inventory/ called");
         
         if ([components count] > 2 &&
             [[components objectAtIndex:1] isEqualToString:@"get"])
         {
             int itemId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://inventory/get/ called from webpage with itemId = %d",itemId);
+            NSLog(@"WebPageViewController: aris://inventory/get/ called from webpage with itemId = %d",itemId);
             int qty = [self getQtyInInventoryOfItem:itemId];
             [webView stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"ARIS.didUpdateItemQty(%d,%d);",itemId,qty]];
             return NO;
@@ -871,7 +875,7 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) movePcIn
 {
-	NSLog(@"DialogViewController: Move PC view to Main View X:%f Y:%f Width:%f Height:%f",mainView.frame.origin.x,mainView.frame.origin.y,mainView.frame.size.width,mainView.frame.size.height );
+	NSLog(@"NpcViewController: Move PC view to Main View X:%f Y:%f Width:%f Height:%f",mainView.frame.origin.x,mainView.frame.origin.y,mainView.frame.size.width,mainView.frame.size.height );
     if([AppModel sharedAppModel].currentGame.pcMediaId != 0)
         [self loadPCImage:[AppModel sharedAppModel].currentGame.pcMediaId];
     else if([AppModel sharedAppModel].playerMediaId != 0)
@@ -885,7 +889,7 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) moveNpcIn
 {
-	NSLog(@"DialogViewController: Move NPC view to Main View X:%f Y:%f Width:%f Height:%f",mainView.frame.origin.x,mainView.frame.origin.y,mainView.frame.size.width,mainView.frame.size.height );
+	NSLog(@"NpcViewController: Move NPC view to Main View X:%f Y:%f Width:%f Height:%f",mainView.frame.origin.x,mainView.frame.origin.y,mainView.frame.size.width,mainView.frame.size.height );
     npcScrollView.hidden = NO;
 
 	[self movePcTo:[pcView frame]   withAlpha:[pcView alpha]
@@ -914,19 +918,19 @@ NSString *const kDialogHtmlTemplate =
 {
     if(media.image != nil && [media.type isEqualToString: kMediaTypeAudio]) //worked before added type check, not sure how
     {
-        NSLog(@"DialogViewController: Playing through AVAudioPlayer");
+        NSLog(@"NpcViewController: Playing through AVAudioPlayer");
         [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];	
         [[AVAudioSession sharedInstance] setActive: YES error: nil];
         NSError* err;
         self.player = [[AVAudioPlayer alloc] initWithData: media.image error:&err];
         [self.player setDelegate: self];
         
-        if(err) NSLog(@"DialogViewController: Playing Audio: Failed with reason: %@", [err localizedDescription]);
+        if(err) NSLog(@"NpcViewController: Playing Audio: Failed with reason: %@", [err localizedDescription]);
         else [self.player play];
     }
     else
     {
-        NSLog(@"DialogViewController: Playing through MPMoviePlayerController");
+        NSLog(@"NpcViewController: Playing through MPMoviePlayerController");
         self.ARISMoviePlayer.moviePlayer.view.hidden = hidden; 
         if(!self.ARISMoviePlayer) self.ARISMoviePlayer = [[ARISMoviePlayerViewController alloc] init];
         self.ARISMoviePlayer.moviePlayer.movieSourceType = MPMovieSourceTypeStreaming;

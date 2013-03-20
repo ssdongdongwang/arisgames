@@ -7,27 +7,26 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
 
-@interface Panoramic : NSObject<NearbyObjectProtocol> {
+@interface Panoramic : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
+{
+    int panoramicId;
+    int iconMediaId;
+    int alignMediaId;
     NSString *name;
     NSString *description;
-    int iconMediaId;
-    NSArray *media;
-    int alignMediaId;
-    int panoramicId;
-    nearbyObjectKind kind;
     NSArray *textureArray;
+    NSArray *mediaArray;
 }
 
+@property(nonatomic, assign) int panoramicId;
+@property(nonatomic, assign) int iconMediaId;
+@property(nonatomic, assign) int alignMediaId;
 @property(nonatomic, strong) NSString *name;
 @property(nonatomic, strong) NSString *description;
 @property(nonatomic, strong) NSArray *textureArray;
-@property(readwrite, assign) int iconMediaId;
-@property(nonatomic, strong) NSArray *media;
-@property(readwrite, assign) int alignMediaId;
-@property(readwrite, assign) int panoramicId;
-@property(readwrite, assign) nearbyObjectKind kind;
-@property(readwrite, assign) int locationId;
+@property(nonatomic, strong) NSArray *mediaArray;
 
 @end

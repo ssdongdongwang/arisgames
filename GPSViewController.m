@@ -14,7 +14,6 @@
 #import "ARISAppDelegate.h"
 #import "AnnotationView.h"
 #import "Media.h"
-#import "Annotation.h"
 #import <UIKit/UIActionSheet.h>
 #import "NoteDetailsViewController.h"
 #import "NoteEditorViewController.h"
@@ -111,11 +110,11 @@ NSMutableArray *locationsToRemove;
         if (mapView)
         {
             NSEnumerator *existingAnnotationsEnumerator = [[[mapView annotations] copy] objectEnumerator];
-            Annotation *annotation;
-            while (annotation = [existingAnnotationsEnumerator nextObject])
+            Location *loc;
+            while (loc = (Location *)[existingAnnotationsEnumerator nextObject])
             {
-                if (annotation != (Annotation *)mapView.userLocation && annotation.kind == NearbyObjectPlayer)
-                    [mapView removeAnnotation:annotation];
+                if (loc != (Location *)mapView.userLocation && [loc.object.objectType isEqualToString:@"Player"])
+                    [mapView removeAnnotation:loc];
             }
         }
     }
@@ -145,11 +144,11 @@ NSMutableArray *locationsToRemove;
 	
 	mapTypeButton.target = self;
 	mapTypeButton.action = @selector(changeMapType:);
-	mapTypeButton.title = NSLocalizedString(@"MapTypeKey",@"");
+	mapTypeButton.title  = NSLocalizedString(@"MapTypeKey",@"");
 	
 	playerTrackingButton.target = self;
 	playerTrackingButton.action = @selector(refreshButtonAction);
-	playerTrackingButton.style = UIBarButtonItemStyleDone;
+	playerTrackingButton.style  = UIBarButtonItemStyleDone;
     
     addMediaButton.target = self;
     addMediaButton.action = @selector(addMediaButtonAction:);
@@ -321,17 +320,18 @@ NSMutableArray *locationsToRemove;
     if(!mapView) return;
     
     //Remove old locations first
-    NSObject<MKAnnotation> *tmpMKAnnotation;
-    Annotation *tmpAnnotation;
+    Location *loc;
     for (int i = 0; i < [[mapView annotations] count]; i++)
     {
-        if((tmpMKAnnotation = [[mapView annotations] objectAtIndex:i]) == mapView.userLocation ||
-          !((tmpAnnotation = (Annotation*)tmpMKAnnotation) && [tmpAnnotation respondsToSelector:@selector(title)])) continue;
+        if([[mapView annotations] objectAtIndex:i] == mapView.userLocation) continue;
+
+        loc = [[mapView annotations] objectAtIndex:i];
+        
         for(int j = 0; j < [locationsToRemove count]; j++)
         {
-            if(tmpAnnotation.location.locationId == ((Location *)[locationsToRemove objectAtIndex:j]).locationId)
+            if(loc.locationId == ((Location *)[locationsToRemove objectAtIndex:j]).locationId)
             {
-                [mapView removeAnnotation:tmpAnnotation];
+                [mapView removeAnnotation:loc];
                 i--;
             }
         }
@@ -339,24 +339,11 @@ NSMutableArray *locationsToRemove;
     [locationsToRemove removeAllObjects];
     
     //Add new locations second
-    Location *tmpLocation;
     for (int i = 0; i < [locationsToAdd count]; i++)
     {
-        tmpLocation = (Location *)[locationsToAdd objectAtIndex:i];
-        if (tmpLocation.hidden == YES || (tmpLocation.kind == NearbyObjectPlayer && [AppModel sharedAppModel].hidePlayers)) continue;
-        
-        CLLocationCoordinate2D locationLatLong = tmpLocation.location.coordinate;
-        
-        Annotation *annotation = [[Annotation alloc]initWithCoordinate:locationLatLong];
-        annotation.location = tmpLocation;
-        annotation.title = tmpLocation.name;
-        annotation.kind = tmpLocation.kind;
-        annotation.iconMediaId = tmpLocation.iconMediaId;
-
-        if (tmpLocation.kind == NearbyObjectItem && tmpLocation.qty > 1 && annotation.title != nil)
-            annotation.subtitle = [NSString stringWithFormat:@"x %d",tmpLocation.qty];
-        
-        [mapView addAnnotation:annotation];
+        loc = [locationsToAdd objectAtIndex:i];
+        if (!loc.hidden || !([loc.object.objectType isEqualToString:@"Player"] && [AppModel sharedAppModel].hidePlayers))
+            [mapView addAnnotation:loc];
     }
     [locationsToAdd removeAllObjects];
     
@@ -385,10 +372,12 @@ NSMutableArray *locationsToRemove;
 {
     [super didReceiveMemoryWarning];
     
-    NSEnumerator *existingAnnotationsEnumerator = [[[mapView annotations] copy] objectEnumerator];
-    NSObject <MKAnnotation> *annotation;
-    while (annotation = [existingAnnotationsEnumerator nextObject])
-        if(annotation != mapView.userLocation) [mapView removeAnnotation:annotation];
+    for(int i =0; i < [[mapView annotations] count]; i++)
+    {
+        if([[mapView annotations] objectAtIndex:i] != mapView.userLocation)
+            [mapView removeAnnotation:[[mapView annotations] objectAtIndex:i]];
+        i--;
+    }
 }
 
 - (void)dealloc
@@ -440,10 +429,10 @@ NSMutableArray *locationsToRemove;
         return [[AnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
 }
 
-- (void)mapView:(MKMapView *)aMapView didSelectAnnotationView:(MKAnnotationView *)view
+- (void)mapView:(MKMapView *)aMapView didSelectAnnotationView:(MKAnnotationView *)annotationView
 {
-	Location *location = ((Annotation*)view.annotation).location;
-    if(view.annotation == aMapView.userLocation) return;
+	Location *location = annotationView.annotation;
+    if(annotationView.annotation == aMapView.userLocation) return;
 
 	NSMutableArray *buttonTitles = [NSMutableArray arrayWithCapacity:1];
 	int cancelButtonIndex = 0;
@@ -465,7 +454,7 @@ NSMutableArray *locationsToRemove;
 	for (NSString *title in buttonTitles)
 		[actionSheet addButtonWithTitle:title];
 	
-	[actionSheet showInView:view];
+	[actionSheet showInView:annotationView];
 }
 
 
@@ -493,16 +482,17 @@ NSMutableArray *locationsToRemove;
 }
 
 #pragma mark UIActionSheet Delegate
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-	Annotation *currentAnnotation = [mapView.selectedAnnotations lastObject];
+	Location *loc = [mapView.selectedAnnotations lastObject];
 	
 	if (buttonIndex == actionSheet.cancelButtonIndex)
-        [mapView deselectAnnotation:currentAnnotation animated:YES];
+        [mapView deselectAnnotation:loc animated:YES];
 	else
     {
-        [currentAnnotation.location display];
-        [mapView deselectAnnotation:currentAnnotation animated:YES];
+        [[RootViewController sharedRootViewController] display:loc.object from:loc];
+        [mapView deselectAnnotation:loc animated:YES];
     }
 }
 

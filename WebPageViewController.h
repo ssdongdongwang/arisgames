@@ -1,5 +1,5 @@
 //
-//  webpageViewController.h
+//  WebPageViewController.h
 //  ARIS
 //
 //  Created by Brian Thiel on 6/14/11.
@@ -7,18 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import "DisplayObjectViewController.h"
 #import "WebPage.h"
 #import "AppModel.h"
 #import "ARISMoviePlayerViewController.h"
 #import "BumpClient.h"
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
 
-@interface webpageViewController : UIViewController <AVAudioPlayerDelegate, UIWebViewDelegate>{
-    IBOutlet	UIWebView	*webView;
-    WebPage     *webPage;
-    IBOutlet    UIView  *blackView;
-    NSObject    *delegate;
+@interface WebPageViewController : DisplayObjectViewController <AVAudioPlayerDelegate, UIWebViewDelegate>
+{
+    IBOutlet UIWebView	*webView;
+    WebPage *webPage;
+    IBOutlet UIView  *blackView;
     UIActivityIndicatorView *activityIndicator;
     NSMutableDictionary *avPlayers;
     AVPlayer *localPlayer;
@@ -29,7 +30,6 @@
 
 @property(nonatomic) IBOutlet UIWebView	*webView;
 @property(nonatomic) WebPage *webPage;
-@property(nonatomic) NSObject *delegate;
 @property(nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property(nonatomic) IBOutlet UIView *blackView;
 @property(nonatomic, strong) NSMutableDictionary *audioPlayers;
@@ -37,7 +37,7 @@
 @property(nonatomic) bool isConnectedToBump;
 @property(nonatomic) bool loaded;
 
-- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest: (NSURLRequest*)req navigationType:(UIWebViewNavigationType)navigationType;
+- (BOOL) webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)req navigationType:(UIWebViewNavigationType)navigationType;
 - (void) showWaitingIndicator;
 - (void) dismissWaitingIndicator;
 - (void) refreshConvos;

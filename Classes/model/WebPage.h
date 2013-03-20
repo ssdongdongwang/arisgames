@@ -7,23 +7,23 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
 
-
-@interface WebPage : NSObject<NearbyObjectProtocol> {
-    nearbyObjectKind	kind;
+@interface WebPage : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
+{
     int webPageId;
+    int iconMediaId;
 	NSString *name;
 	NSString *url;    
-	int iconMediaId; 
-
 }
 
-@property(readwrite, assign) int webPageId;
+@property(nonatomic, assign) int webPageId;
+@property(nonatomic, assign) int iconMediaId;
 @property(nonatomic, strong) NSString *name;
 @property(nonatomic, strong) NSString *url;
-@property(readwrite, assign) int iconMediaId;
-@property(readwrite, assign) nearbyObjectKind kind;
-@property(readwrite, assign) int locationId;
+
+- (BOOL) compareTo:(WebPage *)other;
+- (WebPage *) copy;
 
 @end

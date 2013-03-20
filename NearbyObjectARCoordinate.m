@@ -21,11 +21,11 @@
 	NearbyObjectARCoordinate *newCoordinate = [[NearbyObjectARCoordinate alloc] init];
 	
 	//Let's try correcting for altitude
-	NSLog(@"NearbyObjectARCoordinate: Initing a coord with altitude: %f",aNearbyLocation.location.altitude);
+	NSLog(@"NearbyObjectARCoordinate: Initing a coord with altitude: %f",aNearbyLocation.latlon.altitude);
 	
 	CLLocationCoordinate2D adjustedLocationCoordinate2D;
-	adjustedLocationCoordinate2D.latitude = aNearbyLocation.location.coordinate.latitude;
-	adjustedLocationCoordinate2D.longitude = aNearbyLocation.location.coordinate.longitude;
+	adjustedLocationCoordinate2D.latitude = aNearbyLocation.latlon.coordinate.latitude;
+	adjustedLocationCoordinate2D.longitude = aNearbyLocation.latlon.coordinate.longitude;
 	
 	float adjustedAltitude = [AppModel sharedAppModel].playerLocation.altitude - 10;
 	NSLog(@"NearbyObjectARCoordinate: Adjusted Altitude: %f",adjustedAltitude);
@@ -36,7 +36,7 @@
 	//Carry on with the normal stuff
 	newCoordinate.geoLocation = tempLocation;
 	newCoordinate.title = aNearbyLocation.name;
-	newCoordinate.mediaId = aNearbyLocation.iconMediaId;
+	newCoordinate.mediaId = aNearbyLocation.object.iconMediaId;
 	
 	return newCoordinate;		
 }

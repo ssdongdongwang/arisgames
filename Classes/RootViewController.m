@@ -13,7 +13,7 @@
 #import "PlayerSettingsViewController.h"
 
 #import "GameDetailsViewController.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 #import "NoteDetailsViewController.h"
 #import "LoadingViewController.h"
 
@@ -99,7 +99,7 @@
     tutorialViewController.view.userInteractionEnabled = NO;
     [self.gamePlayTabBarController.view addSubview:tutorialViewController.view];
     
-    gameObjectDisplayViewController = [[GameObjectDisplayViewController alloc] initWithRootViewController:self];
+    displayObjectQueueViewController = [[DisplayObjectQueueViewController alloc] initWithDelegate:self];
     
     gameNotificationViewController = [[GameNotificationViewController alloc] initWithNibName:nil bundle:nil];
     [self.view addSubview:gameNotificationViewController.view];
@@ -344,25 +344,14 @@
     [self.waitingIndicatorAlertViewController dismissMessage];
 }
 
-- (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController
+- (void)display:(id<DisplayableObjectProtocol>)object from:(id<DisplayOriginProtocol>)origin
 {
-    [AppModel sharedAppModel].currentlyInteractingWithObject = YES;
-	self.nearbyObjectNavigationController = [[UINavigationController alloc] initWithRootViewController:nearbyObjectViewController];
-	self.nearbyObjectNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    
-    self.nearbyObjectNavigationController.view.frame = gamePlayTabBarController.view.bounds;
-    [self.gamePlayTabBarController.view addSubview: self.nearbyObjectNavigationController.view];
+    [displayObjectQueueViewController display:object from:origin];
 }
 
-- (void)dismissNearbyObjectView:(UIViewController *)nearbyObjectViewController
+- (void) displayObject:(id<DisplayableObjectProtocol>)object dismissedFrom:(id<DisplayOriginProtocol>)origin
 {
-    [AppModel sharedAppModel].currentlyInteractingWithObject = NO;
-    [nearbyObjectViewController.view removeFromSuperview];
-    [self.nearbyObjectNavigationController.view removeFromSuperview];
     [[AppServices sharedAppServices] fetchAllPlayerLists];
-    
-    NSLog(@"NSNotification: PlayerMoved");
-	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"PlayerMoved" object:nil]];
 }
 
 - (void)beginGamePlay

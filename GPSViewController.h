@@ -10,7 +10,6 @@
 #import "AppModel.h"
 #import "Location.h"
 #import <MapKit/MapKit.h>
-#import "Annotation.h"
 #import "TileOverlay.h"
 #import "TileOverlayView.h"
 #import "RootViewController.h"

@@ -1,5 +1,5 @@
 //
-//  ItemDetailsViewController.h
+//  ItemViewController.h
 //  ARIS
 //
 //  Created by David Gagnon on 4/2/09.
@@ -7,13 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DisplayObjectViewController.h"
 #import "AppModel.h"
 #import "Item.h"
 #import "ARISMoviePlayerViewController.h"
 #import "AsyncMediaImageView.h"
-#import "itemDetailsMode.h"
 
-@interface ItemDetailsViewController : UIViewController <UIWebViewDelegate,UITextViewDelegate> {
+typedef enum {
+	kItemDetailsViewing,
+	kItemDetailsDropping,
+	kItemDetailsDestroying,
+	kItemDetailsPickingUp
+} ItemDetailsModeType;
+
+@interface ItemViewController : DisplayObjectViewController <UIWebViewDelegate,UITextViewDelegate>
+{
 	Item *item;
 	//ARISMoviePlayerViewController *mMoviePlayer; //only used if item is a video
 	MPMoviePlayerViewController *mMoviePlayer; //only used if item is a video
@@ -36,9 +44,8 @@
 	ItemDetailsModeType mode;
     IBOutlet UIActivityIndicatorView *activityIndicator;
     BOOL isLink;
-    NSObject *delegate;
-
 }
+
 @property(readwrite, assign) BOOL isLink;
 
 @property(readwrite) Item *item;
@@ -51,7 +58,8 @@
 @property(nonatomic) IBOutlet UITextView *textBox;
 @property(nonatomic) UIScrollView *scrollView;
 @property(nonatomic) IBOutlet UIButton *saveButton;
-@property (nonatomic) NSObject *delegate;
+
+- (id)initWithItem:(Item *)i;
 
 - (IBAction)dropButtonTouchAction:(id)sender;
 - (IBAction)deleteButtonTouchAction:(id)sender;

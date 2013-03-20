@@ -13,7 +13,7 @@
 #import "Media.h"
 #import "AsyncMediaImageView.h"
 #import "WebPage.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 
 static NSString * const OPTION_CELL = @"quest";
 static int const ACTIVE_SECTION = 0;
@@ -188,7 +188,7 @@ NSString *const kQuestsHtmlTemplate =
     //Does anybody know what "isLink" means? How does it apply to the VC as a whole, where this function is called on individual cells(/webviews)? -Phil 2-14-13
     if(isLink && ![[[request URL] absoluteString] isEqualToString:@"about:blank"])
     {
-        webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle:[NSBundle mainBundle]];
+        WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle:[NSBundle mainBundle]];
         WebPage *temp = [[WebPage alloc] init];
         temp.url = [[request URL] absoluteString];
         webPageViewController.webPage = temp;

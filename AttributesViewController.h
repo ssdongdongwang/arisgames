@@ -10,7 +10,6 @@
 #import "AppModel.h"
 #import "ARISAppDelegate.h"
 #import "Item.h"
-#import "ItemDetailsViewController.h"
 
 @interface AttributesViewController : UIViewController<UITableViewDataSource,UITableViewDataSource>
 {

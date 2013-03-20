@@ -141,7 +141,7 @@
 
 -(void) finishLoadingResult:(NSNotification*) notification
 {	
-	NSObject<QRCodeProtocol> *qrCodeObject = notification.object;
+	NSObject *qrCodeObject = notification.object;
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[[RootViewController sharedRootViewController] removeWaitingIndicator];
     

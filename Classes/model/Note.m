@@ -22,12 +22,11 @@
 @implementation Note
 @synthesize comments,contents, creatorId,noteId,parentNoteId,parentRating,shared,text,title,kind,numRatings,username,delegate,dropped,showOnMap,showOnList,userLiked,hasImage,hasAudio,tags,tagSection,tagName,latitude,longitude;
 
--(nearbyObjectKind) kind { return NearbyObjectNote; }
-
-- (Note *) init {
+- (Note *) init
+{
     self = [super init];
-    if (self) {
-		kind = NearbyObjectNote;
+    if (self)
+    {
         iconMediaId = 71;
         self.comments = [NSMutableArray arrayWithCapacity:5];
         self.contents = [NSMutableArray arrayWithCapacity:5];

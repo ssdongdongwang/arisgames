@@ -7,41 +7,29 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
-#import "QRCodeProtocol.h"
-#import "NodeOption.h"
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
 
-@interface Npc : NSObject  <NearbyObjectProtocol,QRCodeProtocol>{
-	nearbyObjectKind kind;
+@interface Npc : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
+{
 	int npcId;
+    int iconMediaId;
+    int	mediaId;
 	NSString *name;
+    NSString *ndescription;
 	NSString *greeting;
 	NSString *closing;
-	NSString *description;
-	int	mediaId;
-	int iconMediaId;
-	CLLocation *location;
-	BOOL forcedDisplay; //We only need this for the proto, might be good to define a new one
 }
 
-@property(readwrite, assign) nearbyObjectKind kind;
-- (nearbyObjectKind) kind;
 @property(readwrite, assign) int npcId;
+@property(readwrite, assign) int iconMediaId;
+@property(readwrite, assign) int mediaId;
 @property(copy, readwrite) NSString *name;
+@property(copy, readwrite) NSString *ndescription;
 @property(copy, readwrite) NSString *greeting;
 @property(copy, readwrite) NSString *closing;
-@property(copy, readwrite) NSString *description;
-@property(readwrite, assign) int mediaId;
-@property(readwrite, assign) int iconMediaId;
-@property(readwrite, assign) int locationId;
 
-@property(readwrite, assign) BOOL forcedDisplay; //see note above
-
-
-- (void) display;
-
-
-
-
+- (BOOL) compareTo:(Npc *)other;
+- (Npc *) copy;
 
 @end

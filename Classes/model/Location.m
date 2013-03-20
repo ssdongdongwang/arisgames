@@ -7,140 +7,101 @@
 //
 
 #import "Location.h"
-#import "ARISAppDelegate.h"
 #import "AppModel.h"
-#import "Item.h"
-#import "Node.h"
-#import "Npc.h"
-#import "Note.h"
+#import "NSDictionary+ValidParsers.h"
+#import "Note.h" //<- this is dumb, and shouldn't need to be imported to location. See comment below: "this calculation is stupid..."
 
 @implementation Location
 
 @synthesize locationId;
-@synthesize name;
-@synthesize iconMediaId;
-@synthesize location;
-@synthesize error;
 @synthesize object;
-@synthesize objectType;
-@synthesize objectId;
+@synthesize name;
+@synthesize latlon;
+@synthesize qty;
+@synthesize errorRange;
 @synthesize hidden;
 @synthesize forcedDisplay;
-@synthesize allowsQuickTravel, showTitle;
-@synthesize qty,delegate,wiggle,deleteWhenViewed;
+@synthesize allowsQuickTravel;
+@synthesize showTitle;
+@synthesize wiggle;
+@synthesize deleteWhenViewed;
 
-- (nearbyObjectKind)kind
+- (Location *) initFromDictionary:(NSDictionary *)d
 {
-	nearbyObjectKind returnValue = NearbyObjectNil;
-	if ([self.objectType isEqualToString:@"Node"])       returnValue = NearbyObjectNode;
-	if ([self.objectType isEqualToString:@"Npc"])        returnValue = NearbyObjectNPC;
-	if ([self.objectType isEqualToString:@"Item"])       returnValue = NearbyObjectItem;
-	if ([self.objectType isEqualToString:@"Player"])     returnValue = NearbyObjectPlayer;
-    if ([self.objectType isEqualToString:@"WebPage"])    returnValue = NearbyObjectWebPage;
-    if ([self.objectType isEqualToString:@"PlayerNote"]) returnValue = NearbyObjectNote;
-    if ([self.objectType isEqualToString:@"AugBubble"])  returnValue = NearbyObjectPanoramic;
-	return returnValue;
-}
-
-- (int)iconMediaId
-{
-	if (iconMediaId != 0) return iconMediaId;
-    return [[self object] iconMediaId];
-}
-
-- (NSObject<NearbyObjectProtocol> *)object
-{
-    if(deleteWhenViewed == 1)
+    if(self = [super init])
     {
-        NSArray *locs = [AppModel sharedAppModel].currentGame.locationsModel.currentLocations;
-        Location *loc;
-        for(int i = 0; i < [locs count]; i++)
+        self.locationId        = [d validIntForKey:@"location_id"];
+        self.name              = [d validObjectForKey:@"name"];
+        self.object            = nil;
+        self.latlon            = [[CLLocation alloc] initWithLatitude:[d validDoubleForKey:@"latitude"]
+                                                            longitude:[d validDoubleForKey:@"longitude"]];
+        self.qty               = [d validIntForKey:@"item_qty"];
+        self.errorRange        = [d validIntForKey:@"error"] >= 0 ? [d validIntForKey:@"error"] : 99999999;
+        self.hidden            = [d validBoolForKey:@"hidden"];
+        self.forcedDisplay     = [d validBoolForKey:@"force_view"];
+        self.allowsQuickTravel = [d validBoolForKey:@"allow_quick_travel"];
+        self.showTitle         = [d validBoolForKey:@"show_title"];
+        self.wiggle            = [d validBoolForKey:@"wiggle"];
+        self.deleteWhenViewed  = [d validIntForKey:@"delete_when_viewed"];
+        
+        NSString *type = [d validStringForKey:@"type"];
+        if([type isEqualToString:@"Node"])       self.object = [[AppModel sharedAppModel] nodeForNodeId:          [d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"Npc"])        self.object = [[AppModel sharedAppModel] npcForNpcId:            [d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"Item"])       self.object = [[AppModel sharedAppModel] itemForItemId:          [d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"Player"])     self.object = [[AppModel sharedAppModel] itemForItemId:          [d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"WebPage"])    self.object = [[AppModel sharedAppModel] webPageForWebPageID:    [d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"AugBubble"])  self.object = [[AppModel sharedAppModel] panoramicForPanoramicId:[d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"PlayerNote"]) self.object = [[AppModel sharedAppModel] itemForItemId:[d validIntForKey:@"type_id"]];
         {
-            if((loc = (Location *)[locs objectAtIndex:i]).locationId == self.locationId)
-                [[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:(loc.qty*-1) forLocationId:loc.locationId];
+            self.object = [[AppModel sharedAppModel] noteForNoteId:[d validIntForKey:@"type_id"] playerListYesGameListNo:YES];
+            if(!self.object)
+            self.object = [[AppModel sharedAppModel] noteForNoteId:[d validIntForKey:@"type_id"] playerListYesGameListNo:NO];
+            //This calculation is stupid, and should have been done on the server before sending the locations list
+            if(((Note *)self.object).showOnList) self.allowsQuickTravel = YES;
+            else                        self.allowsQuickTravel = NO;
         }
-    }	
-    if (self.kind == NearbyObjectItem)
-    {
-        [[AppModel sharedAppModel] itemForItemId:objectId].locationId = self.locationId; 		
-        [[AppModel sharedAppModel] itemForItemId:objectId].qty = self.qty;
-		return [[AppModel sharedAppModel] itemForItemId:objectId];
-	}
-	if (self.kind == NearbyObjectNode)
-    {
-        [[AppModel sharedAppModel] nodeForNodeId: objectId].locationId = self.locationId;
-		return [[AppModel sharedAppModel] nodeForNodeId: objectId]; 
-	}
-    if (self.kind == NearbyObjectWebPage)
-    {
-        [[AppModel sharedAppModel] webPageForWebPageID: objectId].locationId = self.locationId;
-		return [[AppModel sharedAppModel] webPageForWebPageID: objectId]; 
-	}
-    if (self.kind == NearbyObjectPanoramic)
-    {
-        [[AppModel sharedAppModel]panoramicForPanoramicId: objectId].locationId = self.locationId;
-		return [[AppModel sharedAppModel] panoramicForPanoramicId: objectId]; 
-	}
-    if (self.kind == NearbyObjectNPC)
-    {
-        [[AppModel sharedAppModel]npcForNpcId: objectId].locationId = self.locationId;
-		return [[AppModel sharedAppModel] npcForNpcId: objectId]; 
-	}
-    if (self.kind == NearbyObjectNote)
-    {
-        Note * note    = [[AppModel sharedAppModel] noteForNoteId:objectId playerListYesGameListNo:NO];
-        if(!note) note = [[AppModel sharedAppModel] noteForNoteId:objectId playerListYesGameListNo:YES];
-        if(!note) NSLog(@"this shouldn't happen");
-        return note;
     }
-	else return nil;
+    return self;
 }
 
-- (void)display
+- (BOOL) compareTo:(Location *)other
 {
-	[self.object display];
+    return
+    [other.name isEqualToString:self.name]            &&
+    other.locationId        == self.locationId        &&
+    other.object            == self.object            &&
+    other.latlon            == self.latlon            &&
+    other.qty               == self.qty               &&
+    other.errorRange        == self.errorRange        &&
+    other.hidden            == self.hidden            &&
+    other.forcedDisplay     == self.forcedDisplay     &&
+    other.allowsQuickTravel == self.allowsQuickTravel &&
+    other.showTitle         == self.showTitle         &&
+    other.wiggle            == self.wiggle            &&
+    other.deleteWhenViewed  == self.deleteWhenViewed;
 }
 
-- (BOOL)compareTo:(Location *)other
-{
-    return     [self.name isEqualToString:other.name] &&
-    self.locationId                    == other.locationId &&
-    self.iconMediaId                   == other.iconMediaId &&
-    self.location.coordinate.latitude  == other.location.coordinate.latitude &&
-    self.location.coordinate.longitude == other.location.coordinate.longitude &&
-    self.objectId                      == other.objectId &&
-    self.hidden                        == other.hidden &&
-    self.forcedDisplay                 == other.forcedDisplay &&
-    self.allowsQuickTravel             == other.allowsQuickTravel &&
-    self.showTitle                     == other.showTitle &&
-    self.wiggle                        == other.wiggle &&
-    self.deleteWhenViewed              == other.deleteWhenViewed &&
-    self.qty                           == other.qty;
-}
-
-- (Location *)copy
+- (Location *) copy
 {
     Location *c = [[Location alloc] init];
-    c.name              = self.name;
     c.locationId        = self.locationId;
-    c.iconMediaId       = self.iconMediaId;
-    c.location          = self.location;
-    c.objectType        = self.objectType;
-    c.objectId          = self.objectId;
+    c.object            = self.object;
+    c.name              = self.name;
+    c.latlon            = self.latlon;
+    c.qty               = self.qty;
+    c.errorRange        = self.errorRange;
     c.hidden            = self.hidden;
-    c.error             = self.error;
     c.forcedDisplay     = self.forcedDisplay;
     c.allowsQuickTravel = self.allowsQuickTravel;
     c.showTitle         = self.showTitle;
     c.wiggle            = self.wiggle;
     c.deleteWhenViewed  = self.deleteWhenViewed;
-    c.qty               = self.qty;
     return c;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Location- Id:%d\tName:%@\tType:%@",self.locationId,self.name,self.objectType];
+    return [NSString stringWithFormat:@"Location- Id:%d\tName:%@\tType:%@",self.locationId,self.name,self.object.objectType];
 }
 
 @end

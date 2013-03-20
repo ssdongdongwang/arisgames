@@ -22,7 +22,8 @@
 #define IMAGE_WIDTH 30
 
 
-@interface AnnotationView : MKAnnotationView {
+@interface AnnotationView : MKAnnotationView
+{
 	CGRect titleRect;
 	CGRect subtitleRect;
 	CGRect contentRect;
@@ -50,10 +51,5 @@
 @property (readwrite) float totalWiggleOffsetFromOriginalPosition;
 @property (readwrite) float incrementalWiggleOffset;
 @property (readwrite) float xOnSinWave;
-
-
-//- (void)setImageFromURL:(NSString *)imageURLString;
-- (void)startWiggling;
-- (void) wiggle;
 
 @end

@@ -9,11 +9,10 @@
 #import "NodeViewController.h"
 #import "AppModel.h"
 #import "AppServices.h"
-#import "NodeOption.h"
 #import "ARISAppDelegate.h"
 #import "Media.h"
 #import "AsyncMediaImageView.h"
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 #import "WebPage.h"
 #import <AVFoundation/AVFoundation.h>
 #import "AsyncMediaPlayerButton.h"
@@ -39,18 +38,16 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 @"</html>";
 
 @implementation NodeViewController
-@synthesize node, isLink, hasMedia, imageLoaded, webLoaded, scrollView, mediaArea, webView, continueButton, webViewSpinner, mediaImageView;
 
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(movieFinishedCallback:)
-													 name:MPMoviePlayerPlaybackDidFinishNotification
-												   object:nil];
+@synthesize node, hasMedia, imageLoaded, webLoaded, scrollView, mediaArea, webView, continueButton, webViewSpinner, mediaImageView;
+
+- (id)initWithNode:(Node *)n
+{
+    if ((self = [super initWithNibName:@"NodeViewController" bundle:nil]))
+    {
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieFinishedCallback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
         
-        self.isLink=NO;
+        self.node = n;
         AsyncMediaImageView *mediaImageViewAlloc = [[AsyncMediaImageView alloc]init];
         self.mediaImageView = mediaImageViewAlloc;
         self.mediaImageView.delegate = self;
@@ -60,7 +57,8 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
     
     self.title = self.node.name;
@@ -121,51 +119,6 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
     [scrollView addSubview:continueButton];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
--(BOOL)shouldAutorotate{
-    return YES;
-}
-
--(NSInteger)supportedInterfaceOrientations{
-    NSInteger mask = 0;
-    if ([self shouldAutorotateToInterfaceOrientation: UIInterfaceOrientationLandscapeLeft])
-        mask |= UIInterfaceOrientationMaskLandscapeLeft;
-    if ([self shouldAutorotateToInterfaceOrientation: UIInterfaceOrientationLandscapeRight])
-        mask |= UIInterfaceOrientationMaskLandscapeRight;
-    if ([self shouldAutorotateToInterfaceOrientation: UIInterfaceOrientationPortrait])
-        mask |= UIInterfaceOrientationMaskPortrait;
-    if ([self shouldAutorotateToInterfaceOrientation: UIInterfaceOrientationPortraitUpsideDown])
-        mask |= UIInterfaceOrientationMaskPortraitUpsideDown;
-    return mask;
-}
-
-#pragma mark UIWebViewDelegate Methods
-
-- (BOOL)webView:(UIWebView*)webViewFromMethod shouldStartLoadWithRequest: (NSURLRequest*)req navigationType:(UIWebViewNavigationType)navigationType {
-    
-    if(self.isLink) return YES; // <- I actually don't know what function 'isLink' has... kept for harmless legacy reasons. - Phil 10/2012
-    
-    NSString *url = [req URL].absoluteString;
-    if([url isEqualToString:@"about:blank"]) return YES;
-    //Check to prepend url query with '?' or '&'
-    if([url rangeOfString:@"?"].location == NSNotFound)
-        url = [url stringByAppendingString: [NSString stringWithFormat: @"?gameId=%d&webPageId=%d&playerId=%d",[AppModel sharedAppModel].currentGame.gameId, node.nodeId, [AppModel sharedAppModel].playerId]];
-    else
-        url = [url stringByAppendingString: [NSString stringWithFormat: @"&gameId=%d&webPageId=%d&playerId=%d",[AppModel sharedAppModel].currentGame.gameId, node.nodeId, [AppModel sharedAppModel].playerId]];
-    
-    webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
-    WebPage *temp = [[WebPage alloc]init];
-    temp.url = url;
-    webPageViewController.webPage = temp;
-    webPageViewController.delegate = self;
-    [self.navigationController pushViewController:webPageViewController animated:NO];
-    
-    return NO;
-}
-
 -(void)webViewDidFinishLoad:(UIWebView *)theWebView{
     webView.alpha = 1.00;
     
@@ -186,7 +139,8 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 }
 
 #pragma mark AsyncImageView Delegate Methods
--(void)imageFinishedLoading{
+-(void)imageFinishedLoading
+{
     NSLog(@"NodeVC: imageFinishedLoading with size: %f, %f",self.mediaImageView.frame.size.width,self.mediaImageView.frame.size.height);
     /*
      if(self.mediaImageView.image.size.width > 0){
@@ -202,98 +156,30 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 
 
 #pragma mark Button Handlers
-- (IBAction)backButtonTouchAction: (id) sender{
-	NSLog(@"NodeViewController: Notify server of Node view and Dismiss view");
-	
-	//Notify the server this item was displayed
-	[[AppServices sharedAppServices] updateServerNodeViewed:node.nodeId fromLocation:node.locationId];
-	
-	//[self.view removeFromSuperview];
-    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+- (IBAction)backButtonTouchAction:(id)sender
+{
+	[delegate displayObjectViewControllerWasDismissed:self];
 }
 
 - (IBAction)continueButtonTouchAction
 {
-    NSLog(@"NodeViewController: Notify server of Node view and Dismiss view");
-	
-	//Notify the server this item was displayed
-	[[AppServices sharedAppServices] updateServerNodeViewed:node.nodeId fromLocation:node.locationId];
-	
-    //Remove thyself from the screen // <- lol
-    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-    
-    //Check if this was the game complete Node and if so, display the "Start Over" tab
-    if((node.nodeId == [AppModel sharedAppModel].currentGame.completeNodeId) && ([AppModel sharedAppModel].currentGame.completeNodeId != 0))
-    {
-        NSString *tab;
-        for(int i = 0;i < [[RootViewController sharedRootViewController].gamePlayTabBarController.customizableViewControllers count];i++)
-        {
-            tab = [[[RootViewController sharedRootViewController].gamePlayTabBarController.customizableViewControllers objectAtIndex:i] title];
-            tab = [tab lowercaseString];
-            if([tab isEqualToString:@"start over"]) [RootViewController sharedRootViewController].gamePlayTabBarController.selectedIndex = i;
-        }
-    }
-    
+	[delegate displayObjectViewControllerWasDismissed:self];
 }
 
-/*-(IBAction)playMovie:(id)sender {
- [mMoviePlayer.moviePlayer play];
- [self presentMoviePlayerViewControllerAnimated:mMoviePlayer];
- }
- */
-
 #pragma mark MPMoviePlayerController Notification Handlers
-
-/*
- - (void)movieLoadStateChanged:(NSNotification*) aNotification{
- MPMovieLoadState state = [(MPMoviePlayerController *) aNotification.object loadState];
- 
- if( state & MPMovieLoadStateUnknown ) {
- NSLog(@"NodeViewController: Unknown Load State");
- }
- if( state & MPMovieLoadStatePlayable ) {
- NSLog(@"NodeViewController: Playable Load State");
- 
- //Create a thumbnail for the button
- if (![mediaPlaybackButton backgroundImageForState:UIControlStateNormal]){
- UIImage *videoThumb = [mMoviePlayer.moviePlayer thumbnailImageAtTime:(NSTimeInterval)1.0 timeOption:MPMovieTimeOptionExact];
- UIImage *videoThumbSized = [videoThumb scaleToSize:CGSizeMake(300, 240)];
- [mediaPlaybackButton setBackgroundImage:videoThumbSized forState:UIControlStateNormal];
- }
- 
- }
- if( state & MPMovieLoadStatePlaythroughOK ) {
- NSLog(@"NodeViewController: Playthrough OK Load State");
- 
- }
- if( state & MPMovieLoadStateStalled ) {
- NSLog(@"NodeViewController: Stalled Load State");
- }
- 
- }*/
-
 
 - (void)movieFinishedCallback:(NSNotification*) aNotification
 {
 	[self dismissMoviePlayerViewControllerAnimated];
 }
 
-
-#pragma mark PickerViewDelegate selectors
-
-
 #pragma mark Memory Management
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
-}
 
-
-- (void)dealloc {
+- (void)dealloc
+{
 	NSLog(@"NodeViewController: Dealloc");
     webView.delegate = nil;
     [webView stopLoading];
-    //remove listeners
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

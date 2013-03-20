@@ -1,29 +1,31 @@
 //
-//  webpageViewController.m
+//  WebPageViewController.m
 //  ARIS
 //
 //  Created by Brian Thiel on 6/14/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "webpageViewController.h"
+#import "WebPageViewController.h"
 #import "AppModel.h"
 #import "AppServices.h"
-#import "NodeOption.h"
 #import "ARISAppDelegate.h"
 #import "Media.h"
 #import "AsyncMediaImageView.h"
-#import "DialogViewController.h"
+#import "NpcViewController.h"
 #import "NodeViewController.h"
 #import "QuestsViewController.h"
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 
-@implementation webpageViewController
-@synthesize webView,webPage,delegate,activityIndicator,blackView, audioPlayers, bumpSendString, isConnectedToBump, loaded;
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+@implementation WebPageViewController
+@synthesize webView,webPage,activityIndicator,blackView, audioPlayers, bumpSendString, isConnectedToBump, loaded;
+- (id)initWithWebPage:(WebPage *)w
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
+    self = [super initWithNibName:@"WebPageViewController" bundle:nil];
+    if (self)
+    {
+        self.webPage = w;
+
         // Custom initialization
         self.isConnectedToBump = NO;
         self.bumpSendString = @"";
@@ -57,7 +59,7 @@
     else       
         urlAddress = [self.webPage.url stringByAppendingString: [NSString stringWithFormat: @"&gameId=%d&webPageId=%d&playerId=%d",[AppModel sharedAppModel].currentGame.gameId, webPage.webPageId, [AppModel sharedAppModel].playerId]];
     
-    NSLog(@"WebPageVC: Loading URL: %@",urlAddress);
+    NSLog(@"WebPageViewController: Loading URL: %@",urlAddress);
     NSURL *url = [NSURL URLWithString:urlAddress];
     //URL Requst Object
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
@@ -83,17 +85,18 @@
 
 - (void)viewDidUnload
 {
-    NSLog(@"WebPageVC: viewDidUnload");
+    NSLog(@"WebPageViewController: viewDidUnload");
     [super viewDidUnload];
 }
 
-- (void)dealloc{
+- (void)dealloc
+{
     webView.delegate = nil;
     [webView stopLoading];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    NSLog(@"WebPageVC: viewWillDisapear");
+    NSLog(@"WebPageViewController: viewWillDisapear");
     //if([RootViewController sharedRootViewController].webpageChannel) [[RootViewController sharedRootViewController].client unsubscribeFromChannel:(PTPusherChannel *)[RootViewController sharedRootViewController].webpageChannel];
 
     [self.audioPlayers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
@@ -145,24 +148,10 @@
     [self.activityIndicator stopAnimating];
 }
 
-- (IBAction)backButtonTouchAction: (id) sender{
+- (IBAction)backButtonTouchAction: (id) sender
+{
     if(self.isConnectedToBump) [BumpClient sharedClient].bumpable = NO;
-
-	NSLog(@"NodeViewController: Notify server of Node view and Dismiss view");
-	
-	//Notify the server this item was displayed
-	[[AppServices sharedAppServices] updateServerWebPageViewed:webPage.webPageId fromLocation:webPage.locationId];
-	
-	
-    if([self.delegate isKindOfClass:[DialogViewController class]]) [self refreshConvos];
-	if([self.delegate isKindOfClass:[DialogViewController class]] || 
-       [self.delegate isKindOfClass:[NodeViewController class]] || 
-       [self.delegate isKindOfClass:[QuestsViewController class]] ||
-       [self.delegate isKindOfClass:[ItemDetailsViewController class]])
-        [self.navigationController popToRootViewControllerAnimated:YES];
-    else{
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-    }
+	[delegate displayObjectViewControllerWasDismissed:self];
 }
 
 #pragma mark -
@@ -187,9 +176,9 @@
     
     if ([mainCommand isEqualToString:@"closeMe"])
     {
-        NSLog(@"WebPageVC: aris://closeMe/ called");
+        NSLog(@"WebPageViewController: aris://closeMe/ called");
         [self.navigationController popToRootViewControllerAnimated:YES];
-        if(![[[RootViewController sharedRootViewController].nearbyObjectNavigationController.viewControllers objectAtIndex:0] isKindOfClass:[DialogViewController class]]){
+        if(![[[RootViewController sharedRootViewController].nearbyObjectNavigationController.viewControllers objectAtIndex:0] isKindOfClass:[NpcViewController class]]){
         [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
         }
         /*
@@ -197,26 +186,18 @@
         [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
          */
         return NO; 
-    }  
-    
-    if ([mainCommand isEqualToString:@"refreshStuff"])
-    {
-        NSLog(@"WebPageVC: aris://refreshStuff/ called");
-        [self refreshConvos];
-        [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
-        return NO; 
-    }  
+    }
     
     if ([mainCommand isEqualToString:@"vibrate"])
     {
-        NSLog(@"WebPageVC: aris://vibrate/ called");
+        NSLog(@"WebPageViewController: aris://vibrate/ called");
         [appDelegate vibrate];
         [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
         return NO; 
     } 
     
     if ([mainCommand isEqualToString:@"player"]) {
-        NSLog(@"WebPageVC: aris://player/ called");
+        NSLog(@"WebPageViewController: aris://player/ called");
         
         if ([components count] > 1 && 
             [[components objectAtIndex:1] isEqualToString:@"name"]) 
@@ -236,13 +217,13 @@
     
     if ([mainCommand isEqualToString:@"inventory"])
     {
-        NSLog(@"WebPageVC: aris://inventory/ called");
+        NSLog(@"WebPageViewController: aris://inventory/ called");
         
         if ([components count] > 2 && 
             [[components objectAtIndex:1] isEqualToString:@"get"])
         {
             int itemId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://inventory/get/ called from webpage with itemId = %d",itemId);
+            NSLog(@"WebPageViewController: aris://inventory/get/ called from webpage with itemId = %d",itemId);
             int qty = [self getQtyInInventoryOfItem:itemId];
             [self.webView stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"ARIS.didUpdateItemQty(%d,%d);",itemId,qty]];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
@@ -254,7 +235,7 @@
         {
             int itemId = [[components objectAtIndex:2] intValue];
             int qty = [[components objectAtIndex:3] intValue];
-            NSLog(@"WebPageVC: aris://inventory/set/ called from webpage with itemId = %d and qty = %d",itemId,qty);
+            NSLog(@"WebPageViewController: aris://inventory/set/ called from webpage with itemId = %d and qty = %d",itemId,qty);
             int newQty = [self setQtyInInventoryOfItem:itemId toQty:qty];
             [self.webView stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"ARIS.didUpdateItemQty(%d,%d);",itemId,newQty]];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
@@ -266,7 +247,7 @@
         {
             int itemId = [[components objectAtIndex:2] intValue];
             int qty = [[components objectAtIndex:3] intValue];
-            NSLog(@"WebPageVC: aris://inventory/give/ called from webpage with itemId = %d and qty = %d",itemId,qty);
+            NSLog(@"WebPageViewController: aris://inventory/give/ called from webpage with itemId = %d and qty = %d",itemId,qty);
             int newQty = [self giveQtyInInventoryToItem:itemId ofQty:qty];
             [self.webView stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"ARIS.didUpdateItemQty(%d,%d);",itemId,newQty]];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
@@ -278,7 +259,7 @@
         {
             int itemId = [[components objectAtIndex:2] intValue];
             int qty = [[components objectAtIndex:3] intValue];
-            NSLog(@"WebPageVC: aris://inventory/take/ called from webpage with itemId = %d and qty = %d",itemId,qty);
+            NSLog(@"WebPageViewController: aris://inventory/take/ called from webpage with itemId = %d and qty = %d",itemId,qty);
             int newQty = [self takeQtyInInventoryFromItem:itemId ofQty:qty];
             [self.webView stringByEvaluatingJavaScriptFromString: [NSString stringWithFormat:@"ARIS.didUpdateItemQty(%d,%d);",itemId,newQty]];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
@@ -287,13 +268,13 @@
     } 
     
     if ([mainCommand isEqualToString:@"media"]) {
-        NSLog(@"WebPageVC: aris://media called");
+        NSLog(@"WebPageViewController: aris://media called");
         
         if ([components count] > 2 && 
             [[components objectAtIndex:1] isEqualToString:@"prepare"])
         {
             int mediaId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://media/prepare/ called from webpage with mediaId = %d",mediaId );
+            NSLog(@"WebPageViewController: aris://media/prepare/ called from webpage with mediaId = %d",mediaId );
             [self loadAudioFromMediaId:mediaId];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
             return NO; 
@@ -303,7 +284,7 @@
             [[components objectAtIndex:1] isEqualToString:@"play"])
         {
             int mediaId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://media/play/ called from webpage with mediaId = %d",mediaId );
+            NSLog(@"WebPageViewController: aris://media/play/ called from webpage with mediaId = %d",mediaId );
             [self playAudioFromMediaId:mediaId];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
             return NO; 
@@ -312,7 +293,7 @@
         if ([components count] > 2 && 
             [[components objectAtIndex:1] isEqualToString:@"playAndVibrate"]) {
             int mediaId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://media/playAndVibrate/ called from webpage with mediaId = %d",mediaId );
+            NSLog(@"WebPageViewController: aris://media/playAndVibrate/ called from webpage with mediaId = %d",mediaId );
             [self playAudioFromMediaId:mediaId];
             [appDelegate vibrate];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
@@ -322,7 +303,7 @@
         if ([components count] > 2 && 
             [[components objectAtIndex:1] isEqualToString:@"stop"]) {
             int mediaId = [[components objectAtIndex:2] intValue];
-            NSLog(@"WebPageVC: aris://media/stop/ called from webpage with mediaId = %d",mediaId );
+            NSLog(@"WebPageViewController: aris://media/stop/ called from webpage with mediaId = %d",mediaId );
             [self stopAudioFromMediaId:mediaId];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
             return NO; 
@@ -332,7 +313,7 @@
             [[components objectAtIndex:1] isEqualToString:@"setVolume"]) {
             int mediaId = [[components objectAtIndex:2] intValue];
             int volume = [[components objectAtIndex:3] floatValue];
-            NSLog(@"WebPageVC: aris://media/setVolume/ called from webpage with mediaId = %d and volume =%d",mediaId,volume );
+            NSLog(@"WebPageViewController: aris://media/setVolume/ called from webpage with mediaId = %d and volume =%d",mediaId,volume );
             [self setMediaId:mediaId volumeTo:volume];
             [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
             return NO; 
@@ -340,7 +321,7 @@
     }
     
     if ([mainCommand isEqualToString:@"bump"]) {
-        NSLog(@"WebPageVC: aris://bump/ called");
+        NSLog(@"WebPageViewController: aris://bump/ called");
         if ([components count] > 1) 
         {
             self.bumpSendString = [components objectAtIndex:1];
@@ -352,22 +333,12 @@
     }  
     
     //Shouldn't get here. 
-    NSLog(@"WebPageVC: WARNING. An aris:// url was called with no handler");
+    NSLog(@"WebPageViewController: WARNING. An aris:// url was called with no handler");
     return YES;
 }
 
-
-- (void)refreshConvos {
-    [[AppServices sharedAppServices] fetchAllPlayerLists];
-    if([self.delegate isKindOfClass:[DialogViewController class]]){
-        DialogViewController *temp = (DialogViewController *)self.delegate;
-        [[AppServices sharedAppServices] fetchNpcConversations:temp.currentNpc.npcId afterViewingNode:temp.currentNode.nodeId];
-        [temp showWaitingIndicatorForPlayerOptions];
-    }
-}
-
 - (void) loadAudioFromMediaId:(int)mediaId{
-    NSLog(@"WebPageVC: loadAudioFromMediaId");
+    NSLog(@"WebPageViewController: loadAudioFromMediaId");
     Media* media = [[AppModel sharedAppModel] mediaForMediaId: mediaId];
     NSURL* url = [NSURL URLWithString:media.url];
     AVPlayer *player = [AVPlayer playerWithURL:url];

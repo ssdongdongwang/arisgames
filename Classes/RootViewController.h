@@ -16,22 +16,21 @@
 #import "PTPusher.h"
 #import "PTPusherEvent.h"
 
-#import "GameObjectDisplayViewController.h"
+#import "DisplayObjectQueueViewController.h"
 #import "GameNotificationViewController.h"
 #import "BogusSelectGameViewController.h"
 
 #import "MyCLController.h"
 
 #import "ARViewViewControler.h"
-#import "DeveloperViewController.h"
 #import "WaitingIndicatorAlertViewController.h"
 
 #import "TutorialViewController.h"
 
-@interface RootViewController : UIViewController <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate, PTPusherDelegate>
+@interface RootViewController : UIViewController <UIApplicationDelegate, UITabBarControllerDelegate, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate, PTPusherDelegate, DisplayObjectQueueDelegate>
 {
     GameNotificationViewController *gameNotificationViewController;
-    GameObjectDisplayViewController *gameObjectDisplayViewController;
+    DisplayObjectQueueViewController *displayObjectQueueViewController;
     
     NSString *errorMessage;
     NSString *errorDetail;
@@ -110,8 +109,7 @@
 - (void)commitToPlayGame:(NSNotification *)notification;
 
 - (void)showNearbyTab:(BOOL)yesOrNo;
-- (void)displayNearbyObjectView:(UIViewController *)nearbyObjectViewController;
-- (void)dismissNearbyObjectView:(UIViewController *)nearbyObjectViewController;
+- (void)display:(id<DisplayableObjectProtocol>)object from:(id<DisplayOriginProtocol>)origin;
 
 - (void)beginGamePlay;
 - (void)checkForDisplayCompleteNode;

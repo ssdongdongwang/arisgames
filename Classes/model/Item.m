@@ -7,88 +7,92 @@
 //
 
 #import "Item.h"
-#import "ItemDetailsViewController.h"
-#import "AppModel.h"
-#import "ARISAppDelegate.h"
-
+#import "ItemViewController.h"
+#import "AppServices.h"
 
 @implementation Item
 
-@synthesize name,url;
-@synthesize kind,creatorId;
-@synthesize forcedDisplay, hasViewed, isTradeable;
-
 @synthesize itemId;
-@synthesize mediaId;
 @synthesize iconMediaId;
-@synthesize locationId;
-@synthesize weight,type;
-@synthesize qty,maxQty;
+@synthesize mediaId;
+@synthesize qty;
+@synthesize maxQty;
+@synthesize weight;
+@synthesize isAttribute;
+@synthesize isDroppable;
+@synthesize isDestroyable;
+@synthesize isTradeable;
+@synthesize name;
 @synthesize idescription;
+@synthesize url;
+@synthesize type;
 
-@synthesize dropable;
-@synthesize	destroyable,isAttribute;
-
-
--(nearbyObjectKind) kind {
-	return NearbyObjectItem;
+- (int) objectId
+{
+    return itemId;
 }
 
--(int)iconMediaId {
+- (NSString *) objectType
+{
+    return @"Item";
+}
+
+- (int) iconMediaId
+{
 	if (iconMediaId == 0) return 2;
 	else return iconMediaId;
 }
 
-- (void) display{
-	NSLog(@"Item: Display Self Requested");
-	
-	//Create a reference to the delegate using the application singleton.
-	ItemDetailsViewController *itemDetailsViewController = [[ItemDetailsViewController alloc] 
-															initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-	itemDetailsViewController.item = self;
-	itemDetailsViewController.navigationItem.title = name;
-	itemDetailsViewController.inInventory = NO;
-
-	//Have AppDelegate display
-	[[RootViewController sharedRootViewController] displayNearbyObjectView:itemDetailsViewController];
-	
+- (int) mediaId
+{
+	if (mediaId == 0) return 2;
+	else return mediaId;
 }
 
-- (BOOL)isEqual:(id)anObject {
-	if (![anObject isKindOfClass:[Item class]]) return NO;
-	Item *anItem = (Item*)anObject;
-	if (anItem.itemId == self.itemId) return YES;
-	return NO;
+- (DisplayObjectViewController *) viewControllerForDisplay
+{
+	ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:self];
+	itemVC.inInventory = NO;
+    return itemVC;
 }
 
-- (NSUInteger)hash {
-	return itemId;
+- (void) wasDisplayed
+{
+    
 }
 
--(Item *)copy
+- (void) finishedDisplay
+{
+    [[AppServices sharedAppServices] updateServerItemViewed:itemId fromLocation:nil];
+    //Phil should remove "fromLocation". The location get's its own chance to update server
+}
+
+- (BOOL) compareTo:(Item *)other
+{
+	return other.itemId == self.itemId;
+}
+
+- (Item *) copy
 {
     Item *c = [[Item alloc] init];
     c.itemId        = self.itemId;
-	c.name          = self.name;
-	c.mediaId       = self.mediaId;
-	c.iconMediaId   = self.iconMediaId;
-	c.qty           = self.qty;
-	c.maxQty        = self.maxQty;
+    c.iconMediaId   = self.iconMediaId;
+    c.mediaId       = self.mediaId;
+    c.qty           = self.qty;
+    c.maxQty        = self.maxQty;
     c.weight        = self.weight;
-	c.idescription  = self.idescription;
     c.isAttribute   = self.isAttribute;
-	c.forcedDisplay = self.forcedDisplay;
-	c.dropable      = self.dropable;
-	c.destroyable   = self.destroyable;
-    c.hasViewed     = self.hasViewed;
-	c.kind          = self.kind;
+    c.isDroppable   = self.isDroppable;
+    c.isDestroyable = self.isDestroyable;
+    c.isTradeable   = self.isTradeable;
+    c.name          = self.name;
+    c.idescription  = self.idescription;
     c.url           = self.url;
     c.type          = self.type;
-    c.creatorId     = self.creatorId;
     return c;
 }
 
-- (NSString *)description
+- (NSString *) description
 {
     return [NSString stringWithFormat:@"Item- Id:%d\tName:%@\tAttribute:%d\tQty:%d",self.itemId,self.name,self.isAttribute,self.qty];
 }

@@ -7,13 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NearbyObjectProtocol.h"
+#import "DisplayObjectProtocol.h"
+#import "LocationObjectProtocol.h"
+
 extern NSString *const kNoteContentTypeAudio;
 extern NSString *const kNoteContentTypeVideo;
 extern NSString *const kNoteContentTypePhoto;
 extern NSString *const kNoteContentTypeText;
 
-@interface Note : NSObject <NearbyObjectProtocol>{
+@interface Note : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
+{
     NSMutableArray *comments;
     NSMutableArray *contents;
     NSMutableArray *tags;
@@ -27,7 +30,6 @@ extern NSString *const kNoteContentTypeText;
     BOOL showOnMap,showOnList,userLiked;
     int parentNoteId;
     int parentRating;
-    nearbyObjectKind	kind;
     int iconMediaId;
     NSString *username;
     id __unsafe_unretained delegate;
@@ -42,13 +44,13 @@ extern NSString *const kNoteContentTypeText;
 @property(nonatomic, strong) NSMutableArray *comments;
 @property(nonatomic, strong) NSMutableArray *contents;
 @property(nonatomic, strong) NSMutableArray *tags;
-@property(readwrite,assign)int tagSection;
+@property(readwrite, assign) int tagSection;
 @property(nonatomic, strong) NSString *username;
 @property(nonatomic, strong) NSString *title;
 @property(nonatomic, strong) NSString *tagName;
 
 @property(nonatomic, strong) NSString *text;
-@property(readwrite,assign) int noteId;
+@property(readwrite, assign) int noteId;
 @property(readwrite, assign) int creatorId;
 @property(readwrite, assign) int numRatings;
 @property(readwrite, assign) double latitude;
@@ -63,7 +65,6 @@ extern NSString *const kNoteContentTypeText;
 @property(readwrite, assign) BOOL hasAudio;
 @property(readwrite, assign) int parentNoteId;
 @property(readwrite, assign) int parentRating;
-@property(readwrite, assign) nearbyObjectKind kind;
 @property(nonatomic, unsafe_unretained) id delegate;
 
 -(BOOL)isUploading;

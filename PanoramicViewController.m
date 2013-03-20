@@ -10,24 +10,23 @@
 #import "PanoramicMedia.h"
 #import "AppModel.h"
 #import "AppServices.h"
-#import "NodeOption.h"
 #import "ARISAppDelegate.h"
 #import "Media.h"
 #import "AsyncMediaImageView.h"
 #import "UIImage+Scale.h"
 #import "UIDevice+Hardware.h"
-#import "DialogViewController.h"
+#import "NpcViewController.h"
 
 @implementation PanoramicViewController
 
-@synthesize panoramic,plView,connection,data,media,imagePickerController,viewHasAlreadyAppeared,slider,numTextures,lblSpacing,delegate,showedAlignment;
+@synthesize panoramic,plView,connection,data,media,imagePickerController,viewHasAlreadyAppeared,slider,numTextures,lblSpacing,showedAlignment;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithPanoramic:(Panoramic *)p
 {
-    NSLog(@"YO");
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
+    self = [super initWithNibName:@"PanoramicViewController" bundle:nil];
+    if (self)
+    {
+        panoramic = p;
         return self;
     }
     return nil;
@@ -35,22 +34,11 @@
 
 - (void)dealloc
 {
-    
     [[AppModel sharedAppModel].motionManager stopGyroUpdates];
     plView.isGyroEnabled = NO;
     [plView removeFromSuperview];
     [plView stopAnimation];
     [plView removeAllTextures];
-    
-    
-}
-
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
 }
 
 #pragma mark - View lifecycle
@@ -90,7 +78,7 @@
         plView.isInertiaEnabled = NO;
     }
     
-    self.numTextures = [self.panoramic.media count];
+    self.numTextures = [self.panoramic.mediaArray count];
     //[self loadImageFromMedia:[self.panoramic.textureArray objectAtIndex:(x-1)]];
     
     if(self.numTextures > 1){
@@ -108,7 +96,7 @@
         for(int x = 0;x < self.numTextures; x++)
         {
             UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(self.slider.frame.origin.x + lblSpacing*x - 25, self.slider.frame.origin.y + 10, 50, 70)];
-            lbl.text = [[self.panoramic.media objectAtIndex:x] text];
+            lbl.text = [[self.panoramic.mediaArray objectAtIndex:x] text];
             lbl.textAlignment = UITextAlignmentLeft;
             lbl.transform = CGAffineTransformMakeRotation( M_PI/2 );
             lbl.textColor = [UIColor whiteColor];
@@ -116,7 +104,7 @@
             lbl.backgroundColor = [UIColor clearColor];
             [self.view addSubview:lbl];
             
-            Media *panoMedia = [[AppModel sharedAppModel] mediaForMediaId: [[self.panoramic.media objectAtIndex:x] mediaId]];
+            Media *panoMedia = [[AppModel sharedAppModel] mediaForMediaId: [[self.panoramic.mediaArray objectAtIndex:x] mediaId]];
             self.panoramic.textureArray = [self.panoramic.textureArray arrayByAddingObject:panoMedia];
             //[panoMedia release];
         }
@@ -127,7 +115,7 @@
         Media *panoMedia = [[AppModel sharedAppModel] mediaForMediaId:364];
         self.panoramic.textureArray = [self.panoramic.textureArray arrayByAddingObject:panoMedia];
     }
-    else {Media *panoMedia = [[AppModel sharedAppModel] mediaForMediaId: [[self.panoramic.media objectAtIndex:0] mediaId]];
+    else {Media *panoMedia = [[AppModel sharedAppModel] mediaForMediaId:[[self.panoramic.mediaArray objectAtIndex:0] mediaId]];
         self.panoramic.textureArray = [self.panoramic.textureArray arrayByAddingObject:panoMedia]; }
     
     //Create a close button
@@ -152,7 +140,7 @@
     if (!self.viewHasAlreadyAppeared)
     {
         [self loadImageFromMedia:[self.panoramic.textureArray objectAtIndex:0]];
-        if([self.panoramic.media count] < 2)
+        if([self.panoramic.mediaArray count] < 2)
             self.slider.hidden = YES;
         else
             self.slider.hidden = NO;
@@ -199,21 +187,13 @@
 #pragma mark -
 #pragma mark Button Handlers
 
-- (IBAction)backButtonTouchAction: (id) sender{
-    NSLog(@"PanoVC: backButtonTouchAction");
-    
-	//Notify the server this item was displayed
-	[[AppServices sharedAppServices] updateServerPanoramicViewed:self.panoramic.panoramicId fromLocation:self.panoramic.locationId];
-	
-	//[self.view removeFromSuperview];
-    if([self.delegate isKindOfClass:[DialogViewController class]])
-        [self.navigationController popViewControllerAnimated:YES];
-    else{
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-    }
+- (IBAction)backButtonTouchAction:(id)sender
+{
+    [delegate displayObjectViewControllerWasDismissed:self];
 }
 
--(IBAction) sliderValueChanged: (id) sender{
+-(IBAction) sliderValueChanged:(id)sender
+{
     [self.slider setValue:roundf(self.slider.value) animated:YES];
     [self loadImageFromMedia: [self.panoramic.textureArray objectAtIndex: (int)self.slider.value-1]];
 }

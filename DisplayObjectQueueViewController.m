@@ -1,20 +1,20 @@
 //
-//  GameObjectDisplayViewController.m
+//  DisplayObjectQueueViewController.m
 //  ARIS
 //
 //  Created by Phil Dougherty on 3/1/13.
 //
 //
 
-#import "GameObjectDisplayViewController.h"
+#import "DisplayObjectQueueViewController.h"
 
-@interface GameObjectDisplayViewController ()
+@interface DisplayObjectQueueViewController ()
 
 @end
 
-@implementation GameObjectDisplayViewController
+@implementation DisplayObjectQueueViewController
 
-- (id)initWithRootViewController:(UIViewController *)d
+- (id)initWithDelegate:(UIViewController<DisplayObjectQueueDelegate> *)d
 {
     self = [super initWithNibName:nil bundle:nil];
     if (self)
@@ -38,20 +38,29 @@
     if(!currentlyDisplayedObject && !currentlyDisplayedObjectOrigin) [self dequeueDisplayPackage];
 }
 
-- (void)dequeueDisplayPackage
-{
+- (void) displayObjectViewControllerWasDismissed:(DisplayObjectViewController *)d
+{    
     [self.view removeFromSuperview];
-    if([displayQueue count] == 0) return;
+    [currentlyDisplayedObject       finishedDisplay];
+    [currentlyDisplayedObjectOrigin finishedDisplayingObject];
+    [delegate displayObject:currentlyDisplayedObject dismissedFrom:currentlyDisplayedObjectOrigin];
     
-    if(currentlyDisplayedObjectOrigin) [currentlyDisplayedObjectOrigin finishedDisplayingObject];
-        
+    currentlyDisplayedObject       = nil;
+    currentlyDisplayedObjectOrigin = nil;
+    if([displayQueue count] > 0) [self dequeueDisplayPackage];
+}
+
+- (void)dequeueDisplayPackage
+{        
     NSDictionary *displayPackage;
     displayPackage = [displayQueue objectAtIndex:0];
-    currentlyDisplayedObject       = [displayPackage objectForKey:@"object"];
-    currentlyDisplayedObjectOrigin = [displayPackage objectForKey:@"origin"];
-    currentlyDisplayedView         = [currentlyDisplayedObject getViewForDisplay];
+    currentlyDisplayedObject         = [displayPackage objectForKey:@"object"];
+    currentlyDisplayedObjectOrigin   = [displayPackage objectForKey:@"origin"];
+    currentlyDisplayedViewController = [currentlyDisplayedObject viewControllerForDisplay];
+    currentlyDisplayedViewController.delegate = self;
     
-    [self.view addSubview:currentlyDisplayedView];
+    [self.view addSubview:currentlyDisplayedViewController.view];
+    [currentlyDisplayedObject       wasDisplayed];
     [currentlyDisplayedObjectOrigin didDisplayObject];
     
     [displayQueue removeObjectAtIndex:0];

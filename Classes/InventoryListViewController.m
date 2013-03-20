@@ -264,11 +264,8 @@
 	Item *item = [inventory objectAtIndex: [indexPath row]];
 	
 	UILabel *lblTemp1 = (UILabel *)[cell viewWithTag:1];
-	lblTemp1.text = item.name;	
-    if (item.hasViewed == NO) 
-        lblTemp1.font = [UIFont boldSystemFontOfSize:18];
-    else 
-        lblTemp1.font = [UIFont systemFontOfSize:18];
+	lblTemp1.text = item.name;
+    lblTemp1.font = [UIFont systemFontOfSize:18];
     
     UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
     
@@ -374,15 +371,12 @@
     
 	[((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"swish" shouldVibrate:NO];
 	
-	ItemDetailsViewController *itemDetailsViewController = [[ItemDetailsViewController alloc] 
-															initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-	itemDetailsViewController.item = selectedItem;
-	itemDetailsViewController.navigationItem.title = selectedItem.name;
-	itemDetailsViewController.inInventory = YES;
-	itemDetailsViewController.hidesBottomBarWhenPushed = YES;
+	ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:selectedItem];
+	itemVC.inInventory = YES;
+	itemVC.hidesBottomBarWhenPushed = YES;
     
 	//Put the view on the screen
-	[[self navigationController] pushViewController:itemDetailsViewController animated:YES];
+	[[self navigationController] pushViewController:itemVC animated:YES];
 }
 
 #pragma mark Memory Management

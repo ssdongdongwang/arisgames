@@ -1,12 +1,15 @@
 //
-//  aris_conversationViewController.h
-//  aris-conversation
+//  NpcViewController.h
+//  ARIS
 //
 //  Created by Kevin Harris on 09/11/17.
 //  Copyright Studio Tectorum 2009. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVAudioPlayer.h>
+#import <AVFoundation/AVFoundation.h>
+#import "DisplayObjectViewController.h"
 #import "SceneParser.h"
 #import "AsyncMediaImageView.h"
 #import "Node.h"
@@ -14,7 +17,7 @@
 #import "Scene.h"
 #import "SceneParser.h"
 
-@interface DialogViewController : UIViewController <SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, AVAudioPlayerDelegate>
+@interface NpcViewController : DisplayObjectViewController <SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, AVAudioPlayerDelegate>
 {
 	IBOutlet AsyncMediaImageView *npcImage;
 	IBOutlet AsyncMediaImageView *pcImage;
@@ -102,6 +105,8 @@
 @property(nonatomic, strong) IBOutlet UIView *npcView;
 @property(nonatomic, strong) IBOutlet UIView *pcView;
 @property(nonatomic, strong) IBOutlet UIScrollView *npcVideoView;
+
+- (id)initWithNpc:(Npc *)n;
 
 - (IBAction)continueButtonTouchAction;
 - (IBAction)npcScrollerTouchAction;
