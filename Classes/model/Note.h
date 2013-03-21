@@ -32,6 +32,7 @@ extern NSString *const kNoteContentTypeText;
     int parentRating;
     int iconMediaId;
     NSString *username;
+    NSString *displayname;
     id __unsafe_unretained delegate;
     BOOL hasImage;
     BOOL hasAudio;
@@ -46,6 +47,7 @@ extern NSString *const kNoteContentTypeText;
 @property(nonatomic, strong) NSMutableArray *tags;
 @property(readwrite, assign) int tagSection;
 @property(nonatomic, strong) NSString *username;
+@property(nonatomic, strong) NSString *displayname;
 @property(nonatomic, strong) NSString *title;
 @property(nonatomic, strong) NSString *tagName;
 

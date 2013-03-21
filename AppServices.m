@@ -51,20 +51,20 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void) resetCurrentlyFetchingVars
 {
-    currentlyFetchingNearbyGamesList = NO;
-    currentlyFetchingSearchGamesList = NO;
-    currentlyFetchingPopularGamesList = NO;
-    currentlyFetchingRecentGamesList = NO;
-    currentlyFetchingInventory = NO;
-    currentlyFetchingLocationList = NO;
-    currentlyFetchingOverlayList = NO;
-    currentlyFetchingQuestList = NO;
-    currentlyFetchingGameNoteList = NO;
-    currentlyFetchingPlayerNoteList = NO;
+    currentlyFetchingNearbyGamesList           = NO;
+    currentlyFetchingSearchGamesList           = NO;
+    currentlyFetchingPopularGamesList          = NO;
+    currentlyFetchingRecentGamesList           = NO;
+    currentlyFetchingInventory                 = NO;
+    currentlyFetchingLocationList              = NO;
+    currentlyFetchingOverlayList               = NO;
+    currentlyFetchingQuestList                 = NO;
+    currentlyFetchingGameNoteList              = NO;
+    currentlyFetchingPlayerNoteList            = NO;
     currentlyUpdatingServerWithInventoryViewed = NO;
-    currentlyUpdatingServerWithMapViewed = NO;
-    currentlyUpdatingServerWithPlayerLocation = NO;
-    currentlyUpdatingServerWithQuestsViewed = NO;
+    currentlyUpdatingServerWithMapViewed       = NO;
+    currentlyUpdatingServerWithPlayerLocation  = NO;
+    currentlyUpdatingServerWithQuestsViewed    = NO;
 }
 
 #pragma mark Communication with Server
@@ -127,7 +127,8 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void) updatePlayer:(int)playerId withName:(NSString *)name andImage:(int)mid
 {
-    if(playerId != 0){
+    if(playerId != 0)
+    {
         NSLog(@"AppModel: Updating Player info: %@ %d", name, mid);
         
         //Call server service
@@ -143,9 +144,8 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
                                                                    andUserInfo:nil];
         [jsonConnection performAsynchronousRequestWithHandler:nil];
     }
-    else{
+    else
         NSLog(@"Tried updating non-existent player! (playerId = 0)");
-    }
 }
 
 -(void)resetAndEmailNewPassword:(NSString *)email
@@ -1739,9 +1739,10 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     aNote.creatorId     = [noteDictionary validIntForKey:@"owner_id"];
     aNote.latitude      = [noteDictionary validDoubleForKey:@"lat"];
     aNote.longitude     = [noteDictionary validDoubleForKey:@"lon"];
-    aNote.username      = [noteDictionary validObjectForKey:@"username"];
-    aNote.title         = [noteDictionary validObjectForKey:@"title"];
-    aNote.text          = [noteDictionary validObjectForKey:@"text"];
+    aNote.username      = [noteDictionary validStringForKey:@"username"];
+    aNote.displayname   = [noteDictionary validStringForKey:@"displayname"];
+    aNote.title         = [noteDictionary validStringForKey:@"title"];
+    aNote.text          = [noteDictionary validStringForKey:@"text"];
     
     NSArray *contents = [noteDictionary validObjectForKey:@"contents"];
     for (NSDictionary *content in contents)
