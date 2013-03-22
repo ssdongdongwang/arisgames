@@ -140,11 +140,10 @@
 -(void) finishLoadingResult:(NSNotification*) notification
 {	
 	NSObject *qrCodeObject = notification.object;
-	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[[RootViewController sharedRootViewController] removeWaitingIndicator];
     
 	if (qrCodeObject == nil) {
-		[appDelegate playAudioAlert:@"error" shouldVibrate:NO];
+		[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] playAudioAlert:@"error" shouldVibrate:NO];
 		
 		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerErrorTitleKey", @"")
 														message:NSLocalizedString(@"QRScannerErrorMessageKey", @"")
@@ -156,7 +155,7 @@
 	}
 	else if ([qrCodeObject isKindOfClass:[NSString class]])
     {
-        [appDelegate playAudioAlert:@"error" shouldVibrate:NO];
+        [(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] playAudioAlert:@"error" shouldVibrate:NO];
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QRScannerErrorTitleKey", @"")
                                                         message:(NSString *)qrCodeObject
@@ -167,8 +166,8 @@
     }
     else
     {
-		[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];		
-		[qrCodeObject display];
+		[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] playAudioAlert:@"swish" shouldVibrate:NO];
+        [[RootViewController sharedRootViewController] display:((Location *)qrCodeObject).object from:(Location *)qrCodeObject];
 	}
 }
 

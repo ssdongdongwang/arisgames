@@ -21,13 +21,13 @@
 	NSString *closing;
 }
 
-@property(readwrite, assign) int npcId;
-@property(readwrite, assign) int iconMediaId;
-@property(readwrite, assign) int mediaId;
-@property(copy, readwrite) NSString *name;
-@property(copy, readwrite) NSString *ndescription;
-@property(copy, readwrite) NSString *greeting;
-@property(copy, readwrite) NSString *closing;
+@property(nonatomic, assign) int npcId;
+@property(nonatomic, assign) int iconMediaId;
+@property(nonatomic, assign) int mediaId;
+@property(nonatomic, strong) NSString *name;
+@property(nonatomic, strong) NSString *ndescription;
+@property(nonatomic, strong) NSString *greeting;
+@property(nonatomic, strong) NSString *closing;
 
 - (BOOL) compareTo:(Npc *)other;
 - (Npc *) copy;

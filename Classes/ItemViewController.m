@@ -316,8 +316,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         
 		if (quantity > 0) 
         {
-			[[AppServices sharedAppServices] updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
-			[[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:-quantity forLocationId:self.item.locationId];
+			//[[AppServices sharedAppServices] updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
+			//[[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:-quantity forLocationId:self.item.locationId];
 			item.qty -= quantity; //the above line does not give us an update, only the map
         }
 	}
@@ -413,7 +413,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	ARISAppDelegate* appDelegate = (ARISAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate playAudioAlert:@"swish" shouldVibrate:NO];
 	
-	if(descriptionShowing) { [self hideView:self.itemDescriptionView]; descriptionShowing = NO; }
+	if(descriptionShowing) { [self hideView:self.itemDescriptionView]; descriptionShowing = NO;  }
     else                   { [self showView:self.itemDescriptionView]; descriptionShowing = YES; }
 }
 
@@ -421,18 +421,24 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
-    if(webView == self.itemWebView){
-    if ([[[request URL] absoluteString] hasPrefix:@"aris://closeMe"]) {
-        [self.navigationController popToRootViewControllerAnimated:YES];
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-        return NO; 
-    }  
-    else if ([[[request URL] absoluteString] hasPrefix:@"aris://refreshStuff"]) {
-        [[AppServices sharedAppServices] fetchAllPlayerLists];
-        return NO; 
-    }   
-    }else{
-        if(self.isLink && ![[[request URL]absoluteString] isEqualToString:@"about:blank"]) {
+    if(webView == self.itemWebView)
+    {
+        if([[[request URL] absoluteString] hasPrefix:@"aris://closeMe"])
+        {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+            //[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+            return NO;
+        }  
+        else if([[[request URL] absoluteString] hasPrefix:@"aris://refreshStuff"])
+        {
+            [[AppServices sharedAppServices] fetchAllPlayerLists];
+            return NO;
+        }
+    }
+    else
+    {
+        if(self.isLink && ![[[request URL]absoluteString] isEqualToString:@"about:blank"])
+        {
             WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
             WebPage *temp = [[WebPage alloc]init];
             temp.url = [[request URL]absoluteString];
@@ -476,6 +482,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 }
 
 #pragma mark Note functions
+
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
     if([self.textBox.text isEqualToString:@"Write note here..."])
@@ -491,7 +498,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 #pragma mark Memory Management
 
-- (void)dealloc {
+- (void)dealloc
+{
     NSLog(@"Item Details View: Dealloc");
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     itemDescriptionView.delegate = nil;

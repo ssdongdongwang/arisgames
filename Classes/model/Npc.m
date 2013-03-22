@@ -8,6 +8,7 @@
 
 #import "NpcViewController.h"
 #import "Npc.h"
+#import "AppServices.h"
 
 @implementation Npc
 
@@ -44,6 +45,17 @@
 - (DisplayObjectViewController *) viewControllerForDisplay
 {
 	return [[NpcViewController alloc] initWithNpc:self];
+}
+
+- (void) wasDisplayed
+{
+    
+}
+
+- (void) finishedDisplay
+{
+    [[AppServices sharedAppServices] updateServerNpcViewed:npcId fromLocation:nil];
+    //Phil should remove "fromLocation". The location get's its own chance to update server
 }
 
 - (BOOL) compareTo:(Npc *)other

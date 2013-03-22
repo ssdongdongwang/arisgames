@@ -20,12 +20,17 @@
 #import "AsyncMediaPlayerButton.h"
 
 @implementation NoteDetailsViewController
-@synthesize scrollView,pageControl, delegate,note,commentLabel,likeButton,likeLabel,commentButton;
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+
+@synthesize scrollView,pageControl,note,commentLabel,likeButton,likeLabel,commentButton;
+
+- (id)initWithNote:(Note *)n
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
+    self = [super initWithNibName:@"NoteDetailsViewController" bundle:nil];
+    
+    if(self)
+    {
+        self.note = n;
+        
         self.hidesBottomBarWhenPushed = YES;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -35,25 +40,24 @@
     }
     return self;
 }
+
 - (void)movieFinishedCallback:(NSNotification*) aNotification
 {
 	NSLog(@"NoteDetailsViewController: movieFinishedCallback");
 	[self dismissMoviePlayerViewControllerAnimated];
 }
+
 - (void)dealloc
 {
     NSLog(@"NoteDetailsVC: Dealloc");
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    //scrollView.delegate = nil;
 }
 
 - (void)didReceiveMemoryWarning
 {
-    // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    while([[self.scrollView subviews]count]>0)[[self.scrollView.subviews objectAtIndex:0]removeFromSuperview];
-    // Release any cached data, images, etc that aren't in use.
+    while([[self.scrollView subviews]count]>0)[[self.scrollView.subviews objectAtIndex:0] removeFromSuperview];
 }
 
 #pragma mark - View lifecycle
@@ -81,10 +85,8 @@
         UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"EditKey", @"") style:UIBarButtonItemStyleDone target:self action:@selector(editButtonTouched)];
         [self.navigationItem setRightBarButtonItem:editButton];
     }
-    if([self.delegate isKindOfClass:[Note class]]){
-        UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"BackButtonKey", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(backButtonTouch)];
-        [self.navigationItem setLeftBarButtonItem:backButton];
-    }
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"BackButtonKey", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(backButtonTouch)];
+    [self.navigationItem setLeftBarButtonItem:backButton];
     
     self.pageControl.currentPage = 0;
     if(![AppModel sharedAppModel].currentGame.allowNoteComments){
@@ -102,11 +104,15 @@
     }
     
 }
--(void)backButtonTouch{
+
+-(void)backButtonTouch
+{
     NSLog(@"NoteDetialsViewController: backButtonTouch");
-    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+    [delegate displayObjectViewControllerWasDismissed:self];
 }
--(void)editButtonTouched{
+
+-(void)editButtonTouched
+{
     NoteEditorViewController *noteVC = [[NoteEditorViewController alloc] initWithNibName:@"NoteEditorViewController" bundle:nil];
     noteVC.note = self.note;
     noteVC.delegate = self;
@@ -148,16 +154,8 @@
     }
 }
 
--(void)addUploadsToNote{
-    if(![self.delegate isKindOfClass:[Note class]])
-    {
-        Note *tnote = [[AppModel sharedAppModel] noteForNoteId: self.note.noteId playerListYesGameListNo:YES];
-        if(!tnote)
-            tnote = [[AppModel sharedAppModel] noteForNoteId: self.note.noteId playerListYesGameListNo:NO];
-        if(!tnote)
-            NSLog(@"this shouldn't happen");
-        self.note = note;
-    }
+-(void)addUploadsToNote
+{
     for(int x = [self.note.contents count]-1; x >= 0; x--){
         if(![[[self.note.contents objectAtIndex:x] getUploadState] isEqualToString:@"uploadStateDONE"])
             [self.note.contents removeObjectAtIndex:x];

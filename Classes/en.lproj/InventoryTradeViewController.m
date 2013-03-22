@@ -169,7 +169,6 @@
 - (void)goBackToInventory
 {
     [self.navigationController popToRootViewControllerAnimated:YES];
-    [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
     [[BumpClient sharedClient] disconnect];
 }
 

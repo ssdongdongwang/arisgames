@@ -12,7 +12,7 @@
 #import "DisplayObjectProtocol.h"
 #import "LocationObjectProtocol.h"
 
-@interface Location : NSObject <MKAnnotation>
+@interface Location : NSObject <MKAnnotation, DisplayOriginProtocol>
 {
     int locationId;
     NSObject<DisplayableObjectProtocol, LocationObjectProtocol> *object;

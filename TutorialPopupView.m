@@ -12,27 +12,28 @@
 
 @implementation TutorialPopupView
 
-@synthesize pointerXpos, title, message,type,associatedViewController ;
+@synthesize pointerXpos, title, message,type,associatedViewController;
 
 
-- (id)init{
+- (id)init
+{
     self = [super initWithFrame:CGRectMake(10.0, 290.0, 300.0, 140.0)];
-    if (self) {
+    if(self)
+    {
 		self.opaque = NO;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updatePointerPosition) name:@"TabBarItemsChanged" object:nil];
 	}
     return self;
 }
 
-
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
 	[self updatePointerPosition];
 	
 	CGFloat pointerLength = 20.0;
 	CGFloat pointerWidth = 20.0;
 	CGFloat textMargin = 10.0;
 	CGFloat titleHeight = 22.0;
-	
 	
 	CGRect titleRect = CGRectMake(CGRectGetMinX(self.bounds) + textMargin, CGRectGetMinY(titleRect) + textMargin, 
 								  CGRectGetMaxX(self.bounds) - 2*textMargin, titleHeight);
@@ -61,19 +62,19 @@
 	[self.message drawInRect:messageRect withFont: [UIFont systemFontOfSize:16] lineBreakMode:UILineBreakModeMiddleTruncation alignment:UITextAlignmentCenter];
 	CGContextAddPath(UIGraphicsGetCurrentContext(), popupPath);
 	CGContextStrokePath(UIGraphicsGetCurrentContext());
-	 
 }
 
--(void) updatePointerPosition{
+-(void) updatePointerPosition
+{
 	NSLog(@"TutorialPopupView: updatePointerPosition");
 	int tabIndex = [[RootViewController sharedRootViewController].gamePlayTabBarController.viewControllers indexOfObject:self.associatedViewController];
 	self.pointerXpos = 22.0 + tabIndex * self.superview.frame.size.width / 5;	
 	[self setNeedsDisplay];  
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
 
 @end

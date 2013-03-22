@@ -64,8 +64,8 @@
     //Find locations that are "nearby" from the list of all locations
     for(Location *location in [AppModel sharedAppModel].currentGame.locationsModel.currentLocations)
     {
-        if([[AppModel sharedAppModel].playerLocation distanceFromLocation:location.location] < location.error &&
-           (location.kind != NearbyObjectItem || location.qty != 0) && location.kind != NearbyObjectPlayer)
+        if([[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.errorRange &&
+           (![location.object.objectType isEqualToString:@"Item"] || ((Item *)location.object).qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
             [newNearbyLocationsList addObject:location];
     }
     
@@ -142,10 +142,12 @@
 	
 	Location *l = [self.nearbyLocationsList objectAtIndex:indexPath.row];
 	
-	if (l.kind == NearbyObjectItem && l.qty > 1) cell.title.text = [NSString stringWithFormat:@"%@ (x%d)",l.name,l.qty];
-	else cell.title.text = l.name;
+	if([l.object.objectType isEqualToString:@"Item"] && ((Item *)l.object).qty > 1)
+        cell.title.text = [NSString stringWithFormat:@"%@ (x%d)",l.name,l.qty];
+	else
+        cell.title.text = l.name;
 	
-	Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId: l.iconMediaId];
+	Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId:l.object.iconMediaId];
     [cell.iconView loadImageFromMedia:iconMedia];
     
 	return cell;
@@ -153,9 +155,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	Location<NearbyObjectProtocol> *l = [self.nearbyLocationsList objectAtIndex:indexPath.row];
-    l.delegate = self;
-	[l display];
+	Location *l = [self.nearbyLocationsList objectAtIndex:indexPath.row];
+    [[RootViewController sharedRootViewController] display:l.object from:l];
 }
 
 @end

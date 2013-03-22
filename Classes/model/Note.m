@@ -14,13 +14,34 @@
 #import "NearbyObjectsViewController.h"
 #import "NoteContent.h"
 
- NSString *const kNoteContentTypeAudio = @"AUDIO";
- NSString *const kNoteContentTypeVideo = @"VIDEO";
- NSString *const kNoteContentTypePhoto = @"PHOTO";
- NSString *const kNoteContentTypeText = @"TEXT";
+NSString *const kNoteContentTypeAudio = @"AUDIO";
+NSString *const kNoteContentTypeVideo = @"VIDEO";
+NSString *const kNoteContentTypePhoto = @"PHOTO";
+NSString *const kNoteContentTypeText = @"TEXT";
 
 @implementation Note
-@synthesize comments,contents, creatorId,noteId,parentNoteId,parentRating,shared,text,title,kind,numRatings,username,delegate,dropped,showOnMap,showOnList,userLiked,hasImage,hasAudio,tags,tagSection,tagName,latitude,longitude;
+
+@synthesize comments;
+@synthesize contents;
+@synthesize creatorId;
+@synthesize noteId;
+@synthesize parentNoteId;
+@synthesize parentRating;
+@synthesize shared,text;
+@synthesize title;
+@synthesize numRatings;
+@synthesize username;
+@synthesize delegate;
+@synthesize dropped;
+@synthesize showOnMap;
+@synthesize showOnList;
+@synthesize userLiked;
+@synthesize hasImage;
+@synthesize hasAudio;
+@synthesize tags;
+@synthesize tagSection;
+@synthesize latitude;
+@synthesize longitude;
 @synthesize displayname;
 
 - (Note *) init
@@ -36,34 +57,28 @@
     return self;	
 }
 
-
-
-- (void) display{
-	NSLog(@"WebPage: Display Self Requested");
-
-        //open up note viewer
-        NoteDetailsViewController *dataVC = [[NoteDetailsViewController alloc] initWithNibName:@"NoteDetailsViewController" bundle:nil];
-        dataVC.note = self;
-        dataVC.delegate = self;
-    [[RootViewController sharedRootViewController] displayNearbyObjectView:dataVC];
-
+- (DisplayObjectViewController *) viewControllerForDisplay
+{
+	return [[NoteDetailsViewController alloc] initWithNote:self];
 }
 
--(BOOL)isUploading{
-    for (int i = 0;i < [self.contents count]; i++) {
-        if ([[(NoteContent *)[self.contents objectAtIndex:i]type] isEqualToString:@"UPLOAD"]) {
-            return  YES;
-        }
+-(BOOL)isUploading
+{
+    for (int i = 0;i < [self.contents count]; i++)
+    {
+        if ([[(NoteContent *)[self.contents objectAtIndex:i]type] isEqualToString:@"UPLOAD"])
+            return YES;
     }
     return  NO;
 }
 
-
-- (NSString *) name {
+- (NSString *)name
+{
     return self.name;
 }
 
-- (int)	iconMediaId {
+- (int)iconMediaId
+{
     return 71; 
 }
 

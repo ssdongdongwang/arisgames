@@ -104,7 +104,7 @@
 	for (int i = 0; i < [newLocations count]; i++)
     {
         tmpLocation = (Location *)[newLocations objectAtIndex:i];
-		if (tmpLocation.locationId == locationId && tmpLocation.kind == NearbyObjectItem)
+		if (tmpLocation.locationId == locationId && [tmpLocation.object.objectType isEqualToString:@"Item"])
 			tmpLocation.qty += quantityModifier;
         if(tmpLocation.qty == 0) { [newLocations removeObjectAtIndex:i]; i--; }
 	}

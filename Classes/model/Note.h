@@ -17,57 +17,66 @@ extern NSString *const kNoteContentTypeText;
 
 @interface Note : NSObject <DisplayableObjectProtocol, LocationObjectProtocol>
 {
-    NSMutableArray *comments;
-    NSMutableArray *contents;
-    NSMutableArray *tags;
     int noteId;
     int creatorId;
-    NSString *title;
-    NSString *text;
-    int numRatings;
-    BOOL shared;
-    BOOL dropped;
-    BOOL showOnMap,showOnList,userLiked;
-    int parentNoteId;
-    int parentRating;
-    int iconMediaId;
     NSString *username;
     NSString *displayname;
-    id __unsafe_unretained delegate;
-    BOOL hasImage;
-    BOOL hasAudio;
-    NSString *tagName;
+    NSString *title;
+    NSString *text;
+    NSMutableArray *contents;
+    NSMutableArray *tags;
+    NSMutableArray *comments;
+    
+    int iconMediaId;
+    
+    int numRatings;
+    int parentNoteId;
+    int parentRating;
+
     double latitude;
     double longitude;
 
+    BOOL shared;
+    BOOL dropped;
+    BOOL showOnMap;
+    BOOL showOnList;
+    BOOL userLiked;
+    BOOL hasImage;
+    BOOL hasAudio;
+    
+    id __unsafe_unretained delegate;
 }
 
-@property(nonatomic, strong) NSMutableArray *comments;
-@property(nonatomic, strong) NSMutableArray *contents;
-@property(nonatomic, strong) NSMutableArray *tags;
-@property(readwrite, assign) int tagSection;
-@property(nonatomic, strong) NSString *username;
-@property(nonatomic, strong) NSString *displayname;
-@property(nonatomic, strong) NSString *title;
-@property(nonatomic, strong) NSString *tagName;
+@property (nonatomic, assign) int noteId;
+@property (nonatomic, assign) int creatorId;
+@property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *displayname;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *text;
+@property (nonatomic, strong) NSMutableArray *comments;
+@property (nonatomic, strong) NSMutableArray *contents;
+@property (nonatomic, strong) NSMutableArray *tags;
+@property (nonatomic, assign) int tagSection;
 
-@property(nonatomic, strong) NSString *text;
-@property(readwrite, assign) int noteId;
-@property(readwrite, assign) int creatorId;
-@property(readwrite, assign) int numRatings;
-@property(readwrite, assign) double latitude;
-@property(readwrite, assign) double longitude;
+@property (nonatomic, assign) int iconMediaId;
 
-@property(readwrite, assign) BOOL shared;
-@property(readwrite, assign) BOOL dropped;
-@property(readwrite, assign) BOOL showOnMap;
-@property(readwrite, assign) BOOL showOnList;
-@property(readwrite, assign) BOOL userLiked;
-@property(readwrite, assign) BOOL hasImage;
-@property(readwrite, assign) BOOL hasAudio;
-@property(readwrite, assign) int parentNoteId;
-@property(readwrite, assign) int parentRating;
-@property(nonatomic, unsafe_unretained) id delegate;
+@property (nonatomic, assign) int numRatings;
+@property (nonatomic, assign) int parentNoteId;
+@property (nonatomic, assign) int parentRating;
+
+@property (nonatomic, assign) double latitude;
+@property (nonatomic, assign) double longitude;
+
+@property (nonatomic, assign) BOOL shared;
+@property (nonatomic, assign) BOOL dropped;
+@property (nonatomic, assign) BOOL showOnMap;
+@property (nonatomic, assign) BOOL showOnList;
+@property (nonatomic, assign) BOOL userLiked;
+@property (nonatomic, assign) BOOL hasImage;
+@property (nonatomic, assign) BOOL hasAudio;
+
+@property (nonatomic, unsafe_unretained) id delegate;
 
 -(BOOL)isUploading;
+
 @end

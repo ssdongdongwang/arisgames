@@ -1693,34 +1693,31 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 -(Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary
 {
     Item *item = [[Item alloc] init];
-    item.itemId       = [itemDictionary validIntForKey:@"item_id"];
-    item.mediaId      = [itemDictionary validIntForKey:@"media_id"];
-    item.iconMediaId  = [itemDictionary validIntForKey:@"icon_media_id"];
-    item.maxQty       = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
-    item.weight       = [itemDictionary validIntForKey:@"weight"];
-    item.creatorId    = [itemDictionary validIntForKey:@"creator_player_id"];
-    item.url          = [itemDictionary validObjectForKey:@"url"];
-    item.type         = [itemDictionary validObjectForKey:@"type"];
-    item.name         = [itemDictionary validObjectForKey:@"name"];
-    item.idescription = [itemDictionary validObjectForKey:@"description"];
-    item.dropable     = [itemDictionary validBoolForKey:@"dropable"];
-    item.destroyable  = [itemDictionary validBoolForKey:@"destroyable"];
-    item.isAttribute  = [itemDictionary validBoolForKey:@"is_attribute"];
-    item.isTradeable  = [itemDictionary validBoolForKey:@"tradeable"];
+    item.itemId        = [itemDictionary validIntForKey:@"item_id"];
+    item.mediaId       = [itemDictionary validIntForKey:@"media_id"];
+    item.iconMediaId   = [itemDictionary validIntForKey:@"icon_media_id"];
+    item.maxQty        = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
+    item.weight        = [itemDictionary validIntForKey:@"weight"];
+    item.url           = [itemDictionary validObjectForKey:@"url"];
+    item.type          = [itemDictionary validObjectForKey:@"type"];
+    item.name          = [itemDictionary validObjectForKey:@"name"];
+    item.idescription  = [itemDictionary validObjectForKey:@"description"];
+    item.isDroppable   = [itemDictionary validBoolForKey:@"dropable"];
+    item.isDestroyable = [itemDictionary validBoolForKey:@"destroyable"];
+    item.isAttribute   = [itemDictionary validBoolForKey:@"is_attribute"];
+    item.isTradeable   = [itemDictionary validBoolForKey:@"tradeable"];
 	
     return item;
 }
+
 -(Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary
 {
     Node *node = [[Node alloc] init];
-    node.nodeId          = [nodeDictionary validIntForKey:@"node_id"];
-    node.mediaId         = [nodeDictionary validIntForKey:@"media_id"];
-    node.iconMediaId     = [nodeDictionary validIntForKey:@"icon_media_id"];
-    node.nodeIfCorrect   = [nodeDictionary validIntForKey:@"require_answer_correct_node_id"];
-    node.nodeIfIncorrect = [nodeDictionary validIntForKey:@"require_answer_incorrect_node_id"];
-    node.name            = [nodeDictionary validObjectForKey:@"title"];
-    node.text            = [nodeDictionary validObjectForKey:@"text"];
-    node.answerString    = [nodeDictionary validObjectForKey:@"require_answer_string"];
+    node.nodeId      = [nodeDictionary validIntForKey:@"node_id"];
+    node.mediaId     = [nodeDictionary validIntForKey:@"media_id"];
+    node.iconMediaId = [nodeDictionary validIntForKey:@"icon_media_id"];
+    node.name        = [nodeDictionary validObjectForKey:@"title"];
+    node.text        = [nodeDictionary validObjectForKey:@"text"];
 
     return node;
 }
@@ -1803,13 +1800,13 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 -(Npc *)parseNpcFromDictionary: (NSDictionary *)npcDictionary
 {
 	Npc *npc = [[Npc alloc] init];
-	npc.npcId       = [npcDictionary validIntForKey:@"npc_id"];
-    npc.mediaId     = [npcDictionary validIntForKey:@"media_id"];
-	npc.iconMediaId = [npcDictionary validIntForKey:@"icon_media_id"];
-	npc.name        = [npcDictionary validObjectForKey:@"name"];
-	npc.greeting    = [npcDictionary validObjectForKey:@"text"];
-	npc.description = [npcDictionary validObjectForKey:@"description"];
-    npc.closing     = [npcDictionary validStringForKey:@"closing"];
+	npc.npcId        = [npcDictionary validIntForKey:@"npc_id"];
+    npc.mediaId      = [npcDictionary validIntForKey:@"media_id"];
+	npc.iconMediaId  = [npcDictionary validIntForKey:@"icon_media_id"];
+	npc.name         = [npcDictionary validObjectForKey:@"name"];
+	npc.greeting     = [npcDictionary validObjectForKey:@"text"];
+	npc.ndescription = [npcDictionary validObjectForKey:@"description"];
+    npc.closing      = [npcDictionary validStringForKey:@"closing"];
     
 	return npc;
 }
@@ -1856,7 +1853,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
         [media addObject:pm];
     }
     
-    pan.media = [NSArray arrayWithArray: media];
+    pan.mediaArray = [NSArray arrayWithArray:media];
     
     return pan;
 }
@@ -1922,14 +1919,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     NSDictionary *conversationDictionary;
 	
     while ((conversationDictionary = [conversationOptionsEnumerator nextObject]))
-    {
-	//Make the Node Option and add it to the Npc
-	int optionNodeId = [conversationDictionary validIntForKey:@"node_id"];
-	NSString *text = [conversationDictionary validObjectForKey:@"text"];
-        BOOL hasViewed = [conversationDictionary validBoolForKey:@"has_viewed"];
-	NodeOption *option = [[NodeOption alloc] initWithText:text andNodeId: optionNodeId andHasViewed:hasViewed];
-	[conversationNodeOptions addObject:option];
-    }
+        [conversationNodeOptions addObject:conversationDictionary];
 	
     //return conversationNodeOptions;
     NSLog(@"NSNotification: ConversationNodeOptionsReady");
@@ -1944,11 +1934,11 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     
     if (jsonResult.data != [NSNull null])
     {
-	[AppModel sharedAppModel].loggedIn = YES;
-	[AppModel sharedAppModel].playerId = [((NSDictionary*)jsonResult.data) validIntForKey:@"player_id"];
-	[AppModel sharedAppModel].playerMediaId = [((NSDictionary*)jsonResult.data) validIntForKey:@"media_id"];
-        [AppModel sharedAppModel].userName = [((NSDictionary*)jsonResult.data) validObjectForKey:@"user_name"];
-        [AppModel sharedAppModel].displayName = [((NSDictionary*)jsonResult.data)  validObjectForKey:@"display_name"];
+        [AppModel sharedAppModel].loggedIn = YES;
+        [AppModel sharedAppModel].playerId      = [((NSDictionary*)jsonResult.data) validIntForKey:@"player_id"];
+        [AppModel sharedAppModel].playerMediaId = [((NSDictionary*)jsonResult.data) validIntForKey:@"media_id"];
+        [AppModel sharedAppModel].userName      = [((NSDictionary*)jsonResult.data) validObjectForKey:@"user_name"];
+        [AppModel sharedAppModel].displayName   = [((NSDictionary*)jsonResult.data) validObjectForKey:@"display_name"];
         [[AppServices sharedAppServices] setShowPlayerOnMap];
         [[AppModel sharedAppModel] saveUserDefaults];
         
@@ -2186,7 +2176,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(Location*)parseLocationFromDictionary: (NSDictionary*)locationDictionary
 {
-    Location *location = [[Location alloc] init];
+    return [[Location alloc] initFromDictionary:locationDictionary];
+    
+    /*
     location.locationId        = [locationDictionary validIntForKey:@"location_id"];
     location.objectId          = [locationDictionary validIntForKey:@"type_id"];
     location.qty               = [locationDictionary validIntForKey:@"item_qty"];
@@ -2198,9 +2190,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     location.showTitle         = [locationDictionary validBoolForKey:@"show_title"];
     location.wiggle            = [locationDictionary validBoolForKey:@"wiggle"];
     location.allowsQuickTravel = [locationDictionary validBoolForKey:@"allow_quick_travel"];
-    location.error             = [locationDictionary validIntForKey:@"error"];
-    if(location.error < 0) location.error = 9999999999;
-    location.location          = [[CLLocation alloc] initWithLatitude:[locationDictionary validDoubleForKey:@"latitude"]
+    location.errorRange        = [locationDictionary validIntForKey:@"error"];
+    if(location.errorRange < 0) location.errorRange = 9999999999;
+    location.latlon          = [[CLLocation alloc] initWithLatitude:[locationDictionary validDoubleForKey:@"latitude"]
                                                             longitude:[locationDictionary validDoubleForKey:@"longitude"]];
     
     NSNumber *num = [NSNumber numberWithInt:location.wiggle];
@@ -2216,6 +2208,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
         else                        location.allowsQuickTravel = NO;
     }
     return location;
+     */
 }
 
 -(void)parseSingleMediaFromJSON: (JSONResult *)jsonResult
@@ -2398,7 +2391,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	NSDictionary *itemDictionary;
 	while ((itemDictionary = [inventoryEnumerator nextObject]))
     {
-        Item *item = [[Item alloc] init];
+        Item *item = [self parseItemFromDictionary:itemDictionary];
+        /*
+         [[Item alloc] init];
         item.itemId       = [itemDictionary validIntForKey:@"item_id"];
         item.mediaId      = [itemDictionary validIntForKey:@"media_id"];
         item.iconMediaId  = [itemDictionary validIntForKey:@"icon_media_id"];
@@ -2415,6 +2410,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
         item.type         = [itemDictionary validObjectForKey:@"type"];
         item.name         = [itemDictionary validObjectForKey:@"name"];
         item.idescription = [itemDictionary validObjectForKey:@"description"];
+         */
 
         if(item.isAttribute)[tempAttributes addObject:item];
         else                [tempInventory  addObject:item];
@@ -2437,7 +2433,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     
 	NSObject *qrCodeObject;
     
-	if (jsonResult.data)
+	if(jsonResult.data)
     {
 		NSDictionary *qrCodeDictionary = (NSDictionary *)jsonResult.data;
         if(![qrCodeDictionary isKindOfClass:[NSString class]])

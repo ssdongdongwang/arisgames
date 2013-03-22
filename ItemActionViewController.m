@@ -69,8 +69,7 @@
 
 - (IBAction)backButtonTouchAction:(id)sender
 {
-	[[AppServices sharedAppServices] updateServerItemViewed:item.itemId fromLocation:item.locationId];	
-    [self.navigationController popViewControllerAnimated:YES];
+    [delegate dismissModalViewControllerAnimated:self];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -234,16 +233,15 @@
         
 		if (quantity > 0)
         {
-			[[AppServices sharedAppServices] updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
-			[[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:-quantity forLocationId:self.item.locationId];
+			//[[AppServices sharedAppServices] updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
+			//[[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:-quantity forLocationId:self.item.locationId];
 			item.qty -= quantity; //the above line does not give us an update, only the map
         }
 	}
 		
 	if (item.qty < 1)
     {
-		[self.navigationController popToRootViewControllerAnimated:YES];
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+        [[RootViewController sharedRootViewController] displayObject:self.item dismissedFrom:self];
 	}
 }
 

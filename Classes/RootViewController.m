@@ -362,7 +362,7 @@
 
     int nodeId = [AppModel sharedAppModel].currentGame.launchNodeId;
     if (nodeId && nodeId != 0 && [[AppModel sharedAppModel].currentGame.questsModel.currentCompletedQuests count] < 1)
-        [[[AppModel sharedAppModel] nodeForNodeId:nodeId] display];
+        [self display:[[AppModel sharedAppModel] nodeForNodeId:nodeId] from:nil];
     else
         [AppModel sharedAppModel].currentlyInteractingWithObject = NO;
 }
@@ -375,7 +375,7 @@
         [[AppModel sharedAppModel].currentGame.questsModel.currentCompletedQuests count] > 0)
     {
         NSLog(@"RootViewController: checkForIntroOrCompleteNodeDisplay: Displaying Complete Node");
-		[[[AppModel sharedAppModel] nodeForNodeId:nodeId] display];
+        [self display:[[AppModel sharedAppModel] nodeForNodeId:nodeId] from:nil];
 	}
 }
 
@@ -697,7 +697,7 @@
         
         Location *loc = [[AppModel sharedAppModel].currentGame.locationsModel locationForId:[data intValue]];
         if(loc != nil)
-            [loc.object display];
+            [self display:loc.object from:loc];
     }
     
     return;
@@ -716,7 +716,7 @@
         
         Location *loc = [[AppModel sharedAppModel].currentGame.locationsModel locationForId:[data intValue]];
         if(loc != nil)
-            [loc.object display];
+            [self display:loc.object from:loc];
     }
     
     return;
@@ -735,7 +735,7 @@
         
         Location *loc = [[AppModel sharedAppModel].currentGame.locationsModel locationForId:[data intValue]];
         if(loc != nil)
-            [loc.object display];
+            [self display:loc.object from:loc];
     }
     
     return;
@@ -754,7 +754,7 @@
         
         Location *loc = [[AppModel sharedAppModel].currentGame.locationsModel locationForId:[data intValue]];
         if(loc != nil)
-            [loc.object display];
+            [self display:loc.object from:loc];
     }
     
     return;

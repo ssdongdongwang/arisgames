@@ -37,6 +37,7 @@
 @property(nonatomic) bool isConnectedToBump;
 @property(nonatomic) bool loaded;
 
+- (id) initWithWebPage:(WebPage *)w;
 - (BOOL) webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)req navigationType:(UIWebViewNavigationType)navigationType;
 - (void) showWaitingIndicator;
 - (void) dismissWaitingIndicator;

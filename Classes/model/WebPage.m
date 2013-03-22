@@ -8,6 +8,7 @@
 
 #import "WebPage.h"
 #import "WebPageViewController.h"
+#import "AppServices.h"
 
 @implementation WebPage
 

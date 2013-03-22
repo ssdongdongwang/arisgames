@@ -64,6 +64,11 @@
     return self;
 }
 
+- (void) didDisplayObject
+{
+    
+}
+
 - (BOOL) compareTo:(Location *)other
 {
     return

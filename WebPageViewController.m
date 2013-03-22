@@ -19,6 +19,7 @@
 
 @implementation WebPageViewController
 @synthesize webView,webPage,activityIndicator,blackView, audioPlayers, bumpSendString, isConnectedToBump, loaded;
+
 - (id)initWithWebPage:(WebPage *)w
 {
     self = [super initWithNibName:@"WebPageViewController" bundle:nil];
@@ -178,13 +179,8 @@
     {
         NSLog(@"WebPageViewController: aris://closeMe/ called");
         [self.navigationController popToRootViewControllerAnimated:YES];
-        if(![[[RootViewController sharedRootViewController].nearbyObjectNavigationController.viewControllers objectAtIndex:0] isKindOfClass:[NpcViewController class]]){
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-        }
-        /*
-        [[RootViewController sharedRootViewController] dismissModalViewControllerAnimated:NO];
-        [self.webView stringByEvaluatingJavaScriptFromString: @"ARIS.isNotCurrentlyCalling();"];
-         */
+        if(![[[RootViewController sharedRootViewController].nearbyObjectNavigationController.viewControllers objectAtIndex:0] isKindOfClass:[NpcViewController class]])
+            [delegate displayObjectViewControllerWasDismissed:self];
         return NO; 
     }
     

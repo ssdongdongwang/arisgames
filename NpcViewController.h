@@ -17,7 +17,7 @@
 #import "Scene.h"
 #import "SceneParser.h"
 
-@interface NpcViewController : DisplayObjectViewController <SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, AVAudioPlayerDelegate>
+@interface NpcViewController : DisplayObjectViewController <SceneParserDelegate, AsyncMediaImageViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, AVAudioPlayerDelegate, DisplayOriginProtocol>
 {
 	IBOutlet AsyncMediaImageView *npcImage;
 	IBOutlet AsyncMediaImageView *pcImage;

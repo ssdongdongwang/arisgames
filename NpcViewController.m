@@ -74,7 +74,7 @@ NSString *const kDialogHtmlTemplate =
 {
     if ((self = [super initWithNibName:@"NpcViewController" bundle:nil]))
     {
-        self.npc = n;
+        self.currentNpc = n;
         lastPcId = 0;
         currentNode = nil;
         pcTitle = NSLocalizedString(@"DialogPlayerName",@"");
@@ -229,7 +229,7 @@ NSString *const kDialogHtmlTemplate =
 - (IBAction) backButtonTouchAction:(id)sender
 {
 	NSLog(@"NpcViewController: Notify server of NPC view and Dismiss view");
-	[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+    [delegate displayObjectViewControllerWasDismissed:self];
 }
 
 - (IBAction) continueButtonTouchAction
@@ -292,9 +292,6 @@ NSString *const kDialogHtmlTemplate =
 
 - (void)applyNPCWithGreeting
 {
-    //tell the server
-	[[AppServices sharedAppServices] updateServerNpcViewed:currentNpc.npcId fromLocation:currentNpc.locationId];
-    
     NSString *string1 = currentNpc.greeting;
     NSString *trimmedString = [string1 stringByReplacingOccurrencesOfString:@" " withString:@""]; //remove whitespace
     if([trimmedString length] == 0)[self continueScript]; //if no greeting entered then go to closing screen
@@ -414,8 +411,8 @@ NSString *const kDialogHtmlTemplate =
         //Check if this is a closing script or we are shutting down
         if(self.closingScriptPlaying==YES || (self.exitToTabVal != nil))
         {
-            [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-            [[AppServices sharedAppServices] updateServerNodeViewed:self.currentNode.nodeId fromLocation:self.currentNode.locationId];
+            [delegate displayObjectViewControllerWasDismissed:self];
+            [[AppServices sharedAppServices] updateServerNodeViewed:self.currentNode.nodeId fromLocation:nil];
         }
         
         //Check for exitToTab
@@ -435,38 +432,15 @@ NSString *const kDialogHtmlTemplate =
                 }
             }
             else if([cachedScene.exitToType isEqualToString:@"plaque"])
-            {
-                NodeViewController *nodeVC = [[NodeViewController alloc]initWithNibName:@"Node" bundle:[NSBundle mainBundle]];
-                nodeVC.node = [[AppModel sharedAppModel] nodeForNodeId:[cachedScene.exitToTabWithTitle intValue]];
-                [[RootViewController sharedRootViewController]displayNearbyObjectView:nodeVC];
-            }
+                [[RootViewController sharedRootViewController] display:[[AppModel sharedAppModel] nodeForNodeId:[cachedScene.exitToTabWithTitle intValue]] from:self];
             else if([cachedScene.exitToType isEqualToString:@"webpage"])
-            {
-                WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
-                webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:[cachedScene.exitToTabWithTitle intValue]];
-            //    webPageViewController.delegate = self; if it is the delegate, then it uses the wrong method to close, if there is a good reason for this to be here then put it back : Jacob Hanshaw 2/9/13
-                [[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
-            }
+                [[RootViewController sharedRootViewController] display:[[AppModel sharedAppModel] webPageForWebPageID:[cachedScene.exitToTabWithTitle intValue]] from:self];
             else if([cachedScene.exitToType isEqualToString:@"item"])
-            {
-                Item *i = [[AppModel sharedAppModel] itemForItemId:[cachedScene.exitToTabWithTitle intValue]]
-                i.qty = 1;
-                ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:i];
-                [[RootViewController sharedRootViewController] displayNearbyObjectView:itemVC];
-            }
+                [[RootViewController sharedRootViewController] display:[[AppModel sharedAppModel] itemForItemId:[cachedScene.exitToTabWithTitle intValue]] from:self];
             else if([cachedScene.exitToType isEqualToString:@"character"])
-            {
-                NpcViewController *npcVC = [[NpcViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle]];
-                [npcVC beginWithNPC:[[AppModel sharedAppModel] npcForNpcId:[cachedScene.exitToTabWithTitle intValue]]];
-                [[RootViewController sharedRootViewController] displayNearbyObjectView:npcVC];
-            }
+                [[RootViewController sharedRootViewController] display:[[AppModel sharedAppModel] npcForNpcId:[cachedScene.exitToTabWithTitle intValue]] from:self];
             else if([cachedScene.exitToType isEqualToString:@"panoramic"])
-            {
-                Panoramic *pano = [[AppModel sharedAppModel] panoramicForPanoramicId:[cachedScene.exitToTabWithTitle intValue]];
-                PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithNibName:@"PanoramicViewController" bundle: [NSBundle mainBundle]];    
-                panoramicViewController.panoramic = pano;
-                [[RootViewController sharedRootViewController] displayNearbyObjectView:panoramicViewController];
-            }
+                [[RootViewController sharedRootViewController] display:[[AppModel sharedAppModel] panoramicForPanoramicId:[cachedScene.exitToTabWithTitle intValue]] from:self];
         }
         else
         {
@@ -480,51 +454,11 @@ NSString *const kDialogHtmlTemplate =
 	NSLog(@"NpcViewController: Apply Player Options");
 	++scriptIndex;
 	
-	// Display the appropriate question for the PC
-	if ([currentNode.answerString length] > 0)
-    {
-        [self moveAllOutWithPostSelector:nil];
-        [self movePcIn];
-        
-        pcWebView.hidden = YES;
-        pcContinueButton.hidden = YES;
-        pcTableView.hidden = YES;
-		pcAnswerView.hidden = NO;
-        
-        cachedScrollView = pcImage;
-        [pcImageScrollView zoomToRect:[pcImage frame] animated:NO];
-        
-        self.title = pcTitle;
-	}
-	else
-    {
-		if (currentNode.numberOfOptions > 0)
-        {
-			//There are node options
-            NSLog(@"NpcViewController: Apply Player Options: Node Options Exist");
+    //No node options, load the conversations
+    NSLog(@"NpcViewController: Apply Player Options: Load Conversations");
 
-            [self moveAllOutWithPostSelector:nil];
-            [self movePcIn];
-            
-            pcWebView.hidden = YES;
-            pcContinueButton.hidden = YES;
-            pcTableView.hidden = YES;
-            
-            cachedScrollView = pcImage;
-            [pcImageScrollView zoomToRect:[pcImage frame] animated:NO];
-            
-            self.title = pcTitle;
-            [self finishApplyingPlayerOptions:currentNode.options];
-		}
-		else
-        {
-			//No node options, load the conversations
-            NSLog(@"NpcViewController: Apply Player Options: Load Conversations");
-
-            [[AppServices sharedAppServices] fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
-			[self showWaitingIndicatorForPlayerOptions];
-		}
-	}
+    [[AppServices sharedAppServices] fetchNpcConversations:currentNpc.npcId afterViewingNode:currentNode.nodeId];
+    [self showWaitingIndicatorForPlayerOptions];
 }
 
 - (void) optionsReceivedFromNotification:(NSNotification*)notification
@@ -980,28 +914,6 @@ NSString *const kDialogHtmlTemplate =
     [[AVAudioSession sharedInstance] setActive: NO error: nil];
 }
 
-#pragma mark Answer Checking
-- (BOOL) textFieldShouldReturn:(UITextField *)textField
-{
-	[pcAnswerView resignFirstResponder];
-	NSString *cookedResponse = [pcAnswerView.text lowercaseString];
-	NSString *cookedAnswer = [currentNode.answerString lowercaseString];
-	
-	NSInteger targetNode;
-	if ([cookedAnswer isEqualToString:cookedResponse]) targetNode = currentNode.nodeIfCorrect;
-    else                                               targetNode = currentNode.nodeIfIncorrect;
-		
-	Node *newNode = [[AppModel sharedAppModel] nodeForNodeId: targetNode];
-
-	// TODO: This might need to check for answer string
-    
-	currentNode = newNode;
-	
-	[parser parseText:newNode.text];
-	
-	return YES;
-}
-
 #pragma mark PC options table view
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -1024,11 +936,10 @@ NSString *const kDialogHtmlTemplate =
     
 	if (indexPath.section == 0)
     {
-		NodeOption *option = [optionList objectAtIndex:indexPath.row];
-        cell.textLabel.text = option.text;
+        cell.textLabel.text = [[optionList objectAtIndex:indexPath.row] objectForKey:@"text"];
         cell.textLabel.font = [UIFont boldSystemFontOfSize:kOptionsFontSize];
         [cell.textLabel setLineBreakMode:UILineBreakModeWordWrap];
-        if(option.hasViewed)
+        if([[optionList objectAtIndex:indexPath.row] objectForKey:@"has_viewed"])
         {
             cell.backgroundColor     = [UIColor colorWithRed:233.0/255.0 green:233.0/255.0 blue:233.0/255.0 alpha:1.0];
             cell.textLabel.textColor = [UIColor colorWithRed:100.0/255.0 green:129.0/255.0 blue:183.0/255.0 alpha:1.0];
@@ -1055,13 +966,11 @@ NSString *const kDialogHtmlTemplate =
 {
 	if (indexPath.section == 1) return 35;
 
-	NodeOption *option = [optionList objectAtIndex:indexPath.row];
-
 	CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 50;
     CGFloat maxHeight = 9999;
     CGSize maximumLabelSize = CGSizeMake(maxWidth,maxHeight);
 	
-    CGSize expectedLabelSize = [option.text sizeWithFont:[UIFont boldSystemFontOfSize:kOptionsFontSize] 
+    CGSize expectedLabelSize = [[[optionList objectAtIndex:indexPath.row] objectForKey:@"text"] sizeWithFont:[UIFont boldSystemFontOfSize:kOptionsFontSize] 
 									   constrainedToSize:maximumLabelSize lineBreakMode:UILineBreakModeWordWrap]; 
 	
 	return expectedLabelSize.height + 15;	
@@ -1075,11 +984,8 @@ NSString *const kDialogHtmlTemplate =
 		[self backButtonTouchAction:nil];
 		return;
 	}
-	
-	NodeOption *selectedOption = [optionList objectAtIndex:[indexPath row]];
-	NSLog(@"Going to node #%d for prompt '%@'", selectedOption.nodeId, selectedOption.text);
-		
-	Node *newNode = [[AppModel sharedAppModel] nodeForNodeId:selectedOption.nodeId];
+			
+	Node *newNode = [[AppModel sharedAppModel] nodeForNodeId:[[optionList objectAtIndex:indexPath.row] objectForKey:@"node_id"]];
 
 	currentNode = newNode;
     if(newNode.text.length == 0)
