@@ -65,7 +65,7 @@
     for(Location *location in [AppModel sharedAppModel].currentGame.locationsModel.currentLocations)
     {
         if([[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.errorRange &&
-           (![location.object.objectType isEqualToString:@"Item"] || ((Item *)location.object).qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
+           (![location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
             [newNearbyLocationsList addObject:location];
     }
     
@@ -142,7 +142,7 @@
 	
 	Location *l = [self.nearbyLocationsList objectAtIndex:indexPath.row];
 	
-	if([l.object.objectType isEqualToString:@"Item"] && ((Item *)l.object).qty > 1)
+	if([l.object.objectType isEqualToString:@"Item"] && l.qty > 1)
         cell.title.text = [NSString stringWithFormat:@"%@ (x%d)",l.name,l.qty];
 	else
         cell.title.text = l.name;

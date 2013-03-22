@@ -50,16 +50,16 @@
             titleRect = CGRectMake(0, 0, maxWidth, titleSize.height);
 
             NSString *subtitle;
-            if ([location.object.objectType isEqualToString:@"Item"] && ((Item *)location.object).qty > 1 && location.name != nil)
+            if ([location.object.objectType isEqualToString:@"Item"] && location.qty > 1 && location.name != nil)
             {
-                subtitle = [NSString stringWithFormat:@"x %d",((Item *)location.object).qty];
+                subtitle = [NSString stringWithFormat:@"x %d",location.qty];
                 subtitleRect = CGRectMake(0, titleRect.origin.y+titleRect.size.height, maxWidth, subtitleSize.height);
             }
             else
                 subtitleRect = CGRectMake(0,0,0,0);
             
             contentRect=CGRectUnion(titleRect, subtitleRect);
-            contentRect.size.width += ANNOTATION_PADDING*2;
+            contentRect.size.width  += ANNOTATION_PADDING*2;
             contentRect.size.height += ANNOTATION_PADDING*2;
             
             titleRect=CGRectOffset(titleRect, ANNOTATION_PADDING, ANNOTATION_PADDING);
@@ -89,7 +89,8 @@
         self.iconView.userInteractionEnabled = NO;
         
         //Only load the icon media if it is > 0, otherwise, lets load a default
-        if (location.object.iconMediaId != 0) {
+        if (location.object.iconMediaId != 0)
+        {
             Media *iconMedia = [[AppModel sharedAppModel] mediaForMediaId:location.object.iconMediaId];
             [self.iconView loadImageFromMedia:iconMedia];
         }

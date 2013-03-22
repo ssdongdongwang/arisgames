@@ -7,6 +7,13 @@
 //
 
 #import "InventoryTradeViewController.h"
+#import "AppModel.h"
+#import "AppServices.h"
+#import "ARISAppDelegate.h"
+#import "BumpClient.h"
+#import "Item.h"
+#import "InGameItem.h"
+#import "RoundedTableViewCell.h"
 
 @implementation InventoryTradeViewController
 
@@ -20,7 +27,9 @@
 
 - (void) configureBump
 {
-    if(!self.isConnectedToBump)[[RootViewController sharedRootViewController] showWaitingIndicator:@"Connecting to bump..." displayProgressBar:NO];
+    if(!self.isConnectedToBump)
+        [[RootViewController sharedRootViewController] showWaitingIndicator:@"Connecting to bump..." displayProgressBar:NO];
+    
     NSLog(@"ConfiguringBump");
     [BumpClient configureWithAPIKey:@"4ff1c7a0c2a84bb9938dafc3a1ac770c" andUserID:[[UIDevice currentDevice] name]];
     [[BumpClient sharedClient] connect];
@@ -78,8 +87,8 @@
                 for(int i = 0; i < [self.itemsToTrade count]; i++)
                 {
                     //Decrement qty of traded items
-                    Item *itemDelta = (Item *)[self.itemsToTrade objectAtIndex:i];
-                    [[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:itemDelta qtyToRemove:itemDelta.qty];
+                    InGameItem *itemDelta = (InGameItem *)[self.itemsToTrade objectAtIndex:i];
+                    [[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:itemDelta.item qtyToRemove:itemDelta.qty];
                 }
                 if(self.delegate) [self.delegate refresh];
                 [self goBackToInventory];
@@ -140,16 +149,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+
     NSArray *tempCopy = [AppModel sharedAppModel].currentGame.inventoryModel.currentInventory;
 	self.inventory = [[NSMutableArray alloc] init];
     for(int i = 0; i < [tempCopy count]; i++)
     {
-        if(((Item *)[tempCopy objectAtIndex:i]).isTradeable)
-            [self.inventory addObject:[((Item *)[tempCopy objectAtIndex:i]) copy]];
+        if(((InGameItem *)[tempCopy objectAtIndex:i]).item.isTradeable)
+            [self.inventory addObject:[((InGameItem *)[tempCopy objectAtIndex:i]) copy]];
     } 
-    NSMutableArray *itemsToTradeAlloc = [[NSMutableArray alloc] init];
-    self.itemsToTrade = itemsToTradeAlloc;
+    self.itemsToTrade = [[NSMutableArray alloc] init];
     [self.tradeTableView reloadData];
     
     //Create a close button
@@ -238,7 +246,6 @@
     return 2;
 }
 
-// returns the # of rows in each component..
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(section == 0) return [self.itemsToTrade count];
@@ -251,7 +258,6 @@
     return NSLocalizedString(@"InventoryViewTitleKey",@""); 
 }
 
-// Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {    
 	NSString *CellIdentifier = [NSString stringWithFormat: @"Cell%d%d",indexPath.section,indexPath.row];
@@ -261,37 +267,25 @@
         cell = [[RoundedTableViewCell alloc] initWithStyle:UITableViewCellSelectionStyleNone reuseIdentifier:CellIdentifier forFile:@"InventoryTradeViewController.m"];
     }
 
-    // Configure the cell.
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    // draw round top corners in first row
-    if(indexPath.row == 0){
+    if(indexPath.row == 0)
         [cell drawRoundTop];
-    }
-    // draw round corners in last row
-    if (indexPath.row == [tableView  numberOfRowsInSection:indexPath.section]-1) {
+    if (indexPath.row == [tableView  numberOfRowsInSection:indexPath.section]-1)
         [cell drawRoundBottom];
-    }
-    
-  //  cell.textLabel.backgroundColor = [UIColor clearColor]; 
-   // cell.detailTextLabel.backgroundColor = [UIColor clearColor]; 
-    
-   // cell.contentView.backgroundColor = [UIColor colorWithRed:233.0/255.0  
-     //                                                  green:233.0/255.0  
-       //                                                 blue:233.0/255.0  
-         //                                              alpha:1.0];  
-	Item *item;
+     
+	InGameItem *item;
 	if(indexPath.section == 0) item = [self.itemsToTrade objectAtIndex: [indexPath row]];
 	else item = [self.inventory objectAtIndex: [indexPath row]];
     
-	cell.lbl1.text = item.name;	
+	cell.lbl1.text = item.item.name;
     cell.lbl1.font = [UIFont boldSystemFontOfSize:18.0];
     [cell.lbl1 setNeedsDisplay];
-    cell.lbl2.text = item.idescription;
+    cell.lbl2.text = item.item.idescription;
     [cell.lbl2 setNeedsDisplay];
-    if(item.qty >1 && item.weight > 1)
-         cell.lbl4.text = [NSString stringWithFormat:@"%@: %d, %@: %d",NSLocalizedString(@"x", @""),item.qty,NSLocalizedString(@"WeightKey", @""),item.weight];
-    else if(item.weight > 1)
-        cell.lbl4.text = [NSString stringWithFormat:@"%@: %d",NSLocalizedString(@"WeightKey", @""),item.weight];
+    if(item.qty >1 && item.item.weight > 1)
+         cell.lbl4.text = [NSString stringWithFormat:@"%@: %d, %@: %d",NSLocalizedString(@"x", @""),item.qty,NSLocalizedString(@"WeightKey", @""),item.item.weight];
+    else if(item.item.weight > 1)
+        cell.lbl4.text = [NSString stringWithFormat:@"%@: %d",NSLocalizedString(@"WeightKey", @""),item.item.weight];
     else if(item.qty > 1)
         cell.lbl4.text = [NSString stringWithFormat:@"%@ %d",NSLocalizedString(@"x", @""),item.qty];
     else
@@ -299,26 +293,29 @@
     cell.iconView.hidden = NO;
     [cell.lbl4 setNeedsDisplay];
     Media *media;
-    if (item.mediaId != 0 && ![item.type isEqualToString:@"NOTE"]) {
+    if (item.item.mediaId != 0 && ![item.item.type isEqualToString:@"NOTE"]) {
         if([self.mediaCache count] > indexPath.row){
             media = [self.mediaCache objectAtIndex:indexPath.row];
         }
         else{
             
-            media = [[AppModel sharedAppModel] mediaForMediaId: item.mediaId];
+            media = [[AppModel sharedAppModel] mediaForMediaId:item.item.mediaId];
             if(media)
                 [self.mediaCache  addObject:media];
         }
 	}
     
-	if (item.iconMediaId != 0) {
+	if (item.item.iconMediaId != 0)
+    {
         Media *iconMedia;
-        if([self.iconCache count] < indexPath.row){
+        if([self.iconCache count] < indexPath.row)
+        {
             iconMedia = [self.iconCache objectAtIndex:indexPath.row];
             [cell.iconView updateViewWithNewImage:[UIImage imageWithData:iconMedia.image]];
         }
-        else{
-            iconMedia = [[AppModel sharedAppModel] mediaForMediaId: item.iconMediaId];
+        else
+        {
+            iconMedia = [[AppModel sharedAppModel] mediaForMediaId: item.item.iconMediaId];
             [self.iconCache  addObject:iconMedia];
             [cell.iconView loadImageFromMedia:iconMedia];
         }
@@ -349,50 +346,56 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {	
     
-    if(indexPath.section == 0){
-        Item *selectedItem = [self.itemsToTrade objectAtIndex:[indexPath row]];
-        if(((Item *)[self.itemsToTrade objectAtIndex:[indexPath row]]).qty > 1) ((Item *)[self.itemsToTrade objectAtIndex:[indexPath row]]).qty--;
+    if(indexPath.section == 0)
+    {
+        InGameItem *selectedItem = [self.itemsToTrade objectAtIndex:[indexPath row]];
+        if(((InGameItem *)[self.itemsToTrade objectAtIndex:[indexPath row]]).qty > 1)
+            ((InGameItem *)[self.itemsToTrade objectAtIndex:[indexPath row]]).qty--;
         else [self.itemsToTrade removeObjectAtIndex:[indexPath row]];
         
         NSUInteger result = [self.inventory indexOfObjectPassingTest:
                              ^ (id arrayItem, NSUInteger idx, BOOL *stop)
                              {   
-                                 if (((Item *)arrayItem).itemId == selectedItem.itemId) {
+                                 if (((InGameItem *)arrayItem).item.itemId == selectedItem.item.itemId) {
                                      return YES;
                                  }
                                  else
                                      return NO;
                              }];
         
-        if (result == NSNotFound){
-            Item *itemCopy = [selectedItem copy];
+        if (result == NSNotFound)
+        {
+            InGameItem *itemCopy = [selectedItem copy];
             itemCopy.qty = 1;
             [self.inventory addObject:itemCopy];
         }
-        else ((Item *)[self.inventory objectAtIndex:result]).qty++;
+        else ((InGameItem *)[self.inventory objectAtIndex:result]).qty++;
     }
     
-    else{
-        Item *selectedItem = [self.inventory objectAtIndex:[indexPath row]];
-        if(((Item *)[self.inventory objectAtIndex:[indexPath row]]).qty > 1) ((Item *)[self.inventory objectAtIndex:[indexPath row]]).qty--;
+    else
+    {
+        InGameItem *selectedItem = [self.inventory objectAtIndex:[indexPath row]];
+        if(((InGameItem *)[self.inventory objectAtIndex:[indexPath row]]).qty > 1)
+            ((InGameItem *)[self.inventory objectAtIndex:[indexPath row]]).qty--;
         else [self.inventory removeObjectAtIndex:[indexPath row]];
         
         NSUInteger result = [self.itemsToTrade indexOfObjectPassingTest:
                              ^ (id arrayItem, NSUInteger idx, BOOL *stop)
                              {   
-                                 if (((Item *)arrayItem).itemId == selectedItem.itemId) {
+                                 if (((InGameItem *)arrayItem).item.itemId == selectedItem.item.itemId) {
                                      return YES;
                                  }
                                  else
                                      return NO;
                              }];
         
-        if (result == NSNotFound){
-            Item *itemCopy = [selectedItem copy];
+        if (result == NSNotFound)
+        {
+            InGameItem *itemCopy = [selectedItem copy];
             itemCopy.qty = 1;
             [self.itemsToTrade addObject:itemCopy];
         }
-        else ((Item *)[self.itemsToTrade objectAtIndex:result]).qty++;
+        else ((InGameItem *)[self.itemsToTrade objectAtIndex:result]).qty++;
     }
     
     [self.tradeTableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange (0, 2)] withRowAnimation:UITableViewRowAnimationFade];
@@ -406,7 +409,7 @@
     NSString *giftsJSON = [NSString stringWithFormat:@"{\"gameId\":%d,\"playerId\":%d,\"items\":[",[AppModel sharedAppModel].currentGame.gameId, [AppModel sharedAppModel].playerId];
     for(int i = 0; i < itemsToTrade.count; i++)
     {
-        giftsJSON = [NSString stringWithFormat:@"%@{\"item_id\":%d,\"qtyDelta\":%d}",giftsJSON,((Item *)[itemsToTrade objectAtIndex:i]).itemId, ((Item *)[itemsToTrade objectAtIndex:i]).qty];
+        giftsJSON = [NSString stringWithFormat:@"%@{\"item_id\":%d,\"qtyDelta\":%d}",giftsJSON,((InGameItem *)[itemsToTrade objectAtIndex:i]).item.itemId, ((InGameItem *)[itemsToTrade objectAtIndex:i]).qty];
         if(i+1 < itemsToTrade.count)
             giftsJSON = [NSString stringWithFormat:@"%@,",giftsJSON];
     }
@@ -415,19 +418,23 @@
     return giftsJSON;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
--(BOOL)shouldAutorotate{
+-(BOOL)shouldAutorotate
+{
     return YES;
 }
 
--(NSInteger)supportedInterfaceOrientations{
+-(NSInteger)supportedInterfaceOrientations
+{
     NSInteger mask = 0;
     if ([self shouldAutorotateToInterfaceOrientation: UIInterfaceOrientationLandscapeLeft])
         mask |= UIInterfaceOrientationMaskLandscapeLeft;

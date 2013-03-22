@@ -26,7 +26,7 @@
 @synthesize wiggle;
 @synthesize deleteWhenViewed;
 
-- (Location *) initFromDictionary:(NSDictionary *)d
+- (id) initFromDictionary:(NSDictionary *)d
 {
     if(self = [super init])
     {
@@ -51,7 +51,7 @@
         if([type isEqualToString:@"Player"])     self.object = [[AppModel sharedAppModel] itemForItemId:          [d validIntForKey:@"type_id"]];
         if([type isEqualToString:@"WebPage"])    self.object = [[AppModel sharedAppModel] webPageForWebPageID:    [d validIntForKey:@"type_id"]];
         if([type isEqualToString:@"AugBubble"])  self.object = [[AppModel sharedAppModel] panoramicForPanoramicId:[d validIntForKey:@"type_id"]];
-        if([type isEqualToString:@"PlayerNote"]) self.object = [[AppModel sharedAppModel] itemForItemId:[d validIntForKey:@"type_id"]];
+        if([type isEqualToString:@"PlayerNote"])
         {
             self.object = [[AppModel sharedAppModel] noteForNoteId:[d validIntForKey:@"type_id"] playerListYesGameListNo:YES];
             if(!self.object)

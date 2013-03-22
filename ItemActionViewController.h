@@ -19,7 +19,7 @@
     IBOutlet UIPickerView *picker;
     ItemDetailsModeType mode;
     Item *item;
-    Item *itemInInventory;
+    InGameItem *itemInInventory;
     int numItems;
     int max;
     id delegate;
@@ -34,13 +34,12 @@
 @property(nonatomic) IBOutlet UIButton *backButton;
 @property(nonatomic) IBOutlet UIButton *actionButton;
 @property(nonatomic) Item *item;
-@property(nonatomic) Item *itemInInventory;
+@property(nonatomic) InGameItem *itemInInventory;
 
-@property(nonatomic)	id delegate;
+@property(nonatomic) id delegate;
 
-
--(void)doActionWithMode: (ItemDetailsModeType) itemMode quantity: (int) quantity;
-- (IBAction)backButtonTouchAction: (id) sender;
-- (IBAction)actionButtonTouchAction: (id) sender;
+- (void) doActionWithMode:(ItemDetailsModeType)itemMode quantity:(int)quantity;
+- (IBAction) backButtonTouchAction:(id)sender;
+- (IBAction) actionButtonTouchAction:(id)sender;
 
 @end

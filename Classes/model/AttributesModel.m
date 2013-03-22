@@ -45,13 +45,13 @@
     NSDictionary *attributeDeltaDict; //Could just be a struct for speed, but whatever
     
     //Gained Attributes
-    for (Item *newAttribute in attributes)
+    for (InGameItem *newAttribute in attributes)
     {
         BOOL match = NO;
         int delta = 0;
-        for (Item *existingAttribute in self.currentAttributes)
+        for (InGameItem *existingAttribute in self.currentAttributes)
         {
-            if (newAttribute.itemId == existingAttribute.itemId)
+            if (newAttribute.item.itemId == existingAttribute.item.itemId)
             {
                 match = YES;
                 delta = newAttribute.qty - existingAttribute.qty;
@@ -71,13 +71,13 @@
     }
     
     //Lost Attributes
-    for (Item *existingAttribute in self.currentAttributes)
+    for (InGameItem *existingAttribute in self.currentAttributes)
     {
         BOOL match = NO;
         int delta = 0;
-        for (Item *newAttribute in attributes)
+        for (InGameItem *newAttribute in attributes)
         {
-            if (newAttribute.itemId == existingAttribute.itemId)
+            if (newAttribute.item.itemId == existingAttribute.item.itemId)
             {
                 match = YES;
                 delta = existingAttribute.qty - newAttribute.qty;
@@ -128,11 +128,11 @@
     for(int i = 0; i < [self.currentAttributes count]; i++)
         [newAttributes addObject:[((Item *)[self.currentAttributes objectAtIndex:i]) copy]];
 
-    Item* tmpItem;
+    InGameItem* tmpItem;
     for(int i = 0; i < [newAttributes count]; i++)
     {
-        tmpItem = (Item *)[newAttributes objectAtIndex:i];
-        if(tmpItem.itemId == item.itemId)
+        tmpItem = (InGameItem *)[newAttributes objectAtIndex:i];
+        if(tmpItem.item.itemId == item.itemId)
         {
             tmpItem.qty -= qty;
             if(tmpItem.qty < 1) [newAttributes removeObjectAtIndex:i];
@@ -151,31 +151,32 @@
     for(int i = 0; i < [self.currentAttributes count]; i++)
         [newAttributes addObject:[((Item *)[self.currentAttributes objectAtIndex:i]) copy]];
     
-    Item* tmpItem;
+    InGameItem* tmpItem;
     for(int i = 0; i < [newAttributes count]; i++)
     {
-        tmpItem = (Item *)[newAttributes objectAtIndex:i];
-        if(tmpItem.itemId == item.itemId)
+        tmpItem = (InGameItem *)[newAttributes objectAtIndex:i];
+        if(tmpItem.item.itemId == item.itemId)
         {
             tmpItem.qty += qty;
-            if(tmpItem.qty > tmpItem.maxQty) tmpItem.qty = tmpItem.maxQty;
+            if(tmpItem.qty > tmpItem.item.maxQty) tmpItem.qty = tmpItem.item.maxQty;
             
             [self updateAttributes:newAttributes];
             return tmpItem.qty;
         }
     }
     
-    item.qty = qty;
-    if(item.qty > item.maxQty) item.qty = item.maxQty;
-    [newAttributes addObject:item];
+    tmpItem = [[InGameItem alloc] initWithItem:item qty:qty];
+    if(tmpItem.qty > tmpItem.item.maxQty) tmpItem.qty = tmpItem.item.maxQty;
+
+    [newAttributes addObject:tmpItem];
     [self updateAttributes:newAttributes];
-    return item.qty;
+    return tmpItem.qty;
 }
 
--(Item *)attributesItemForId:(int)itemId
+-(InGameItem *)attributesItemForId:(int)itemId
 {
     for(int i = 0; i < [currentAttributes count]; i++)
-        if(((Item *)[currentAttributes objectAtIndex:i]).itemId == itemId) return [currentAttributes objectAtIndex:i];
+        if(((InGameItem *)[currentAttributes objectAtIndex:i]).item.itemId == itemId) return [currentAttributes objectAtIndex:i];
     return nil;
 }
 

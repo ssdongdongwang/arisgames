@@ -120,7 +120,7 @@
 -(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
 {
     if(self.mode == kItemDetailsPickingUp)
-        return (item.qty + 1);
+        return (itemInInventory.qty + 1);
     else 
         self.itemInInventory = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:item.itemId];
     return (itemInInventory.qty + 1);
@@ -235,13 +235,13 @@
         {
 			//[[AppServices sharedAppServices] updateServerPickupItem:self.item.itemId fromLocation:self.item.locationId qty:quantity];
 			//[[AppModel sharedAppModel].currentGame.locationsModel modifyQuantity:-quantity forLocationId:self.item.locationId];
-			item.qty -= quantity; //the above line does not give us an update, only the map
+			itemInInventory.qty -= quantity; //the above line does not give us an update, only the map
         }
 	}
 		
-	if (item.qty < 1)
+	if (itemInInventory.qty < 1)
     {
-        [[RootViewController sharedRootViewController] displayObject:self.item dismissedFrom:self];
+        [[RootViewController sharedRootViewController] displayObject:self.item dismissedFrom:nil];
 	}
 }
 

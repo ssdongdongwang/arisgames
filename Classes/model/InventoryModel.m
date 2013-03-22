@@ -34,7 +34,7 @@
 {
     [self updateInventory:[[NSArray alloc] init]];
     currentWeight = 0;
-    weightCap = 0;
+    weightCap     = 0;
 }
 
 -(void)latestPlayerInventoryReceived:(NSNotification *)notification
@@ -49,13 +49,13 @@
     NSDictionary   *itemDeltaDict; //{"item":item,"delta":delta}
 
     //Gained Items
-    for(Item *newItem in inventory)
+    for(InGameItem *newItem in inventory)
     {
         BOOL match = NO;
         int delta = 0;
-        for (Item *existingItem in self.currentInventory)
+        for (InGameItem *existingItem in self.currentInventory)
         {
-            if (newItem.itemId == existingItem.itemId)
+            if (newItem.item.itemId == existingItem.item.itemId)
             {
                 match = YES;
                 delta = newItem.qty - existingItem.qty;
@@ -75,13 +75,13 @@
     }
     
     //Lost Items
-    for (Item *existingItem in self.currentInventory)
+    for (InGameItem *existingItem in self.currentInventory)
     {
         BOOL match = NO;
         int delta = 0;
-        for (Item *newItem in inventory)
+        for (InGameItem *newItem in inventory)
         {
-            if (newItem.itemId == existingItem.itemId)
+            if (newItem.item.itemId == existingItem.item.itemId)
             {
                 match = YES;
                 delta = existingItem.qty - newItem.qty;
@@ -104,8 +104,8 @@
     }
     
     self.currentWeight = 0;
-    for (Item *item in inventory)
-        self.currentWeight += item.weight*item.qty;
+    for (InGameItem *item in inventory)
+        self.currentWeight += item.item.weight*item.qty;
     
     self.currentInventory = inventory;
     
@@ -131,16 +131,15 @@
 
 -(int)removeItemFromInventory:(Item*)item qtyToRemove:(int)qty
 {
-	NSLog(@"InventoryModel: removing an item from the local inventory");
     NSMutableArray *newInventory = [[NSMutableArray alloc] initWithCapacity:[self.currentInventory count]];
     for(int i = 0; i < [self.currentInventory count]; i++)
-        [newInventory addObject:[((Item *)[self.currentInventory objectAtIndex:i]) copy]];
+        [newInventory addObject:[((InGameItem *)[self.currentInventory objectAtIndex:i]) copy]];
         
-    Item* tmpItem;
+    InGameItem* tmpItem;
     for(int i = 0; i < [newInventory count]; i++)
     {
-        tmpItem = (Item *)[newInventory objectAtIndex:i];
-        if(tmpItem.itemId == item.itemId)
+        tmpItem = (InGameItem *)[newInventory objectAtIndex:i];
+        if(tmpItem.item.itemId == item.itemId)
         {
             tmpItem.qty -= qty;
             if(tmpItem.qty < 1) [newInventory removeObjectAtIndex:i];
@@ -154,36 +153,36 @@
 
 -(int)addItemToInventory:(Item*)item qtyToAdd:(int)qty
 {
-	NSLog(@"InventoryModel: removing an item from the local inventory");
     NSMutableArray *newInventory = [[NSMutableArray alloc] initWithCapacity:[self.currentInventory count]];
     for(int i = 0; i < [self.currentInventory count]; i++)
-        [newInventory addObject:[((Item *)[self.currentInventory objectAtIndex:i]) copy]];
+        [newInventory addObject:[((InGameItem *)[self.currentInventory objectAtIndex:i]) copy]];
     
-    Item* tmpItem;
+    InGameItem* tmpItem;
     for(int i = 0; i < [newInventory count]; i++)
     {
-        tmpItem = (Item *)[newInventory objectAtIndex:i];
-        if(tmpItem.itemId == item.itemId)
+        tmpItem = (InGameItem *)[newInventory objectAtIndex:i];
+        if(tmpItem.item.itemId == item.itemId)
         {
             tmpItem.qty += qty;
-            if(tmpItem.qty > tmpItem.maxQty) tmpItem.qty = tmpItem.maxQty;
+            if(tmpItem.qty > tmpItem.item.maxQty) tmpItem.qty = tmpItem.item.maxQty;
             
             [self updateInventory:newInventory];
             return tmpItem.qty;
         }
     }
     
-    item.qty = qty;
-    if(item.qty > item.maxQty) item.qty = item.maxQty;
-    [newInventory addObject:item];
+    tmpItem = [[InGameItem alloc] initWithItem:item qty:qty];
+    if(tmpItem.qty > tmpItem.item.maxQty) tmpItem.qty = tmpItem.item.maxQty;
+
+    [newInventory addObject:tmpItem];
     [self updateInventory:newInventory];
-    return item.qty;
+    return tmpItem.qty;
 }
 
--(Item *)inventoryItemForId:(int)itemId
+-(InGameItem *) inventoryItemForId:(int)itemId
 {
     for(int i = 0; i < [currentInventory count]; i++)
-        if(((Item *)[currentInventory objectAtIndex:i]).itemId == itemId) return [currentInventory objectAtIndex:i];
+        if(((InGameItem *)[currentInventory objectAtIndex:i]).item.itemId == itemId) return [currentInventory objectAtIndex:i];
     return nil;
 }
 

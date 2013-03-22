@@ -41,7 +41,7 @@
 @property (nonatomic, assign) bool wiggle;
 @property (nonatomic, assign) bool deleteWhenViewed;
 
-- (Location *) initFromDictionary:(NSDictionary *)d;
+- (id) initFromDictionary:(NSDictionary *)d;
 - (BOOL) compareTo:(Location *)other;
 - (Location *) copy;
 

@@ -9,13 +9,13 @@
 #import "Item.h"
 #import "ItemViewController.h"
 #import "AppServices.h"
+#import "NSDictionary+ValidParsers.h"
 
 @implementation Item
 
 @synthesize itemId;
 @synthesize iconMediaId;
 @synthesize mediaId;
-@synthesize qty;
 @synthesize maxQty;
 @synthesize weight;
 @synthesize isAttribute;
@@ -26,6 +26,27 @@
 @synthesize idescription;
 @synthesize url;
 @synthesize type;
+
+- (id) initFromDictionary:(NSDictionary *)d
+{
+    if(self = [super init])
+    {
+        self.itemId        = [d validIntForKey:@"item_id"];
+        self.mediaId       = [d validIntForKey:@"media_id"];
+        self.iconMediaId   = [d validIntForKey:@"icon_media_id"];
+        self.maxQty        = [d validIntForKey:@"max_qty_in_inventory"];
+        self.weight        = [d validIntForKey:@"weight"];
+        self.url           = [d validObjectForKey:@"url"];
+        self.type          = [d validObjectForKey:@"type"];
+        self.name          = [d validObjectForKey:@"name"];
+        self.idescription  = [d validObjectForKey:@"description"];
+        self.isDroppable   = [d validBoolForKey:@"dropable"];
+        self.isDestroyable = [d validBoolForKey:@"destroyable"];
+        self.isAttribute   = [d validBoolForKey:@"is_attribute"];
+        self.isTradeable   = [d validBoolForKey:@"tradeable"];
+    }
+    return self;
+}
 
 - (int) objectId
 {
@@ -78,7 +99,6 @@
     c.itemId        = self.itemId;
     c.iconMediaId   = self.iconMediaId;
     c.mediaId       = self.mediaId;
-    c.qty           = self.qty;
     c.maxQty        = self.maxQty;
     c.weight        = self.weight;
     c.isAttribute   = self.isAttribute;
@@ -94,7 +114,7 @@
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"Item- Id:%d\tName:%@\tAttribute:%d\tQty:%d",self.itemId,self.name,self.isAttribute,self.qty];
+    return [NSString stringWithFormat:@"Item- Id:%d\tName:%@\tAttribute:%d",self.itemId,self.name,self.isAttribute];
 }
 
 @end

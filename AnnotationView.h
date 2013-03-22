@@ -21,7 +21,6 @@
 #define IMAGE_HEIGHT 30
 #define IMAGE_WIDTH 30
 
-
 @interface AnnotationView : MKAnnotationView
 {
 	CGRect titleRect;

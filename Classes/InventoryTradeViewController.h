@@ -7,14 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppModel.h"
-#import "AppServices.h"
-#import "ARISAppDelegate.h"
-#import "BumpClient.h"
-#import "Item.h"
-#import "RoundedTableViewCell.h"
 
-@interface InventoryTradeViewController : UIViewController {
+@interface InventoryTradeViewController : UIViewController
+{
 	UITableView *tradeTableView;
 	NSMutableArray *inventory;
     NSMutableArray *itemsToTrade;
@@ -33,4 +28,5 @@
 @property(nonatomic) id delegate;
 
 - (NSString *)generateTransactionJSON;
+
 @end

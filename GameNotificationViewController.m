@@ -217,17 +217,17 @@
     for(int i = 0; i < [receivedItems count]; i++)
     {
         NSDictionary *receivedItemDict = [receivedItems objectAtIndex:i];
-        Item *receivedItem = [receivedItemDict objectForKey:@"item"];
+        InGameItem *receivedItem = [receivedItemDict objectForKey:@"item"];
         int qty = [((NSNumber *)[receivedItemDict objectForKey:@"delta"]) intValue];
         
         NSString *notifString;
-        if(receivedItem.maxQty == 1)
-            notifString = [NSString stringWithFormat:@"%@ %@", receivedItem.name, NSLocalizedString(@"ReceivedNotifKey", nil)];
+        if(receivedItem.item.maxQty == 1)
+            notifString = [NSString stringWithFormat:@"%@ %@", receivedItem.item.name, NSLocalizedString(@"ReceivedNotifKey", nil)];
         else
-            notifString = [NSString stringWithFormat:@"+%d %@ : %d %@",  qty, receivedItem.name, receivedItem.qty, NSLocalizedString(@"TotalNotifKey", nil)];
+            notifString = [NSString stringWithFormat:@"+%d %@ : %d %@",  qty, receivedItem.item.name, receivedItem.qty, NSLocalizedString(@"TotalNotifKey", nil)];
         
         [((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
-        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:receivedItem.name];
+        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:receivedItem.item.name];
         
         NSLog(@"NSNotification: NewlyChangedItemsGameNotificationSent");
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewlyChangedItemsGameNotificationSent" object:self]];
@@ -241,17 +241,17 @@
     for(int i = 0; i < [lostItems count]; i++)
     {
         NSDictionary *lostItemDict = [lostItems objectAtIndex:i];
-        Item *lostItem = [lostItemDict objectForKey:@"item"];
+        InGameItem *lostItem = [lostItemDict objectForKey:@"item"];
         int qty = [((NSNumber *)[lostItemDict objectForKey:@"delta"]) intValue];
         
         NSString *notifString;
-        if(lostItem.maxQty == 1)
-            notifString = [NSString stringWithFormat:@"%@ %@", lostItem.name, NSLocalizedString(@"LostNotifKey", nil)];
+        if(lostItem.item.maxQty == 1)
+            notifString = [NSString stringWithFormat:@"%@ %@", lostItem.item.name, NSLocalizedString(@"LostNotifKey", nil)];
         else
-            notifString = [NSString stringWithFormat:@"-%d %@ : %d %@",  qty, lostItem.name, lostItem.qty, NSLocalizedString(@"LeftNotifKey", nil)];
+            notifString = [NSString stringWithFormat:@"-%d %@ : %d %@",  qty, lostItem.item.name, lostItem.qty, NSLocalizedString(@"LeftNotifKey", nil)];
         
         [((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
-        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:lostItem.name];
+        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:lostItem.item.name];
         
         NSLog(@"NSNotification: NewlyChangedItemsGameNotificationSent");
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewlyChangedItemsGameNotificationSent" object:self]];
@@ -265,17 +265,17 @@
     for(int i = 0; i < [receivedAttributes count]; i++)
     {
         NSDictionary *receivedAttributeDict = [receivedAttributes objectAtIndex:i];
-        Item *receivedAttribute = [receivedAttributeDict objectForKey:@"attribute"];
+        InGameItem *receivedAttribute = [receivedAttributeDict objectForKey:@"attribute"];
         int qty = [((NSNumber *)[receivedAttributeDict objectForKey:@"delta"]) intValue];
         
         NSString *notifString;
-        if(receivedAttribute.maxQty == 1)
-            notifString = [NSString stringWithFormat:@"%@ %@", receivedAttribute.name, NSLocalizedString(@"ReceivedNotifKey", nil)];
+        if(receivedAttribute.item.maxQty == 1)
+            notifString = [NSString stringWithFormat:@"%@ %@", receivedAttribute.item.name, NSLocalizedString(@"ReceivedNotifKey", nil)];
         else
-            notifString = [NSString stringWithFormat:@"+%d %@ : %d %@",  qty, receivedAttribute.name, receivedAttribute.qty, NSLocalizedString(@"TotalNotifKey", nil)];
+            notifString = [NSString stringWithFormat:@"+%d %@ : %d %@",  qty, receivedAttribute.item.name, receivedAttribute.qty, NSLocalizedString(@"TotalNotifKey", nil)];
         
         [((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
-        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:receivedAttribute.name];
+        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:receivedAttribute.item.name];
 
         NSLog(@"NSNotification: NewlyChangedAttributesGameNotificationSent");
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewlyChangedAttributesGameNotificationSent" object:self]];
@@ -290,17 +290,17 @@
     for(int i = 0; i < [lostAttributes count]; i++)
     {
         NSDictionary *lostAttributeDict = [lostAttributes objectAtIndex:i];
-        Item *lostAttribute = [lostAttributeDict objectForKey:@"attribute"];
+        InGameItem *lostAttribute = [lostAttributeDict objectForKey:@"attribute"];
         int qty = [((NSNumber *)[lostAttributeDict objectForKey:@"delta"]) intValue];
 
         NSString *notifString;
-        if(lostAttribute.maxQty == 1)
-            notifString = [NSString stringWithFormat:@"%@ %@", lostAttribute.name, NSLocalizedString(@"LostNotifKey", nil)];
+        if(lostAttribute.item.maxQty == 1)
+            notifString = [NSString stringWithFormat:@"%@ %@", lostAttribute.item.name, NSLocalizedString(@"LostNotifKey", nil)];
         else
-            notifString = [NSString stringWithFormat:@"-%d %@ : %d %@",  qty, lostAttribute.name, lostAttribute.qty, NSLocalizedString(@"LeftNotifKey", nil)];
+            notifString = [NSString stringWithFormat:@"-%d %@ : %d %@",  qty, lostAttribute.item.name, lostAttribute.qty, NSLocalizedString(@"LeftNotifKey", nil)];
         
         [((ARISAppDelegate *)[[UIApplication sharedApplication] delegate]) playAudioAlert:@"inventoryChange" shouldVibrate:YES];
-        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:lostAttribute.name];
+        [self enqueueDropDownNotificationWithFullString:notifString andBoldedString:lostAttribute.item.name];
         
         NSLog(@"NSNotification: NewlyChangedAttributesGameNotificationSent");
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewlyChangedAttributesGameNotificationSent" object:self]];

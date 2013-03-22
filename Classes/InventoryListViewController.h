@@ -26,20 +26,20 @@
     NSMutableDictionary *mediaCache;
 }
 
-@property(nonatomic) IBOutlet UIProgressView *capBar;
-@property(nonatomic) IBOutlet UILabel *capLabel;
-@property(nonatomic) IBOutlet UITableView *inventoryTable;
-@property(nonatomic) IBOutlet UIBarButtonItem *tradeButton;
-@property(nonatomic) NSArray *inventory;
+@property (nonatomic) IBOutlet UIProgressView *capBar;
+@property (nonatomic) IBOutlet UILabel *capLabel;
+@property (nonatomic) IBOutlet UITableView *inventoryTable;
+@property (nonatomic) IBOutlet UIBarButtonItem *tradeButton;
+@property (nonatomic) NSArray *inventory;
 
-@property(nonatomic) NSMutableDictionary *iconCache;
-@property(nonatomic) NSMutableDictionary *mediaCache;
+@property (nonatomic) NSMutableDictionary *iconCache;
+@property (nonatomic) NSMutableDictionary *mediaCache;
 
 - (void) refresh;
-- (unsigned int) indexOf:(char) searchChar inString:(NSString *)searchString;
-- (void)showLoadingIndicator;
-- (void)dismissTutorial;
-- (void)refreshViewFromModel;
--(NSString *) stringByStrippingHTML:(NSString *)stringToStrip;
+- (unsigned int) indexOf:(char)searchChar inString:(NSString *)searchString;
+- (void) showLoadingIndicator;
+- (void) dismissTutorial;
+- (void) refreshViewFromModel;
+- (NSString *) stringByStrippingHTML:(NSString *)stringToStrip;
 
 @end

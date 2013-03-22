@@ -15,7 +15,6 @@
 	int itemId;
     int iconMediaId;
 	int mediaId;
-	int qty;
 	int maxQty;
     int weight;
     BOOL isAttribute;
@@ -31,7 +30,6 @@
 @property (nonatomic, assign) int itemId;
 @property (nonatomic, assign) int iconMediaId;
 @property (nonatomic, assign) int mediaId;
-@property (nonatomic, assign) int qty;
 @property (nonatomic, assign) int maxQty;
 @property (nonatomic, assign) int weight;
 @property (nonatomic, assign) BOOL isAttribute;
@@ -43,6 +41,7 @@
 @property (nonatomic, strong) NSString *url;
 @property (nonatomic, strong) NSString *type;
 
+- (id) initFromDictionary:(NSDictionary *)d;
 - (BOOL) compareTo:(Item *)other;
 - (Item *) copy;
 

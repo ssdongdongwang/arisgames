@@ -388,7 +388,6 @@ NSString *const kDialogHtmlTemplate =
         else if(currentScene.itemId != 0)
         {
             Item *i = [[AppModel sharedAppModel] itemForItemId:currentScene.itemId];
-            i.qty = 1;
             ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:i];
             [self.navigationController pushViewController:itemVC animated:YES];
             itemVC.delegate = self;
@@ -789,7 +788,8 @@ NSString *const kDialogHtmlTemplate =
 
 - (int) getQtyInInventoryOfItem:(int)itemId
 {
-    Item *i;
+    InGameItem *i;
+    
     i = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:itemId];
     if(i) return i.qty;
     

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "InGameItem.h"
 #import "Item.h"
 
 @interface InventoryModel : NSObject
@@ -17,12 +18,12 @@
 }
 
 @property(nonatomic, strong) NSArray *currentInventory;
-@property(nonatomic) int currentWeight;
-@property(nonatomic) int weightCap;
+@property(nonatomic, assign) int currentWeight;
+@property(nonatomic, assign) int weightCap;
 
--(void)clearData;
--(int)removeItemFromInventory:(Item*)item qtyToRemove:(int)qty;
--(int)addItemToInventory:(Item*)item qtyToAdd:(int)qty;
--(Item *)inventoryItemForId:(int)itemId;
+-(void) clearData;
+-(int) removeItemFromInventory:(Item*)item qtyToRemove:(int)qty;
+-(int) addItemToInventory:(Item*)item qtyToAdd:(int)qty;
+-(InGameItem *) inventoryItemForId:(int)itemId;
 
 @end

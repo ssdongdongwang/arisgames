@@ -38,17 +38,41 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 @"</html>";
 
 @implementation ItemViewController
-@synthesize item, inInventory,mode,itemImageView, itemWebView,activityIndicator,isLink,itemDescriptionView,textBox,saveButton,scrollView;
 
-- (id) initWithItem:(Item *)i
+@synthesize item;
+@synthesize inInventory;
+@synthesize mode;
+@synthesize itemImageView;
+@synthesize itemWebView;
+@synthesize activityIndicator;
+@synthesize itemDescriptionView;;
+@synthesize textBox;
+@synthesize scrollView;
+@synthesize saveButton;
+
+- (id) init
 {
     if ((self = [super initWithNibName:@"ItemViewController" bundle:nil]))
     {
-        self.item = i;
-        
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieFinishedCallback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
 		mode = kItemDetailsViewing;
     }
+    return self;
+}
+
+- (id) initWithItem:(Item *)i
+{
+    self = [self init];
+    self.item = [[InGameItem alloc] initWithItem:i qty:1];
+
+    return self;
+}
+
+- (id) initWithInGameItem:(InGameItem *)i
+{
+    self = [self init];
+    self.item = i;
+
     return self;
 }
 
@@ -76,8 +100,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 		
 		[toolBar setItems:[NSMutableArray arrayWithObjects: dropButton, deleteButton, detailButton,  nil] animated:NO];
         
-		if (!item.isDroppable)   dropButton.enabled   = NO;
-		if (!item.isDestroyable) deleteButton.enabled = NO;
+		if (!item.item.isDroppable)   dropButton.enabled   = NO;
+		if (!item.item.isDestroyable) deleteButton.enabled = NO;
 	}
 	else
     {
@@ -94,10 +118,10 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 									target:self 
 									action:@selector(backButtonTouchAction:)];    
 	//Set Up General Stuff
-	NSString *htmlDescription = [NSString stringWithFormat:kItemDetailsDescriptionHtmlTemplate, item.idescription];
+	NSString *htmlDescription = [NSString stringWithFormat:kItemDetailsDescriptionHtmlTemplate, item.item.idescription];
 	[itemDescriptionView loadHTMLString:htmlDescription baseURL:nil];
     
-	Media *media = [[AppModel sharedAppModel] mediaForMediaId:item.mediaId];
+	Media *media = [[AppModel sharedAppModel] mediaForMediaId:item.item.mediaId];
         
 	if ([media.type isEqualToString: kMediaTypeImage] && media.url)
     {
@@ -131,19 +155,19 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         */
 	}
 	else
-		NSLog(@"ItemDetailsVC: Error Loading Media ID: %d. It etiher doesn't exist or is not of a valid type.", item.mediaId);
+		NSLog(@"ItemDetailsVC: Error Loading Media ID: %d. It etiher doesn't exist or is not of a valid type.", item.item.mediaId);
     
     self.itemWebView.hidden = YES;
 	//Stop Waiting Indicator
 	//[[RootViewController sharedRootViewController] removeWaitingIndicator];
 	[self updateQuantityDisplay];
-    if ([self.item.type isEqualToString:@"URL"] && self.item.url && (![self.item.url isEqualToString: @"0"]) &&(![self.item.url isEqualToString:@""]))
+    if ([self.item.item.type isEqualToString:@"URL"] && self.item.item.url && (![self.item.item.url isEqualToString: @"0"]) &&(![self.item.item.url isEqualToString:@""]))
     {
         //Config the webView
         self.itemWebView.allowsInlineMediaPlayback = YES;
         self.itemWebView.mediaPlaybackRequiresUserAction = NO;
         
-        NSString *urlAddress = [self.item.url stringByAppendingString: [NSString stringWithFormat: @"?playerId=%d&gameId=%d",[AppModel sharedAppModel].playerId,[AppModel sharedAppModel].currentGame.gameId]];
+        NSString *urlAddress = [self.item.item.url stringByAppendingString: [NSString stringWithFormat: @"?playerId=%d&gameId=%d",[AppModel sharedAppModel].playerId,[AppModel sharedAppModel].currentGame.gameId]];
         
         //Create a URL object.
         NSURL *url = [NSURL URLWithString:urlAddress];
@@ -155,12 +179,12 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         [itemWebView loadRequest:requestObj];
     }
     else itemWebView.hidden = YES;
-    if([self.item.type isEqualToString: @"NOTE"])
+    if([self.item.item.type isEqualToString: @"NOTE"])
     {
         UIBarButtonItem *hideKeyboardButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"HideKeyboardKey", @"") style:UIBarButtonItemStylePlain target:self action:@selector(hideKeyboard)];      
         self.navigationItem.rightBarButtonItem = hideKeyboardButton;
         saveButton.frame = CGRectMake(0, 335, 320, 37);
-        textBox.text = item.idescription;
+        textBox.text = item.item.idescription;
         [self.scrollView addSubview:textBox];
         [self.scrollView addSubview:saveButton];
         self.textBox.userInteractionEnabled = NO;
@@ -171,8 +195,8 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 - (void)updateQuantityDisplay
 {
-	if (item.qty > 1) self.title = [NSString stringWithFormat:@"%@ x%d",item.name,item.qty];
-	else self.title = item.name;
+	if (item.qty > 1) self.title = [NSString stringWithFormat:@"%@ x%d",item.item.name,item.qty];
+	else self.title = item.item.name;
 }
 
 - (IBAction)backButtonTouchAction:(id)sender
@@ -188,7 +212,6 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 - (IBAction)dropButtonTouchAction:(id)sender
 {
 	NSLog(@"ItemDetailsVC: Drop Button Pressed");
-	
 	mode = kItemDetailsDropping;
 	if(self.item.qty > 1)
     {
@@ -202,14 +225,12 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         
     }
     else 
-    {
         [self doActionWithMode:mode quantity:1];
-    }    
 }
 
-- (IBAction)deleteButtonTouchAction: (id) sender{
+- (IBAction) deleteButtonTouchAction:(id)sender
+{
 	NSLog(@"ItemDetailsVC: Destroy Button Pressed");
-    
 	mode = kItemDetailsDestroying;
 	if(self.item.qty > 1)
     {
@@ -232,9 +253,10 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	mode = kItemDetailsPickingUp;
     if(self.item.qty > 1)
     {
-        ItemActionViewController *itemActionVC = [[ItemActionViewController alloc]initWithNibName:@"ItemActionViewController" bundle:nil];
+        ItemActionViewController *itemActionVC = [[ItemActionViewController alloc] initWithNibName:@"ItemActionViewController" bundle:nil];
         itemActionVC.mode = mode;
-        itemActionVC.item = item;
+        itemActionVC.item = item.item;
+        itemActionVC.itemInInventory = item;
         itemActionVC.delegate = self;
         
         itemActionVC.modalPresentationStyle = UIModalTransitionStyleCoverVertical;
@@ -254,38 +276,38 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 	if(mode == kItemDetailsDropping)
     {
 		NSLog(@"ItemDetailsVC: Dropping %d",quantity);
-		[[AppServices sharedAppServices] updateServerDropItemHere:item.itemId qty:quantity];
-		[[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:item qtyToRemove:quantity];
+		[[AppServices sharedAppServices] updateServerDropItemHere:item.item.itemId qty:quantity];
+		[[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:item.item qtyToRemove:quantity];
     }
 	else if(mode == kItemDetailsDestroying)
     {
 		NSLog(@"ItemDetailsVC: Destroying %d",quantity);
-		[[AppServices sharedAppServices] updateServerDestroyItem:self.item.itemId qty:quantity];
-		[[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:item qtyToRemove:quantity];
+		[[AppServices sharedAppServices] updateServerDestroyItem:self.item.item.itemId qty:quantity];
+		[[AppModel sharedAppModel].currentGame.inventoryModel removeItemFromInventory:item.item qtyToRemove:quantity];
 	}
 	else if(mode == kItemDetailsPickingUp)
     {
         NSString *errorMessage;
         
 		//Determine if this item can be picked up
-		Item *itemInInventory  = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:item.itemId];
-		if(itemInInventory && itemInInventory.qty + quantity > item.maxQty && item.maxQty != -1)
+		InGameItem *itemInInventory  = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:item.item.itemId];
+		if(itemInInventory && itemInInventory.qty + quantity > item.item.maxQty && item.item.maxQty != -1)
         {
 			[appDelegate playAudioAlert:@"error" shouldVibrate:YES];
 			
-			if (itemInInventory.qty < item.maxQty)
+			if (itemInInventory.qty < item.item.maxQty)
             {
-				quantity = item.maxQty - itemInInventory.qty;
+				quantity = item.item.maxQty - itemInInventory.qty;
                 
                 if([AppModel sharedAppModel].currentGame.inventoryModel.weightCap != 0)
                 {
-                    while((quantity*item.weight + [AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap){
+                    while((quantity*item.item.weight + [AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap){
                         quantity--;
                     }
                 }
 				errorMessage = [NSString stringWithFormat:@"%@ %d %@",NSLocalizedString(@"ItemAcionCarryThatMuchKey", @""),quantity,NSLocalizedString(@"PickedUpKey", @"")];
 			}
-			else if (item.maxQty == 0)
+			else if (item.item.maxQty == 0)
             {
 				errorMessage = NSLocalizedString(@"ItemAcionCannotPickUpKey", @"");
 				quantity = 0;
@@ -301,10 +323,9 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 														   delegate:self cancelButtonTitle:NSLocalizedString(@"OkKey", @"") otherButtonTitles:nil];
 			[alert show];
 		}
-        else if (((quantity*item.weight +[AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap)&&([AppModel sharedAppModel].currentGame.inventoryModel.weightCap != 0))
+        else if (((quantity*item.item.weight +[AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap)&&([AppModel sharedAppModel].currentGame.inventoryModel.weightCap != 0))
         {
-            while ((quantity*item.weight + [AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap)
-
+            while ((quantity*item.item.weight + [AppModel sharedAppModel].currentGame.inventoryModel.currentWeight) > [AppModel sharedAppModel].currentGame.inventoryModel.weightCap)
                 quantity--;
 
             errorMessage = [NSString stringWithFormat:@"%@ %d %@",NSLocalizedString(@"ItemAcionTooHeavyKey", @""),quantity,NSLocalizedString(@"PickedUpKey", @"")];
@@ -387,7 +408,7 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
 
 #pragma mark Animate view show/hide
 
-- (void)showView:(UIView *)aView 
+- (void)showView:(UIView *)aView
 {
 	CGRect superFrame = [aView superview].bounds;
 	CGRect viewFrame = [aView frame];
@@ -426,7 +447,6 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
         if([[[request URL] absoluteString] hasPrefix:@"aris://closeMe"])
         {
             [self.navigationController popToRootViewControllerAnimated:YES];
-            //[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
             return NO;
         }  
         else if([[[request URL] absoluteString] hasPrefix:@"aris://refreshStuff"])
@@ -435,25 +455,18 @@ NSString *const kItemDetailsDescriptionHtmlTemplate =
             return NO;
         }
     }
-    else
+    else if(![[[request URL]absoluteString] isEqualToString:@"about:blank"])
     {
-        if(self.isLink && ![[[request URL]absoluteString] isEqualToString:@"about:blank"])
-        {
-            WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
-            WebPage *temp = [[WebPage alloc]init];
-            temp.url = [[request URL]absoluteString];
-            webPageViewController.webPage = temp;
-            webPageViewController.delegate = self;
-            [self.navigationController pushViewController:webPageViewController animated:NO];
+        WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithNibName:@"WebPageViewController" bundle: [NSBundle mainBundle]];
+        WebPage *temp = [[WebPage alloc]init];
+        temp.url = [[request URL]absoluteString];
+        webPageViewController.webPage = temp;
+        webPageViewController.delegate = self;
+        [self.navigationController pushViewController:webPageViewController animated:NO];
             
-            return NO;
-        }
-        else
-        {
-            self.isLink = YES;
-            return YES;
-        }
+        return NO;
     }
+    
     return YES;
 }
 

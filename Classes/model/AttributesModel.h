@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Item.h"
+#import "InGameItem.h"
 
 @interface AttributesModel : NSObject
 {
@@ -19,6 +20,6 @@
 -(void)clearData;
 -(int)removeItemFromAttributes:(Item*)item qtyToRemove:(int)qty;
 -(int)addItemToAttributes:(Item*)item qtyToAdd:(int)qty;
--(Item *)attributesItemForId:(int)itemId;
+-(InGameItem *)attributesItemForId:(int)itemId;
 
 @end

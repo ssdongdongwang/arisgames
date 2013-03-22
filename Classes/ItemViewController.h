@@ -13,7 +13,8 @@
 #import "ARISMoviePlayerViewController.h"
 #import "AsyncMediaImageView.h"
 
-typedef enum {
+typedef enum
+{
 	kItemDetailsViewing,
 	kItemDetailsDropping,
 	kItemDetailsDestroying,
@@ -22,7 +23,7 @@ typedef enum {
 
 @interface ItemViewController : DisplayObjectViewController <UIWebViewDelegate,UITextViewDelegate>
 {
-	Item *item;
+	InGameItem *item;
 	//ARISMoviePlayerViewController *mMoviePlayer; //only used if item is a video
 	MPMoviePlayerViewController *mMoviePlayer; //only used if item is a video
 
@@ -43,12 +44,9 @@ typedef enum {
 	UIButton *mediaPlaybackButton;
 	ItemDetailsModeType mode;
     IBOutlet UIActivityIndicatorView *activityIndicator;
-    BOOL isLink;
 }
 
-@property(readwrite, assign) BOOL isLink;
-
-@property(readwrite) Item *item;
+@property(readwrite) InGameItem *item;
 @property(readwrite) bool inInventory;
 @property(readwrite) ItemDetailsModeType mode;
 @property(nonatomic) IBOutlet AsyncMediaImageView *itemImageView;
@@ -59,17 +57,19 @@ typedef enum {
 @property(nonatomic) UIScrollView *scrollView;
 @property(nonatomic) IBOutlet UIButton *saveButton;
 
-- (id)initWithItem:(Item *)i;
+- (id) initWithItem:(Item *)i;
+- (id) initWithInGameItem:(InGameItem *)i;
 
-- (IBAction)dropButtonTouchAction:(id)sender;
-- (IBAction)deleteButtonTouchAction:(id)sender;
-- (IBAction)backButtonTouchAction:(id)sender;
-- (IBAction)pickupButtonTouchAction:(id)sender;
-- (IBAction)playMovie:(id)sender;
-- (IBAction)toggleDescription:(id)sender;
-- (void)doActionWithMode:(ItemDetailsModeType)itemMode quantity:(int)quantity;
-- (void)updateQuantityDisplay;
+- (IBAction) dropButtonTouchAction:(id)sender;
+- (IBAction) deleteButtonTouchAction:(id)sender;
+- (IBAction) backButtonTouchAction:(id)sender;
+- (IBAction) pickupButtonTouchAction:(id)sender;
+- (IBAction) playMovie:(id)sender;
+- (IBAction) toggleDescription:(id)sender;
+- (void) doActionWithMode:(ItemDetailsModeType)itemMode quantity:(int)quantity;
+- (void) updateQuantityDisplay;
 
 - (void) showWaitingIndicator;
 - (void) dismissWaitingIndicator;
+
 @end

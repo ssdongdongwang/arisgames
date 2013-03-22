@@ -25,7 +25,6 @@
 @synthesize iconCache;
 @synthesize mediaCache;
 
-//Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
@@ -36,11 +35,9 @@
         
         badgeCount = 0;
 
-        //Alloc caches
         self.mediaCache = [[NSMutableDictionary alloc] initWithCapacity:[[AppModel sharedAppModel].currentGame.inventoryModel.currentInventory count]];
         self.iconCache  = [[NSMutableDictionary alloc] initWithCapacity:[[AppModel sharedAppModel].currentGame.inventoryModel.currentInventory count]];
         
-		//register for notifications
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLoadingIndicator) name:@"ReceivedInventory"           object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost"              object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel)   name:@"NewlyAcquiredItemsAvailable" object:nil];
@@ -177,7 +174,6 @@
     CGRect Label3Frame = CGRectMake(260, 12, 50, 20); //Qty
 	UILabel *lblTemp;
 	UIImageView *iconViewTemp;
-    UIImageView *newBannerViewTemp;
 	
 	UITableViewCell *cell = [[UITableViewCell alloc] initWithFrame:CellFrame reuseIdentifier:cellIdentifier];	
 	//Setup Cell
@@ -232,14 +228,11 @@
     return 1;
 }
 
-// returns the # of rows in each component..
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	return [inventory count];
 }
 
-
-// Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *CellIdentifier = @"Cell";
@@ -250,32 +243,24 @@
     cell.textLabel.backgroundColor = [UIColor clearColor]; 
     cell.detailTextLabel.backgroundColor = [UIColor clearColor]; 
     
-    if (indexPath.row % 2 == 0)
-        cell.contentView.backgroundColor = [UIColor colorWithRed:233.0/255.0  
-                                                           green:233.0/255.0  
-                                                            blue:233.0/255.0  
-                                                           alpha:1.0];  
-    else
-        cell.contentView.backgroundColor = [UIColor colorWithRed:200.0/255.0
-                                                           green:200.0/255.0  
-                                                            blue:200.0/255.0  
-                                                           alpha:1.0];
+    if (indexPath.row % 2 == 0) cell.contentView.backgroundColor = [UIColor colorWithRed:233.0/255.0 green:233.0/255.0 blue:233.0/255.0 alpha:1.0];  
+    else                        cell.contentView.backgroundColor = [UIColor colorWithRed:200.0/255.0 green:200.0/255.0 blue:200.0/255.0 alpha:1.0];
     
-	Item *item = [inventory objectAtIndex: [indexPath row]];
+	InGameItem *item = [inventory objectAtIndex: [indexPath row]];
 	
 	UILabel *lblTemp1 = (UILabel *)[cell viewWithTag:1];
-	lblTemp1.text = item.name;
+	lblTemp1.text = item.item.name;
     lblTemp1.font = [UIFont systemFontOfSize:18];
     
     UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
     
     // if description has html tags in it, take first line (up until <br>) and display unformatted text for decription
-    NSRange range = [item.idescription rangeOfString:@"<br>"];
+    NSRange range = [item.item.idescription rangeOfString:@"<br>"];
     NSString *shortDescription;
     if (range.length != 0)
-       shortDescription = [item.idescription substringToIndex:range.location];
+       shortDescription = [item.item.idescription substringToIndex:range.location];
     else
-        shortDescription = item.idescription;
+        shortDescription = item.item.idescription;
     range = [shortDescription rangeOfString:@"</br>"];
     if (range.length != 0)
         shortDescription = [shortDescription substringToIndex:range.location];
@@ -289,10 +274,10 @@
     
     UILabel *lblTemp3 = (UILabel *)[cell viewWithTag:4];
     lblTemp3.numberOfLines = 2;
-    if(item.qty >1 && item.weight > 1)
-        lblTemp3.text = [NSString stringWithFormat:@"%@: %d/n%@ %d",NSLocalizedString(@"QuantityKey", @""),item.qty,NSLocalizedString(@"WeightKey", @""),item.weight];
-    else if(item.weight > 1)
-        lblTemp3.text = [NSString stringWithFormat:@"%@: %d",NSLocalizedString(@"WeightKey", @""),item.weight];
+    if(item.qty > 1 && item.item.weight > 1)
+        lblTemp3.text = [NSString stringWithFormat:@"%@: %d/n%@ %d",NSLocalizedString(@"QuantityKey", @""),item.qty,NSLocalizedString(@"WeightKey", @""),item.item.weight];
+    else if(item.item.weight > 1)
+        lblTemp3.text = [NSString stringWithFormat:@"%@: %d",NSLocalizedString(@"WeightKey", @""),item.item.weight];
     else if(item.qty > 1)
         lblTemp3.text = [NSString stringWithFormat:@"%@ %d",NSLocalizedString(@"x", @""),item.qty];
     else
@@ -300,12 +285,12 @@
     //newBannerView.hidden = NO;
     
     Media *media;
-    if (item.mediaId != 0 && ![item.type isEqualToString:@"NOTE"])
+    if (item.item.mediaId != 0 && ![item.item.type isEqualToString:@"NOTE"])
     {
-        if(!(media = [self.mediaCache objectForKey:[NSNumber numberWithInt:item.itemId]]))
+        if(!(media = [self.mediaCache objectForKey:[NSNumber numberWithInt:item.item.itemId]]))
         {
-            media = [[AppModel sharedAppModel] mediaForMediaId: item.mediaId];
-            [self.mediaCache setObject:media forKey:[NSNumber numberWithInt:item.itemId]];
+            media = [[AppModel sharedAppModel] mediaForMediaId:item.item.mediaId];
+            [self.mediaCache setObject:media forKey:[NSNumber numberWithInt:item.item.itemId]];
         }
 	}
     
@@ -313,12 +298,12 @@
     iconView.hidden = NO;
     
     Media *iconMedia;
-	if (item.iconMediaId != 0)
+	if (item.item.iconMediaId != 0)
     {
-        if(!(iconMedia = [self.iconCache objectForKey:[NSNumber numberWithInt:item.itemId]]))
+        if(!(iconMedia = [self.iconCache objectForKey:[NSNumber numberWithInt:item.item.itemId]]))
         {
-            iconMedia = [[AppModel sharedAppModel] mediaForMediaId:item.iconMediaId];
-            [self.iconCache setObject:iconMedia forKey:[NSNumber numberWithInt:item.itemId]];
+            iconMedia = [[AppModel sharedAppModel] mediaForMediaId:item.item.iconMediaId];
+            [self.iconCache setObject:iconMedia forKey:[NSNumber numberWithInt:item.item.itemId]];
         }
         
         if(iconView.isLoading)
@@ -342,7 +327,8 @@
 }
 
 
--(NSString *) stringByStrippingHTML: (NSString *)stringToStrip{
+-(NSString *) stringByStrippingHTML:(NSString *)stringToStrip
+{
     NSRange r;
     NSString *s = stringToStrip;
     while ((r = [s rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location != NSNotFound)
@@ -379,7 +365,6 @@
 	[[self navigationController] pushViewController:itemVC animated:YES];
 }
 
-#pragma mark Memory Management
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];

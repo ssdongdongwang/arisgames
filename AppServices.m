@@ -1108,7 +1108,8 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	return [self performSelector:aSelector withObject:jsonResult.data];
 }
 
--(Item *)fetchItem:(int)itemId{
+-(Item *)fetchItem:(int)itemId
+{
 	NSLog(@"Model: Fetch Requested for Item %d", itemId);
 	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId],
 						  [NSString stringWithFormat:@"%d",itemId],
@@ -1692,22 +1693,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(Item *)parseItemFromDictionary: (NSDictionary *)itemDictionary
 {
-    Item *item = [[Item alloc] init];
-    item.itemId        = [itemDictionary validIntForKey:@"item_id"];
-    item.mediaId       = [itemDictionary validIntForKey:@"media_id"];
-    item.iconMediaId   = [itemDictionary validIntForKey:@"icon_media_id"];
-    item.maxQty        = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
-    item.weight        = [itemDictionary validIntForKey:@"weight"];
-    item.url           = [itemDictionary validObjectForKey:@"url"];
-    item.type          = [itemDictionary validObjectForKey:@"type"];
-    item.name          = [itemDictionary validObjectForKey:@"name"];
-    item.idescription  = [itemDictionary validObjectForKey:@"description"];
-    item.isDroppable   = [itemDictionary validBoolForKey:@"dropable"];
-    item.isDestroyable = [itemDictionary validBoolForKey:@"destroyable"];
-    item.isAttribute   = [itemDictionary validBoolForKey:@"is_attribute"];
-    item.isTradeable   = [itemDictionary validBoolForKey:@"tradeable"];
-	
-    return item;
+    return [[Item alloc] initFromDictionary:itemDictionary];
 }
 
 -(Node *)parseNodeFromDictionary: (NSDictionary *)nodeDictionary
@@ -2281,7 +2267,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	NSDictionary *dict;
 	while ((dict = [enumerator nextObject]))
     {
-		Item *tmpItem = [self parseItemFromDictionary:dict];
+		Item *tmpItem = [[Item alloc] initFromDictionary:dict];
 		[tempItemList setObject:tmpItem forKey:[NSNumber numberWithInt:tmpItem.itemId]];
     }
 	
@@ -2391,29 +2377,10 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	NSDictionary *itemDictionary;
 	while ((itemDictionary = [inventoryEnumerator nextObject]))
     {
-        Item *item = [self parseItemFromDictionary:itemDictionary];
-        /*
-         [[Item alloc] init];
-        item.itemId       = [itemDictionary validIntForKey:@"item_id"];
-        item.mediaId      = [itemDictionary validIntForKey:@"media_id"];
-        item.iconMediaId  = [itemDictionary validIntForKey:@"icon_media_id"];
-        item.creatorId    = [itemDictionary validIntForKey:@"creator_player_id"];
-        item.qty          = [itemDictionary validIntForKey:@"qty"];
-        item.maxQty       = [itemDictionary validIntForKey:@"max_qty_in_inventory"];
-        item.weight       = [itemDictionary validIntForKey:@"weight"];
-        item.dropable     = [itemDictionary validBoolForKey:@"dropable"];
-        item.destroyable  = [itemDictionary validBoolForKey:@"destroyable"];
-        item.isAttribute  = [itemDictionary validBoolForKey:@"is_attribute"];
-        item.isTradeable  = [itemDictionary validBoolForKey:@"tradeable"];
-        item.hasViewed    = [itemDictionary validBoolForKey:@"viewed"];
-        item.url          = [itemDictionary validObjectForKey:@"url"];
-        item.type         = [itemDictionary validObjectForKey:@"type"];
-        item.name         = [itemDictionary validObjectForKey:@"name"];
-        item.idescription = [itemDictionary validObjectForKey:@"description"];
-         */
-
-        if(item.isAttribute)[tempAttributes addObject:item];
-        else                [tempInventory  addObject:item];
+        InGameItem *igi = [[InGameItem alloc] initFromDictionary:itemDictionary];
+        
+        if(igi.item.isAttribute)[tempAttributes addObject:igi];
+        else                    [tempInventory  addObject:igi];
 	}
     
 	NSDictionary *inventory  = [[NSDictionary alloc] initWithObjectsAndKeys:tempInventory,@"inventory", nil];

@@ -179,18 +179,19 @@
 
 #pragma mark PickerViewDelegate selectors
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    // return 2;
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     return 1;
 }
 
-// returns the # of rows in each component..
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	return [attributes count];
 }
 
 // Customize the appearance of table view cells.
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 	if(cell == nil) cell = [self getCellContentView:@"Cell"];
     
@@ -209,31 +210,31 @@
     cell.backgroundView.layer.cornerRadius = 10.0;
     cell.contentView.layer.cornerRadius = 10.0;
     
-	Item *item = [attributes objectAtIndex: [indexPath row]];
+	InGameItem *item = [attributes objectAtIndex:[indexPath row]];
 	
 	UILabel *lblTemp1 = (UILabel *)[cell viewWithTag:1];
-	lblTemp1.text = item.name;
+	lblTemp1.text = item.item.name;
     lblTemp1.font = [UIFont boldSystemFontOfSize:18.0];
     
     UILabel *lblTemp2 = (UILabel *)[cell viewWithTag:2];
-    lblTemp2.text = item.idescription;
+    lblTemp2.text = item.item.idescription;
 	AsyncMediaImageView *iconView = (AsyncMediaImageView *)[cell viewWithTag:3];
     
     UILabel *lblTemp3 = (UILabel *)[cell viewWithTag:4];
-    if(item.qty > 1 || item.maxQty > 1)
+    if(item.qty > 1 || item.item.maxQty > 1)
         lblTemp3.text = [NSString stringWithFormat:@"%@: %d",NSLocalizedString(@"QuantityKey", @""),item.qty];
     else
         lblTemp3.text = nil;
     iconView.hidden = NO;
     
-	if (item.iconMediaId != 0) {
+	if (item.item.iconMediaId != 0) {
         Media *iconMedia;
         if([self.iconCache count] < indexPath.row){
             iconMedia = [self.iconCache objectAtIndex:indexPath.row];
             [iconView updateViewWithNewImage:[UIImage imageWithData:iconMedia.image]];
         }
         else{
-            iconMedia = [[AppModel sharedAppModel] mediaForMediaId: item.iconMediaId];
+            iconMedia = [[AppModel sharedAppModel] mediaForMediaId:item.item.iconMediaId];
             [self.iconCache  addObject:iconMedia];
             [iconView loadImageFromMedia:iconMedia];
         }
@@ -242,26 +243,19 @@
 	return cell;
 }
 
--(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    //if(section==0)return  @"Group";
-    // else
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
     return NSLocalizedString(@"AttributesAttributesTitleKey", @"");
 }
 
-// Customize the height of each row
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	return 60;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	
-}
-
-#pragma mark Memory Management
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
 }
 
 @end

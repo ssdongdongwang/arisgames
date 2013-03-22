@@ -18,6 +18,7 @@
 #import "ItemViewController.h"
 
 @implementation WebPageViewController
+
 @synthesize webView,webPage,activityIndicator,blackView, audioPlayers, bumpSendString, isConnectedToBump, loaded;
 
 - (id)initWithWebPage:(WebPage *)w
@@ -380,12 +381,14 @@
 
 - (int) getQtyInInventoryOfItem:(int)itemId
 {
-    Item *i = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:itemId];
-    if(i)
-        return i.qty;
+    InGameItem *i;
+    
+    i = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:itemId];
+    if(i) return i.qty;
+    
     i = [[AppModel sharedAppModel].currentGame.attributesModel attributesItemForId:itemId];
-    if(i)
-        return i.qty;
+    if(i) return i.qty;
+    
     return 0;
 }
 
@@ -398,7 +401,7 @@
     int newQty = 0;
     if(!i.isAttribute)
     {
-        Item *ii = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:itemId];
+        InGameItem *ii = [[AppModel sharedAppModel].currentGame.inventoryModel inventoryItemForId:itemId];
         if(ii && ii.qty < qty)
             newQty = [[AppModel sharedAppModel].currentGame.inventoryModel addItemToInventory:i qtyToAdd:qty-ii.qty];
         else if(ii && ii.qty > qty)
@@ -408,7 +411,7 @@
     }
     else
     {
-        Item *ii = [[AppModel sharedAppModel].currentGame.attributesModel attributesItemForId:itemId];
+        InGameItem *ii = [[AppModel sharedAppModel].currentGame.attributesModel attributesItemForId:itemId];
         if(ii && ii.qty < qty)
             newQty = [[AppModel sharedAppModel].currentGame.attributesModel addItemToAttributes:i qtyToAdd:qty-ii.qty];
         else if(ii && ii.qty > qty)
