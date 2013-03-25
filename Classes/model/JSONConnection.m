@@ -127,7 +127,8 @@
 }
 
 
-- (void)connectionDidFinishLoading:(NSURLConnection*)theConnection {
+- (void)connectionDidFinishLoading:(NSURLConnection*)theConnection
+{
     //end the UI indicator
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [[RootViewController sharedRootViewController] removeNetworkAlert];	

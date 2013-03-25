@@ -15,7 +15,8 @@
 #import "RootViewController.h"
 
 
-@interface GPSViewController : UIViewController <MKMapViewDelegate, UIActionSheetDelegate> {
+@interface GPSViewController : UIViewController <MKMapViewDelegate, UIActionSheetDelegate>
+{
 	IBOutlet MKMapView *mapView;
 	NSMutableArray *locations;
     NSMutableArray *route;
@@ -27,7 +28,6 @@
     IBOutlet UIBarButtonItem *addMediaButton;
 	NSTimer *refreshTimer;
     IBOutlet UIBarButtonItem *playerButton;
-    
 }
 
 - (void) refresh;
@@ -56,6 +56,5 @@
 @property (nonatomic) IBOutlet UIBarButtonItem *addMediaButton;
 @property (nonatomic) IBOutlet UIBarButtonItem *playerTrackingButton;
 @property (nonatomic) IBOutlet UIToolbar *toolBar;
-
 
 @end

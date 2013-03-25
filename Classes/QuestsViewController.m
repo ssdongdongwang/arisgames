@@ -192,7 +192,6 @@ NSString *const kQuestsHtmlTemplate =
         WebPage *temp = [[WebPage alloc] init];
         temp.url = [[request URL] absoluteString];
         webPageViewController.webPage = temp;
-        webPageViewController.delegate = self;
         [self.navigationController pushViewController:webPageViewController animated:NO];
         return NO;
     }

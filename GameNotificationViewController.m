@@ -24,11 +24,10 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
-        //Init Notification Arrays
-        notifArray = [[NSMutableArray alloc] initWithCapacity:5];
+        notifArray   = [[NSMutableArray alloc] initWithCapacity:5];
         popOverArray = [[NSMutableArray alloc] initWithCapacity:5];
         showingDropDown = NO;
-        showingPopOver = NO;
+        showingPopOver  = NO;
     }
     return self;
 }

@@ -56,9 +56,10 @@
             self.object = [[AppModel sharedAppModel] noteForNoteId:[d validIntForKey:@"type_id"] playerListYesGameListNo:YES];
             if(!self.object)
             self.object = [[AppModel sharedAppModel] noteForNoteId:[d validIntForKey:@"type_id"] playerListYesGameListNo:NO];
+            
             //This calculation is stupid, and should have been done on the server before sending the locations list
             if(((Note *)self.object).showOnList) self.allowsQuickTravel = YES;
-            else                        self.allowsQuickTravel = NO;
+            else                                 self.allowsQuickTravel = NO;
         }
     }
     return self;
@@ -67,6 +68,11 @@
 - (void) didDisplayObject
 {
     
+}
+
+- (void) finishedDisplayingObject
+{
+    //Phil should add call here to alert server that its content was viewed
 }
 
 - (BOOL) compareTo:(Location *)other

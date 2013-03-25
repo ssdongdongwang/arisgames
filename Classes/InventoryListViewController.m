@@ -175,7 +175,7 @@
 	UILabel *lblTemp;
 	UIImageView *iconViewTemp;
 	
-	UITableViewCell *cell = [[UITableViewCell alloc] initWithFrame:CellFrame reuseIdentifier:cellIdentifier];	
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	//Setup Cell
 	UIView *transparentBackground = [[UIView alloc] initWithFrame:CGRectZero];
     transparentBackground.backgroundColor = [UIColor clearColor];
