@@ -98,7 +98,7 @@ NSString *const kQuestsHtmlTemplate =
 - (void)refresh
 {
 	NSLog(@"QuestsViewController: refresh requested");
-	if ([AppModel sharedAppModel].loggedIn) [[AppServices sharedAppServices] fetchPlayerQuestList];
+	if ([AppModel sharedAppModel].playerId) [[AppServices sharedAppServices] fetchPlayerQuestList];
 	[self showLoadingIndicator];
 }
 

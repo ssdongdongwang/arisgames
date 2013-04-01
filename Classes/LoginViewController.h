@@ -22,8 +22,8 @@
 	IBOutlet UILabel *newAccountMessageLabel;
 }
 
--(IBAction) newAccountButtonTouched: (id) sender;
--(IBAction) loginButtonTouched: (id) sender;
+-(IBAction) newAccountButtonTouched:(id)sender;
+-(IBAction) loginButtonTouched:(id)sender;
 -(IBAction) QRButtonTouched;
 -(IBAction) changePassTouch;
 

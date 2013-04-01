@@ -17,12 +17,10 @@
 @synthesize serverURL;
 @synthesize showGamesInDevelopment;
 @synthesize showPlayerOnMap;
-@synthesize loggedIn;
 @synthesize userName;
 @synthesize groupName;
 @synthesize groupGame;
 @synthesize displayName;
-@synthesize password;
 @synthesize playerId;
 @synthesize fallbackGameId;
 @synthesize playerMediaId;
@@ -139,7 +137,7 @@
     
     //Safe to load defaults
     
-    if(!self.loggedIn)
+    if(!self.playerId)
     {
         self.showPlayerOnMap = [defaults boolForKey:@"showPlayerOnMap"];
         self.playerId        = [defaults integerForKey:@"playerId"];

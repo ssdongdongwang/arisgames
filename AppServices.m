@@ -7,6 +7,8 @@
 //
 
 #import "AppServices.h"
+#import "AppModel.h"
+#import "RootViewController.h"
 #import "ARISUploader.h"
 #import "NSDictionary+ValidParsers.h"
 
@@ -68,9 +70,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 }
 
 #pragma mark Communication with Server
-- (void)login
+- (void)loginWithUsername:(NSString *)userName password:(NSString *)password
 {
-	NSArray *arguments = [NSArray arrayWithObjects:[AppModel sharedAppModel].userName, [AppModel sharedAppModel].password, nil];
+	NSArray *arguments = [NSArray arrayWithObjects:userName, password, nil];
 	JSONConnection *jsonConnection = [[JSONConnection alloc] initWithServer:[AppModel sharedAppModel].serverURL
                                                              andServiceName: @"players"
                                                               andMethodName:@"getLoginPlayerObject"
@@ -164,9 +166,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
      @selector(parseResetAndEmailNewPassword:)];
 }
 
--(void)setShowPlayerOnMap
+-(void)setShowPlayer:(int)playerId onMap:(BOOL)showOnMap
 {
-	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d", [AppModel sharedAppModel].playerId],[NSString stringWithFormat:@"%d", [AppModel sharedAppModel].showPlayerOnMap], nil];
+	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d", playerId,[NSString stringWithFormat:@"%d",showOnMap], nil];
 	JSONConnection *jsonConnection = [[JSONConnection alloc] initWithServer:[AppModel sharedAppModel].serverURL
                                                              andServiceName:@"players"
                                                               andMethodName:@"setShowPlayerOnMap"
@@ -1060,7 +1062,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)updateServerWithPlayerLocation
 {
-	if (![AppModel sharedAppModel].loggedIn)
+	if (![AppModel sharedAppModel].playerId)
     {
         NSLog(@"Skipping Request: player not logged in");
 		return;
@@ -1557,7 +1559,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)fetchPlayerLocationList
 {
-	if (![AppModel sharedAppModel].loggedIn)
+	if (![AppModel sharedAppModel].playerId)
     {
 		NSLog(@"AppModel: Player Not logged in yet, skip the location fetch");
 		return;
@@ -1585,7 +1587,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)fetchPlayerOverlayList {
 	
-    if (![AppModel sharedAppModel].loggedIn)
+    if (![AppModel sharedAppModel].playerId)
     {
 		NSLog(@"AppModel: Player Not logged in yet, skip the overlay fetch");
 		return;
@@ -1920,19 +1922,18 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     
     if (jsonResult.data != [NSNull null])
     {
-        [AppModel sharedAppModel].loggedIn = YES;
         [AppModel sharedAppModel].playerId      = [((NSDictionary*)jsonResult.data) validIntForKey:@"player_id"];
         [AppModel sharedAppModel].playerMediaId = [((NSDictionary*)jsonResult.data) validIntForKey:@"media_id"];
         [AppModel sharedAppModel].userName      = [((NSDictionary*)jsonResult.data) validObjectForKey:@"user_name"];
         [AppModel sharedAppModel].displayName   = [((NSDictionary*)jsonResult.data) validObjectForKey:@"display_name"];
-        [[AppServices sharedAppServices] setShowPlayerOnMap];
+        [[AppServices sharedAppServices] setShowPlayer:[AppModel sharedAppModel].playerId onMap:[AppModel sharedAppModel].showPlayerOnMap];
         [[AppModel sharedAppModel] saveUserDefaults];
         
         //Subscribe to player channel
         //[RootViewController sharedRootViewController].playerChannel = [[RootViewController sharedRootViewController].client subscribeToPrivateChannelNamed:[NSString stringWithFormat:@"%d-player-channel",[AppModel sharedAppModel].playerId]];
     }
     else
-      [AppModel sharedAppModel].loggedIn = NO;
+      [AppModel sharedAppModel].playerId = 0;
     
     NSLog(@"NSNotification: NewLoginResponseReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewLoginResponseReady" object:nil]];
@@ -2066,7 +2067,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     return tempGameList;
 }
 
--(void)parseOneGameGameListFromJSON: (JSONResult *)jsonResult
+- (void) parseOneGameGameListFromJSON:(JSONResult *)jsonResult
 {
     currentlyFetchingOneGame = NO;
     [AppModel sharedAppModel].oneGameGameList = [self parseGameListFromJSON:jsonResult];
@@ -2075,7 +2076,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewOneGameGameListReady" object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:game,@"game", nil]]];
 }
 
--(void)parseNearbyGameListFromJSON: (JSONResult *)jsonResult
+- (void) parseNearbyGameListFromJSON:(JSONResult *)jsonResult
 {
     currentlyFetchingNearbyGamesList = NO;
     [AppModel sharedAppModel].nearbyGameList = [self parseGameListFromJSON:jsonResult];
@@ -2083,7 +2084,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNearbyGameListReady" object:nil]];
 }
 
--(void)parseSearchGameListFromJSON: (JSONResult *)jsonResult
+- (void) parseSearchGameListFromJSON:(JSONResult *)jsonResult
 {
     currentlyFetchingSearchGamesList = NO;
     [AppModel sharedAppModel].searchGameList = [self parseGameListFromJSON:jsonResult];
@@ -2091,14 +2092,15 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewSearchGameListReady" object:nil]];
 }
 
--(void)parsePopularGameListFromJSON: (JSONResult *)jsonResult{
+- (void) parsePopularGameListFromJSON:(JSONResult *)jsonResult
+{
     currentlyFetchingPopularGamesList = NO;
     [AppModel sharedAppModel].popularGameList = [self parseGameListFromJSON:jsonResult];
     NSLog(@"NSNotification: NewPopularGameListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewPopularGameListReady" object:nil]];
 }
 
--(void)parseRecentGameListFromJSON: (JSONResult *)jsonResult
+- (void) parseRecentGameListFromJSON:(JSONResult *)jsonResult
 {
     currentlyFetchingRecentGamesList = NO;
     NSArray *gameListArray = (NSArray *)jsonResult.data;

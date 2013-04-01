@@ -18,6 +18,7 @@
 #import "UIImage+Scale.h"
 #import "AppServices.h"
 #import "AsyncMediaPlayerButton.h"
+#import "RootViewController.h"
 
 @implementation NoteDetailsViewController
 

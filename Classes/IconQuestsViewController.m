@@ -104,7 +104,7 @@ NSArray *sortedQuests;
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    if (![AppModel sharedAppModel].loggedIn || [AppModel sharedAppModel].currentGame.gameId==0) return;
+    if (![AppModel sharedAppModel].playerId || [AppModel sharedAppModel].currentGame.gameId==0) return;
     
     self.tabBarItem.badgeValue = nil;
 	newItemsSinceLastView = 0;
@@ -122,7 +122,7 @@ NSArray *sortedQuests;
 
 - (void)refresh
 {
-	if ([AppModel sharedAppModel].loggedIn) [[AppServices sharedAppServices] fetchPlayerQuestList];
+	if ([AppModel sharedAppModel].playerId) [[AppServices sharedAppServices] fetchPlayerQuestList];
 	[self showLoadingIndicator];
 }
 

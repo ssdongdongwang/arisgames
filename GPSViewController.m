@@ -220,7 +220,7 @@ NSMutableArray *locationsToRemove;
 {
     if (mapView)
     {
-        if ([AppModel sharedAppModel].loggedIn && ([AppModel sharedAppModel].currentGame.gameId != 0 && [AppModel sharedAppModel].playerId != 0))
+        if ([AppModel sharedAppModel].playerId && ([AppModel sharedAppModel].currentGame.gameId != 0 && [AppModel sharedAppModel].playerId != 0))
         {
             [[AppServices sharedAppServices] fetchPlayerLocationList];
             [[AppServices sharedAppServices] fetchPlayerOverlayList];
@@ -240,7 +240,7 @@ NSMutableArray *locationsToRemove;
 
 - (void) playerMoved
 {
-    if (mapView && [AppModel sharedAppModel].loggedIn && [AppModel sharedAppModel].currentGame.gameId != 0 && [AppModel sharedAppModel].playerId != 0)
+    if (mapView && [AppModel sharedAppModel].playerId && [AppModel sharedAppModel].currentGame.gameId != 0 && [AppModel sharedAppModel].playerId != 0)
     {
         if (tracking) [self zoomAndCenterMap];
     }

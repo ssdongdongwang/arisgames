@@ -11,7 +11,6 @@
 
 @implementation AccountSettingsViewController
 
-//Override init for passing title and icon to tab bar
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
@@ -22,7 +21,6 @@
     return self;
 }
 
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -30,23 +28,22 @@
 	[logoutButton setTitle:NSLocalizedString(@"LogoutKey",@"") forState:UIControlStateNormal];
 }
 
-- (IBAction)logoutButtonPressed: (id) sender
+- (IBAction) logoutButtonPressed:(id)sender
 {
 	NSLog(@"NSNotification: LogoutRequested");
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"LogoutRequested" object:self]];
 }
 
-- (IBAction)passButtonPressed: (id) sender
+- (IBAction) passButtonPressed:(id)sender
 {
 	ForgotViewController *forgotPassViewController = [[ForgotViewController alloc]
                                                       initWithNibName:@"ForgotViewController" bundle:[NSBundle mainBundle]];
 	[[self navigationController] pushViewController:forgotPassViewController animated:YES];
 }
 
-- (IBAction)profileButtonPressed: (id) sender
+- (IBAction) profileButtonPressed:(id)sender
 {
-    NSLog(@"NSNotification: ProfSettingsRequested");
-	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ProfSettingsRequested" object:self]];
+    [[RootViewController sharedRootViewController] displayPlayerSettings];
 }
 
 @end

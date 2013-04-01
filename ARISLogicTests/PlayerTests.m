@@ -1,26 +1,23 @@
 //
-//  ARISLogicTests.m
-//  ARISLogicTests
+//  PlayerTests.m
+//  ARIS
 //
 //  Created by Phil Dougherty on 3/25/13.
 //
 //
 
-#import "ARISLogicTests.h"
+#import "PlayerTests.h"
+#import "AppServices.h"
 
-@implementation ARISLogicTests
+@implementation PlayerTests
 
 - (void)setUp
 {
     [super setUp];
-    
-    // Set-up code here.
 }
 
 - (void)tearDown
 {
-    // Tear-down code here.
-    
     [super tearDown];
 }
 

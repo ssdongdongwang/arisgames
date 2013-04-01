@@ -36,7 +36,6 @@
 
     CMMotionManager *motionManager;
 
-	BOOL loggedIn;
 	int playerId;
 	int fallbackGameId;
     int playerMediaId;
@@ -44,7 +43,6 @@
 	NSString *groupName;
 	NSString *userName;
 	NSString *displayName;
-	NSString *password;
 	CLLocation *playerLocation;
     
     NSMutableArray *oneGameGameList;
@@ -94,7 +92,6 @@
 }
 
 @property(nonatomic, strong) NSURL *serverURL;
-@property(readwrite) BOOL loggedIn;
 @property(readwrite) BOOL showGamesInDevelopment;
 @property(readwrite) BOOL showPlayerOnMap;
 @property(readwrite) BOOL museumMode;
@@ -118,7 +115,6 @@
 @property(nonatomic, strong) NSString *userName;
 @property(nonatomic, strong) NSString *groupName;
 @property(nonatomic, strong) NSString *displayName;
-@property(nonatomic, strong) NSString *password;
 @property(readwrite) int groupGame;
 @property(readwrite) int playerId;
 @property(readwrite) int fallbackGameId;//Used only to recover from crashes

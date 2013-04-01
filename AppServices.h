@@ -7,32 +7,30 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RootViewController.h"
-#import "AppModel.h"
-#import "MyCLController.h"
-#import "Location.h"
-#import "Game.h"
-#import "Tab.h"
-#import "Item.h"
-#import "Node.h"
-#import "Npc.h"
-#import "Media.h"
-#import "WebPage.h"
-#import "Panoramic.h"
-#import "Quest.h"
-#import "PanoramicMedia.h"
+
+#import "JSON.h"
 #import "JSONResult.h"
 #import "JSONConnection.h"
 #import "JSONResult.h"
-#import "JSON.h"
-#import "ARISAppDelegate.h"
+
+#import "Media.h"
+#import "Tab.h"
+
+#import "Game.h"
 #import "Comment.h"
+#import "Location.h"
+#import "Quest.h"
+#import "Item.h"
+#import "Node.h"
+#import "Npc.h"
+#import "WebPage.h"
+#import "Panoramic.h"
+#import "PanoramicMedia.h"
 #import "Note.h"
 #import "NoteContent.h"
-#import <MapKit/MapKit.h>
 #import "Tag.h"
-#import "ARISUploader.h"
 
+#import "ARISUploader.h"
 
 @interface AppServices : NSObject
 
@@ -43,7 +41,7 @@ extern NSString *const kARISServerServicePackage;
 - (void)resetCurrentlyFetchingVars;
 
 //Player
-- (void)login;
+- (void)loginWithUsername:(NSString *)userName password:(NSString *)password;
 - (void)registerNewUser:(NSString*)userName
                password:(NSString*)pass
 			  firstName:(NSString*)firstName
@@ -53,7 +51,7 @@ extern NSString *const kARISServerServicePackage;
 - (void)uploadPlayerPicMediaWithFileURL:(NSURL *)fileURL;
 - (void)updatePlayer:(int)playerId withName:(NSString *)name andImage:(int)mid;
 - (void)resetAndEmailNewPassword:(NSString *)email;
-- (void)setShowPlayerOnMap;
+- (void)setShowPlayer:(int)playerId onMap:(BOOL)showOnMap;
 
 //Game Picker
 - (void)fetchGameListWithDistanceFilter:(int)distanceInMeters locational:(BOOL)locationalOrNonLocational;

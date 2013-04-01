@@ -80,29 +80,23 @@
     LoginViewController* loginViewController = [[LoginViewController alloc] initWithNibName:@"Login" bundle:nil];
     self.loginNavigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
     self.loginNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    //self.loginNavigationController.view.frame = self.view.frame;
-    [self.view addSubview:self.loginNavigationController.view];
     
     //Player Settings View Controller
     PlayerSettingsViewController *playerSettingsViewController = [[PlayerSettingsViewController alloc] initWithNibName:@"PlayerSettingsViewController" bundle:nil];
     self.playerSettingsNavigationController = [[UINavigationController alloc] initWithRootViewController:playerSettingsViewController];
     self.playerSettingsNavigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     [self.playerSettingsNavigationController.view setFrame:UIScreen.mainScreen.applicationFrame];
-    //self.playerSettingsNavigationController.view.frame = self.view.frame;
     self.playerSettingsNavigationController.view.hidden = YES;
-    [self.view addSubview:self.playerSettingsNavigationController.view];
     
     //Tutorial View Controller
     tutorialViewController = [[TutorialViewController alloc] init];
     tutorialViewController.view.frame = self.gamePlayTabBarController.view.frame;
     tutorialViewController.view.hidden = YES;
     tutorialViewController.view.userInteractionEnabled = NO;
-    [self.gamePlayTabBarController.view addSubview:tutorialViewController.view];
     
     displayObjectQueueViewController = [[DisplayObjectQueueViewController alloc] initWithDelegate:self];
     
     gameNotificationViewController = [[GameNotificationViewController alloc] initWithNibName:nil bundle:nil];
-    [self.view addSubview:gameNotificationViewController.view];
     
     self.waitingIndicatorAlertViewController = [[WaitingIndicatorAlertViewController alloc] init];
 }
@@ -228,11 +222,11 @@
         //Start Polling Location
         [NSTimer scheduledTimerWithTimeInterval:3.0 target:[[MyCLController sharedMyCLController]locationManager] selector:@selector(startUpdatingLocation) userInfo:nil repeats:NO];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishLoginAttempt:)         name:@"NewLoginResponseReady"         object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleLogin:)                name:@"LoginSuccessful"               object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissPlayerSettings:)      name:@"PlayerSettingsDismissed"       object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectGameWithoutPicker:)    name:@"NewOneGameGameListReady"       object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(commitToPlayGame:)           name:@"CommitToPlayGame"              object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(beginGamePlay)               name:@"GameFinishedLoading"           object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showPlayerSettings:)         name:@"ProfSettingsRequested"         object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(performLogout:)              name:@"PassChangeRequested"           object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(performLogout:)              name:@"LogoutRequested"               object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(checkForDisplayCompleteNode) name:@"NewlyCompletedQuestsAvailable" object:nil];
@@ -241,19 +235,11 @@
         //Set up visibility of views at top of heirarchy
         [[AppModel sharedAppModel] loadUserDefaults];
         if([AppModel sharedAppModel].playerId == 0)
-        {
-            self.loginNavigationController.view.hidden     = NO;
-            self.gamePlayTabBarController.view.hidden      = YES;
-            self.gamePickerTabBarController.view.hidden    = YES;
-        }
+            [self.view addSubview:self.loginNavigationController];
         else
         {
-            [[AppServices sharedAppServices] setShowPlayerOnMap];
-            [AppModel sharedAppModel].loggedIn = YES;
-            self.gamePickerTabBarController.view.hidden         = NO;
-            self.loginNavigationController.view.hidden          = YES;
-            self.gamePlayTabBarController.view.hidden           = YES;
-            self.playerSettingsNavigationController.view.hidden = YES;
+            [[AppServices sharedAppServices] setShowPlayer:[AppModel sharedAppModel].playerId onMap:[AppModel sharedAppModel].showPlayerOnMap];
+            [self.view addSubview:self.gamePickerTabBarController.view];
         }
     }
     return self;
@@ -274,7 +260,6 @@
     [UIView beginAnimations:nil context:context];
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:YES];
     self.gamePlayTabBarController.view.hidden           = YES;
-    self.loginNavigationController.view.hidden          = YES;
     self.playerSettingsNavigationController.view.hidden = YES;
     [UIView commitAnimations];
 
@@ -285,6 +270,13 @@
     
     [AppModel sharedAppModel].fallbackGameId = 0;
     [[AppModel sharedAppModel] saveUserDefaults];
+}
+
+- (void)handleLogin:(NSNotification *)notification
+{
+    self.gamePickerTabBarController.selectedIndex = 0;
+    [self.view addSubview:self.gamePickerTabBarController.view]
+    [self.loginNavigationController.view removeFromSuperview];
 }
 
 - (void)showAlert:(NSString *)title message:(NSString *)message
@@ -412,77 +404,16 @@
 }
 
 #pragma mark Login and Game Selection
-- (void)createUserAndLoginWithGroup:(NSString *)groupName andGameId:(int)gameId inMuseumMode:(BOOL)museumMode
-{
-	[AppModel sharedAppModel].museumMode = museumMode;
-    
-    [self showWaitingIndicator:@"Creating User And Logging In..." displayProgressBar:NO];
-	[[AppServices sharedAppServices] createUserAndLoginWithGroup:[NSString stringWithFormat:@"%d-%@", gameId, groupName]];
-    
-    if(gameId != 0)
-    {
-        [AppModel sharedAppModel].skipGameDetails = YES;
-        [[AppServices sharedAppServices] fetchOneGameGameList:gameId];
-    }
-}
-
-- (void)attemptLoginWithUserName:(NSString *)userName andPassword:(NSString *)password andGameId:(int)gameId inMuseumMode:(BOOL)museumMode
-{
-	[AppModel sharedAppModel].userName = userName;
-	[AppModel sharedAppModel].password = password;
-	[AppModel sharedAppModel].museumMode = museumMode;
-    
-    [self showWaitingIndicator:@"Logging In..." displayProgressBar:NO];
-	[[AppServices sharedAppServices] login];
-    
-    if(gameId != 0)
-    {
-        [AppModel sharedAppModel].skipGameDetails = YES;
-        [[AppServices sharedAppServices] fetchOneGameGameList:gameId];
-    }
-}
-
-- (void)showPlayerSettings:(NSNotification *)notification
+- (void) displayPlayerSettings
 {
     [(PlayerSettingsViewController *)self.playerSettingsNavigationController.topViewController refreshViewFromModel];
-    self.playerSettingsNavigationController.view.hidden = NO;
+    [self.view addSubview:self.playerSettingsNavigationController.view];
     [(PlayerSettingsViewController *)self.playerSettingsNavigationController.topViewController viewDidIntentionallyAppear];
-    self.gamePickerTabBarController.view.hidden = NO;
 }
 
-- (void)finishLoginAttempt:(NSNotification *)notification
-{    
-	if([AppModel sharedAppModel].loggedIn)
-    {
-		NSLog(@"ARIS: Login Success");
-        self.loginNavigationController.view.hidden = YES;
-        if([AppModel sharedAppModel].museumMode)
-        {
-            NSLog(@"NSNotification: ProfSettingsRequested");
-            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ProfSettingsRequested" object:nil]];
-        }
-        else
-        {
-            self.playerSettingsNavigationController.view.hidden = YES;
-            self.gamePickerTabBarController.view.hidden = NO;
-            self.gamePickerTabBarController.selectedIndex = 0;
-        }
-    }
-    else
-    {
-		NSLog(@"ARIS: Login Failed");
-		if (self.networkAlert)
-            NSLog(@"RootViewController: Network is down, skip login alert");
-		else
-        {
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"LoginErrorTitleKey",@"")
-                                                            message:NSLocalizedString(@"LoginErrorMessageKey",@"")
-                                                           delegate:self
-                                                  cancelButtonTitle:NSLocalizedString(@"OkKey", @"")
-                                                  otherButtonTitles:nil];
-			[alert show];
-		}
-	}
+- (void) dismissPlayerSettings
+{
+    [self.playerSettingsNavigationController.view removeFromSuperview];
 }
 
 - (void)commitToPlayGame:(NSNotification *)notification
@@ -505,7 +436,6 @@
     
     self.gamePlayTabBarController.view.hidden           = NO;
     self.gamePickerTabBarController.view.hidden         = YES;
-    self.loginNavigationController.view.hidden          = YES;
     self.playerSettingsNavigationController.view.hidden = YES;
     
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]]; //Let the keyboard go away before loading the object
@@ -605,7 +535,7 @@
 	self.gamePlayTabBarController.view.hidden           = YES;
     self.gamePickerTabBarController.view.hidden         = YES;
     self.playerSettingsNavigationController.view.hidden = YES;
-    self.loginNavigationController.view.hidden          = NO;
+    [self.view addSubview:self.loginNavigationController.view];
     
     [gameNotificationViewController stopListeningToModel];
     [gameNotificationViewController cutOffGameNotifications];
@@ -622,7 +552,6 @@
     NSLog(@"ARIS: Selected Game (w/o picker): %@", game);
     
     self.gamePlayTabBarController.view.hidden  = YES;
-    self.loginNavigationController.view.hidden = YES;
 
     // Push Game Detail View Controller
     GameDetailsViewController *gameDetailsViewController = [[GameDetailsViewController alloc] initWithNibName:@"GameDetails" bundle:nil];

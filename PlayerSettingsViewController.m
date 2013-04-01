@@ -7,6 +7,7 @@
 
 #import "PlayerSettingsViewController.h"
 #import "AppServices.h"
+#import "RootViewController.h"
 
 @implementation PlayerSettingsViewController
 
@@ -90,9 +91,8 @@
     
     [[AppModel sharedAppModel] saveUserDefaults];
     
-    //THIS IS GARBAGE
     NSLog(@"NSNotification: PlayerSettingsDidDismiss");
-    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"PlayerSettingsDidDismiss" object:self userInfo:nil]];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"PlayerSettingsDismissed" object:self userInfo:nil]];
 
     return;
 }

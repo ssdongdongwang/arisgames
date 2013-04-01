@@ -51,7 +51,7 @@
 {
     [super requestNewGameList];
     
-    if([AppModel sharedAppModel].playerLocation && [[AppModel sharedAppModel] loggedIn])
+    if([AppModel sharedAppModel].playerLocation && [[AppModel sharedAppModel] playerId])
     {
         currentPage = 0;
         self.theSearchBar.text = searchText;

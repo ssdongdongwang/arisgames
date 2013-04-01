@@ -50,7 +50,7 @@
 {
     [super requestNewGameList];
     
-    if([AppModel sharedAppModel].playerLocation && [[AppModel sharedAppModel] loggedIn])
+    if([AppModel sharedAppModel].playerLocation && [[AppModel sharedAppModel] playerId])
     {
         [[AppServices sharedAppServices] fetchGameListWithDistanceFilter:distanceFilter locational:locational];
         [self showLoadingIndicator];

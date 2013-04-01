@@ -42,7 +42,7 @@
     UITabBarController *gamePickerTabBarController;
     UITabBarController *gamePlayTabBarController;
     
-    UINavigationController *playerSettingsViewNavigationController;
+    UINavigationController *playerSettingsNavigationController;
 
     UINavigationController *nearbyObjectsNavigationController;
     UINavigationController *nearbyObjectNavigationController;
@@ -99,11 +99,9 @@
 
 + (RootViewController *)sharedRootViewController;
 
-- (void)attemptLoginWithUserName:(NSString *)userName andPassword:(NSString *)password andGameId:(int)gameId inMuseumMode:(BOOL)museumMode;
-- (void)createUserAndLoginWithGroup:(NSString *)groupName andGameId:(int)gameId inMuseumMode:(BOOL)museumMode;
-
 - (void)setGamePlayTabBarVCs:(NSArray *)gamePlayTabs;
 - (void)showGamePickerTabBarAndHideOthers;
+- (void)displayPlayerSettings;
 
 - (void)selectGameWithoutPicker:(NSNotification *)notification;
 - (void)commitToPlayGame:(NSNotification *)notification;

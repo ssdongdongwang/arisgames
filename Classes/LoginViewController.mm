@@ -14,19 +14,32 @@
 #import "QRCodeReader.h"
 #import "BumpTestViewController.h"
 
+@interface LoginViewController ()
+{
+    BOOL create;
+    BOOL museumMode;
+    int  quickGameId;
+}
+
+@end
+
 @implementation LoginViewController
 
-- (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
+- (id) initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
     self = [super initWithNibName:nibName bundle:nibBundle];
     if (self)
     {
         self.title = NSLocalizedString(@"LoginTitleKey", @"");
+        create = NO;
+        museumMode = NO;
+        quickGameId = 0;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handlLoginAttempt:) name:@"NewLoginResponseReady" object:nil];
     }
     return self;
 }
 
-- (void)viewDidLoad
+- (void) viewDidLoad
 {
     [super viewDidLoad];
 
@@ -37,50 +50,132 @@
     [newAccountButton setTitle:NSLocalizedString(@"CreateAccountKey",@"") forState:UIControlStateNormal];
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL) textFieldShouldReturn:(UITextField *)textField
 {
-    if (textField == usernameField)
+    if(textField == usernameField)
         [passwordField becomeFirstResponder];
     if(textField == passwordField)
-        [self loginButtonTouched:self];
+        [self loginButtonTouched:nil];
     return YES;
 }
 
-//Makes keyboard disappear on touch outside of keyboard or textfield
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [usernameField resignFirstResponder];
     [passwordField resignFirstResponder];
 }
 
--(IBAction)loginButtonTouched:(id)sender
+- (IBAction) loginButtonTouched:(id)sender
 {
-    [[RootViewController sharedRootViewController] attemptLoginWithUserName:usernameField.text andPassword:passwordField.text andGameId:0 inMuseumMode:false];
-
     [usernameField resignFirstResponder];
     [passwordField resignFirstResponder];
+ 
+    [[RootViewController sharedRootViewController] showWaitingIndicator:@"Logging In..." displayProgressBar:NO];
+    [[AppServices sharedAppServices] loginWithUsername:usernameField.text password:passwordField.text];
 }
 
--(IBAction)QRButtonTouched
+- (IBAction) QRButtonTouched
 {
     ZXingWidgetController *widController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO];
     widController.readers = [[NSMutableSet alloc ] initWithObjects:[[QRCodeReader alloc] init], nil];
     [self presentModalViewController:widController animated:NO];
 }
 
--(void)changePassTouch
+- (void) changePassTouch
 {
     ForgotViewController *forgotPassViewController = [[ForgotViewController alloc] initWithNibName:@"ForgotViewController" bundle:[NSBundle mainBundle]];
     [[self navigationController] pushViewController:forgotPassViewController animated:NO];
 }
 
--(IBAction)newAccountButtonTouched:(id)sender
+- (IBAction) newAccountButtonTouched:(id)sender
 {
     SelfRegistrationViewController *selfRegistrationViewController = [[SelfRegistrationViewController alloc] initWithNibName:@"SelfRegistration" bundle:[NSBundle mainBundle]];
     [[self navigationController] pushViewController:selfRegistrationViewController animated:NO];
 }
 
-- (void)zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)result
+- (void) interpretLoginScan:(NSString *)scanString
+{
+    NSArray *terms  = [scanString componentsSeparatedByString:@","];
+    if([terms count] > 1)
+    {
+        if([terms count] > 0) create = [[terms objectAtIndex:0] boolValue];
+        
+        if(create)
+        {
+            NSString *groupname;
+            
+            if([terms count] > 1) groupname   = [terms objectAtIndex:1]; //Group Name
+            if([terms count] > 2) quickGameId = [[terms objectAtIndex:2] intValue];
+            if([terms count] > 3) museumMode  = [[terms objectAtIndex:3] boolValue];
+            
+            [[RootViewController sharedRootViewController] showWaitingIndicator:@"Creating User And Logging In..." displayProgressBar:NO];
+            [[AppServices sharedAppServices] createUserAndLoginWithGroup:[NSString stringWithFormat:@"%d-%@", quickGameId, groupname]];
+        }
+        else
+        {
+            NSString *username;
+            NSString *password;
+            
+            if([terms count] > 1) username    = [terms objectAtIndex:1]; //Username
+            if([terms count] > 2) password    = [terms objectAtIndex:2]; //Password
+            if([terms count] > 3) quickGameId = [[terms objectAtIndex:3] intValue];
+            if([terms count] > 4) museumMode  = [[terms objectAtIndex:4] boolValue];
+            
+            [[RootViewController sharedRootViewController] showWaitingIndicator:@"Logging In..." displayProgressBar:NO];
+            [[AppServices sharedAppServices] loginWithUsername:username password:password];
+        }
+    }
+}
+
+- (void) handleLoginAttempt:(NSNotification *)n
+{
+    if([AppModel sharedAppModel].playerId) //logged in
+    {
+        if(create)           [self pickPlayerSettings];
+        else if(quickGameId) [self loadQuickGame];
+        else                 [self finishLogin];
+    }
+    else
+    {
+        [[RootViewController sharedRootViewController] showAlert:NSLocalizedString(@"LoginErrorTitleKey",@"") message:NSLocalizedString(@"LoginErrorMessageKey",@"")];
+	}
+}
+
+- (void) pickPlayerSettings
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerSettingsPicked:) name:@"PlayerSettingsDismissed" object:nil];
+    [[RootViewController sharedRootViewController] displayPlayerSettings];
+}
+
+- (void) playerSettingsPicked:(NSNotification *)n
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self selector:@selector(playerSettingsPicked:) name:@"PlayerSettingsDismissed" object:nil];
+    if(quickGameId) [self loadQuickGame];
+    else            [self finishLogin];
+}
+
+- (void) loadQuickGame
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(quickGameLoaded:) name:@"NewOneGameGameListReady" object:nil];
+    [[AppServices sharedAppServices] fetchOneGameGameList:quickGameId];
+}
+
+- (void) quickGameLoaded:(NSNotification *)n
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self selector:@selector(quickGameLoaded:) name:@"NewOneGameGameListReady" object:nil];
+    if(museumMode) 
+        ;
+    else 
+        ;
+    [self finishLogin];
+}
+
+- (void) finishLogin
+{
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"LoginSuccessful" object:self userInfo:nil]];
+}
+
+- (void) zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)result
 {
     [self dismissModalViewControllerAnimated:NO];
     if([result isEqualToString:@"TEST_BUMP"])
@@ -89,37 +184,17 @@
         [self presentViewController:b animated:NO completion:nil];
     }
     else
-    {
-        NSArray *terms  = [result componentsSeparatedByString:@","];
-        if([terms count] > 1)
-        {
-            int gameId = 0;
-            bool create;
-            bool museumMode;
-            
-            if([terms count] > 0) create = [[terms objectAtIndex:0] boolValue];
-            if(create)
-            {
-                if([terms count] > 1) usernameField.text = [terms objectAtIndex:1]; //Group Name
-                if([terms count] > 2) gameId = [[terms objectAtIndex:2] intValue];
-                if([terms count] > 3) museumMode = [[terms objectAtIndex:3] boolValue];
-                [[RootViewController sharedRootViewController] createUserAndLoginWithGroup:usernameField.text andGameId:gameId inMuseumMode:museumMode];
-            }
-            else
-            {
-                if([terms count] > 1) usernameField.text = [terms objectAtIndex:1]; //Username
-                if([terms count] > 2) passwordField.text = [terms objectAtIndex:2]; //Password
-                if([terms count] > 3) gameId = [[terms objectAtIndex:3] intValue];
-                if([terms count] > 4) museumMode = [[terms objectAtIndex:4] boolValue];
-                [[RootViewController sharedRootViewController] attemptLoginWithUserName:usernameField.text andPassword:passwordField.text andGameId:gameId inMuseumMode:museumMode];
-            }
-        }
-    }
+        [self interpretLoginScan:result];
 }
 
-- (void)zxingControllerDidCancel:(ZXingWidgetController*)controller
+- (void) zxingControllerDidCancel:(ZXingWidgetController*)controller
 {
     [self dismissModalViewControllerAnimated:NO];
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
