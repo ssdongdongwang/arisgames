@@ -43,6 +43,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel)   name:@"NewlyAcquiredItemsAvailable" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel)   name:@"NewlyLostItemsAvailable"     object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(incrementBadge)         name:@"NewlyChangedItemsGameNotificationSent"    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearBadge)             name:@"ClearBadgeRequest" object:nil];
     }
     return self;
 }
@@ -97,11 +98,16 @@
 {
     self.tabBarController.selectedIndex = [self.tabBarController.viewControllers indexOfObjectIdenticalTo:self];
 
-    badgeCount = 0;
-    self.tabBarItem.badgeValue = nil;
+    [self clearBadge];
     
     [[AppServices sharedAppServices] updateServerInventoryViewed];
 	[self refresh];				
+}
+
+- (void) clearBadge
+{
+    badgeCount = 0;
+    self.tabBarItem.badgeValue = nil;
 }
 
 -(void)tradeButtonTouched

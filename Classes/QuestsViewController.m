@@ -58,6 +58,7 @@ NSString *const kQuestsHtmlTemplate =
         badgeCount = 0;
 		isLink = NO;
         
+        self.title = NSLocalizedString(@"QuestViewTitleKey",@"");
         self.tabBarItem.image = [UIImage imageNamed:@"117-todo"];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLoadingIndicator) name:@"ConnectionLost"                object:nil];
@@ -65,25 +66,26 @@ NSString *const kQuestsHtmlTemplate =
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel)   name:@"NewlyActiveQuestsAvailable"    object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel)   name:@"NewlyCompletedQuestsAvailable" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(incrementBadge)         name:@"NewlyChangedQuestsGameNotificationSent"    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearBadge)             name:@"ClearBadgeRequest" object:nil];
     }
     return self;
-}
-
--(void)viewDidLoad
-{
-    self.title = NSLocalizedString(@"QuestViewTitleKey",@"");
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     self.tabBarController.selectedIndex = [self.tabBarController.viewControllers indexOfObjectIdenticalTo:self];
 
-    badgeCount = 0;
-    self.tabBarItem.badgeValue = nil;
+    [self clearBadge];
     
 	[[AppServices sharedAppServices] updateServerQuestsViewed];
 	
 	[self refresh];
+}
+
+- (void) clearBadge
+{
+    badgeCount = 0;
+    self.tabBarItem.badgeValue = nil;
 }
 
 - (IBAction)sortQuestsButtonTouched

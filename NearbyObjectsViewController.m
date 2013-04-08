@@ -64,19 +64,26 @@
     //Find locations that are "nearby" from the list of all locations
     for(Location *location in [AppModel sharedAppModel].currentGame.locationsModel.currentLocations)
     {
-        if([[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.errorRange &&
-           (![location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
+        BOOL match = NO;
+        for (Location *oldLocation in self.nearbyLocationsList)
+            if (oldLocation.locationId == location.locationId) match = YES;
+        if(!match && [[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.error &&
+           ([location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
+            [newNearbyLocationsList addObject:location];
+        else if(match && [[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.error+10 &&
+           ([location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
             [newNearbyLocationsList addObject:location];
     }
     
     //Find new nearby locations to be force displayed
-    for(int i = 0; i < newNearbyLocationsList.count; i++)
+    for(Location *location in newNearbyLocationsList)
     {
-        Location *location = [newNearbyLocationsList objectAtIndex:i];
         BOOL match = NO;
         for (Location *oldLocation in self.nearbyLocationsList)
             if (oldLocation.locationId == location.locationId) match = YES;
-        if (match == NO && location.forcedDisplay)
+        for(Location *oldForceDisplay in forceDisplayQueue)
+            if(oldForceDisplay.locationId == location.locationId) match = YES;
+        if(match == NO && location.forcedDisplay)
             [forceDisplayQueue addObject:location];
     }
     
