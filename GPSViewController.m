@@ -279,7 +279,7 @@ NSMutableArray *locationsToRemove;
     {
         for(int j = 0; j < [locationsToAdd count]; j++)
         {
-            if(((Location *)[newLocations objectAtIndex:i]).locationId == ((Location *)[locationsToAdd objectAtIndex:j]).locationId)
+            if([((Location *)[newLocations objectAtIndex:i]) compareTo: ((Location *)[locationsToAdd objectAtIndex:j])])
                 [locationsToAdd removeObjectAtIndex:j];
         }
     }
@@ -296,7 +296,7 @@ NSMutableArray *locationsToRemove;
     {
         for(int j = 0; j < [locationsToRemove count]; j++)
         {
-            if(((Location *)[lostLocations objectAtIndex:i]).locationId == ((Location *)[locationsToRemove objectAtIndex:j]).locationId)
+            if([((Location *)[lostLocations objectAtIndex:i]) compareTo: ((Location *)[locationsToRemove objectAtIndex:j])])
                 [locationsToRemove removeObjectAtIndex:j];
         }
     }
@@ -307,7 +307,7 @@ NSMutableArray *locationsToRemove;
     {
         for(int j = 0; j < [locationsToAdd count]; j++)
         {
-            if(((Location *)[locationsToRemove objectAtIndex:i]).locationId == ((Location *)[locationsToAdd objectAtIndex:j]).locationId)
+            if([((Location *)[locationsToRemove objectAtIndex:i]) compareTo: ((Location *)[locationsToAdd objectAtIndex:j])])
                 [locationsToAdd removeObjectAtIndex:j];
         }
     }

@@ -198,6 +198,7 @@
 		AA2C3CF816D54A2B00623957 /* LocationsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2C3CF716D54A2B00623957 /* LocationsModel.m */; };
 		AA39E32116C4370D005A4E06 /* libPusher-combined.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA39E32016C4370D005A4E06 /* libPusher-combined.a */; };
 		AA39F65916DD21B0000DE415 /* GamePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA39F65816DD21B0000DE415 /* GamePickerViewController.m */; };
+		AA3F0310170B407E007A67A7 /* NpcViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA3F030D170B407E007A67A7 /* NpcViewController.xib */; };
 		AA479A0416CD6B24001B2B03 /* AttributesModel.m in Sources */ = {isa = PBXBuildFile; fileRef = AA479A0316CD6B24001B2B03 /* AttributesModel.m */; };
 		AA4FF4651700B3FE005D71C9 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB1660BD14E8754B002C6ACB /* SenTestingKit.framework */; };
 		AA4FF4661700B3FE005D71C9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB1660BF14E8754B002C6ACB /* UIKit.framework */; };
@@ -375,7 +376,6 @@
 		D424324D1107730E00E58147 /* Scene.m in Sources */ = {isa = PBXBuildFile; fileRef = D424324A1107730E00E58147 /* Scene.m */; };
 		D424324E1107730E00E58147 /* SceneParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D424324C1107730E00E58147 /* SceneParser.m */; };
 		D42432631107735800E58147 /* NpcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D42432621107735800E58147 /* NpcViewController.m */; };
-		D4243268110773EB00E58147 /* NpcViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D4243267110773EB00E58147 /* NpcViewController.xib */; };
 		D43717DF106D62BB0020C515 /* Media.m in Sources */ = {isa = PBXBuildFile; fileRef = D43717DE106D62BB0020C515 /* Media.m */; };
 		D4D366DF111B6789009C4D00 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4D366DE111B6789009C4D00 /* CFNetwork.framework */; };
 		D4DE6B8B110A00D7008BFE38 /* defaultCharacter.png in Resources */ = {isa = PBXBuildFile; fileRef = D4DE6B8A110A00D7008BFE38 /* defaultCharacter.png */; };
@@ -721,6 +721,8 @@
 		A7E39EC90F5F655E00826198 /* Camera.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Camera.xib; sourceTree = "<group>"; };
 		A7E4C88B0F54C4D000C6D9E8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A7E4C8980F54C5E300C6D9E8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		AA0CE8311704C3BE0098429E /* DialogScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogScript.h; sourceTree = "<group>"; };
+		AA0CE8321704C3BE0098429E /* DialogScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DialogScript.m; sourceTree = "<group>"; };
 		AA1771A11652DDAB00A3836D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AA1E2D4D1652CC6000219535 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		AA1E2D4F1652CC7500219535 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -752,6 +754,7 @@
 		AA39E33316C43771005A4E06 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
 		AA39F65716DD21B0000DE415 /* GamePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GamePickerViewController.h; sourceTree = "<group>"; };
 		AA39F65816DD21B0000DE415 /* GamePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GamePickerViewController.m; sourceTree = "<group>"; };
+		AA3F030D170B407E007A67A7 /* NpcViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NpcViewController.xib; sourceTree = "<group>"; };
 		AA479A0216CD6B24001B2B03 /* AttributesModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributesModel.h; sourceTree = "<group>"; };
 		AA479A0316CD6B24001B2B03 /* AttributesModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributesModel.m; sourceTree = "<group>"; };
 		AA4FF4641700B3FE005D71C9 /* ARISLogicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ARISLogicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1005,7 +1008,6 @@
 		D424324C1107730E00E58147 /* SceneParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneParser.m; sourceTree = "<group>"; };
 		D42432611107735800E58147 /* NpcViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NpcViewController.h; sourceTree = "<group>"; };
 		D42432621107735800E58147 /* NpcViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = NpcViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		D4243267110773EB00E58147 /* NpcViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NpcViewController.xib; sourceTree = "<group>"; };
 		D43717DD106D62BB0020C515 /* Media.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Media.h; sourceTree = "<group>"; };
 		D43717DE106D62BB0020C515 /* Media.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Media.m; sourceTree = "<group>"; };
 		D4D366DE111B6789009C4D00 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -2105,9 +2107,9 @@
 		D42432501107734300E58147 /* NPC Dialog */ = {
 			isa = PBXGroup;
 			children = (
+				AA3F030D170B407E007A67A7 /* NpcViewController.xib */,
 				ABDF2CCA15DB4379008E8CA0 /* textToggle.png */,
 				AB8E31F51228399B00C198C3 /* textFade.png */,
-				D4243267110773EB00E58147 /* NpcViewController.xib */,
 				D42432611107735800E58147 /* NpcViewController.h */,
 				D42432621107735800E58147 /* NpcViewController.m */,
 				D42432491107730E00E58147 /* Scene.h */,
@@ -2116,6 +2118,8 @@
 				D424324C1107730E00E58147 /* SceneParser.m */,
 				DBBCE9E015937704006994F9 /* DefaultPCImage.png */,
 				D4DE6B8A110A00D7008BFE38 /* defaultCharacter.png */,
+				AA0CE8311704C3BE0098429E /* DialogScript.h */,
+				AA0CE8321704C3BE0098429E /* DialogScript.m */,
 			);
 			name = "NPC Dialog";
 			sourceTree = "<group>";
@@ -2251,7 +2255,6 @@
 				ABB925E510C858DF00B09506 /* inventory.png in Resources */,
 				ABB925E910C8590200B09506 /* qrscanner.png in Resources */,
 				ABA104C710CA0E3E008538D0 /* ARView.xib in Resources */,
-				D4243268110773EB00E58147 /* NpcViewController.xib in Resources */,
 				D4DE6B8B110A00D7008BFE38 /* defaultCharacter.png in Resources */,
 				AB0DE80511559CF000A6EC3E /* AudioRecorderViewController.xib in Resources */,
 				AB4150B61159291400DBA15F /* microphoneBackground.jpg in Resources */,
@@ -2400,6 +2403,7 @@
 				DDC495DD16407DE500D4C063 /* PopOverViewController.xib in Resources */,
 				AABD101916B7164C007278EF /* README_ABOUT_LINK_ERRORS in Resources */,
 				AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */,
+				AA3F0310170B407E007A67A7 /* NpcViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
