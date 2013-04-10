@@ -1195,6 +1195,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void)parseOverlayListFromJSON: (JSONResult *)jsonResult
 {
+    if(!currentlyFetchingOverlayList) return;
     currentlyFetchingOverlayList = NO;
     
     NSLog(@"NSNotification: ReceivedOverlayList");
@@ -1848,6 +1849,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void)parseGameNoteListFromJSON: (JSONResult *)jsonResult
 {
+    if(!currentlyFetchingGameNoteList) return;
+    currentlyFetchingGameNoteList = NO;
+
     NSArray *noteListArray = (NSArray *)jsonResult.data;
     NSMutableDictionary *tempNoteList = [[NSMutableDictionary alloc]init];
     
@@ -1867,12 +1871,13 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     NSLog(@"NSNotification: ReceivedNoteList");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ReceivedNoteList"      object:nil]];
     //^ This is ridiculous. Each notification is a paraphrasing of the last. <3 Phil
-    
-    currentlyFetchingGameNoteList = NO;
 }
 
 -(void)parsePlayerNoteListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingPlayerNoteList) return;
+    currentlyFetchingPlayerNoteList = NO;
+
     NSLog(@"Parsing Player Note List");
     
     NSArray *noteListArray = (NSArray *)jsonResult.data;
@@ -1891,7 +1896,6 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     [AppModel sharedAppModel].playerNoteList = tempNoteList;
     NSLog(@"NSNotification: NewNoteListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNoteListReady" object:nil]];
-    currentlyFetchingPlayerNoteList = NO;
 }
 
 -(void)parseConversationNodeOptionsFromJSON:(JSONResult *)jsonResult
@@ -2069,7 +2073,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void) parseOneGameGameListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingOneGame) return;
     currentlyFetchingOneGame = NO;
+    
     [AppModel sharedAppModel].oneGameGameList = [self parseGameListFromJSON:jsonResult];
     Game * game = (Game *)[[AppModel sharedAppModel].oneGameGameList  objectAtIndex:0];
     NSLog(@"NSNotification: NewOneGameGameListReady");
@@ -2078,7 +2084,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void) parseNearbyGameListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingNearbyGamesList) return;
     currentlyFetchingNearbyGamesList = NO;
+    
     [AppModel sharedAppModel].nearbyGameList = [self parseGameListFromJSON:jsonResult];
     NSLog(@"NSNotification: NewNearbyGameListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewNearbyGameListReady" object:nil]];
@@ -2086,15 +2094,19 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void) parseSearchGameListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingSearchGamesList) return;
     currentlyFetchingSearchGamesList = NO;
+    
     [AppModel sharedAppModel].searchGameList = [self parseGameListFromJSON:jsonResult];
     NSLog(@"NSNotification: NewSearchGameListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewSearchGameListReady" object:nil]];
 }
 
-- (void) parsePopularGameListFromJSON:(JSONResult *)jsonResult
+-(void)parsePopularGameListFromJSON: (JSONResult *)jsonResult
 {
+    if(!currentlyFetchingPopularGamesList) return;
     currentlyFetchingPopularGamesList = NO;
+    
     [AppModel sharedAppModel].popularGameList = [self parseGameListFromJSON:jsonResult];
     NSLog(@"NSNotification: NewPopularGameListReady");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"NewPopularGameListReady" object:nil]];
@@ -2102,7 +2114,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void) parseRecentGameListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingRecentGamesList) return;
     currentlyFetchingRecentGamesList = NO;
+    
     NSArray *gameListArray = (NSArray *)jsonResult.data;
     
     NSMutableArray *tempGameList = [[NSMutableArray alloc] init];
@@ -2136,9 +2150,9 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)parseLocationListFromJSON: (JSONResult *)jsonResult
 {
-	NSLog(@"AppModel: Parsing Location List");
-	
+    if(!currentlyFetchingLocationList) return;
     currentlyFetchingLocationList = NO;
+    
     NSLog(@"NSNotification: ReceivedLocationList");
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ReceivedLocationList" object:nil]];
 	
@@ -2366,11 +2380,12 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void)parseInventoryFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingInventory) return;
+    currentlyFetchingInventory = NO;
+    
     NSLog(@"NSNotification: ReceivedInventory");
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ReceivedInventory" object:nil]];
     
-    currentlyFetchingInventory = NO;
-	
 	NSMutableArray *tempInventory = [[NSMutableArray alloc] initWithCapacity:10];
     NSMutableArray *tempAttributes = [[NSMutableArray alloc] initWithCapacity:10];
     
@@ -2420,15 +2435,17 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void)parseUpdateServerWithPlayerLocationFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyUpdatingServerWithPlayerLocation) return;
     currentlyUpdatingServerWithPlayerLocation = NO;
 }
 
 -(void)parseQuestListFromJSON:(JSONResult *)jsonResult
 {
+    if(!currentlyFetchingQuestList) return;
+    currentlyFetchingQuestList = NO;
+    
     NSLog(@"NSNotification: ReceivedQuestList");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ReceivedQuestList" object:nil]];
-    
-    currentlyFetchingQuestList = NO;
 
 	NSDictionary *questListsDictionary = (NSDictionary *)jsonResult.data;
 	

@@ -139,7 +139,7 @@ NSString *const kPlaqueDescriptionHtmlTemplate =
 }
 
 #pragma mark AsyncImageView Delegate Methods
--(void)imageFinishedLoading
+-(void)imageFinishedLoading:(AsyncMediaImageView *)image
 {
     NSLog(@"NodeVC: imageFinishedLoading with size: %f, %f",self.mediaImageView.frame.size.width,self.mediaImageView.frame.size.height);
     /*
