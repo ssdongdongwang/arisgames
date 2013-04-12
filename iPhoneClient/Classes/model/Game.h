@@ -93,10 +93,12 @@
 @property (readwrite) BOOL allowNoteComments;
 @property (readwrite) BOOL allowNoteLikes;
 @property (readwrite) BOOL allowTrading;
+@property (readwrite) BOOL offlineMode;
 
 @property (readwrite, assign) int calculatedScore;
 @property (nonatomic, strong) Media *iconMedia;
 @property (nonatomic, strong) Media *splashMedia;
+
 
 - (void) getReadyToPlay;
 - (NSComparisonResult)compareDistanceFromPlayer:(Game*)otherGame;

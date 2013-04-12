@@ -429,7 +429,8 @@
     if(managedObjectModel != nil)
         return managedObjectModel;
         
-    managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];    
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"UploadContent" withExtension:@"momd"];
+    managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     return managedObjectModel;
 }
 

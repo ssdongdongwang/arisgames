@@ -13,6 +13,10 @@
 #import "commentsViewController.h"
 #import <MapKit/MKReverseGeocoder.h>
 #import "RatingCell.h"
+#import "LocalData.h"
+#import "MGame.h"
+#import "StoreLocallyViewController.h"
+
 
 #include <QuartzCore/QuartzCore.h>
 
@@ -126,6 +130,8 @@ NSString *const kGameDetailsHtmlTemplate =
 #pragma mark Table view methods
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    // miodrag: add additional row for downloading the game for offline games
+    if (self.game.offlineMode) return 4;
     return 3;
 }
 
@@ -141,6 +147,9 @@ NSString *const kGameDetailsHtmlTemplate =
             else return 2;
             break;
         case 2:
+            return 1;
+            break;
+        case 3:
             return 1;
             break;
     }
@@ -204,6 +213,10 @@ NSString *const kGameDetailsHtmlTemplate =
         [descriptionWebView setFrame:descriptionFrame];
         [cell.contentView addSubview:descriptionWebView];
     }
+    else if (indexPath.section == 3)
+    {
+        cell.textLabel.text = NSLocalizedString(@"Download Game", @"");
+    }
     
     return cell;
 }
@@ -236,6 +249,19 @@ NSString *const kGameDetailsHtmlTemplate =
     {
         if(indexPath.row == 0)
         {
+            if (self.game.offlineMode) {
+                // try to get it from the local model
+                MGame *mgame = [[LocalData sharedLocal] gameForId:self.game.gameId];
+                if (mgame) {
+                    [self playGame];
+                    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+                    [self.tableView reloadData];
+                }
+                else {
+                    // download the game
+                }
+            }
+            
             [self playGame];
             [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
             [self.tableView reloadData];
@@ -263,6 +289,12 @@ NSString *const kGameDetailsHtmlTemplate =
             [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
             [self.navigationController pushViewController:commentsVC animated:YES];     
         }
+    }
+    else if (indexPath.section == 3) {
+        StoreLocallyViewController *controller = [[StoreLocallyViewController alloc] initWithNibName:@"StoreLocallyViewController" bundle:nil];
+        controller.game = self.game;
+        [controller setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+        [self presentModalViewController:controller animated:YES];
     }
 }
 
