@@ -38,7 +38,6 @@
     if (self)
     {
         viewControllers = [[NSMutableArray alloc] initWithCapacity:10];
-        //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTable) name:@"ImageReady" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewFromModel) name:@"NewNoteListReady" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieFinishedCallback:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
         self.hidesBottomBarWhenPushed = YES;
@@ -415,11 +414,9 @@
                 self.note.showOnMap = YES;
                 self.sharingLabel.text = NSLocalizedString(@"NoteEditorListAndMapKey", @""); 
                 if(!self.note.dropped){
-                    if(!self.note.dropped){
                         [[AppServices sharedAppServices] dropNote:self.note.noteId atCoordinate:[AppModel sharedAppModel].playerLocation.coordinate];
                         self.note.dropped = YES;
                         self.mapButton.selected = YES;
-                    }
                 }
             }
             else{

@@ -70,8 +70,8 @@
         if(!match && [[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.error &&
            ([location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
             [newNearbyLocationsList addObject:location];
-        else if(match && [[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.error+10 &&
-           ([location.object.objectType isEqualToString:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
+        else if(match && (location.error >= 2147483637 || [[AppModel sharedAppModel].playerLocation distanceFromLocation:location.latlon] < location.error+10) &&
+           (![location.object.objectType isEqualToStrine:@"Item"] || location.qty != 0) && ![location.object.objectType isEqualToString:@"Player"])
             [newNearbyLocationsList addObject:location];
     }
     
