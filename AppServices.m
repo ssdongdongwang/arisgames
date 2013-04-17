@@ -17,7 +17,7 @@ static const BOOL kEmptyBoolValue = NO;
 static const int kEmptyIntValue = 0;
 static const float kEmptyFloatValue = 0.0;
 static const double kEmptyDoubleValue = 0.0;
-NSString *const kARISServerServicePackage = @"v2";
+NSString *const kARISServerServicePackage = @"v1";
 
 BOOL currentlyFetchingLocationList;
 BOOL currentlyFetchingOverlayList;
@@ -841,7 +841,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 - (void)noteContentUploadDidfinish:(ARISUploader*)uploader {
 	NSLog(@"Model: Upload Note Content Request Finished. Response: %@", [uploader responseString]);
 	
-        int noteId = [[uploader userInfo] validObjectForKey:@"noteId"] ? [[uploader userInfo] validIntForKey:@"noteId"] : 0;
+        int noteId = [[uploader userInfo] validIntForKey:@"noteId"] ? [[uploader userInfo] validIntForKey:@"noteId"] : 0;
         NSString *title = [[uploader userInfo] validObjectForKey:@"title"];
         NSString *type  = [[uploader userInfo] validObjectForKey:@"type"];
         NSURL *localUrl = [[uploader userInfo] validObjectForKey:@"url"];
@@ -854,7 +854,6 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
     newContent.title = @"Refreshing From Server...";
     newContent.type = type;
     newContent.contentId = 0;
-    
     
     [[[[[AppModel sharedAppModel] playerNoteList] objectForKey:[NSNumber numberWithInt:noteId]] contents] addObject:newContent];
     [[AppModel sharedAppModel].uploadManager deleteContentFromNoteId:noteId andFileURL:localUrl];
@@ -1354,13 +1353,13 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)fetchGameNoteListAsynchronously:(BOOL)YesForAsyncOrNoForSync
 {
-    /*if (currentlyFetchingGameNoteList)
+    if (currentlyFetchingGameNoteList)
      {
      NSLog(@"Skipping Request: already fetching game notes");
      return;
      }
      
-     currentlyFetchingGameNoteList = YES;*/
+     currentlyFetchingGameNoteList = YES;
 	NSArray *arguments = [NSArray arrayWithObjects:[NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId], [NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],nil];
 	
 	JSONConnection *jsonConnection = [[JSONConnection alloc]initWithServer:[AppModel sharedAppModel].serverURL
@@ -1375,13 +1374,13 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 - (void)fetchPlayerNoteListAsynchronously:(BOOL)YesForAsyncOrNoForSync
 {
-	/*if (currentlyFetchingPlayerNoteList)
+	if (currentlyFetchingPlayerNoteList)
      {
      NSLog(@"Skipping Request: already fetching player notes");
      return;
      }
      
-     currentlyFetchingPlayerNoteList = YES;*/
+     currentlyFetchingPlayerNoteList = YES;
     
 	NSArray *arguments = [NSArray arrayWithObjects:[NSString stringWithFormat:@"%d",[AppModel sharedAppModel].playerId],[NSString stringWithFormat:@"%d",[AppModel sharedAppModel].currentGame.gameId], nil];
 	
