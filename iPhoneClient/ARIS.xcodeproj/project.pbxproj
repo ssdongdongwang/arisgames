@@ -234,11 +234,12 @@
 		AA7988A1171762B200584220 /* MTab.m in Sources */ = {isa = PBXBuildFile; fileRef = AA79887E171762B200584220 /* MTab.m */; };
 		AA7988A2171762B200584220 /* NSData+md5.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798880171762B200584220 /* NSData+md5.m */; };
 		AA7988A3171762B200584220 /* NSURLConnection+block.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798882171762B200584220 /* NSURLConnection+block.m */; };
-		AA7988A4171762B200584220 /* Offline.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AA798883171762B200584220 /* Offline.bundle */; };
 		AA7988A5171762B200584220 /* StoreLocallyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798885171762B200584220 /* StoreLocallyViewController.m */; };
 		AA7988A6171762B200584220 /* StoreLocallyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA798886171762B200584220 /* StoreLocallyViewController.xib */; };
 		AA80EFCE16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA80EFCD16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m */; };
 		AA84429E17131ECD0097FF21 /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = AA84429D17131ECD0097FF21 /* MTStatusBarOverlay.m */; };
+		AA96D780171EF19200FDF943 /* MOverlayTile.m in Sources */ = {isa = PBXBuildFile; fileRef = AA96D77F171EF19200FDF943 /* MOverlayTile.m */; };
+		AA96D786171F40A300FDF943 /* MOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = AA96D785171F40A300FDF943 /* MOverlay.m */; };
 		AA99E61F16F0D80E00E22030 /* libZXingWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA99E61A16F0D7FF00E22030 /* libZXingWidget.a */; };
 		AAA5890116DE714A00C2445B /* BumpTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAA588FF16DE714A00C2445B /* BumpTestViewController.m */; };
 		AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAA5890016DE714A00C2445B /* BumpTestViewController.xib */; };
@@ -853,7 +854,6 @@
 		AA798880171762B200584220 /* NSData+md5.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+md5.m"; sourceTree = "<group>"; };
 		AA798881171762B200584220 /* NSURLConnection+block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLConnection+block.h"; sourceTree = "<group>"; };
 		AA798882171762B200584220 /* NSURLConnection+block.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLConnection+block.m"; sourceTree = "<group>"; };
-		AA798883171762B200584220 /* Offline.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Offline.bundle; sourceTree = "<group>"; };
 		AA798884171762B200584220 /* StoreLocallyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreLocallyViewController.h; sourceTree = "<group>"; };
 		AA798885171762B200584220 /* StoreLocallyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StoreLocallyViewController.m; sourceTree = "<group>"; };
 		AA798886171762B200584220 /* StoreLocallyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StoreLocallyViewController.xib; sourceTree = "<group>"; };
@@ -862,6 +862,10 @@
 		AA80EFCD16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaitingIndicatorAlertViewController.m; sourceTree = "<group>"; };
 		AA84429C17131ECD0097FF21 /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
 		AA84429D17131ECD0097FF21 /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
+		AA96D77E171EF19200FDF943 /* MOverlayTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOverlayTile.h; sourceTree = "<group>"; };
+		AA96D77F171EF19200FDF943 /* MOverlayTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOverlayTile.m; sourceTree = "<group>"; };
+		AA96D784171F40A300FDF943 /* MOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOverlay.h; sourceTree = "<group>"; };
+		AA96D785171F40A300FDF943 /* MOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOverlay.m; sourceTree = "<group>"; };
 		AA99E61416F0D7FF00E22030 /* ZXingWidget.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZXingWidget.xcodeproj; path = "../zxing-master/iphone/ZXingWidget/ZXingWidget.xcodeproj"; sourceTree = "<group>"; };
 		AAA588FE16DE714A00C2445B /* BumpTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BumpTestViewController.h; sourceTree = "<group>"; };
 		AAA588FF16DE714A00C2445B /* BumpTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BumpTestViewController.m; sourceTree = "<group>"; };
@@ -1819,7 +1823,6 @@
 				AA798880171762B200584220 /* NSData+md5.m */,
 				AA798881171762B200584220 /* NSURLConnection+block.h */,
 				AA798882171762B200584220 /* NSURLConnection+block.m */,
-				AA798883171762B200584220 /* Offline.bundle */,
 				AA798884171762B200584220 /* StoreLocallyViewController.h */,
 				AA798885171762B200584220 /* StoreLocallyViewController.m */,
 				AA798886171762B200584220 /* StoreLocallyViewController.xib */,
@@ -1838,6 +1841,10 @@
 		AA79885C171762B200584220 /* model classes */ = {
 			isa = PBXGroup;
 			children = (
+				AA96D784171F40A300FDF943 /* MOverlay.h */,
+				AA96D785171F40A300FDF943 /* MOverlay.m */,
+				AA96D77E171EF19200FDF943 /* MOverlayTile.h */,
+				AA96D77F171EF19200FDF943 /* MOverlayTile.m */,
 				AA79885D171762B200584220 /* MComment.h */,
 				AA79885E171762B200584220 /* MComment.m */,
 				AA79885F171762B200584220 /* MGame.h */,
@@ -2552,7 +2559,6 @@
 				AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */,
 				AA3D34E7170F368300830B60 /* Central Park New York.gpx in Resources */,
 				AA798887171762B200584220 /* ac_location.gpx in Resources */,
-				AA7988A4171762B200584220 /* Offline.bundle in Resources */,
 				AA7988A6171762B200584220 /* StoreLocallyViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2801,6 +2807,8 @@
 				AA7988A2171762B200584220 /* NSData+md5.m in Sources */,
 				AA7988A3171762B200584220 /* NSURLConnection+block.m in Sources */,
 				AA7988A5171762B200584220 /* StoreLocallyViewController.m in Sources */,
+				AA96D780171EF19200FDF943 /* MOverlayTile.m in Sources */,
+				AA96D786171F40A300FDF943 /* MOverlay.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

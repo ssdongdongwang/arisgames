@@ -2130,6 +2130,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
         if (cRating) c.rating = [cRating intValue];
         [game.comments addObject:c];
     }
+    game.offlineMode = [self validBoolForKey:@"offline"            inDictionary:gameSource];
     
     //NSLog(@"Model: Adding Game: %@", game.name);
     return game;

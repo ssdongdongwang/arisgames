@@ -34,9 +34,8 @@ typedef void(^store_locally_block_t)(NSString *name, float progress, BOOL done);
 - (void)storeNpcConversations:(NSArray *)npcConverationsDictionary game:(MGame*)game;
 - (void)storeQRCodes:(NSArray *)rqCodesDictionary game:(MGame*)game;
 - (void)storePlayerStateChanges:(NSArray *)playerStateChangesDictionary game:(MGame*)game;
+- (void)storeOverlays:(NSArray *)overlaysArray game:(MGame*)game;
 - (MPlayer*)storePlayer:(NSDictionary*)playerDictionary;
-
-
 
 // network replacement calls
 - (MGame*)gameForId:(NSUInteger)gameId;
@@ -73,6 +72,7 @@ typedef void(^store_locally_block_t)(NSString *name, float progress, BOOL done);
 - (void)giveItem:(MItem*)item toPlayer:(MPlayer*)player amount:(NSInteger)amount game:(MGame*)game;
 - (void)takeItem:(MItem*)item fromPlayer:(MPlayer*)player amount:(NSInteger)amount game:(MGame*)game;
 - (void)adjustItem:(MItem*)item player:(MPlayer*)player amount:(NSInteger)amount game:(MGame*)game;
+- (JSONResult*)currentOverlaysForPlayer:(MPlayer*)player game:(MGame*)game;
 
 +(NSNumberFormatter *)numberFormatter;
 +(NSDateFormatter *)dateFormatter;

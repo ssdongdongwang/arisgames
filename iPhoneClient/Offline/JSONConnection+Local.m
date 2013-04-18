@@ -46,8 +46,17 @@ static BOOL needsSync = NO;
     
     // game if offline
     Game *game = [AppModel sharedAppModel].currentGame;
-    if (game) {
-        return game.offlineMode;
+    if (game && game.offlineMode) {
+        NSArray *remoteCalls = [NSArray arrayWithObjects:@"getGamesForPlayerAtLocation", @"startOverGameForPlayer", @"loginPlayer", @"createPlayer", nil];
+        NSArray *remoteServices = @[];
+        
+        if ([remoteCalls containsObject:methodName]) {
+            return NO;
+        }
+        if ([remoteServices containsObject:serviceName]) {
+            return NO;
+        }
+        return YES;
     }
     return NO;
     
@@ -67,11 +76,7 @@ static BOOL needsSync = NO;
     }
     
     // get the game
-    NSArray *remoteCalls = [NSArray arrayWithObjects:@"getGamesForPlayerAtLocation", @"startOverGameForPlayer", @"loginPlayer", @"createPlayer", nil];
     
-    if ([remoteCalls containsObject:methodName]) {
-         return NO;
-    }
     return YES;
 }
 
@@ -89,7 +94,7 @@ static BOOL needsSync = NO;
             if (requestHandler) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-                [[AppServices sharedAppServices] performSelector:self.handler withObject:jsonResult];
+                [[AppServices sharedAppServices] performSelector:requestHandler withObject:jsonResult];
             }
 #pragma clang diagnostic pop
         });
@@ -214,6 +219,12 @@ static BOOL needsSync = NO;
             jsonResult = [localData recentGamesForPlayer:player latitude:latitude longitude:longitude _Bool:showGamesInDevelopment];
             processed = YES;
         }
+        else if ([methodName isEqualToString:@"getPopularGames"]) {
+#warning TODO
+            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
     }
     else if ([serviceName isEqualToString:@"items"]) {
         if ([methodName isEqualToString:@"getItems"]) {
@@ -288,9 +299,39 @@ static BOOL needsSync = NO;
     }
     else if ([serviceName isEqualToString:@"notes"]) {
         if ([methodName isEqualToString:@"getNotesForGame"]) {
-            // TODO
+#warning TODO
             NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
+        else if ([methodName isEqualToString:@"getNotesForPlayer"]) {
+#warning TODO
+            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
+    }
+    else if ([serviceName isEqualToString:@"augbubbles"]) {
+        if ([methodName isEqualToString:@"getAugBubbles"]) {
+#warning TODO
+            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
+    }
+    else if ([serviceName isEqualToString:@"webpages"]) {
+        if ([methodName isEqualToString:@"getWebPages"]) {
+#warning TODO
+            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
+    }
+    else if ([serviceName isEqualToString:@"overlays"]) {
+        if ([methodName isEqualToString:@"getCurrentOverlaysForPlayer"]) {
+            MGame *game = [localData gameForId:[[arguments objectAtIndex:0] intValue]];
+            MPlayer *player = [localData playerForId:[[arguments objectAtIndex:1] intValue]];
+            jsonResult =  [localData currentOverlaysForPlayer:player game:game];
             processed = YES;
         }
     }
@@ -314,35 +355,5 @@ static BOOL needsSync = NO;
     
     return jsonResult;
 }
-
-/*
-- (void)requestFinishedLocal:(ASIHTTPRequest *)request {
-	NSLog(@"JSONConnection: requestFinished");
-    if (needsSync && [[[AppModel sharedAppModel] currentGame] gameId]) {
-        [[AppServices sharedAppServices] updateServer:^(BOOL success) {
-            needsSync = NO;
-        }];
-    }
-	
-	//end the loading and spinner UI indicators
-	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-	[(ARISAppDelegate *)[[UIApplication sharedApplication] delegate] removeNetworkAlert];	
-	
-	NSString *jsonString = [[NSString alloc] initWithData:[request responseData] 
-												 encoding:NSUTF8StringEncoding];
-	
-	//Get the JSONResult here
-	JSONResult *jsonResult = [[JSONResult alloc] initWithJSONString:jsonString];
-	
-	SEL parser = NSSelectorFromString([[request userInfo] objectForKey:@"parser"]);   
-    
-	if (parser) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-		[[AppServices sharedAppServices] performSelector:parser withObject:jsonResult];
-#pragma clang diagnostic pop
-	}
-}
- */
 
 @end

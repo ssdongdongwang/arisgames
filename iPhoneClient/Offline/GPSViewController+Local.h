@@ -6,8 +6,10 @@
 //  Copyright (c) 2011 Amherst College. All rights reserved.
 //
 
+/*
 #import "GPSViewController.h"
 
 @interface GPSViewController (Local)
 
 @end
+ */

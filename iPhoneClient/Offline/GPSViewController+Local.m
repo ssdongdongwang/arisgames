@@ -6,6 +6,7 @@
 //  Copyright (c) 2011 Amherst College. All rights reserved.
 //
 
+/*
 #import "GPSViewController+Local.h"
 #import "LocalMapView.h"
 #import "TileOverlay.h"
@@ -26,3 +27,4 @@
 }
 
 @end
+ */

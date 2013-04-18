@@ -43,6 +43,7 @@
 @property (nonatomic, retain) MMedia *gameIcon;
 @property (nonatomic, retain) MNode *onLaunchNode;
 @property (nonatomic, retain) NSSet *qrCodes;
+@property (nonatomic, retain) NSSet *overlays;
 @end
 
 @interface MGame (CoreDataGeneratedAccessors)
@@ -95,4 +96,8 @@
 - (void)removeQrCodesObject:(MQRCode *)value;
 - (void)addQrCodes:(NSSet *)values;
 - (void)removeQrCodes:(NSSet *)values;
+- (void)addOverlaysObject:(MQRCode *)value;
+- (void)removeOverlaysObject:(MQRCode *)value;
+- (void)addOverlays:(NSSet *)values;
+- (void)removeOverlays:(NSSet *)values;
 @end

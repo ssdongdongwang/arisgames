@@ -29,7 +29,8 @@
 #import "MQRCode.h"
 #import "MPlayerStateChange.h"
 #import "MMedia.h"
-#import "TileOverlay.h"
+#import "MOverlay.h"
+#import "MOverlayTile.h"
 #import "GPSViewController+Local.h"
 
 #if ! __has_feature(objc_arc)
@@ -95,12 +96,13 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
 - (void)updateFile:(NSDictionary*)fileDictionary semaphore:(dispatch_semaphore_t)semaphore;
 
 // server stuff
-- (MGame*)storeGame:(NSDictionary*)gameDictionary medias:(NSMutableArray*)medias files:(NSMutableArray*)files;
+- (MGame*)storeGame:(NSDictionary*)gameDictionary medias:(NSMutableArray*)medias;
 - (void)storeItems:(NSArray *)itemssDictionary game:(MGame*)game medias:(NSMutableArray*)medias;
 - (void)storeQuests:(NSArray *)questsDictionary game:(MGame*)game player:(MPlayer *)player medias:(NSMutableArray*)medias;
 - (void)storeNodes:(NSArray *)nodesDictionary game:(MGame*)game medias:(NSMutableArray*)medias;
 - (void)storeNpcs:(NSArray *)ncsDictionary game:(MGame*)game medias:(NSMutableArray*)medias;
 - (void)storeLocations:(NSArray *)locationsDictionary game:(MGame*)game player:(MPlayer *)player medias:(NSMutableArray*)medias;
+- (void)storeOverlays:(NSArray *)overlaysArray game:(MGame*)game medias:(NSMutableArray*)medias;
 - (BOOL)playerHasLog:(MPlayer*)player game:(MGame*)game eventType:(NSString*)eventType eventDetail:(NSString*)eventDetail;
 - (BOOL)playerHasItem:(MPlayer*)player game:(MGame*)game itemId:(NSString*)itemId minQuantity:(NSString*)minQuantity;
 - (BOOL)playerHasUploadedMediaItemWithinDistance:(MPlayer*)player game:(MGame*)game latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude distance:(CLLocationDistance)distance mediaType:(NSString*)mediaType;
@@ -554,12 +556,10 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[str dataUsingEncoding:NSUTF8StringEncoding]];
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request finishBlock:^(NSData *data){
-        NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        NSDictionary *info = [jsonString JSONValue];
+        //NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         NSError *error;
+        NSDictionary *info = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         block(@"Storing Game", 0.0, NO);
-        
-        // TODO;
         
         _managedObjectContext = nil;
         _managedObjectModel = nil;
@@ -574,32 +574,34 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
          
         MPlayer *player = [self storePlayer:[info objectForKey:@"player"]];
         NSMutableArray *medias = [NSMutableArray array];
-        NSMutableArray *files = [NSMutableArray array];
-        MGame *game = [self storeGame:[info objectForKey:@"game"] medias:medias files:files];
+        MGame *game = [self storeGame:[info objectForKey:@"game"] medias:medias];
         [self storeTabs:[info objectForKey:@"tabs"] game:game];
-        block(@"Storing Game", 1.0/12.0, NO);
+        block(@"Storing Game", 1.0/13.0, NO);
         [self storeRequirements:[info objectForKey:@"requirements"] game:game];
-        block(@"Storing Game", 2.0/12.0, NO);
+        block(@"Storing Game", 2.0/13.0, NO);
         [self storeItems:[info objectForKey:@"items"] game:game medias:medias];
-        block(@"Storing Game", 3.0/12.0, NO);
+        block(@"Storing Game", 3.0/13.0, NO);
         [self storeQuests:[info objectForKey:@"quests"] game:game player:player medias:medias];
-        block(@"Storing Game", 4.0/12.0, NO);
+        block(@"Storing Game", 4.0/13.0, NO);
         [self storeNodes:[info objectForKey:@"nodes"] game:game medias:medias];
-        block(@"Storing Game", 5.0/12.0, NO);
+        block(@"Storing Game", 5.0/13.0, NO);
         [self storeNpcs:[info objectForKey:@"npcs"] game:game medias:medias];
-        block(@"Storing Game", 6.0/12.0, NO);
+        block(@"Storing Game", 6.0/13.0, NO);
         [self storeLocations:[info objectForKey:@"locations"] game:game player:player medias:medias];
-        block(@"Storing Game", 7.0/12.0, NO);
+        block(@"Storing Game", 7.0/13.0, NO);
         [self storePlayerLogs:[info objectForKey:@"player_logs"] game:game player:player];
-        block(@"Storing Game", 8.0/12.0, NO);
+        block(@"Storing Game", 8.0/13.0, NO);
         [self storePlayerItems:[info objectForKey:@"player_items"] game:game player:player];
-        block(@"Storing Game", 9.0/12.0, NO);
+        block(@"Storing Game", 9.0/13.0, NO);
         [self storeNpcConversations:[info objectForKey:@"npc_conversations"] game:game];
-        block(@"Storing Game", 10.0/12.0, NO);
+        block(@"Storing Game", 10.0/13.0, NO);
         [self storeQRCodes:[info objectForKey:@"qrcodes"] game:game];
-        block(@"Storing Game", 11.0/12.0, NO);
+        block(@"Storing Game", 11.0/13.0, NO);
         [self storePlayerStateChanges:[info objectForKey:@"player_state_changes"] game:game];
-        block(@"Storing Game", 12.0/12.0, NO);
+        block(@"Storing Game", 12.0/13.0, NO);
+        [self storeOverlays:[info objectForKey:@"overlays"] game:game medias:medias];
+        block(@"Storing Game", 13.0/13.0, NO);
+
         
         // save changes
         if (![self.managedObjectContext save:&error]) {
@@ -622,17 +624,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
             });
         }
         index = 0;
-        for (NSDictionary *fileDictionary in files) {
-            index++;
-            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-            dispatch_async(q_update_media, ^{
-                dispatch_semaphore_wait(fd_sema, DISPATCH_TIME_FOREVER);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self updateFile:fileDictionary semaphore:fd_sema];
-                    block([NSString stringWithFormat:@"Downloading map files: %ld / %d",  index, [files count]], (float)index / (float)[files count], NO);
-                });
-            });
-        }
         dispatch_async(q_update_media, ^{
             dispatch_semaphore_wait(fd_sema, DISPATCH_TIME_FOREVER);
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -655,48 +646,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     }    
 }
 
-- (void)overlayMap {
-    
-    int gameId = [[AppModel sharedAppModel] currentGame].gameId;
-    MGame *game = [self gameForId:gameId];
-    RootViewController *rootViewControler = [RootViewController sharedRootViewController];
-    GPSViewController *gpsViewController = (GPSViewController*)[rootViewControler.gpsNavigationController topViewController];
-    MKMapView *map = gpsViewController.mapView;
-    NSURL *cacheDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
-    NSURL *tilesURL = [[cacheDirectory URLByAppendingPathComponent:[game.gameId stringValue]] URLByAppendingPathComponent:@"tiles"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[tilesURL path]]) {
-        BOOL added = NO;
-        for (id overlay in [map overlays]) {
-            if ([overlay isMemberOfClass:[TileOverlay class]]) {
-                added = YES;
-                break;
-            }
-        } 
-        if (!added) {
-            NSString *tileDirectory = [tilesURL path];
-            TileOverlay *localMap = [[TileOverlay alloc] initWithTileDirectory:tileDirectory];
-            [map addOverlay:localMap];
-        }
-
-    } else {
-        if (map) {
-            
-            BOOL added = NO;
-            for (id overlay in [map overlays]) {
-                if ([overlay isMemberOfClass:[LocalMap class]]) {
-                    added = YES;
-                    break;
-                }
-            } 
-            if (!added) {
-                LocalMap *localMap = [[LocalMap alloc] initWithGame:game];
-                [map addOverlay:localMap];
-            }
-        }
-    }
-}
-
-
 - (MPlayer*)storePlayer:(NSDictionary*)playerDictionary {
     MPlayer *mplayer = [self fetchForEntityName:@"Player" predicate:[NSPredicate predicateWithFormat:@"playerId = %@", [playerDictionary objectForKey:@"player_id"]]];
     mplayer.playerId = [NSNumber numberWithInt:[[playerDictionary objectForKey:@"player_id"]intValue]];
@@ -706,7 +655,7 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     return mplayer;
 }
 
-- (MGame*)storeGame:(NSDictionary*)gameDictionary medias:(NSMutableArray*)medias files:(NSMutableArray *)files{
+- (MGame*)storeGame:(NSDictionary*)gameDictionary medias:(NSMutableArray*)medias {
     NSManagedObjectContext *context = [self managedObjectContext];
     NSNumberFormatter *f = [LocalData numberFormatter];
     MGame *mgame = [self fetchForEntityName:@"Game" predicate:[NSPredicate predicateWithFormat:@"gameId = %@", [gameDictionary objectForKey:@"game_id"]]];
@@ -758,94 +707,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         comment.game = mgame;
         comment.rating = [f numberFromString:[commentDictionary objectForKey:@"rating"]];
         comment.text = [commentDictionary objectForKey:@"text"];
-    }
-    // get media
-    NSDictionary *mapsDictionary = [gameDictionary objectForKey:@"maps"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *cacheDirectory = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
-    NSURL *tilesURL = [[cacheDirectory URLByAppendingPathComponent:[mgame.gameId stringValue]] URLByAppendingPathComponent:@"tiles"];
-    NSError *error = nil;
-    NSMutableArray *newTiles = [NSMutableArray array];
-    for (NSDictionary *mapDictionary in mapsDictionary) {
-        // TODO: optimize
-        if ([mapDictionary objectForKey:@"path"] == nil) {
-            NSNumber *mediaId = [f numberFromString:[mapDictionary objectForKey:@"media_id"]];
-            MMap *map = [self fetchForEntityName:@"Map" predicate:[NSPredicate predicateWithFormat:@"media.mediaId = %@", mediaId]];
-            map.latitude = [mapDictionary objectForKey:@"latitude"];
-            map.longitude = [mapDictionary objectForKey:@"longitude"];
-            map.zoom = [mapDictionary objectForKey:@"zoom"];
-            map.game = mgame;
-            MMedia *mmedia = [self fetchForEntityName:@"Media" predicate:[NSPredicate predicateWithFormat:@"mediaId = %@", mediaId]];
-            mmedia.mediaId = mediaId;
-            mmedia.game = mgame;
-            map.media = mmedia;
-            [medias addObject:mmedia];
-        }
-        else {
-            // find existing files
-            [newTiles addObject:mapDictionary];
-        }
-    }
-    // 
-    if (newTiles.count > 0) {
-        NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:[tilesURL path]];
-        NSString *file;
-        NSMutableArray *oldTiles = [NSMutableArray array];
-        while (file = [dirEnum nextObject]) {
-            if ([[file pathExtension] isEqualToString: @"png"]) {
-                NSLog(@"%@", [file class]);
-                [oldTiles addObject:file];                
-            }
-        }
-        
-        [newTiles sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            NSString *filename1 = [NSString stringWithFormat:@"%@/%@", [obj1 objectForKey:@"path"], [obj1 objectForKey:@"filename"]];
-            NSString *filename2 = [NSString stringWithFormat:@"%@/%@", [obj2 objectForKey:@"path"], [obj2 objectForKey:@"filename"]];
-            return [filename1 compare:filename2];
-        }];
-        [oldTiles sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            return [obj1 compare:obj2];
-        }];
-        NSEnumerator *enumerator = [oldTiles objectEnumerator];
-        NSString *tile = [enumerator nextObject];
-        for (NSDictionary *tileDictionary in newTiles) {
-            // get the requirements
-            if (tile && [[NSString stringWithFormat:@"tiles/%@", tile] isEqualToString:[NSString stringWithFormat:@"%@/%@", [tileDictionary objectForKey:@"path"], [tileDictionary objectForKey:@"filename"]]]) {
-                NSString *path = [[tilesURL path] stringByAppendingPathComponent:tile];
-                NSData *fileData = [NSData dataWithContentsOfFile:path];
-                NSString *md5 = [fileData md5];
-                if (![md5 isEqualToString:[tileDictionary objectForKey:@"md5"]]) {
-                    [files addObject:tileDictionary];
-                }
-                tile = [enumerator nextObject];
-            }
-            else {
-                // create
-                [files addObject:tileDictionary];
-            }
-        }
-        // delete what is not tile
-        enumerator = [newTiles objectEnumerator];
-        NSDictionary *tileDictionary = [enumerator nextObject];
-        for (NSString *tile in oldTiles) {
-            if (tileDictionary && [[NSString stringWithFormat:@"tiles/%@", tile] isEqualToString:[NSString stringWithFormat:@"%@/%@", [tileDictionary objectForKey:@"path"], [tileDictionary objectForKey:@"filename"]]]) {
-                tileDictionary = [enumerator nextObject];
-            }
-            else {
-                NSLog(@"deleting");
-                NSString *path = [[tilesURL path] stringByAppendingPathComponent:tile];
-                [fileManager removeItemAtPath:path error:&error];
-            }
-        }
-    }
-    else {
-        // no tiles, delete if something exists
-        if ([fileManager fileExistsAtPath:[tilesURL path]]) {
-            if (![fileManager removeItemAtPath:[tilesURL path] error:&error]) {
-                NSLog(@"Error removing tiles");
-                exit(0);
-            }
-        }
     }
 
     return mgame;
@@ -1481,6 +1342,85 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     }
 }
 
+- (void)storeOverlays:(NSArray *)overlaysArray game:(MGame*)game medias:(NSMutableArray*)medias {
+    NSFetchRequest *fetchOverlays = [NSFetchRequest fetchRequestWithEntityName:@"Overlay"];
+    fetchOverlays.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"overlayId" ascending:YES]];
+    fetchOverlays.predicate = [NSPredicate predicateWithFormat:@"game = %@", game];
+    NSError *error;
+    NSArray *fetchedOverlays = [_managedObjectContext executeFetchRequest:fetchOverlays error:&error];
+    NSEnumerator *overlayEnumerator = [fetchedOverlays objectEnumerator];
+    
+    MOverlay *overlay = [overlayEnumerator nextObject];
+    for (NSDictionary *overlayDictionary in overlaysArray) {
+        // does it exist
+        int overlayId = [overlayDictionary[@"overlay_id"] intValue];
+        if (overlay && overlay.overlayId == overlayId) {
+            [self storeOVerlayTiles:overlayDictionary[@"tiles"] game:game overlay:overlay medias:medias];
+            overlay = [overlayEnumerator nextObject];
+        }
+        else {
+            MOverlay *newOverlay = [NSEntityDescription insertNewObjectForEntityForName:@"Overlay" inManagedObjectContext:_managedObjectContext];
+            newOverlay.game = game;
+            newOverlay.overlayId = [overlayDictionary[@"overlay_id"] intValue];
+            newOverlay.sortOrder = [overlayDictionary[@"sort_index"] intValue];
+            if (overlayDictionary[@"alpha"] != [NSNull null]) {
+                newOverlay.alpha = [overlayDictionary[@"alpha"] floatValue];
+            }
+            else {
+                newOverlay.alpha = 1.0;
+            }
+            if (overlayDictionary[@"num_tiles"] != [NSNull null]) {
+                newOverlay.numTiles = [overlayDictionary[@"num_tiles"] intValue];
+            }
+            newOverlay.name = overlayDictionary[@"name"];
+            if (overlayDictionary[@"description"] != [NSNull null]) {
+                newOverlay.overlayDescription = overlayDictionary[@"description"];
+            }
+            [self storeOVerlayTiles:overlayDictionary[@"tiles"] game:game overlay:newOverlay medias:medias];
+        }
+    }
+    
+    
+    return;
+}
+
+- (void)storeOVerlayTiles:(NSArray*)tilesArray game:(MGame*)game overlay:(MOverlay*)overlay medias:(NSMutableArray*)medias {
+    NSFetchRequest *fetchTiles = [NSFetchRequest fetchRequestWithEntityName:@"OverlayTile"];
+    fetchTiles.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"zoom" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"x" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"y" ascending:YES]];
+    fetchTiles.predicate = [NSPredicate predicateWithFormat:@"overlay = %@", overlay];
+    NSError *error;
+    NSArray *fetchedTiles = [_managedObjectContext executeFetchRequest:fetchTiles error:&error];
+    NSEnumerator *tileEnumerator = [fetchedTiles objectEnumerator];
+    MOverlayTile *tile = [tileEnumerator nextObject];
+    for (NSDictionary *tileDictionary in tilesArray) {
+        int zoom = [tileDictionary[@"zoom"] intValue];
+        int x = [tileDictionary[@"x"] intValue];
+        int y = [tileDictionary[@"y"] intValue];
+        if (tile && tile.zoom == zoom && tile.x == x && tile.y == y) {
+            tile = [tileEnumerator nextObject];
+        }
+        else {
+            MOverlayTile *newTile = [NSEntityDescription insertNewObjectForEntityForName:@"OverlayTile" inManagedObjectContext:_managedObjectContext];
+            newTile.overlay = overlay;
+            newTile.zoom = [tileDictionary[@"zoom"] intValue];
+            newTile.x = [tileDictionary[@"x"] intValue];
+            newTile.y = [tileDictionary[@"y"] intValue];
+            if (tileDictionary[@"x_max"] != [NSNull null]) {
+                newTile.xMax = [tileDictionary[@"x_max"] intValue];
+            }
+            if (tileDictionary[@"y_max"] != [NSNull null]) {
+                newTile.yMax = [tileDictionary[@"y_max"] intValue];
+            }
+            int mediaId = [tileDictionary[@"media_id"] intValue];
+            MMedia *mmedia = [self fetchForEntityName:@"Media" predicate:[NSPredicate predicateWithFormat:@"mediaId = %d", mediaId]];
+            mmedia.mediaId = @(mediaId);
+            mmedia.game = game;
+            newTile.media = mmedia;
+            [medias addObject:mmedia];
+        }
+    }
+}
+
 - (void)updateMedia:(MMedia *)media semaphore:(dispatch_semaphore_t)semaphore {
     // first get the info
     NSString *urlString = @"server/sync/";
@@ -2016,7 +1956,7 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     NSDictionary *result = [NSDictionary dictionaryWithObject:data forKey:@"data"];
     
     // 
-    [self overlayMap];
+    //[self overlayMap];
     
     
     return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
@@ -2024,10 +1964,8 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
 }
 
 - (JSONResult*)questsForPlayer:(MPlayer*)player game:(MGame*)game {
-    // TODO:
     NSMutableArray *activeQuests = [[NSMutableArray alloc] init];
     NSMutableArray *completedQuests = [[NSMutableArray alloc] init];
-    // TODO:
     
     // get quests
     for (MQuest *quest in game.quests) {
@@ -2441,6 +2379,22 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         // handle error
         NSLog(@"%@", [error localizedDescription]);
     }
+}
+
+
+- (JSONResult*)currentOverlaysForPlayer:(MPlayer*)player game:(MGame*)game {
+#warning TODO: check conditions
+    NSMutableArray *data = [[NSMutableArray alloc] init];
+    NSArray *overlays = [game.overlays sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortOrder" ascending:YES]]];
+    for (MOverlay *overlay in overlays) {
+        NSArray *tiles = [overlay.tiles sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"zoom" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"x" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"y" ascending:YES]]];
+        for (MOverlayTile *tile in tiles) {
+            NSDictionary *dictionary = @{@"alpha":@(overlay.alpha), @"file_name":@"", @"file_path":@"", @"media_id":tile.media.mediaId, @"sort_order":@(overlay.sortOrder), @"x":@(tile.x), @"y":@(tile.y), @"zoom":@(tile.zoom)};
+            [data addObject:dictionary];
+        }
+    }
+    NSDictionary *result = [NSDictionary dictionaryWithObject:data forKey:@"data"];
+    return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
 }
 
 @end

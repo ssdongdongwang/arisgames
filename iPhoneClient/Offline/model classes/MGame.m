@@ -53,5 +53,6 @@
 @dynamic gameIcon;
 @dynamic onLaunchNode;
 @dynamic qrCodes;
+@dynamic overlays;
 
 @end

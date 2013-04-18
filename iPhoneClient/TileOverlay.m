@@ -166,7 +166,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
         NSMutableArray* xArray = [[NSMutableArray alloc] init];
         NSMutableArray* yArray = [[NSMutableArray alloc] init];
         NSMutableArray* zArray = [[NSMutableArray alloc] init];
-        NSNumber *minZ = [NSNumber numberWithInt:1000000];
+        NSInteger minZ = 1000000;
         
         for (int i = 0; i < [currentOverlay.tileX count]; i++) {
         
@@ -180,10 +180,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
             NSNumber *z = [currentOverlay.tileZ objectAtIndex:i]; 
             [zArray addObject:z];
             
-            if (z < minZ)
-                minZ = z;
-            
-            
+            NSInteger currentZ = [z intValue];
+            if (currentZ < minZ)
+                minZ = currentZ;
         }
 
         
@@ -202,7 +201,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
         NSInteger maxX = 0;
         NSInteger maxY = 0;
         for (int i = 0; i < [currentOverlay.tileX count]; i++) {            
-            if ([zArray objectAtIndex:i] == minZ) {
+            if ([[zArray objectAtIndex:i] intValue] == minZ) {
                 minX = MIN(minX, [[xArray objectAtIndex:i] intValue]);
                 minY = MIN(minY, [[yArray objectAtIndex:i] intValue]);
                 maxX = MAX(maxX, [[xArray objectAtIndex:i] intValue]);
@@ -211,7 +210,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
         }
         
         // Note: this part stays the same
-        NSInteger tilesAtZ = pow(2, [minZ doubleValue]);
+        NSInteger tilesAtZ = pow(2, minZ);
         double sizeAtZ = tilesAtZ * TILE_SIZE;
         double zoomScaleAtMinZ = sizeAtZ / MKMapSizeWorld.width;
         
