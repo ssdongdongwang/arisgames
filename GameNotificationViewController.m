@@ -24,7 +24,9 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
+        notifArray   = [[NSMutableArray alloc] initWithCapacity:5];
         popOverArray = [[NSMutableArray alloc] initWithCapacity:5];
+        showingDropDown = NO;
         showingPopOver  = NO;
     }
     return self;
@@ -35,10 +37,75 @@
     popOverVC = [[PopOverViewController alloc] initWithNibName:@"PopOverViewController" bundle:nil delegate:self];
     popOverView = (PopOverContentView *)popOverVC.view;
     
-    statusBar = [MTStatusBarOverlay sharedInstance];
-    statusBar.animation = MTStatusBarOverlayAnimationFallDown;
-    statusBar.detailViewMode = MTDetailViewModeHistory;
-    statusBar.delegate = self;
+    dropDownView = [[UIWebView alloc] initWithFrame:CGRectMake(0, -28.0, [UIScreen mainScreen].bounds.size.width, 28)];
+}
+
+-(void)lowerDropDownFrame
+{
+    [[RootViewController sharedRootViewController].view addSubview:dropDownView];
+
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
+    [UIView setAnimationDuration:.5];
+
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+
+    [UIView commitAnimations];
+}
+
+-(void)raiseDropDownFrame
+{
+    [dropDownView removeFromSuperview];
+
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:.5];
+
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+
+    [UIView commitAnimations];
+}
+
+-(void)dequeueDropDown
+{
+    showingDropDown = YES;
+
+    dropDownView.alpha = 0.0;
+    NSString* str = [notifArray objectAtIndex:0];
+     
+    NSString* htmlContentString = [NSString stringWithFormat:
+        @"<html>"
+        "<style type=\"text/css\">"
+        "body       { background-color:black; vertical-align:text-top; text-align:center; font:16px Arial,Helvetica,sans-serif; color:white; }"
+        "</style>"
+        "<body>%@</body>"
+        "</html>", str];
+
+    [dropDownView loadHTMLString:htmlContentString baseURL:nil];
+
+    [UIView animateWithDuration:3.0 delay:0.0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^{ dropDownView.alpha = 1.0; }
+                     completion:^(BOOL finished){
+                        if(finished)
+                        {
+                            [UIView animateWithDuration:3.0
+                                                  delay:0.0
+                                                options:UIViewAnimationCurveEaseIn
+                                             animations:^{ dropDownView.alpha = 0.0; }
+                                             completion:^(BOOL finished){
+                                                 if(finished)
+                                                 {
+                                                     showingDropDown = NO;
+                                                     if([notifArray count] > 0)
+                                                         [self dequeueDropDown];
+                                                     else
+                                                         [self raiseDropDownFrame];
+                                                 }
+                                             }];
+                        }
+                     }];
+    [notifArray removeObjectAtIndex:0];
 }
 
 -(void)dequeuePopOver
@@ -65,7 +132,12 @@
 
 -(void)enqueueDropDownNotificationWithString:(NSString *)string
 {
-    [statusBar postMessage:string duration:4.0 animated:YES];
+    [notifArray addObject:string];
+    if(!showingDropDown)
+    {
+        [self lowerDropDownFrame];
+        [self dequeueDropDown];
+    }
 }
 
 -(void)enqueuePopOverNotificationWithTitle:(NSString *)title description:(NSString *)description webViewText:(NSString *)text andMediaId:(int) mediaId
@@ -230,8 +302,10 @@
 {
     NSLog(@"NSNotification: ClearBadgeRequest");
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"ClearBadgeRequest" object:self]];
+    [notifArray   removeAllObjects];
     [popOverArray removeAllObjects];
-    showingPopOver  = NO;
+    showingDropDown  = NO;
+    showingPopOver   = NO;
 }
 
 -(void)startListeningToModel
