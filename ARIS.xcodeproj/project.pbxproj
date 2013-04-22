@@ -209,6 +209,8 @@
 		AA763156169B68A800860665 /* PopOverContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA763155169B68A800860665 /* PopOverContentView.m */; };
 		AA80EFCE16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA80EFCD16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m */; };
 		AA8BC74F16FCCF6F0073D651 /* InGameItem.m in Sources */ = {isa = PBXBuildFile; fileRef = AA8BC74E16FCCF6E0073D651 /* InGameItem.m */; };
+		AA9560281725A63C00077D8E /* DialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA9560251725A63C00077D8E /* DialogViewController.m */; };
+		AA9560291725A63C00077D8E /* Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA9560271725A63C00077D8E /* Dialog.xib */; };
 		AA99E61F16F0D80E00E22030 /* libZXingWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA99E61A16F0D7FF00E22030 /* libZXingWidget.a */; };
 		AAA5890116DE714A00C2445B /* BumpTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAA588FF16DE714A00C2445B /* BumpTestViewController.m */; };
 		AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAA5890016DE714A00C2445B /* BumpTestViewController.xib */; };
@@ -771,6 +773,9 @@
 		AA80EFCD16C048AB00DAB826 /* WaitingIndicatorAlertViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaitingIndicatorAlertViewController.m; sourceTree = "<group>"; };
 		AA8BC74D16FCCF6E0073D651 /* InGameItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InGameItem.h; sourceTree = "<group>"; };
 		AA8BC74E16FCCF6E0073D651 /* InGameItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InGameItem.m; sourceTree = "<group>"; };
+		AA9560251725A63C00077D8E /* DialogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DialogViewController.m; sourceTree = "<group>"; };
+		AA9560261725A63C00077D8E /* DialogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogViewController.h; sourceTree = "<group>"; };
+		AA9560271725A63C00077D8E /* Dialog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Dialog.xib; sourceTree = "<group>"; };
 		AA99E61416F0D7FF00E22030 /* ZXingWidget.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZXingWidget.xcodeproj; path = "../zxing-master/iphone/ZXingWidget/ZXingWidget.xcodeproj"; sourceTree = "<group>"; };
 		AAA588FE16DE714A00C2445B /* BumpTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BumpTestViewController.h; sourceTree = "<group>"; };
 		AAA588FF16DE714A00C2445B /* BumpTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BumpTestViewController.m; sourceTree = "<group>"; };
@@ -2099,6 +2104,9 @@
 		D42432501107734300E58147 /* NPC Dialog */ = {
 			isa = PBXGroup;
 			children = (
+				AA9560251725A63C00077D8E /* DialogViewController.m */,
+				AA9560261725A63C00077D8E /* DialogViewController.h */,
+				AA9560271725A63C00077D8E /* Dialog.xib */,
 				AA3F030D170B407E007A67A7 /* NpcViewController.xib */,
 				ABDF2CCA15DB4379008E8CA0 /* textToggle.png */,
 				AB8E31F51228399B00C198C3 /* textFade.png */,
@@ -2395,6 +2403,7 @@
 				AABD101916B7164C007278EF /* README_ABOUT_LINK_ERRORS in Resources */,
 				AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */,
 				AA3F0310170B407E007A67A7 /* NpcViewController.xib in Resources */,
+				AA9560291725A63C00077D8E /* Dialog.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2612,6 +2621,7 @@
 				AAF3724C16F9499A006405D0 /* NearbyPlayer.m in Sources */,
 				DD3C285116F3BF0D00CBC085 /* Logger.m in Sources */,
 				AA8BC74F16FCCF6F0073D651 /* InGameItem.m in Sources */,
+				AA9560281725A63C00077D8E /* DialogViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
