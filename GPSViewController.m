@@ -375,18 +375,6 @@ NSMutableArray *locationsToRemove;
     if(badgeCount != 0) self.tabBarItem.badgeValue = [NSString stringWithFormat:@"%d",badgeCount];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    
-    for(int i =0; i < [[mapView annotations] count]; i++)
-    {
-        if([[mapView annotations] objectAtIndex:i] != mapView.userLocation)
-            [mapView removeAnnotation:[[mapView annotations] objectAtIndex:i]];
-        i--;
-    }
-}
-
 #pragma mark MKMapViewDelegate
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
