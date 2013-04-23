@@ -44,6 +44,8 @@
 @property (nonatomic, retain) MNode *onLaunchNode;
 @property (nonatomic, retain) NSSet *qrCodes;
 @property (nonatomic, retain) NSSet *overlays;
+@property (nonatomic, retain) NSNumber *offline;
+@property (nonatomic, retain) NSNumber *hasBeenPlayed;
 @end
 
 @interface MGame (CoreDataGeneratedAccessors)

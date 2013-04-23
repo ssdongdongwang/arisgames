@@ -42,7 +42,9 @@ static BOOL needsSync = NO;
         }
     };
     */
-    
+    //return YES;
+
+    LocalData *local = [LocalData sharedLocal];
     
     // game if offline
     Game *game = [AppModel sharedAppModel].currentGame;
@@ -58,7 +60,15 @@ static BOOL needsSync = NO;
         }
         return YES;
     }
-    return NO;
+    else {
+        // special cases
+        if ([methodName isEqualToString:@"getMediaObject"]) {
+            NSNumber *mediaId = @([[arguments objectAtIndex:1] intValue]);
+            if ([local offlineURLForMediaId:[mediaId integerValue] gameId:0]) {
+                return YES;
+            }
+        }
+    }
     
     SCNetworkReachabilityRef reachabilityRef = SCNetworkReachabilityCreateWithName(NULL, [[self.completeRequestURL host] UTF8String]);
     SCNetworkReachabilityFlags flags;
@@ -75,9 +85,7 @@ static BOOL needsSync = NO;
         return YES;
     }
     
-    // get the game
-    
-    return YES;
+    return NO;
 }
 
 - (BOOL) performAsynchronousLocalRequestWithHandler: (SEL)requestHandler {
@@ -199,6 +207,12 @@ static BOOL needsSync = NO;
             [localData dropItem:item player:player game:game location:location qty:qty];
             processed = YES;
         }
+        else if ([methodName isEqualToString:@"setShowPlayerOnMap"]) {
+#warning TODO
+            NSDictionary *result =  @{@"data" : @[]};
+            jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
     }
     else if ([serviceName isEqualToString:@"games"]) {
         if ([methodName isEqualToString:@"getGamesForPlayerAtLocation"]) {
@@ -221,8 +235,18 @@ static BOOL needsSync = NO;
         }
         else if ([methodName isEqualToString:@"getPopularGames"]) {
 #warning TODO
-            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            NSDictionary *result =  @{@"data" : @[]};
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+            processed = YES;
+        }
+        else if ([methodName isEqualToString:@"getOneGame"]) {
+            MGame *game = [localData gameForId:[[arguments objectAtIndex:0] intValue]];
+            MPlayer *player = [localData playerForId:[[arguments objectAtIndex:1] intValue]];
+//            BOOL locationInfo = [[arguments objectAtIndex:2] boolValue];
+//            int skipAtDistance = [[arguments objectAtIndex:3] intValue];
+            double latitude = [[arguments objectAtIndex:4] doubleValue];
+            double longitude = [[arguments objectAtIndex:5] doubleValue];
+            jsonResult = [localData game:game player:player latitude:latitude longitude:longitude includeGamesInDevelopment:YES];
             processed = YES;
         }
     }
@@ -271,6 +295,12 @@ static BOOL needsSync = NO;
             jsonResult = [localData mediasForGame:game];
             processed = YES;
         }
+        else if ([methodName isEqualToString:@"getMediaObject"]) {
+            //MGame *game = [localData gameForId:[[arguments objectAtIndex:0] intValue]];
+            NSNumber *mediaId = @([[arguments objectAtIndex:1] intValue]);
+            jsonResult = [localData mediaForId:mediaId];
+            processed = YES;
+        }
     }
     else if ([serviceName isEqualToString:@"locations"]) {
         if ([methodName isEqualToString:@"getLocationsForPlayer"]) {
@@ -300,13 +330,13 @@ static BOOL needsSync = NO;
     else if ([serviceName isEqualToString:@"notes"]) {
         if ([methodName isEqualToString:@"getNotesForGame"]) {
 #warning TODO
-            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            NSDictionary *result =  @{@"data" : @[]};
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
             processed = YES;
         }
         else if ([methodName isEqualToString:@"getNotesForPlayer"]) {
 #warning TODO
-            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            NSDictionary *result =  @{@"data" : @[]};
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
             processed = YES;
         }
@@ -314,7 +344,7 @@ static BOOL needsSync = NO;
     else if ([serviceName isEqualToString:@"augbubbles"]) {
         if ([methodName isEqualToString:@"getAugBubbles"]) {
 #warning TODO
-            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            NSDictionary *result =  @{@"data" : @[]};
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
             processed = YES;
         }
@@ -322,7 +352,7 @@ static BOOL needsSync = NO;
     else if ([serviceName isEqualToString:@"webpages"]) {
         if ([methodName isEqualToString:@"getWebPages"]) {
 #warning TODO
-            NSDictionary *result =  @{@"data" : @[]};  //[NSDictionary dictionaryWithObject:data forKey:@"data"];
+            NSDictionary *result =  @{@"data" : @[]};
             jsonResult =  [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
             processed = YES;
         }

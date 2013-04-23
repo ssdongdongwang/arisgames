@@ -206,10 +206,6 @@
 		AA73E48216E141D2001F11A6 /* GameObjectDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA73E48116E141D2001F11A6 /* GameObjectDisplayViewController.m */; };
 		AA763156169B68A800860665 /* PopOverContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA763155169B68A800860665 /* PopOverContentView.m */; };
 		AA798887171762B200584220 /* ac_location.gpx in Resources */ = {isa = PBXBuildFile; fileRef = AA798848171762B100584220 /* ac_location.gpx */; };
-		AA798888171762B200584220 /* ACNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA79884A171762B100584220 /* ACNavigationController.m */; };
-		AA798889171762B200584220 /* ACRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA79884C171762B200584220 /* ACRootViewController.m */; };
-		AA79888A171762B200584220 /* ACTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA79884E171762B200584220 /* ACTabBarController.m */; };
-		AA79888B171762B200584220 /* GPSViewController+Local.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798850171762B200584220 /* GPSViewController+Local.m */; };
 		AA79888C171762B200584220 /* JSONConnection+Local.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798852171762B200584220 /* JSONConnection+Local.m */; };
 		AA79888D171762B200584220 /* LocalData.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798854171762B200584220 /* LocalData.m */; };
 		AA79888E171762B200584220 /* LocalMap.m in Sources */ = {isa = PBXBuildFile; fileRef = AA798856171762B200584220 /* LocalMap.m */; };
@@ -799,14 +795,6 @@
 		AA763154169B68A800860665 /* PopOverContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopOverContentView.h; sourceTree = "<group>"; };
 		AA763155169B68A800860665 /* PopOverContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopOverContentView.m; sourceTree = "<group>"; };
 		AA798848171762B100584220 /* ac_location.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ac_location.gpx; sourceTree = "<group>"; };
-		AA798849171762B100584220 /* ACNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACNavigationController.h; sourceTree = "<group>"; };
-		AA79884A171762B100584220 /* ACNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ACNavigationController.m; sourceTree = "<group>"; };
-		AA79884B171762B200584220 /* ACRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACRootViewController.h; sourceTree = "<group>"; };
-		AA79884C171762B200584220 /* ACRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ACRootViewController.m; sourceTree = "<group>"; };
-		AA79884D171762B200584220 /* ACTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACTabBarController.h; sourceTree = "<group>"; };
-		AA79884E171762B200584220 /* ACTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ACTabBarController.m; sourceTree = "<group>"; };
-		AA79884F171762B200584220 /* GPSViewController+Local.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GPSViewController+Local.h"; sourceTree = "<group>"; };
-		AA798850171762B200584220 /* GPSViewController+Local.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GPSViewController+Local.m"; sourceTree = "<group>"; };
 		AA798851171762B200584220 /* JSONConnection+Local.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JSONConnection+Local.h"; sourceTree = "<group>"; };
 		AA798852171762B200584220 /* JSONConnection+Local.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "JSONConnection+Local.m"; sourceTree = "<group>"; };
 		AA798853171762B200584220 /* LocalData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalData.h; sourceTree = "<group>"; };
@@ -1801,14 +1789,6 @@
 			isa = PBXGroup;
 			children = (
 				AA798848171762B100584220 /* ac_location.gpx */,
-				AA798849171762B100584220 /* ACNavigationController.h */,
-				AA79884A171762B100584220 /* ACNavigationController.m */,
-				AA79884B171762B200584220 /* ACRootViewController.h */,
-				AA79884C171762B200584220 /* ACRootViewController.m */,
-				AA79884D171762B200584220 /* ACTabBarController.h */,
-				AA79884E171762B200584220 /* ACTabBarController.m */,
-				AA79884F171762B200584220 /* GPSViewController+Local.h */,
-				AA798850171762B200584220 /* GPSViewController+Local.m */,
 				AA798851171762B200584220 /* JSONConnection+Local.h */,
 				AA798852171762B200584220 /* JSONConnection+Local.m */,
 				AA798853171762B200584220 /* LocalData.h */,
@@ -2778,10 +2758,6 @@
 				DD3C285116F3BF0D00CBC085 /* Logger.m in Sources */,
 				AA0CE8331704C3BE0098429E /* DialogScript.m in Sources */,
 				AA84429E17131ECD0097FF21 /* MTStatusBarOverlay.m in Sources */,
-				AA798888171762B200584220 /* ACNavigationController.m in Sources */,
-				AA798889171762B200584220 /* ACRootViewController.m in Sources */,
-				AA79888A171762B200584220 /* ACTabBarController.m in Sources */,
-				AA79888B171762B200584220 /* GPSViewController+Local.m in Sources */,
 				AA79888C171762B200584220 /* JSONConnection+Local.m in Sources */,
 				AA79888D171762B200584220 /* LocalData.m in Sources */,
 				AA79888E171762B200584220 /* LocalMap.m in Sources */,

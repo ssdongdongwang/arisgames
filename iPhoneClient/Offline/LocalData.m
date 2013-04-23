@@ -31,7 +31,6 @@
 #import "MMedia.h"
 #import "MOverlay.h"
 #import "MOverlayTile.h"
-#import "GPSViewController+Local.h"
 
 #if ! __has_feature(objc_arc)
 #error This file must be compiled with ARC
@@ -93,7 +92,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
 - (id)fetchForEntityName:(NSString *)entityName idName:(NSString*)idName idValue:(NSInteger)idValue;
 - (NSManagedObjectContext*)managedObjectContext;
 - (void)updateMedia:(MMedia *)media semaphore:(dispatch_semaphore_t)semaphore;
-- (void)updateFile:(NSDictionary*)fileDictionary semaphore:(dispatch_semaphore_t)semaphore;
 
 // server stuff
 - (MGame*)storeGame:(NSDictionary*)gameDictionary medias:(NSMutableArray*)medias;
@@ -205,6 +203,9 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     
     NSURL *applicationDocumentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
     NSURL *storeURL = [applicationDocumentsDirectory URLByAppendingPathComponent:@"offline.sqlite"];
+    
+//#warning debugging
+//    [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
     
     NSError *error = nil;
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
@@ -696,6 +697,8 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     else {
         mgame.calculatedScore = [f numberFromString:[gameDictionary objectForKey:@"calculatedScore"]];
     }
+    mgame.offline = @([gameDictionary[@"offline"] boolValue]);
+    mgame.hasBeenPlayed = @([gameDictionary[@"has_been_played"] boolValue]);
     for (MComment *comment in mgame.comments) {
         [context deleteObject:comment];
     }
@@ -1475,7 +1478,8 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
                     media.filePath = filePath;
                     media.md5 = [mediaInfo objectForKey:@"md5"];
                     media.defaultMedia = isDefault;
-                    media.type = [mediaData objectForKey:@"type"];
+                    //media.type = [mediaData objectForKey:@"type"];
+                    media.type = mediaData[@"type"];
                     //NSLog(@"******name: %@ and id: %@", media.fileName, media.mediaId);
                     error = nil;
                     if (![context save:&error]) {
@@ -1506,6 +1510,7 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     }   
 }
 
+/*
 - (void)updateFile:(NSDictionary*)fileDictionary semaphore:(dispatch_semaphore_t)semaphore {
     // create directory if it does not exist
     NSURL *cacheDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
@@ -1530,6 +1535,7 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         dispatch_semaphore_signal(semaphore);
     }
 }
+ */
 
 // implementation of server stuff
 - (BOOL)meetsRequirementsForId:(NSNumber *)objectId objectType:(NSString*)objectType game:(MGame*)game player:(MPlayer*)player {
@@ -1747,6 +1753,12 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
 }
 
+- (JSONResult*)game:(MGame*)game player:(MPlayer*)player latitude:(double)latitude longitude:(double)longitude includeGamesInDevelopment:(BOOL)includeGamesInDevelopment {
+    NSArray *games = @[[self dictionaryWithGame:game]];
+    NSDictionary *result = [NSDictionary dictionaryWithObject:games forKey:@"data"];
+    return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
+}
+
 - (MPlayer*)playerWithId:(NSInteger)playerid {
     NSManagedObjectContext *context = [self managedObjectContext];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -1800,6 +1812,8 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     [dictionary setObject:[NSNumber numberWithInt:[game.comments count]] forKey:@"numComments"];
     [dictionary setObject:game.rating forKey:@"rating"];
     [dictionary setValue:game.gameDescription forKey:@"description"];
+    dictionary[@"offline"] = game.offline;
+    dictionary[@"has_been_played"] = game.hasBeenPlayed;
     return dictionary;
 }
 
@@ -1921,28 +1935,13 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         [mediaDictionary setObject:media.mediaId forKey:@"media_id"];
         [mediaDictionary setObject:media.type forKey:@"type"];
         NSString *cacheDirectory =  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-        NSURL *path;
-        if ([media.defaultMedia boolValue]) {
-            path = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:@"0"]];
-        }
-        else {
-            path = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@", game.gameId]]];
-        }
+        NSURL *path = [NSURL fileURLWithPath:cacheDirectory];
         [mediaDictionary setObject:[path absoluteString] forKey:@"url_path"];
         [data addObject:mediaDictionary];
     }
     
     NSDictionary *result = [NSDictionary dictionaryWithObject:data forKey:@"data"];
     return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
-    
-    /*
-     "file_name" = "augbubble.png";
-     "is_default" = 1;
-     "media_id" = 5;
-     name = "Default AugBubble";
-     type = Icon;
-     "url_path" = "http://mglumac-1.ats.amherst.edu/~mglumac/aris/gamedata/0/";
-     */
 }
 
 - (JSONResult*)locationsForPlayer:(MPlayer*)player game:(MGame*)game {
@@ -1954,9 +1953,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         }
     }
     NSDictionary *result = [NSDictionary dictionaryWithObject:data forKey:@"data"];
-    
-    // 
-    //[self overlayMap];
     
     
     return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
@@ -2396,5 +2392,58 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     NSDictionary *result = [NSDictionary dictionaryWithObject:data forKey:@"data"];
     return [[JSONResult alloc] initWithJSONString:[result JSONRepresentation] andUserData:nil];
 }
+
+- (JSONResult*)mediaForId:(NSNumber*)mediaId {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Media"];
+    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"mediaId = %@", mediaId];
+    NSArray *fetchedMedia = [_managedObjectContext executeFetchRequest:fetchRequest error:nil];
+    NSDictionary *result;
+    if ([fetchedMedia count] > 0) {
+        MMedia *media = fetchedMedia[0];
+        NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
+        dictionary[@"media_id"] = media.mediaId;
+        if (media.name) {
+            dictionary[@"name"] = media.name;
+        }
+        dictionary[@"file_name"] = media.filePath;
+        dictionary[@"file_path"] = media.filePath;
+        dictionary[@"type"] = media.type;
+        dictionary[@"is_default"] = media.defaultMedia;
+        NSString *cacheDirectory =  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        dictionary[@"url_path"]  = [[NSURL fileURLWithPath:cacheDirectory] path];
+        result = @{@"data":dictionary};
+    }
+    else {
+        result = @{};
+    }
+    NSError *error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:result options:0 error:&error];
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return [[JSONResult alloc] initWithJSONString:jsonString andUserData:nil];
+}
+
+- (NSURL*)offlineURLForMediaId:(NSUInteger)mediaId gameId:(NSUInteger)gameId{
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Media"];
+    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"mediaId = %d", mediaId];
+    NSError *error;
+    NSArray *fetchedMedia = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if ([fetchedMedia count] == 0) {
+        return nil;
+    }
+    MMedia *media = fetchedMedia[0];
+    NSString *cacheDirectory =  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+//    NSURL *path = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%d", gameId]]];
+//    NSURL *filePath = [path URLByAppendingPathComponent:media.filePath];
+    NSURL *filePath = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:media.filePath]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:[filePath path]]) {
+        return filePath;
+    }
+    else {
+        return nil;
+    }
+}
+
+
 
 @end

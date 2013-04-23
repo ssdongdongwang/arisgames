@@ -54,5 +54,7 @@
 @dynamic onLaunchNode;
 @dynamic qrCodes;
 @dynamic overlays;
+@dynamic offline;
+@dynamic hasBeenPlayed;
 
 @end

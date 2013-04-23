@@ -291,12 +291,23 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale) {
                     
                     
                     //NSString *path = [currentOverlay.tilePath objectAtIndex:i]; 
-                    UIImage *image = [UIImage imageWithData:media.image];
-                    //init tile
-                    ImageTile *tile = [[ImageTile alloc] initWithFrame:frame image:image];
-                    
-                    
-                    [tiles addObject:tile];                               
+                    UIImage *image;
+                    if (media.image) {
+                        image = [UIImage imageWithData:media.image];
+                    }
+                    else {
+                        NSURL *url = [NSURL URLWithString:media.url];
+                        if ([url isFileURL]) {
+                            image = [UIImage imageWithContentsOfFile:[url path]];
+                        }
+                    }
+                    if (image) {
+                        //init tile
+                        ImageTile *tile = [[ImageTile alloc] initWithFrame:frame image:image];
+                        
+                        
+                        [tiles addObject:tile];
+                    }
                 }
                 
             }
