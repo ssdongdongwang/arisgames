@@ -275,7 +275,7 @@
 - (void)handleLogin:(NSNotification *)notification
 {
     self.gamePickerTabBarController.selectedIndex = 0;
-    [self.view addSubview:self.gamePickerTabBarController.view]
+    [self.view addSubview:self.gamePickerTabBarController.view];
     [self.loginNavigationController.view removeFromSuperview];
 }
 

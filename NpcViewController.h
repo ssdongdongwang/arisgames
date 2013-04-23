@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DisplayObjectViewController.h"
 #import "SceneParser.h"
 #import "AsyncMediaImageView.h"
+#import <AVFoundation/AVFoundation.h>
 #import "Node.h"
 #import "Npc.h"
 
@@ -53,7 +55,7 @@
 @property (nonatomic, strong) Npc *currentNpc;
 @property (nonatomic, strong) Node *currentNode;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil npc:(Npc *)npc;
+- (id)initWithNpc:(Npc *)npc;
 
 - (IBAction)continueButtonTouchAction;
 

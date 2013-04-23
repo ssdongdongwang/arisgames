@@ -7,6 +7,7 @@
 //
 
 #import "AccountSettingsViewController.h"
+#import "RootViewController.h"
 #import "ForgotViewController.h"
 
 @implementation AccountSettingsViewController

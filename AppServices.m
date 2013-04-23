@@ -88,7 +88,6 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 	//createPlayer($strNewUserName, $strPassword, $strFirstName, $strLastName, $strEmail)
 	NSArray *arguments = [NSArray arrayWithObjects:userName, pass, firstName, lastName, email, nil];
     [AppModel sharedAppModel].userName = userName;
-    [AppModel sharedAppModel].password = pass;
 	JSONConnection *jsonConnection = [[JSONConnection alloc] initWithServer:[AppModel sharedAppModel].serverURL
                                                              andServiceName:@"players"
                                                               andMethodName:@"createPlayer"
@@ -168,7 +167,7 @@ BOOL currentlyUpdatingServerWithInventoryViewed;
 
 -(void)setShowPlayer:(int)playerId onMap:(BOOL)showOnMap
 {
-	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d", playerId,[NSString stringWithFormat:@"%d",showOnMap], nil];
+	NSArray *arguments = [NSArray arrayWithObjects: [NSString stringWithFormat:@"%d", playerId],[NSString stringWithFormat:@"%d",showOnMap], nil];
 	JSONConnection *jsonConnection = [[JSONConnection alloc] initWithServer:[AppModel sharedAppModel].serverURL
                                                              andServiceName:@"players"
                                                               andMethodName:@"setShowPlayerOnMap"

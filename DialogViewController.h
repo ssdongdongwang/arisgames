@@ -6,6 +6,8 @@
 //  Copyright Studio Tectorum 2009. All rights reserved.
 //
 
+/*
+
 #import <UIKit/UIKit.h>
 #import "SceneParser.h"
 #import "AsyncMediaImageView.h"
@@ -60,3 +62,5 @@
 - (void) showWaitingIndicatorForPlayerOptions;
 
 @end
+ 
+ */

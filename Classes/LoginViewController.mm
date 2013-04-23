@@ -149,7 +149,7 @@
 
 - (void) playerSettingsPicked:(NSNotification *)n
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self selector:@selector(playerSettingsPicked:) name:@"PlayerSettingsDismissed" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PlayerSettingsDismissed" object:nil];
     if(quickGameId) [self loadQuickGame];
     else            [self finishLogin];
 }
@@ -162,7 +162,7 @@
 
 - (void) quickGameLoaded:(NSNotification *)n
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self selector:@selector(quickGameLoaded:) name:@"NewOneGameGameListReady" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NewOneGameGameListReady" object:nil];
     if(museumMode) 
         ;
     else 

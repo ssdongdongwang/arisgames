@@ -10,15 +10,15 @@
 
 const float kDefaultZoomTime = 1.0;
 
-NSString *const kTagDialog                      = @"dialog";
-NSString *const kTagPc                          = @"pc";
-NSString *const kTagNpc                         = @"npc";
+NSString *const kTagDialog                       = @"dialog";
+NSString *const kTagPc                           = @"pc";
+NSString *const kTagNpc                          = @"npc";
 
-NSString *const kTagVideo                       = @"video";
-NSString *const kTagPanoramic                   = @"panoramic";
-NSString *const kTagWebpage                     = @"webpage";
-NSString *const kTagPlaque                      = @"plaque";
-NSString *const kTagItem                        = @"item";
+NSString *const kTagVideo                        = @"video";
+NSString *const kTagPanoramic                    = @"panoramic";
+NSString *const kTagWebpage                      = @"webpage";
+NSString *const kTagPlaque                       = @"plaque";
+NSString *const kTagItem                         = @"item";
 NSString *const kAttrId                          = @"id";
 
 NSString *const kAttrTitle                       = @"title";
@@ -234,4 +234,5 @@ didStartElement:(NSString *)elementName
 {
 	NSLog(@"SceneParser: Fatal error: %@", parseError);
 }
+
 @end

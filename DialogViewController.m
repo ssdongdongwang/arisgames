@@ -6,6 +6,7 @@
 //  Copyright Studio Tectorum 2009. All rights reserved.
 //
 
+/*
 #import "ARISAppDelegate.h"
 #import "AppModel.h"
 #import "AppServices.h"
@@ -45,6 +46,8 @@ NSString *const kDialogHtmlTemplate =
 @"<body>%@</body>"
 @"</html>";
 
+ */
+
 /*
  SAMPLE DIALOG FORMAT
  NSString *xmlData =
@@ -58,6 +61,7 @@ NSString *const kDialogHtmlTemplate =
  @"</dialog>";
  */
 
+/*
 @interface DialogViewController()
 {
     SceneParser *parser;
@@ -867,3 +871,4 @@ NSString *const kDialogHtmlTemplate =
 }
 
 @end
+ */

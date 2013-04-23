@@ -8,6 +8,7 @@
 
 #import "SelfRegistrationViewController.h"
 #import "ARISAppDelegate.h"
+#import "RootViewController.h"
 #import "AppModel.h"
 #import "AppServices.h"
 
@@ -58,7 +59,6 @@
 
 	[[RootViewController sharedRootViewController] removeWaitingIndicator];
     [AppModel sharedAppModel].userName = nil;
-    [AppModel sharedAppModel].password = nil;
 	
 	if ([AppModel sharedAppModel].networkAlert) NSLog(@"SelfRegistration: Network is down, skip alert");
 	else{
@@ -84,7 +84,7 @@
 	[alert show];
     */
     
-    [[RootViewController sharedRootViewController] attemptLoginWithUserName:[AppModel sharedAppModel].userName andPassword:[AppModel sharedAppModel].password andGameId:0 inMuseumMode:true];
+    [[AppServices sharedAppServices] registerNewUser:[AppModel sharedAppModel].userName password:self.password.text firstName:@"" lastName:@"" email:self.email.text];
 	[userName resignFirstResponder];
 	[password resignFirstResponder];
 	[email resignFirstResponder];

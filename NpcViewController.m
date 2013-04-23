@@ -1,19 +1,20 @@
 //
-//  NpcViewController.m
+//  aris_conversationViewController.m
 //  aris-conversation
 //
 //  Created by Kevin Harris on 09/11/17.
 //  Copyright Studio Tectorum 2009. All rights reserved.
 //
+
+#import "NpcViewController.h"
+#import "DialogScript.h"
 #import "ARISAppDelegate.h"
 #import "AppModel.h"
 #import "AppServices.h"
 #import "AsyncMediaImageView.h"
-#import "NpcViewController"
 #import "Media.h"
 #import "Node.h"
 #import "Scene.h"
-#import "DialogScript.h"
 #import "ARISMoviePlayerViewController.h"
 #import "Panoramic.h"
 #import "PanoramicViewController.h"
@@ -21,7 +22,7 @@
 #import "webpageViewController.h"
 #import "Item.h"
 #import "NodeViewController.h"
-#import "ItemDetailsViewController.h"
+#import "ItemViewController.h"
 
 const NSInteger kOptionsFontSize = 17;
 
@@ -108,11 +109,11 @@ NSString *const kDialogHtmlTemplate =
 @synthesize currentNpc;
 @synthesize currentNode;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil npc:(Npc *)npc
+- (id)initWithNpc:(Npc *)npc
 {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
+    if ((self = [super initWithNibName:@"NpcViewController" bundle:nil]))
     {
-        [[AppServices sharedAppServices] updateServerNpcViewed:npc.npcId fromLocation:npc.locationId];
+        [[AppServices sharedAppServices] updateServerNpcViewed:npc.npcId fromLocation:0];
         currentNpc = npc;
         
         parser = [[SceneParser alloc] initWithDelegate:self];
@@ -143,6 +144,9 @@ NSString *const kDialogHtmlTemplate =
     pcImageSection.contentSize  = pcImageSection.frame.size;
     npcImageSection.contentSize = npcImageSection.frame.size;
     
+    pcImageView.delegate = self;
+    npcImageView.delegate = self;
+    
 	pcOptionsTableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
 	pcOptionsTableViewController.view = pcOptionsTable;
     
@@ -168,7 +172,7 @@ NSString *const kDialogHtmlTemplate =
 - (void) didFinishParsing:(DialogScript *)s
 {
     currentScript = s;
-    if(currentScript.hideLeaveConversationButtonSpecified)  currentlyHidingLeaveConversationButton = currentScript.hideLeaveConversationButton;
+    if(currentScript.hideLeaveConversationButtonSpecified) currentlyHidingLeaveConversationButton = currentScript.hideLeaveConversationButton;
     if(currentScript.leaveConversationButtonTitle) currentLeaveConversationTitle = currentScript.leaveConversationButtonTitle;
     [self readySceneForDisplay:[currentScript nextScene]];
 }
@@ -240,19 +244,14 @@ NSString *const kDialogHtmlTemplate =
         {
             Media *media = [[AppModel sharedAppModel] mediaForMediaId:currentScene.mediaId];
             //TEMPORARY BANDAID
-            if(currentImageView.isLoading && currentImageView == npcImageView)
+            if(currentImageView.isLoading)
             {
-                [npcImageView removeFromSuperview];
-                npcImageView = [[AsyncMediaImageView alloc] initWithFrame:npcImageView.frame andMedia:media];
-                [npcImageSection addSubview:npcImageView];
-                currentImageView = npcImageView;
-            }
-            if(currentImageView.isLoading && currentImageView == pcImageView)
-            {
-                [pcImageView removeFromSuperview];
-                pcImageView = [[AsyncMediaImageView alloc] initWithFrame:pcImageView.frame andMedia:media];
-                [pcImageSection addSubview:pcImageView];
-                currentImageView = npcImageView;
+                [currentImageView removeFromSuperview];
+                currentImageView = [[AsyncMediaImageView alloc] initWithFrame:currentImageView.frame andMedia:media];
+                if(currentImageView == npcImageView)
+                    [npcImageSection addSubview:currentImageView];
+                else if(currentImageView == pcImageView)
+                    [pcImageSection addSubview:currentImageView];
             }
             //END TEMPORARY BANDAID
             if(!media.type) [currentImageView loadImageFromMedia:media]; // This should never happen (all game media should be cached by now)
@@ -326,7 +325,6 @@ NSString *const kDialogHtmlTemplate =
     {
         //Setup the Button
         Media *media = [[AppModel sharedAppModel] mediaForMediaId:currentScene.typeId];
-        NSLog(@"NpcViewController: VideoURL: %@", media.url);
         //Create movie player object
         ARISMoviePlayerViewController *mMoviePlayer = [[ARISMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:media.url]];
         
@@ -345,9 +343,7 @@ NSString *const kDialogHtmlTemplate =
     }
     else if([currentScene.sceneType isEqualToString:@"webpage"])
     {
-        webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
-        webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:currentScene.typeId];
-        webPageViewController.delegate = self;
+        WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithWebPage:[[AppModel sharedAppModel] webPageForWebPageID:currentScene.typeId]];
         [self.navigationController pushViewController:webPageViewController animated:YES];
     }
     else if([currentScene.sceneType isEqualToString:@"node"])
@@ -358,11 +354,8 @@ NSString *const kDialogHtmlTemplate =
     }
     else if([currentScene.sceneType isEqualToString:@"item"])
     {
-        ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-        itemVC.item = [[AppModel sharedAppModel] itemForItemId:currentScene.typeId];
-        itemVC.item.qty = 1;
+        ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:[[AppModel sharedAppModel] itemForItemId:currentScene.typeId]];
         [self.navigationController pushViewController:itemVC animated:YES];
-        itemVC.delegate = self;
     }
 }
 
@@ -406,12 +399,55 @@ NSString *const kDialogHtmlTemplate =
     [UIView commitAnimations];
 }
 
+- (void) imageFinishedLoading:(AsyncMediaImageView *)image
+{
+    //ASPECT FIT + ALIGN TO TOP:
+    //Let 'aspect fit' do the actual aspect fit- but still required to simulate the fitting to get correct dimensions
+    float sw = image.superview.frame.size.width;  //screen width (320)
+    float sh = image.superview.frame.size.height; //screen height(416)
+    float iw = image.image.size.width;            //image width  (like, the raw image size. example:1024)
+    float ih = image.image.size.height;           //image height (like, the raw image size. example:768)
+    
+    float dw = iw;                                //display width  (calculated size of image AFTER aspect fit)
+    float dh = ih;                                //display height (calculated size of image AFTER aspect fit)
+    if(ih < sh && iw < sw)                        //simulate scale up to aspect fit if necessary
+    {
+        if(ih > iw)
+        {
+            dh = sh;
+            dw = sh/ih*iw;
+        }
+        else
+        {
+            dh = sw/iw*ih;
+            dw = sw;
+        }
+    }
+    
+    
+    if(dw > sw)
+    {
+        dw = sw;
+        dh = ih*sw/iw;
+    }
+    if(dh > sh)
+    {
+        dh = sh;
+        dw = iw*sh/ih;
+    }
+    
+    if(dh < sh)
+        image.frame = CGRectMake(0, (-0.5*(sh-dh)), image.frame.size.width, image.frame.size.height);
+    else
+        image.frame = CGRectMake(0,0,sw,sh);
+}
+
 - (void) scriptEnded
 {
     if(closingScriptPlaying == YES || currentScript.exitToType)
     {
-        [[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
-        [[AppServices sharedAppServices] updateServerNodeViewed:currentNode.nodeId fromLocation:currentNode.locationId];
+        //[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+        [[AppServices sharedAppServices] updateServerNodeViewed:currentNode.nodeId fromLocation:0];
         
         if ([currentScript.exitToType isEqualToString:@"tab"])
         {
@@ -427,32 +463,27 @@ NSString *const kDialogHtmlTemplate =
         {
             NodeViewController *nodeVC = [[NodeViewController alloc]initWithNibName:@"Node" bundle:[NSBundle mainBundle]];
             nodeVC.node = [[AppModel sharedAppModel] nodeForNodeId:currentScript.exitToTypeId];
-            [[RootViewController sharedRootViewController]displayNearbyObjectView:nodeVC];
+            //[[RootViewController sharedRootViewController] displayNearbyObjectView:nodeVC];
         }
         else if([currentScript.exitToType isEqualToString:@"webpage"])
         {
-            webpageViewController *webPageViewController = [[webpageViewController alloc] initWithNibName:@"webpageViewController" bundle: [NSBundle mainBundle]];
-            webPageViewController.webPage = [[AppModel sharedAppModel] webPageForWebPageID:currentScript.exitToTypeId];
-            //    webPageViewController.delegate = self; if it is the delegate, then it uses the wrong method to close, if there is a good reason for this to be here then put it back : Jacob Hanshaw 2/9/13
-            [[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
+            WebPageViewController *webPageViewController = [[WebPageViewController alloc] initWithWebPage:[[AppModel sharedAppModel] webPageForWebPageID:currentScript.exitToTypeId]];
+            //[[RootViewController sharedRootViewController] displayNearbyObjectView:webPageViewController];
         }
         else if([currentScript.exitToType isEqualToString:@"item"])
         {
-            ItemDetailsViewController *itemVC = [[ItemDetailsViewController alloc]initWithNibName:@"ItemDetailsView" bundle:[NSBundle mainBundle]];
-            itemVC.item = [[AppModel sharedAppModel] itemForItemId:currentScript.exitToTypeId];
-            [[RootViewController sharedRootViewController] displayNearbyObjectView:itemVC];
+            ItemViewController *itemVC = [[ItemViewController alloc] initWithItem:[[AppModel sharedAppModel] itemForItemId:currentScript.exitToTypeId]];
+            //[[RootViewController sharedRootViewController] displayNearbyObjectView:itemVC];
         }
         else if([currentScript.exitToType isEqualToString:@"character"])
         {
-            NpcViewController *dialogVC = [[NpcViewController alloc] initWithNibName:@"Dialog" bundle:[NSBundle mainBundle] npc:[[AppModel sharedAppModel] npcForNpcId:currentScript.exitToTypeId]];
-            [[RootViewController sharedRootViewController] displayNearbyObjectView:dialogVC];
+            NpcViewController *npcVC = [[NpcViewController alloc] initWithNpc:[[AppModel sharedAppModel] npcForNpcId:currentScript.exitToTypeId]];
+            //[[RootViewController sharedRootViewController] displayNearbyObjectView:dialogVC];
         }
         else if([currentScript.exitToType isEqualToString:@"panoramic"])
         {
-            Panoramic *pano = [[AppModel sharedAppModel] panoramicForPanoramicId:currentScript.exitToTypeId];
-            PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithNibName:@"PanoramicViewController" bundle: [NSBundle mainBundle]];
-            panoramicViewController.panoramic = pano;
-            [[RootViewController sharedRootViewController] displayNearbyObjectView:panoramicViewController];
+            PanoramicViewController *panoramicViewController = [[PanoramicViewController alloc] initWithPanoramic:[[AppModel sharedAppModel] panoramicForPanoramicId:currentScript.exitToTypeId]];
+            //[[RootViewController sharedRootViewController] displayNearbyObjectView:panoramicViewController];
         }
     }
     else
@@ -486,6 +517,7 @@ NSString *const kDialogHtmlTemplate =
     {
         pcTapToContinueButton.hidden = YES;
         pcTextWebView.hidden  = YES;
+        [pcTextWebView loadHTMLString:@"" baseURL:nil];
         pcOptionsTable.hidden = NO;
         
         if(!pcView.frame.origin.x  == 0)
@@ -506,8 +538,9 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) showWaitingIndicatorForPlayerOptions
 {
-    pcOptionsTable.hidden = NO;
     pcTextWebView.hidden  = YES;
+    [pcTextWebView loadHTMLString:@"" baseURL:nil];
+    pcOptionsTable.hidden = NO;
     [self.view addSubview:pcLoadingIndicator];
     [pcLoadingIndicator startAnimating];
 }
@@ -525,8 +558,7 @@ NSString *const kDialogHtmlTemplate =
 
 - (void) backButtonTouchAction:(id)sender
 {
-	NSLog(@"NpcViewController: Notify server of NPC view and Dismiss view");
-	[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
+	//[[RootViewController sharedRootViewController] dismissNearbyObjectView:self];
 }
 
 - (IBAction) continueButtonTouchAction
@@ -632,19 +664,16 @@ NSString *const kDialogHtmlTemplate =
 {
     if(media.image != nil && [media.type isEqualToString: kMediaTypeAudio]) //worked before added type check, not sure how
     {
-        NSLog(@"NpcViewController: Playing through AVAudioPlayer");
         [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];
         [[AVAudioSession sharedInstance] setActive: YES error: nil];
         NSError* err;
         audioPlayer = [[AVAudioPlayer alloc] initWithData: media.image error:&err];
         [audioPlayer setDelegate: self];
         
-        if(err) NSLog(@"NpcViewController: Playing Audio: Failed with reason: %@", [err localizedDescription]);
-        else [audioPlayer play];
+        if(!err) [audioPlayer play];
     }
     else
     {
-        NSLog(@"NpcViewController: Playing through MPMoviePlayerController");
         ARISMoviePlayer.moviePlayer.view.hidden = hidden;
         if(!ARISMoviePlayer) ARISMoviePlayer = [[ARISMoviePlayerViewController alloc] init];
         ARISMoviePlayer.moviePlayer.movieSourceType = MPMovieSourceTypeStreaming;
@@ -715,6 +744,7 @@ NSString *const kDialogHtmlTemplate =
     
 	if (indexPath.section == 0)
     {
+        /*
 		NodeOption *option = [optionList objectAtIndex:indexPath.row];
         cell.textLabel.text = option.text;
         cell.textLabel.font = [UIFont boldSystemFontOfSize:kOptionsFontSize];
@@ -726,6 +756,7 @@ NSString *const kDialogHtmlTemplate =
         }
         else
             cell.textLabel.textColor = [UIColor colorWithRed:50.0/255.0 green:79.0/255.0 blue:133.0/255.0 alpha:1.0];
+         */
 	}
 	else if (indexPath.row == 0)
     {
@@ -746,6 +777,7 @@ NSString *const kDialogHtmlTemplate =
 {
 	if (indexPath.section == 1) return 35;
     
+    /*
 	NodeOption *option = [optionList objectAtIndex:indexPath.row];
     
 	CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 50;
@@ -756,6 +788,9 @@ NSString *const kDialogHtmlTemplate =
 									   constrainedToSize:maximumLabelSize lineBreakMode:UILineBreakModeWordWrap];
 	
 	return expectedLabelSize.height + 15;
+     */
+
+    return 15;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -767,6 +802,7 @@ NSString *const kDialogHtmlTemplate =
 		return;
 	}
 	
+    /*
 	NodeOption *selectedOption = [optionList objectAtIndex:[indexPath row]];
 	Node *newNode = [[AppModel sharedAppModel] nodeForNodeId:selectedOption.nodeId];
     
@@ -780,6 +816,7 @@ NSString *const kDialogHtmlTemplate =
     pcOptionsTable.hidden = YES;
     pcTextWebView.hidden  = YES;
     [parser parseText:newNode.text];
+     */
 }
 
 #pragma mark Scroll View
