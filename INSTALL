@@ -20,11 +20,7 @@ For this example we will say you called the schema "aris_schema" and game it the
 
 	mysql -u aris_username -p aris_schema < aris_db_install.sql
 
-6. Run the DB update script to make sure everything is up to snuff (this might produce a lot of errors, but you shouldn't need to mind them.
-
-	http://myserver.com/aris_server/json.php/v1.games.upgradeGameDatabases/0
-
-7. Set file permissions so that the web server can write to the gamedata directory
+6. Set file permissions so that the web server can write to the gamedata directory
 
 	chown -R apache:apache aris_server
 	chmod -R 775 aris_server
