@@ -239,6 +239,7 @@
 		AA99E61F16F0D80E00E22030 /* libZXingWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA99E61A16F0D7FF00E22030 /* libZXingWidget.a */; };
 		AAA5890116DE714A00C2445B /* BumpTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAA588FF16DE714A00C2445B /* BumpTestViewController.m */; };
 		AAA5890216DE714A00C2445B /* BumpTestViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAA5890016DE714A00C2445B /* BumpTestViewController.xib */; };
+		AAA5B27617271BB7006A1015 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAA5B27517271BB7006A1015 /* MainWindow-iPad.xib */; };
 		AABD101916B7164C007278EF /* README_ABOUT_LINK_ERRORS in Resources */ = {isa = PBXBuildFile; fileRef = AABD101716B7164C007278EF /* README_ABOUT_LINK_ERRORS */; };
 		AABD101B16B71787007278EF /* libCrittercism_v3_4_9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AABD101A16B71787007278EF /* libCrittercism_v3_4_9.a */; };
 		AB0A5BA5120365420065CE68 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB0A5BA3120365420065CE68 /* Localizable.strings */; };
@@ -858,6 +859,7 @@
 		AAA588FE16DE714A00C2445B /* BumpTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BumpTestViewController.h; sourceTree = "<group>"; };
 		AAA588FF16DE714A00C2445B /* BumpTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BumpTestViewController.m; sourceTree = "<group>"; };
 		AAA5890016DE714A00C2445B /* BumpTestViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BumpTestViewController.xib; sourceTree = "<group>"; };
+		AAA5B27517271BB7006A1015 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		AABD101416B7164C007278EF /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
 		AABD101516B7164C007278EF /* CrittercismDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrittercismDelegate.h; sourceTree = "<group>"; };
 		AABD101716B7164C007278EF /* README_ABOUT_LINK_ERRORS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README_ABOUT_LINK_ERRORS; sourceTree = "<group>"; };
@@ -1380,6 +1382,7 @@
 		29B97314FDCFA39411CA2CEA /* ARIS */ = {
 			isa = PBXGroup;
 			children = (
+				AAA5B27417271BB5006A1015 /* iPad */,
 				AA3D34E6170F368300830B60 /* Central Park New York.gpx */,
 				AA99E61416F0D7FF00E22030 /* ZXingWidget.xcodeproj */,
 				AA1E2D4D1652CC6000219535 /* libicucore.dylib */,
@@ -1882,6 +1885,14 @@
 				AA99E61C16F0D7FF00E22030 /* ZXingTests.octest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AAA5B27417271BB5006A1015 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				AAA5B27517271BB7006A1015 /* MainWindow-iPad.xib */,
+			);
+			name = iPad;
 			sourceTree = "<group>";
 		};
 		AABD101316B7164C007278EF /* CrittercismSDK */ = {
@@ -2540,6 +2551,7 @@
 				AA3D34E7170F368300830B60 /* Central Park New York.gpx in Resources */,
 				AA798887171762B200584220 /* ac_location.gpx in Resources */,
 				AA7988A6171762B200584220 /* StoreLocallyViewController.xib in Resources */,
+				AAA5B27617271BB7006A1015 /* MainWindow-iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2904,7 +2916,7 @@
 					"\"$(SRCROOT)/zxing-Classes\"/**",
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/**",
@@ -2920,7 +2932,7 @@
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3028,7 +3040,7 @@
 					"\"$(SRCROOT)/zxing-Classes\"/**",
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/**",
@@ -3043,7 +3055,7 @@
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
