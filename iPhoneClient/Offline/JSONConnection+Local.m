@@ -34,14 +34,6 @@ static BOOL needsSync = NO;
 
 - (BOOL)localCall {
     // testing
-    // these methods are not implemented yet
-    /*
-    if ([serviceName isEqual: @"notes"]) {
-        if ([methodName isEqual:@"getNotesForGame"]) {
-            return NO;
-        }
-    };
-    */
     //return YES;
 
     LocalData *local = [LocalData sharedLocal];

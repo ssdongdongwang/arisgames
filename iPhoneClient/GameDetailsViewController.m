@@ -252,13 +252,13 @@ NSString *const kGameDetailsHtmlTemplate =
             if (self.game.offlineMode) {
                 // try to get it from the local model
                 MGame *mgame = [[LocalData sharedLocal] gameForId:self.game.gameId];
-                if (mgame) {
-                    [self playGame];
-                    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
-                    [self.tableView reloadData];
-                }
-                else {
+                if (!mgame)  {
                     // download the game
+                    StoreLocallyViewController *controller = [[StoreLocallyViewController alloc] initWithNibName:@"StoreLocallyViewController" bundle:nil];
+                    controller.game = self.game;
+                    [controller setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+                    [self presentViewController:controller animated:YES completion:nil];
+                    return;
                 }
             }
             
@@ -294,7 +294,7 @@ NSString *const kGameDetailsHtmlTemplate =
         StoreLocallyViewController *controller = [[StoreLocallyViewController alloc] initWithNibName:@"StoreLocallyViewController" bundle:nil];
         controller.game = self.game;
         [controller setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-        [self presentModalViewController:controller animated:YES];
+        [self presentViewController:controller animated:YES completion:nil];
     }
 }
 

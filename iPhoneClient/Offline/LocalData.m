@@ -2410,7 +2410,7 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
         dictionary[@"type"] = media.type;
         dictionary[@"is_default"] = media.defaultMedia;
         NSString *cacheDirectory =  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-        dictionary[@"url_path"]  = [[NSURL fileURLWithPath:cacheDirectory] path];
+        dictionary[@"url_path"]  = [[NSURL fileURLWithPath:cacheDirectory isDirectory:YES] absoluteString];
         result = @{@"data":dictionary};
     }
     else {
@@ -2432,8 +2432,6 @@ NSString * const kPSC_TAKE_ITEM = @"TAKE_ITEM";
     }
     MMedia *media = fetchedMedia[0];
     NSString *cacheDirectory =  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-//    NSURL *path = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%d", gameId]]];
-//    NSURL *filePath = [path URLByAppendingPathComponent:media.filePath];
     NSURL *filePath = [NSURL fileURLWithPath:[cacheDirectory stringByAppendingPathComponent:media.filePath]];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if ([fileManager fileExistsAtPath:[filePath path]]) {
