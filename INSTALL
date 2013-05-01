@@ -6,19 +6,19 @@ This guide is broken up into two parts: the setup for the server, and for the ed
 The server:
 
 The main components of the server:
-	• Apache webserver: this utilizes PHP extensively for all server roles.
-	• AMFPHP: this allows for communication between the flash application and the server’s php files.
-	• MySQL: the database where game, editor and player data is stored.
+	- Apache webserver: this utilizes PHP extensively for all server roles.
+	- AMFPHP: this allows for communication between the flash application and the server’s php files.
+	- MySQL: the database where game, editor and player data is stored.
 
 Implementation for the server:
-	• CentOS 5.9
-	• MySQL 5.0.95
-	• Apache 2
-	• PHP 5.1.6
+	- CentOS 5.9
+	- MySQL 5.0.95
+	- Apache 2
+	- PHP 5.1.6
 
 Server setup notes:
-	• All server functions used by ARIS can be tested in the service browser.  Any data changed through this 	  browser will be changed in the database as well, so use at your own risk!
-	• We had serious issues getting the server to function properly using virtual hosting in Apache, and 	  consequently would not recommend it for testing purposes.
+	- All server functions used by ARIS can be tested in the service browser.  Any data changed through this 	  browser will be changed in the database as well, so use at your own risk!
+	- We had serious issues getting the server to function properly using virtual hosting in Apache, and 	  consequently would not recommend it for testing purposes.
 
 Server setup guide:
 1. Install the required packages:
@@ -29,8 +29,8 @@ Server setup guide:
 	[root@aris]# mysql –u root
 	mysql>create database aris;
 	mysql>use mysql;
-	mysql>INSERT INTO user (Host,User,Password) VALUES(‘%’,’aris’,’yourpassword’));
-	mysql>grant usage on *.* to ‘aris’@’localhost’ identified by ‘yourpassword’;
+	mysql>INSERT INTO user (Host,User,Password) VALUES('%','aris','yourpassword'));
+	mysql>grant usage on *.* to 'aris'@'localhost' identified by 'yourpassword';
 	mysql>flush privileges;
 
 
@@ -38,21 +38,21 @@ Server setup guide:
 	[root@aris]# mkdir /var/www/html/server
 	[root@aris]# cd /var/www/html/server
 
-4. Use subversion to obtain the current server package from ARIS’ repository:
+4. Use subversion to obtain the current server package from ARIS's repository:
 	[root@aris]# svn checkout https://arisgames.googlecode.com/svn/trunk/server .
 
 5. Copy ~server/config.class.php.template to ~server/config.class.php and edit it as follows: 
    (mySQLBinPath variable may differ depending on your system)
 	…
-	const dbUser = ‘aris’;
-	const dbPass = ‘yourpassword’;
-	const dbSchema = ‘aris’;
+	const dbUser = 'aris';
+	const dbPass = 'yourpassword';
+	const dbSchema = 'aris';
 	const dbHost = 'localhost';
-	const adminEmail = 'youremail@yourdomain.com; //This email address, if specified, will be notified of 		server errors
-	const WWWPath           = 'http://yourdomain.com;
-	const serverWWWPath     = 'http:// yourdomain.com /';
-	const gamedataWWWPath   = 'http:// yourdomain.com /server/gamedata';
-	const playerdataWWWPath = 'http:// yourdomain.com /server/playerdata';
+	const adminEmail = 'youremail@yourdomain.com'; //This email address, if specified, will be notified of 		server errors
+	const WWWPath           = 'http://yourdomain.com';
+	const serverWWWPath     = 'http://yourdomain.com/';
+	const gamedataWWWPath   = 'http://yourdomain.com/server/gamedata';
+	const playerdataWWWPath = 'http://yourdomain.com/server/playerdata';
 	const gamedataFSPath    = '/var/www/html/server/gamedata'; //Make Sure this directory is writable
 	const playerdataFSPath  = '/var/www/html/server/playerdata'; //Make Sure this directory is writable
 	const serverErrorLog    = '/var/log/httpd/aris_error_log'; //Make sure this file is writable
@@ -83,16 +83,16 @@ Server setup guide:
 The editor:
 
 The main components of the editor:
-	• main.html: this page executes the flex-based editor in a web browser.
-	• MySQL: the database where game, editor and player data is stored.
+	- main.html: this page executes the flex-based editor in a web browser.
+	- MySQL: the database where game, editor and player data is stored.
 
 Implementation for the editor:
-	• Flash-enabled web browser
-	• Flashbuilder 4.7
+	- Flash-enabled web browser
+	- Flashbuilder 4.7
 
 Editor setup notes:
-	• Update(4/30/2013) The editor successfully compiles and runs locally but cannot be run from a webserver 	  due to the Google Map Flash API key.  Unless you already have a Flash API key, you will be unable to get 	  the editor to function except when compiled and run on a local machine.  Google has deprecated the Flash 	  API key, thus no new keys are being issued and old Flash API keys will expire sometime in 2014.
-	• We used Flashbuilder 4.7 to compile the Flex project, however one could use the Flex SDK and 
+	- Update(4/30/2013) The editor successfully compiles and runs locally but cannot be run from a webserver 	  due to the Google Map Flash API key.  Unless you already have a Flash API key, you will be unable to get 	  the editor to function except when compiled and run on a local machine.  Google has deprecated the Flash 	  API key, thus no new keys are being issued and old Flash API keys will expire sometime in 2014.
+	- We used Flashbuilder 4.7 to compile the Flex project, however one could use the Flex SDK and 
 	  compile the project through the command line. 
 
 
@@ -100,7 +100,7 @@ Editor setup notes:
 
 
 Editor setup guide:
-1. Use subversion to obtain the current flexEditor directory from ARIS’ repository:
+1. Use subversion to obtain the current flexEditor directory from ARIS's repository:
 	[root@aris]# svn co https://arisgames.googlecode.com/svn/trunk/flexEditor
 
 2. In Flashbuilder, create a new Flex project
