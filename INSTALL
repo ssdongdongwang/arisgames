@@ -77,22 +77,27 @@ mysql>INSERT INTO user (Host,User,Password) VALUES('%','aris','yourpassword'));
 
 6. Import aris_db_install.sql into the database:
    [root@aris]# mysql .u aris .p aris < aris_db_install.sql
+   
+   
+7. Enable 'pass by referencing' for PHP:
+   In /etc/php.ini, find the line 'allow_call_time_pass_reference = Off'
+   Change this to 'On'
 
 
-7. Set file permissions for the server directories:
+8. Set file permissions for the server directories:
    [root@aris]# cd /var/www/html/
    [root@aris]# chown .R apache.apache server
    [root@aris]# chmod .R 775 server
    [root@aris]# chmod .R u+s server/gamedata
 
 
-8. Ensure both httpd and mysqld are started:
+9. Ensure both httpd and mysqld are started:
    [root@aris]# service httpd restart
    [root@aris]# chkconfig httpd on
    [root@aris]# service mysqld restart
    [root@aris]# chkconfig mysqld on
 
-9. The service browser can be used to test the server, and is accessible at:
+10. The service browser can be used to test the server, and is accessible at:
    http://yourdomain.com/server/browser/
 
 
